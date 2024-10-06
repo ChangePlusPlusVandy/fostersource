@@ -1,0 +1,7 @@
+# Node.js
+node_modules/
+.env
+
+# React
+frontend/node_modules/
+frontend/build/
