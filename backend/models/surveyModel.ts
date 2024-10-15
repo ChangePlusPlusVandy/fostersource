@@ -1,33 +1,28 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-// Define an interface for the document (you can replace "ModelName" with the actual model name)
-export interface IModelName extends Document {
-  // Define your model fields here, for example:
-  // fieldName: string;
-  // createdAt?: Date;  // Optional field
+// Define an interface for the document
+export interface ISurvey extends Document {
+  // Define fields here:
+  id: string;
+  question: Question[];
 }
 
 // Define the schema with placeholders for fields (others will fill this in)
-const modelNameSchema: Schema = new Schema(
+const surveySchema: Schema = new Schema(
   {
-    // Define fields here, for example:
-    // fieldName: { type: String, required: true },
+    // Define fields here:
+    id: { type: String, required: true },
+    question: { type: Question[], required: true },
   },
   {
     timestamps: true, // Enable automatic createdAt and updatedAt fields
   }
 );
 
-// Define pre/post hooks or custom methods if necessary (optional)
-// modelNameSchema.pre('save', function (next) {
-//   // Custom logic before saving the document
-//   next();
-// });
-
-// Export the model (replace "ModelName" with the actual model name)
-const ModelName: Model<IModelName> = mongoose.model<IModelName>(
-  "ModelName",
-  modelNameSchema
+// Export the model 
+const Survey: Model<ISurvey> = mongoose.model<ISurvey>(
+  "Survey",
+  surveySchema
 );
 
-export default ModelName;
+export default Survey;
