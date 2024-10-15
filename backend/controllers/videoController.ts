@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-
+// TODO: FINISH 
 // @desc    Get all videos or filter videos by query parameters
 // @route   GET /api/videos
 // @access  Public
@@ -7,6 +7,7 @@ export const getVideos = async (
   req: Request,
   res: Response
 ): Promise<void> => {};
+
 
 // @desc    Create a new video
 // @route   POST /api/videos
