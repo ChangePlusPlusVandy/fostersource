@@ -23,5 +23,6 @@
     "jest": "^29.7.0",
     "mongodb-memory-server": "^10.1.2",
     "supertest": "^7.0.0"
+
   }
 }
