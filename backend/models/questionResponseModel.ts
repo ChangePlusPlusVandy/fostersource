@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 // Define an interface for the document (you can replace "ModelName" with the actual model name)
 export interface IQuestionResponse extends Document {
+
   id: string;
   Questionid: string;
   answer: string;
@@ -27,6 +28,7 @@ const QuestionResponseSchema: Schema = new Schema(
 // });
 
 // Export the model (replace "ModelName" with the actual model name)
+
 const QuestionResponse: Model<IQuestionResponse> = mongoose.model<IQuestionResponse>(
   "QuestionResponse",
   QuestionResponseSchema
