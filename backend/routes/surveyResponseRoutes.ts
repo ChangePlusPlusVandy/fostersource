@@ -2,7 +2,7 @@ import express from "express";
 import {
   getSurveyResponses,
   createSurveyResponse,
-  updateSurveyResponse,
+  // updateSurveyResponse,
   deleteSurveyResponse,
 } from "../controllers/surveyResponseController";
 
@@ -15,7 +15,7 @@ router.get("/", getSurveyResponses);
 router.post("/", createSurveyResponse);
 
 // PUT update survey response by ID
-router.put("/:id", updateSurveyResponse);
+// router.put("/:id", updateSurveyResponse);
 
 // DELETE survey response by ID
 router.delete("/:id", deleteSurveyResponse);
