@@ -6,7 +6,13 @@ import { Request, Response } from "express";
 export const getSurveys = async (
   req: Request,
   res: Response
-): Promise<void> => {};
+): Promise<void> => {
+  try {
+    
+  } catch (error) {
+    
+  }
+};
 
 // @desc    Create a new survey
 // @route   POST /api/surveys
@@ -14,7 +20,13 @@ export const getSurveys = async (
 export const createSurvey = async (
   req: Request,
   res: Response
-): Promise<void> => {};
+): Promise<void> => {
+  try {
+    
+  } catch (error) {
+    
+  }
+};
 
 // @desc    Update a survey
 // @route   PUT /api/surveys/:id
@@ -22,7 +34,13 @@ export const createSurvey = async (
 export const updateSurvey = async (
   req: Request,
   res: Response
-): Promise<void> => {};
+): Promise<void> => {
+  try {
+    
+  } catch (error) {
+    
+  }
+};
 
 // @desc    Delete a survey
 // @route   DELETE /api/surveys/:id
@@ -30,4 +48,10 @@ export const updateSurvey = async (
 export const deleteSurvey = async (
   req: Request,
   res: Response
-): Promise<void> => {};
+): Promise<void> => {
+  try {
+    
+  } catch (error) {
+    
+  }
+};
