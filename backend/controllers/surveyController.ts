@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import Survey from "../models/surveyModel";
 
 // @desc    Get all surveys or filter by query parameters
 // @route   GET /api/surveys
@@ -8,9 +9,25 @@ export const getSurveys = async (
   res: Response
 ): Promise<void> => {
   try {
-    
+    const { name, instructor, category } = req.query; // Example filters
+
+    // Create a query object based on the provided query parameters
+    const query: { [key: string]: string | undefined } = {};
+
+    if (name) query.name = String(name);
+    if (instructor) query.instructor = String(instructor);
+    if (category) query.category = String(category);
+
+    // Fetch surveys based on query (if no filters, return all surveys)
+    const surveys = await Survey.find(query);
+
+    res.status(200).json(surveys);
   } catch (error) {
-    
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
   }
 };
 
@@ -22,9 +39,23 @@ export const createSurvey = async (
   res: Response
 ): Promise<void> => {
   try {
-    
+    const { name, instructor, category } = req.query; // Example filters
+
+    // Create a query object based on the provided query parameters
+    const query: { [key: string]: string | undefined } = {};
+
+    if (name) query.name = String(name);
+    if (instructor) query.instructor = String(instructor);
+    if (category) query.category = String(category);
+
+    const survey = new Survey({ query });
+    await survey.save();
   } catch (error) {
-    
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
   }
 };
 
@@ -36,9 +67,29 @@ export const updateSurvey = async (
   res: Response
 ): Promise<void> => {
   try {
-    
+    const _id = req.query.id;
+    const { name, instructor, category } = req.query; // Example filters
+
+    // Create a query object based on the provided query parameters
+    const query: { [key: string]: string | undefined } = {};
+
+    if (name) query.name = String(name);
+    if (instructor) query.instructor = String(instructor);
+    if (category) query.category = String(category);
+
+    const toUpdate = await Survey.findOne(_id);
+
+    toUpdate.name = name;
+    toUpdate.instructor = instructor;
+    toUpdate.category = category;
+
+    await toUpdate.save();
   } catch (error) {
-    
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
   }
 };
 
@@ -50,8 +101,14 @@ export const deleteSurvey = async (
   res: Response
 ): Promise<void> => {
   try {
-    
+    const _id = req.query.id;
+
+    await Survey.deleteOne(_id);
   } catch (error) {
-    
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
   }
 };
