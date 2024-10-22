@@ -23,14 +23,14 @@ const CourseSchema: Schema = new Schema(
     ],
     ratings: [
       {
-        type: mongoose.Schema.Types.ObjectId, 
+        type: Schema.Types.ObjectId, 
         ref: "Rating"
       }
     ],
     className: { type: String, required: true },
     discussion: { type: String, required: true },
     components: [
-      {type: Object, required: true }
+      {type: Schema.Types.Mixed, required: true }
     ]
   },
   {
