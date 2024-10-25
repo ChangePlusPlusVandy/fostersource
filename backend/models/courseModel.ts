@@ -24,11 +24,12 @@ const CourseSchema: Schema = new Schema(
     ratings: [
       {
         type: Schema.Types.ObjectId, 
-        ref: "Rating"
+        ref: "Rating", 
+        required: false
       }
     ],
     className: { type: String, required: true },
-    discussion: { type: String, required: true },
+    discussion: { type: String, required: false },
     components: [
       {type: Schema.Types.Mixed, required: true }
     ]
