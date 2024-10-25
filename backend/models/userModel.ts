@@ -1,33 +1,81 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { IProgress } from "./progressModel";
+import { IPayment } from "./paymentModel";
 
-// Define an interface for the document (you can replace "ModelName" with the actual model name)
-export interface IModelName extends Document {
-  // Define your model fields here, for example:
-  // fieldName: string;
-  // createdAt?: Date;  // Optional field
+export interface IUser extends Document {
+  firebaseId: string;
+  email: string;
+  isColorado: boolean;
+  role:
+    | "foster parent"
+    | "certified kin"
+    | "non-certified kin"
+    | "staff"
+    | "casa"
+    | "teacher"
+    | "county/cpa worker"
+    | "speaker"
+    | "former parent"
+    | "caregiver";
+  name: string;
+  address1: string;
+  address2?: string;
+  city: string;
+  state: string;
+  zip: string;
+  certification: string;
+  phone: string;
+  progress: IProgress;
+  payments: IPayment;
 }
 
-// Define the schema with placeholders for fields (others will fill this in)
-const modelNameSchema: Schema = new Schema(
+const userSchema: Schema = new Schema(
   {
-    // Define fields here, for example:
-    // fieldName: { type: String, required: true },
+    firebaseId: { type: String, required: true },
+    email: { type: String, required: true },
+    isColorado: { type: Boolean, required: true },
+    role: {
+      type: String,
+      enum: [
+        "foster parent",
+        "certified kin",
+        "non-certified kin",
+        "staff",
+        "casa",
+        "teacher",
+        "county/cpa worker",
+        "speaker",
+        "former parent",
+        "caregiver",
+      ],
+      required: true,
+    },
+    name: { type: Boolean, required: true },
+    address1: { type: Boolean, required: true },
+    address2: { type: Boolean, required: true },
+    city: { type: Boolean, required: true },
+    state: { type: Boolean, required: true },
+    zip: { type: Boolean, required: true },
+    certification: { type: Boolean, required: true },
+    phone: { type: Boolean, required: true },
+    progress: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Progress",
+      },
+    ],
+    payments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Payment",
+      },
+    ],
   },
   {
-    timestamps: true, // Enable automatic createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 
-// Define pre/post hooks or custom methods if necessary (optional)
-// modelNameSchema.pre('save', function (next) {
-//   // Custom logic before saving the document
-//   next();
-// });
+const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 
-// Export the model (replace "ModelName" with the actual model name)
-const ModelName: Model<IModelName> = mongoose.model<IModelName>(
-  "ModelName",
-  modelNameSchema
-);
-
-export default ModelName;
+export default User;
