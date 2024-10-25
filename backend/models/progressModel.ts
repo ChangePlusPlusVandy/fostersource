@@ -2,16 +2,16 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 // Define an interface for the document (you can replace "ModelName" with the actual model name)
 export interface IProgress extends Document {
-  user:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+  user: {
+    type: mongoose.Schema.Types.ObjectId;
+    ref: "User";
   };
-  class:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Class"
+  class: {
+    type: mongoose.Schema.Types.ObjectId;
+    ref: "Course";
   };
   isComplete: Boolean;
-  completedComponents:any;
+  completedComponents: any;
   dateCompleted: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -19,28 +19,29 @@ export interface IProgress extends Document {
 
 // Define the schema with placeholders for fields (others will fill this in)
 const progressSchema: Schema = new Schema(
-  {user: {
+  {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true
+      required: true,
     },
     class: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Class",
-      required: true
+      ref: "Course",
+      required: true,
     },
     isComplete: {
       type: Boolean,
-      default: false
+      default: false,
     },
     completedComponents: {
       type: mongoose.Schema.Types.Mixed,
-      default: {}
+      default: {},
     },
     dateCompleted: {
       type: Date,
-      default: null
-    }
+      default: null,
+    },
   },
   {
     timestamps: true, // Enable automatic createdAt and updatedAt fields
@@ -49,7 +50,8 @@ const progressSchema: Schema = new Schema(
 
 // Export the model (replace "ModelName" with the actual model name)
 const Progress: Model<IProgress> = mongoose.model<IProgress>(
-  "Progress", progressSchema
+  "Progress",
+  progressSchema
 );
 
 export default Progress;
