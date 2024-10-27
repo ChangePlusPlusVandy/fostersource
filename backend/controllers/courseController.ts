@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Course from "../models/courseModel";
 import Rating from "../models/courseModel";
+import Video from "../models/videoModel";
+import Survey from "../models/surveyModel"
 
 // @desc    Get all courses or filter courses by query parameters
 // @route   GET /api/courses
@@ -138,7 +140,14 @@ export const deleteCourse = async (
 
     await Rating.deleteMany({ _id: { $in: courseResponse.ratings }})
 
-    // TODO: delete components, which can be mixed type (Survey or Video)
+    for (const component of courseResponse.components) {
+      if (component instanceof Survey) 
+        await Survey.deleteOne({ _id: component.id }); 
+
+      else if (component instanceof Video) 
+        await Video.deleteOne({ _id: component.id }); 
+      
+    }
 
     await Course.deleteOne({ _id: id }); 
 
