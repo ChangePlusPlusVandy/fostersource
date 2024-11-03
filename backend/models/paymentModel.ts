@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import User from "./userModel";
 
 export interface IPayment extends Document {
-  userId: string;
+  userId: mongoose.Types.ObjectId;
   date: Date;
   amount: number;
   memo: string;
@@ -9,7 +10,11 @@ export interface IPayment extends Document {
 
 const paymentSchema: Schema = new Schema(
   {
-    userId: { type: String, required: true },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     date: { type: Date, required: true },
     amount: { type: Number, required: true },
     memo: { type: String, required: true },
@@ -18,6 +23,19 @@ const paymentSchema: Schema = new Schema(
     timestamps: true,
   }
 );
+
+// Middleware to automatically add payment to user's payments array after saving
+paymentSchema.post("save", async function (doc) {
+  if (doc.userId) {
+    try {
+      await User.findByIdAndUpdate(doc.userId, {
+        $push: { payments: doc._id },
+      });
+    } catch (error) {
+      console.error("Failed to update user's payments array:", error);
+    }
+  }
+});
 
 const Payment: Model<IPayment> = mongoose.model<IPayment>(
   "Payment",

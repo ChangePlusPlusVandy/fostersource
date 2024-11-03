@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import User from "./userModel";
 
 // Define an interface for the document (you can replace "ModelName" with the actual model name)
 export interface IProgress extends Document {
@@ -6,7 +7,7 @@ export interface IProgress extends Document {
     type: mongoose.Schema.Types.ObjectId;
     ref: "User";
   };
-  class: {
+  course: {
     type: mongoose.Schema.Types.ObjectId;
     ref: "Course";
   };
@@ -25,7 +26,7 @@ const progressSchema: Schema = new Schema(
       ref: "User",
       required: true,
     },
-    class: {
+    course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
       required: true,
@@ -47,6 +48,19 @@ const progressSchema: Schema = new Schema(
     timestamps: true, // Enable automatic createdAt and updatedAt fields
   }
 );
+
+// Middleware to automatically add payment to user's progress array after saving
+progressSchema.post("save", async function (doc) {
+  if (doc.user) {
+    try {
+      await User.findByIdAndUpdate(doc.user, {
+        $push: { progress: doc._id },
+      });
+    } catch (error) {
+      console.error("Failed to update user's progress array:", error);
+    }
+  }
+});
 
 // Export the model (replace "ModelName" with the actual model name)
 const Progress: Model<IProgress> = mongoose.model<IProgress>(
