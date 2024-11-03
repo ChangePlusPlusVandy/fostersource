@@ -45,6 +45,7 @@ export const getOrCreateUser = async (
 
     if (user) {
       res.status(200).json({ user, message: "User already exists" });
+      return;
     }
 
     const newUser = new User({
@@ -84,10 +85,14 @@ export const updateUser = async (
     const { id } = req.params;
     const updates = req.body;
 
+    console.log(id);
+
     const updatedUser = await User.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
     });
+
+    console.log(updatedUser);
 
     if (!updatedUser) {
       res.status(404).json({ message: "User not found" });
@@ -96,6 +101,7 @@ export const updateUser = async (
 
     res.status(200).json(updatedUser);
   } catch (error) {
+    console.error(error);
     res.status(400).json({ message: "Failed to update user", error });
   }
 };
@@ -119,6 +125,8 @@ export const deleteUser = async (
       });
       return;
     }
+
+    console.log(user);
 
     await Progress.deleteMany({ _id: { $in: user.progress } });
     await Payment.deleteMany({ _id: { $in: user.payments } });
