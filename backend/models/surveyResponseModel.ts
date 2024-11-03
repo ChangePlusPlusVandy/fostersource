@@ -24,23 +24,6 @@ const surveyResponseSchema: Schema = new Schema(
   }
 );
 
-surveyResponseSchema.pre("findOneAndDelete", async function (next) {
-  const surveyResponse = await this.model.findOne(this.getQuery());
-
-  if (surveyResponse) {
-    try {
-      await QuestionResponse.deleteMany({
-        _id: { $in: surveyResponse.answers.map((answer: any) => answer._id) },
-      });
-      next();
-    } catch (err) {
-      next(err as CallbackError);
-    }
-  } else {
-    next();
-  }
-});
-
 const SurveyResponse: Model<ISurveyResponse> = mongoose.model<ISurveyResponse>(
   "SurveyResponse",
   surveyResponseSchema
