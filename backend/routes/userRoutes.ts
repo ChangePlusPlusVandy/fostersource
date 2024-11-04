@@ -1,25 +1,21 @@
 import express from "express";
 import {
   getUsers,
-  createUser,
+  getOrCreateUser,
   updateUser,
-  getUserByFilter,
   deleteUser,
 } from "../controllers/userController";
 
 const router = express.Router();
 
-// GET all users
+// GET all users or by filter
 router.get("/", getUsers);
 
-// POST new user
-router.post("/", createUser);
+// POST new user if does not exist, otherwise return existing user for login
+router.post("/", getOrCreateUser);
 
 // PUT update user by ID
 router.put("/:id", updateUser);
-
-// GET user by filter (name or email)
-router.get("/filter", getUserByFilter);
 
 // DELETE user by ID
 router.delete("/:id", deleteUser);

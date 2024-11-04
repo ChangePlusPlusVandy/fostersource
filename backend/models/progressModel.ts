@@ -1,33 +1,71 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import User from "./userModel";
 
 // Define an interface for the document (you can replace "ModelName" with the actual model name)
-export interface IModelName extends Document {
-  // Define your model fields here, for example:
-  // fieldName: string;
-  // createdAt?: Date;  // Optional field
+export interface IProgress extends Document {
+  user: {
+    type: mongoose.Schema.Types.ObjectId;
+    ref: "User";
+  };
+  course: {
+    type: mongoose.Schema.Types.ObjectId;
+    ref: "Course";
+  };
+  isComplete: Boolean;
+  completedComponents: any;
+  dateCompleted: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Define the schema with placeholders for fields (others will fill this in)
-const modelNameSchema: Schema = new Schema(
+const progressSchema: Schema = new Schema(
   {
-    // Define fields here, for example:
-    // fieldName: { type: String, required: true },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+      required: true,
+    },
+    isComplete: {
+      type: Boolean,
+      default: false,
+    },
+    completedComponents: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
+    dateCompleted: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true, // Enable automatic createdAt and updatedAt fields
   }
 );
 
-// Define pre/post hooks or custom methods if necessary (optional)
-// modelNameSchema.pre('save', function (next) {
-//   // Custom logic before saving the document
-//   next();
-// });
+// Middleware to automatically add payment to user's progress array after saving
+progressSchema.post("save", async function (doc) {
+  if (doc.user) {
+    try {
+      await User.findByIdAndUpdate(doc.user, {
+        $push: { progress: doc._id },
+      });
+    } catch (error) {
+      console.error("Failed to update user's progress array:", error);
+    }
+  }
+});
 
 // Export the model (replace "ModelName" with the actual model name)
-const ModelName: Model<IModelName> = mongoose.model<IModelName>(
-  "ModelName",
-  modelNameSchema
+const Progress: Model<IProgress> = mongoose.model<IProgress>(
+  "Progress",
+  progressSchema
 );
 
-export default ModelName;
+export default Progress;
