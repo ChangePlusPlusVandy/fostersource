@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Survey from "../models/surveyModel";
+import Survey, { ISurvey } from "../models/surveyModel";
 
 // @desc    Get all surveys or filter by query parameters
 // @route   GET /api/surveys
@@ -67,21 +67,20 @@ export const updateSurvey = async (
   res: Response
 ): Promise<void> => {
   try {
-    const _id = req.query.id;
-    const { name, instructor, category } = req.query; // Example filters
+    const { id } = req.params;
+    const { name, instructor, category } = req.body; // Example filters
 
     // Create a query object based on the provided query parameters
     const query: { [key: string]: string | undefined } = {};
 
-    if (name) query.name = String(name);
-    if (instructor) query.instructor = String(instructor);
-    if (category) query.category = String(category);
+    const toUpdate = (await Survey.findById(id)) as ISurvey | null;
 
-    const toUpdate = await Survey.findOne(_id);
+    if (!toUpdate) {
+      res.status(404).json({ message: "Survey not found" });
+      return;
+    }
 
-    toUpdate.name = name;
-    toUpdate.instructor = instructor;
-    toUpdate.category = category;
+    // figure out what to update later
 
     await toUpdate.save();
   } catch (error) {
@@ -101,9 +100,9 @@ export const deleteSurvey = async (
   res: Response
 ): Promise<void> => {
   try {
-    const _id = req.query.id;
+    const { id } = req.params;
 
-    await Survey.deleteOne(_id);
+    await Survey.deleteOne({ _id: id });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
