@@ -1,7 +1,10 @@
 # Node.js
 node_modules/
 .env
+serviceAccountKey.json
 
 # React
 frontend/node_modules/
 frontend/build/
+.idea/*
+.DS_Store
