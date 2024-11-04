@@ -4,6 +4,7 @@ import User from "../models/userModel";
 import mongoose from "mongoose";
 import Payment from "../models/paymentModel";
 import Progress from "../models/progressModel";
+import QuestionResponse from "..//models/questionResponseModel";
 
 const userData1 = {
   firebaseId: "12345",
@@ -32,6 +33,100 @@ const userData2 = {
   certification: "Certified",
   phone: "1234567890",
 };
+
+const questionResponseData1 = {
+  id: "LebronJames",
+  Questionid: "OffspringOfNumber23",
+  answer: "Bronny James",
+};
+
+const questionResponseData2 = {
+  id: "User123",
+  Questionid: "question101",
+  answer: "Test Answer 1",
+};
+
+  describe("GET /api/questionResponses", () => {
+    beforeEach(async () => {
+      await QuestionResponse.create([questionResponseData1, questionResponseData2]);
+    });
+
+    it("should get all question responses", async () => {
+      const res = await request(app).get("/api/questionResponses");
+      expect(res.statusCode).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBe(2);
+    });
+
+    it("should filter and get question responses back", async () => {
+      const res = await request(app).get("/api/questionResponses").query({ answer: "Test Answer 1" });
+      expect(res.statusCode).toBe(200);
+      res.body.forEach((response: any) => {
+        expect(response.answer).toBe("Test Answer 1");
+      });
+      expect(res.body.length).toBe(1);
+    });
+  });
+
+  describe("POST /api/questionResponses", () => {
+    it("should create a new question response", async () => {
+      const res = await request(app).post("/api/questionResponses").send(questionResponseData1);
+      expect(res.statusCode).toBe(201);
+      expect(res.body.answer).toBe(questionResponseData1.answer);
+      expect(res.body.id).toBe(questionResponseData1.id);
+    });
+  });
+
+  describe("PUT /api/questionResponses/:id", () => {
+    let questionResponseId: string;
+
+    beforeEach(async () => {
+      const questionResponse = await QuestionResponse.create(questionResponseData1);
+      questionResponseId = questionResponse.id.toString();
+    });
+
+    it("should update a question response", async () => {
+      const updates = { answer: "Updated Answer" };
+
+      const res = await request(app).put(`/api/questionResponses/${questionResponseId}`).send(updates);
+      expect(res.statusCode).toBe(200);
+      expect(res.body.answer).toBe("Updated Answer");
+    });
+
+    it("should return 404 if question response is not found", async () => {
+      const nonExistentResponseId = new mongoose.Types.ObjectId().toString();
+      const res = await request(app)
+        .put(`/api/questionResponses/${nonExistentResponseId}`)
+        .send({ answer: "Another Answer" });
+      expect(res.statusCode).toBe(404);
+      expect(res.body.message).toBe("Response not found");
+    });
+  });
+
+  describe("DELETE /api/questionResponses/:id", () => {
+    let questionResponseId: string;
+
+    beforeEach(async () => {
+      const questionResponse = await QuestionResponse.create(questionResponseData1);
+      questionResponseId = questionResponse.id.toString();
+    });
+
+    it("should delete the question response", async () => {
+      const res = await request(app).delete(`/api/questionResponses/${questionResponseId}`);
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe("Deleted");
+
+      const deletedResponse = await QuestionResponse.findById(questionResponseId);
+      expect(deletedResponse).toBeNull();
+    });
+
+    it("should return 404 if question response is not found", async () => {
+      const nonExistentResponseId = new mongoose.Types.ObjectId().toString();
+      const res = await request(app).delete(`/api/questionResponses/${nonExistentResponseId}`);
+      expect(res.statusCode).toBe(404);
+      expect(res.body.message).toBe("Response not found");
+    });
+  });
 
 describe("GET /api/users", () => {
   beforeEach(async () => {
