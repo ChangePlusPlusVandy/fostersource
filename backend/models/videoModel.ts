@@ -5,6 +5,11 @@ export interface IModelName extends Document {
   // Define your model fields here, for example:
   // fieldName: string;
   // createdAt?: Date;  // Optional field
+  title: string;
+  description: string;
+  publiched: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 // Define the schema with placeholders for fields (others will fill this in)
@@ -12,9 +17,12 @@ const modelNameSchema: Schema = new Schema(
   {
     // Define fields here, for example:
     // fieldName: { type: String, required: true },
+    title:{type: String, required: true},
+    description:{type: String},
+    published:{type: Boolean, required:true},
   },
   {
-    timestamps: true, // Enable automatic createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 
