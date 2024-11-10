@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Course from "../models/courseModel";
 import Rating from "../models/courseModel";
 import Video from "../models/videoModel";
-import Survey from "../models/surveyModel"
+import Survey from "../models/surveyModel";
 
 // @desc    Get all courses or filter courses by query parameters
 // @route   GET /api/courses
