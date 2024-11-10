@@ -52,7 +52,7 @@ export const updateProgress = async (
 
          res.status(200).json(updatedProgress); // Return the updated progress entry
     } catch (error) {
-         res.status(500).json({ message: "Error updating progress entry", error });
+         res.status(500);
     }
 };
 
@@ -75,6 +75,6 @@ export const deleteProgress = async (
 
          res.status(204).send(); // Send a 204 No Content response
     } catch (error) {
-         res.status(500).json({ message: "Error deleting progress entry", error });
+         res.status(500);
     }
 };
