@@ -31,14 +31,14 @@ describe("GET /api/surveys", () => {
     const res = await request(app).get("/api/surveys").query({ id: "12345" });
     expect(res.statusCode).toBe(200);
     res.body.forEach((survey: any) => {
-      expect(survey.role).toBe("staff");
+      expect(survey.id).toBe("12345");
     });
     expect(res.body.length).toBe(1);
   });
 });
 
 describe("POST /api/surveys - getOrCreateSurvey", () => {
-  it("should create a new survey if not exists", async () => {
+  it("should create a new survey if it does not exist", async () => {
     const res = await request(app).post("/api/surveys").send(surveyData1);
     expect(res.statusCode).toBe(201);
     expect(res.body.survey.id).toBe("12345");
@@ -101,40 +101,15 @@ describe("DELETE /api/surveys/:id", () => {
   beforeEach(async () => {
     const survey = await Survey.create(surveyData1);
     surveyId = (survey._id as mongoose.Types.ObjectId).toString();
-
-    const payment = await Payment.create({
-      surveyId: surveyId,
-      date: new Date(),
-      amount: 1000000,
-      memo: "Payment for survey",
-    });
-    paymentId = (payment._id as mongoose.Types.ObjectId).toString();
-
-    const progress = await Progress.create({
-      survey: surveyId,
-      course: new mongoose.Types.ObjectId(),
-      isComplete: false,
-      completedComponents: {},
-      dateCompleted: new Date(),
-    });
-    progressId = (progress._id as mongoose.Types.ObjectId).toString();
   });
 
-  it("should delete the survey and associated payments and progress", async () => {
+  it("should delete the requested survey", async () => {
     const res = await request(app).delete(`/api/surveys/${surveyId}`);
     expect(res.statusCode).toBe(200);
-    expect(res.body.message).toBe(
-      "Survey and associated progress and payment records deleted successfully."
-    );
+    expect(res.body.message).toBe("Survey deleted successfully.");
 
     const survey = await Survey.findById(surveyId);
     expect(survey).toBeNull();
-
-    const payment = await Payment.findById(paymentId);
-    expect(payment).toBeNull();
-
-    const progress = await Progress.findById(progressId);
-    expect(progress).toBeNull();
   });
 
   it("should return 404 if survey is not found", async () => {

@@ -9,14 +9,13 @@ export const getSurveys = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { name, instructor, category } = req.query; // Example filters
+    const { id, question } = req.query; // Example filters
 
     // Create a query object based on the provided query parameters
     const query: { [key: string]: string | undefined } = {};
 
-    if (name) query.name = String(name);
-    if (instructor) query.instructor = String(instructor);
-    if (category) query.category = String(category);
+    if (id) query.id = String(id);
+    if (question) query.question = String(question);
 
     // Fetch surveys based on query (if no filters, return all surveys)
     const surveys = await Survey.find(query);
@@ -39,17 +38,30 @@ export const createSurvey = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { name, instructor, category } = req.query; // Example filters
+    const { id, question } = req.body; // Changed from req.query to req.body
 
-    // Create a query object based on the provided query parameters
-    const query: { [key: string]: string | undefined } = {};
+    // Check if survey exists
+    const existingSurvey = await Survey.findOne({ id });
 
-    if (name) query.name = String(name);
-    if (instructor) query.instructor = String(instructor);
-    if (category) query.category = String(category);
+    if (existingSurvey) {
+      res.status(200).json({
+        survey: existingSurvey,
+        message: "Survey already exists",
+      });
+      return;
+    }
 
-    const survey = new Survey({ query });
+    // Create new survey
+    const survey = new Survey({
+      id,
+      question,
+    });
     await survey.save();
+
+    res.status(201).json({
+      survey,
+      message: "Survey created successfully",
+    });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -67,22 +79,21 @@ export const updateSurvey = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { id } = req.params;
-    const { name, instructor, category } = req.body; // Example filters
+    const { id: surveyId } = req.params;
+    const updates = req.body;
 
-    // Create a query object based on the provided query parameters
-    const query: { [key: string]: string | undefined } = {};
+    const updatedSurvey = await Survey.findByIdAndUpdate(
+      surveyId,
+      updates,
+      { new: true } // Returns the updated document
+    );
 
-    const toUpdate = (await Survey.findById(id)) as ISurvey | null;
-
-    if (!toUpdate) {
+    if (!updatedSurvey) {
       res.status(404).json({ message: "Survey not found" });
       return;
     }
 
-    // figure out what to update later
-
-    await toUpdate.save();
+    res.status(200).json(updatedSurvey);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -102,7 +113,23 @@ export const deleteSurvey = async (
   try {
     const { id } = req.params;
 
+    // Check if survey exists
+    const survey = await Survey.findById(id);
+    if (!survey) {
+      res.status(404).json({
+        success: false,
+        message: "Survey not found.",
+      });
+      return;
+    }
+
+    // Delete the survey
     await Survey.deleteOne({ _id: id });
+
+    res.status(200).json({
+      success: true,
+      message: "Survey deleted successfully.",
+    });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
