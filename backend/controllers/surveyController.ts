@@ -9,16 +9,16 @@ export const getSurveys = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { id, question } = req.query; // Example filters
-
-    // Create a query object based on the provided query parameters
-    const query: { [key: string]: string | undefined } = {};
+    const { id, question } = req.query;
+    const query: { [key: string]: any } = {};
 
     if (id) query.id = String(id);
     if (question) query.question = String(question);
 
-    // Fetch surveys based on query (if no filters, return all surveys)
-    const surveys = await Survey.find(query);
+    const surveys = await Survey.find(query).populate({
+      path: "question",
+      model: "Question",
+    });
 
     res.status(200).json(surveys);
   } catch (error) {
