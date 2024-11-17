@@ -41,18 +41,19 @@ export const createQuestionResponse = async (
 // @access  Public
 export const updateQuestionResponse = async (
   req: Request,
-  res: Response
-): Promise<void> => {
+   res: Response
+  ): Promise<void> => {
   try {
-    const { id } = req.params;
-    const updatedResponse = await QuestionResponse.findByIdAndUpdate(id,req.body,{ new: true });
+    const {id} = req.params;
+    const update = req.body;
+    const updatedResponse = await QuestionResponse.findByIdAndUpdate(id, update, { new: true });
     if (!updatedResponse) {
-      res.status(404).json({ message: "Response not found"});
+      res.status(404).json({ message: "Response not found" });
+      return;
     }
-
     res.status(200).json(updatedResponse);
   } catch (error) {
-    res.status(500).json({ message: "PUT error"});
+    res.status(500).json({ message: "PUT error" });
   }
 };
 
@@ -60,19 +61,17 @@ export const updateQuestionResponse = async (
 // @route   DELETE /api/questionResponses/:id
 // @access  Public
 export const deleteQuestionResponse = async (
-  req: Request,
-  res: Response
+  req: Request, res: Response
 ): Promise<void> => {
   try {
-  const { id } = req.params;
-  const deletedResponse = await QuestionResponse.findByIdAndDelete(id);
-
-  if (!deletedResponse) {
-    res.status(404).json({ message: "Response not found" });
+    const {id} = req.params;
+    const deleted = await QuestionResponse.findByIdAndDelete(id);
+    if (!deleted) {
+      res.status(404).json({ message: "Response not found" });
+      return;
+    }
+    res.status(200).json({message: "Deleted: ", deleted});
+  } catch (error) {
+    res.status(500).json({message: "DELETE error"});
   }
-
-  res.status(200).json({ message: "Deleted", deletedResponse });
-}catch(error) {
-  res.status(500).json({ message: "DELETE error" });
-}
 };

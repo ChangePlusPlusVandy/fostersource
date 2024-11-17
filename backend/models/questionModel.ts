@@ -1,23 +1,23 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 // Define an interface for the document (you can replace "ModelName" with the actual model name)
-export interface IModelName extends Document {
-  // Define your model fields here, for example:
-  // fieldName: string;
-  // createdAt?: Date;  // Optional field
+export interface IQuestion extends Document {
+  question: string;
+  isMCQ: boolean;
+  answers?: string[];
 }
 
 // Define the schema with placeholders for fields (others will fill this in)
-const modelNameSchema: Schema = new Schema(
+const QuestionSchema: Schema = new Schema(
   {
-    // Define fields here, for example:
-    // fieldName: { type: String, required: true },
+    question: { type: String, required: true },
+    isMCQ: { type: Boolean, required: true },
+    answers: [{ type: String }],
   },
   {
-    timestamps: true, // Enable automatic createdAt and updatedAt fields
+    timestamps: true,
   }
 );
-
 // Define pre/post hooks or custom methods if necessary (optional)
 // modelNameSchema.pre('save', function (next) {
 //   // Custom logic before saving the document
@@ -25,9 +25,10 @@ const modelNameSchema: Schema = new Schema(
 // });
 
 // Export the model (replace "ModelName" with the actual model name)
-const ModelName: Model<IModelName> = mongoose.model<IModelName>(
-  "ModelName",
-  modelNameSchema
+
+const Question: Model<IQuestion> = mongoose.model<IQuestion>(
+  "Question",
+  QuestionSchema
 );
 
-export default ModelName;
+export default Question;
