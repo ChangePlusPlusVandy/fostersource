@@ -38,4 +38,6 @@ app.use("/api/videos", videoRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
+module.exports = app;
+
 export default app;
