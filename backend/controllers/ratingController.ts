@@ -29,12 +29,18 @@ export const getRatings = async (
     // Fetch ratings based on the query
     const ratings = await Rating.find(query);
 
+    if (ratings.length === 0) {
+      // No ratings found for the query
+      res.status(404).json({ message: "No ratings found for this user." });
+      return;
+    }
+
     res.status(200).json(ratings);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
     } else {
-      res.status(500).json({ message: "An unknown error occurred" });
+      res.status(500).json({ message: "An unknown error occurred." });
     }
   }
 };
@@ -51,7 +57,11 @@ export const createRating = async (
 
     // Validate the data
     if (!userId || rating == null) {
-      res.status(400).json({ message: "User ID and rating are required" });
+      res.status(400).json({ message: "User ID and rating are required." });
+      return;
+    }
+    if (rating > 10){
+      res.status(400).json({ message: "Rating must be between 1 and 10." });
       return;
     }
 
@@ -63,7 +73,7 @@ export const createRating = async (
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
     } else {
-      res.status(500).json({ message: "An unknown error occurred" });
+      res.status(500).json({ message: "An unknown error occurred." });
     }
   }
 };
@@ -78,10 +88,10 @@ export const updateRating = async (
   const { id } = req.params;
 
   try {
-    const updatedRating = await Rating.findOneAndUpdate({ id }, req.body, { new: true });
+    const updatedRating = await Rating.findOneAndUpdate({ _id: id }, req.body, { new: true });
 
     if (!updatedRating) {
-      res.status(404).json({ message: "Rating not found" });
+      res.status(404).json({ message: "Rating not found." });
       return;
     }
 
@@ -90,7 +100,7 @@ export const updateRating = async (
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
     } else {
-      res.status(500).json({ message: "An unknown error occurred" });
+      res.status(500).json({ message: "An unknown error occurred." });
     }
   }
 };
@@ -105,10 +115,10 @@ export const deleteRating = async (
   const { id } = req.params;
 
   try {
-    const deletedRating = await Rating.findOneAndDelete({ id });
+    const deletedRating = await Rating.findOneAndDelete({ _id: id });
 
     if (!deletedRating) {
-      res.status(404).json({ message: "Rating not found" });
+      res.status(404).json({ message: "Rating not found." });
       return;
     }
 
@@ -117,7 +127,7 @@ export const deleteRating = async (
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
     } else {
-      res.status(500).json({ message: "An unknown error occurred" });
+      res.status(500).json({ message: "An unknown error occurred." });
     }
   }
 };
