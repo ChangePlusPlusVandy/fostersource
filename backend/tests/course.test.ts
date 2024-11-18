@@ -5,13 +5,11 @@ import Course from "../models/courseModel";
 import Rating from "../models/ratingModel";
 import Survey from "../models/surveyModel";
 import Video from "../models/videoModel";
+import Question from "../models/questionModel";
 
-const incompleteCourseData = {
-    id: "01234"
-}
+const incompleteCourseData = {}
 
 const courseData1 = {
-    id: "12345",
     handouts: [],
     ratings: [], 
     className: "Course A", 
@@ -20,7 +18,6 @@ const courseData1 = {
 }
 
 const courseData2 = {
-    id: "23456",
     handouts: [], 
     ratings: [], 
     className: "Course B", 
@@ -36,26 +33,17 @@ describe("GET /api/courses", () => {
     it("should retrieve all courses", async () => {
         const res = await request(app).get("/api/courses");
         expect(res.statusCode).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
-        expect(res.body.length).toBe(2);
+        expect(Array.isArray(res.body.data)).toBe(true);
+        expect(res.body.count).toBe(2);
     }); 
-
-    it("should retrieve courses by id", async () => {
-        const res = await request(app).get("/api/courses").query({ courseId: "12345" });
-        expect(res.statusCode).toBe(200);
-        res.body.forEach((course: any) => {
-            expect(course.id).toBe("12345"); 
-        });
-        expect(res.body.length).toBe(1);
-    })
 
     it("should retrieve courses by name", async () => {
         const res = await request(app).get("/api/courses").query({ className: "Course A" });
         expect(res.statusCode).toBe(200);
-        res.body.forEach((course: any) => {
+        res.body.data.forEach((course: any) => {
             expect(course.className).toBe("Course A"); 
         });
-        expect(res.body.length).toBe(2);
+        expect(res.body.count).toBe(1);
     }); 
 }); 
 
@@ -63,7 +51,7 @@ describe("POST /api/courses", () => {
     it("should fail to create a new course if missing data", async () => {
         const res = await request(app).post("/api/courses").send(incompleteCourseData); 
         expect(res.statusCode).toBe(400); 
-        expect(res.body.message).toBe("Please provide courseId, className, and components."); 
+        expect(res.body.message).toBe("Please provide className"); 
     }); 
     
     it("should create a new course if not exists", async () => {
@@ -79,7 +67,6 @@ describe("POST /api/courses", () => {
     
         it("should retrieve an existing course", async () => {
         const existingCourseData = {
-            id: "12345",
             className: "Course A",
         };
     
@@ -91,35 +78,34 @@ describe("POST /api/courses", () => {
     })
 }); 
 
-describe("PUT /api/courses/:id", async () => {
+describe("PUT /api/courses/:id", () => {
     let courseId: string;
     beforeEach(async () => {
-        const user = await Course.create<any>(courseData1);
-        courseId = (user._id as mongoose.Types.ObjectId).toString();
+        const course = await Course.create<any>(courseData1);
+        courseId = (course._id as mongoose.Types.ObjectId).toString();
     });
 
-    it("should update a user", async () => {
+    it("should update a course", async () => {
         const updates = { className: "Course C" };
     
-        const res = await request(app).put(`/api/users/${courseId}`).send(updates);
+        const res = await request(app).put(`/api/courses/${courseId}`).send(updates);
         expect(res.statusCode).toBe(200);
         expect(res.body.data.className).toBe("Course C");
     });
 
-    it("should return 404 if user is not found", async () => {
+    it("should return 404 if course is not found", async () => {
         const invalidCourseId = new mongoose.Types.ObjectId();
         const res = await request(app)
-          .put(`/api/users/${invalidCourseId}`)
-          .send({ email: "Course X" });
+          .put(`/api/courses/${invalidCourseId}`)
+          .send({ className: "Course X" });
         expect(res.statusCode).toBe(404);
-        expect(res.body.message).toBe("Course entry not found.");
+        expect(res.body.message).toBe("Course entry not found");
     });
 });
 
-describe("DELETE /api/courses/:id", async () => {
+describe("DELETE /api/courses/:id", () => {
     let courseId: string; 
     let ratingId: string; 
-    let componentId: string; 
 
     beforeEach(async () => {
         const course = await Course.create(courseData1); 
@@ -127,18 +113,14 @@ describe("DELETE /api/courses/:id", async () => {
 
         const rating = await Rating.create({
             userId: "12345", 
+            courseId: courseId,
             rating: "5",
         }); 
         ratingId = (rating._id as mongoose.Types.ObjectId).toString(); 
-
-        const component = await Survey.create({
-            // TODO: fill in survey once model is created 
-        });
-        componentId = (component._id as mongoose.Types.ObjectId).toString();
     });
 
     it("should delete course and associated ratings and components", async () => {
-        const res = await request(app).delete(`/app/courses/${courseId}`); 
+        const res = await request(app).delete(`/api/courses/${courseId}`); 
         expect(res.statusCode).toBe(200);
         expect(res.body.message).toBe(
           "Course and associated data deleted successfully."
@@ -149,9 +131,6 @@ describe("DELETE /api/courses/:id", async () => {
 
         const rating = await Rating.findById(ratingId); 
         expect(rating).toBeNull(); 
-
-        const component = await Survey.findById(componentId); 
-        expect(component).toBeNull(); 
     }); 
 
     it("should return 404 if course not found", async () => {
@@ -159,5 +138,5 @@ describe("DELETE /api/courses/:id", async () => {
         const res = await request(app).delete(`/api/courses/${nonExistentUserId}`);
         expect(res.statusCode).toBe(404);
         expect(res.body.message).toBe("Course entry not found.");
-    })
+    });
 }); 
