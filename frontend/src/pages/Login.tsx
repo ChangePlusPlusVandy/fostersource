@@ -1,10 +1,10 @@
 import React, {useState} from "react";
-import {signIn, register} from "../services/firebaseAuthService"; // Import your auth service
+import {signIn, register} from "../services/firebaseAuthService";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false); // Toggle between sign-up and sign-in
+  const [isSignUp, setIsSignUp] = useState(false); 
   const [error, setError] = useState("");
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -24,6 +24,7 @@ export default function Login() {
     }
   };
 
+  // design later when designs are in
   return (
     <div>Login</div>
   );
