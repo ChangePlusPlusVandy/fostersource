@@ -32,8 +32,7 @@ export const verifyToken = async (
     (req as AuthenticatedRequest).user = dbUser;
     next();
   } catch (error) {
-    console.error("Token verification error:", error);
-    res.status(403).json({ message: "Unauthorized" });
+    // res.status(403).json({ message: "Unauthorized" });
     next(error);
   }
 };
