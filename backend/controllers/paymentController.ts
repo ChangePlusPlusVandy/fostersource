@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Payment from "../models/paymentModel";
+import User from "../models/userModel";
 
 // @desc    Get all payments or filter by query parameters
 // @route   GET /api/payments
@@ -39,11 +40,7 @@ export const getPayments = async (
 
     const payments = await Payment.find(filter).exec();
 
-    res.status(200).json({
-      success: true,
-      count: payments.length,
-      data: payments,
-    });
+    res.status(200).json(payments);
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -80,10 +77,7 @@ export const createPayment = async (
 
     const savedPayment = await newPayment.save();
 
-    res.status(201).json({
-      success: true,
-      data: savedPayment,
-    });
+    res.status(201).json(savedPayment);
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -121,10 +115,7 @@ export const updatePayment = async (
 
     const updatedPayment = await payment.save();
 
-    res.status(200).json({
-      success: true,
-      data: updatedPayment,
-    });
+    res.status(200).json(updatedPayment);
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -153,6 +144,12 @@ export const deletePayment = async (
       });
       return;
     }
+
+    await User.findByIdAndUpdate(
+      payment.userId,
+      { $pull: { payments: id } },
+      { new: true }
+    );
 
     await Payment.deleteOne({ _id: id });
 

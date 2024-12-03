@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import Course from "../models/courseModel";
-import Rating from "../models/courseModel";
-import Video from "../models/videoModel";
-import Survey from "../models/surveyModel"
+import Rating from "../models/ratingModel";
 
 // @desc    Get all courses or filter courses by query parameters
 // @route   GET /api/courses
@@ -12,29 +10,23 @@ export const getCourses = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { courseId, courseName } = req.query; 
+    const filters = req.query;
 
-    const filter: any = {}; 
-
-    if (courseId) filter.courseId = courseId; 
-    if (courseName) filter.courseName = courseName; 
-
-    const courseResponses = await Course.find(filter)
+    const courseResponses = await Course.find(filters)
       .populate(["ratings", "components"])
       .exec(); 
 
-      res.status(200).json({
-        success: true,
-        count: courseResponses.length,
-        data: courseResponses,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "Internal service error.",
-      });
-    }
+    res.status(200).json({
+      success: true,
+      count: courseResponses.length,
+      data: courseResponses,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal service error.",
+    });
+  }
 };
 
 // @desc    Create a new course
@@ -45,18 +37,26 @@ export const createCourse = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { courseId, handouts, ratings, className, discussion, components } = req.body; 
+    const { handouts, ratings, className, discussion, components } = req.body; 
 
-    if (!courseId || !className || !components || components.length == 0) {
+    if (!className) {
       res.status(400).json({
         success: false,
-        message: "Please provide courseId, className, and components.",
+        message: "Please provide className",
+      });
+      return;
+    }
+    
+    let existingCourse = await Course.findOne({ className }); 
+    if (existingCourse) {
+      res.status(200).json({
+        data: existingCourse,
+        message: "Course already exists"
       });
       return;
     }
 
     const newCourseResponse = new Course({
-      courseId, 
       handouts, 
       ratings, 
       className, 
@@ -71,7 +71,6 @@ export const createCourse = async (
       data: savedCourseResponse,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       success: false,
       message: "Internal service error.",
@@ -88,18 +87,19 @@ export const updateCourse = async (
 ): Promise<void> => {
   try {
     const { id } = req.params; 
+    const updates = req.body; 
 
-    const updatedCourse = await Course.findByIdAndUpdate(id, req.body, {
+    const updatedCourse = await Course.findByIdAndUpdate(id, updates, {
       new: true, 
       runValidators: true,
     }); 
-
 
     if (!updatedCourse) {
       res.status(404).json({
         success: false, 
         message: "Course entry not found"
       }); 
+      return;
     }
 
     const savedCourse = await updatedCourse?.save(); 
@@ -109,7 +109,6 @@ export const updateCourse = async (
       data: savedCourse, 
     }); 
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       success: false,
       message: "Internal service error.",
@@ -133,26 +132,22 @@ export const deleteCourse = async (
     if (!courseResponse) {
       res.status(404).json({
         success: false,
-        message: "Course response not found.",
+        message: "Course entry not found.",
       });
       return;
     }
 
-    await Rating.deleteMany({ _id: { $in: courseResponse.ratings }})
+    await Rating.deleteMany({ _id: { $in: courseResponse.ratings }});
 
-    for (const component of courseResponse.components) {
-      if (component instanceof Survey) 
-        await Survey.deleteOne({ _id: component.id }); 
-
-      else if (component instanceof Video) 
-        await Video.deleteOne({ _id: component.id }); 
-      
-    }
+    // TODO: component handling
 
     await Course.deleteOne({ _id: id }); 
 
+    res.status(200).json({
+      success: true,
+      message: "Course and associated data deleted successfully.",
+    });
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       success: false,
       message: "Internal service error.",

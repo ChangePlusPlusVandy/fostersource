@@ -13,11 +13,13 @@ const surveySchema: Schema = new Schema(
   {
     // Define fields here:
     id: { type: String, required: true },
-    question: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Question",
-      required: true,
-    },
+    question: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Question",
+        required: true,
+      },
+    ],
   },
   {
     timestamps: true, // Enable automatic createdAt and updatedAt fields
