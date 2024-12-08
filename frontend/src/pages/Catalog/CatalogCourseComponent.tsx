@@ -1,5 +1,5 @@
 import React from "react";
-import {Course} from "../../sharedTypes/course"
+import {Course} from "../../shared/types/course"
 
 interface CatalogCourseComponentProps {
     course: Course;

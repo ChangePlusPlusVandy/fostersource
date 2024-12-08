@@ -1,16 +1,139 @@
 import React, { useState } from "react";
+import Dropdown from "../../shared/components/dropdown-select";
 
 interface CatalogSearchBarProps {
     onSearch: (query: string) => void;
+    updateFilters: (filterType: string, filterValue: string) => void;
 }
 
-export default function CatalogSearchBar({ onSearch }: CatalogSearchBarProps) {
+export default function CatalogSearchBar({ onSearch,updateFilters }: CatalogSearchBarProps) {
     const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const query = formData.get("searchQuery") as string;
         onSearch(query);
     };
+
+    const categoryMenuItems = [
+        {
+            label: "All",
+            onClick: () => {
+                setSelectedCategory("All");
+                updateFilters("category", "All");
+            },
+        },
+        {
+            label: "Technology",
+            onClick: () => {
+                setSelectedCategory("Technology");
+                updateFilters("category", "Technology");
+            },
+        }
+    ];
+    const ratingMenuItems = [
+        {
+            label: "All",
+            onClick: () => {
+                setSelectedRating("All");
+                updateFilters("rating", "All");
+            },
+        },
+        {
+            label: "1+",
+            onClick: () => {
+                setSelectedRating("1");
+                updateFilters("rating", "1");
+            },
+        },
+        {
+            label: "2+",
+            onClick: () => {
+                setSelectedRating("2");
+                updateFilters("rating", "2");
+            },
+        },
+        {
+            label: "3+",
+            onClick: () => {
+                setSelectedRating("3");
+                updateFilters("rating", "3");
+            },
+        },
+        {
+            label: "4+",
+            onClick: () => {
+                setSelectedRating("4");
+                updateFilters("rating", "4");
+            },
+        },
+        {
+            label: "5",
+            onClick: () => {
+                setSelectedRating("5");
+                updateFilters("rating", "5");
+            },
+        },
+    ];
+    const creditsMenuItems = [
+        {
+            label: "All",
+            onClick: () => {
+                setSelectedCredits("All");
+                updateFilters("credits", "All");
+            },
+        },
+        {
+            label: "1",
+            onClick: () => {
+                setSelectedCredits("1");
+                updateFilters("credits", "1");
+            },
+        },
+        {
+            label: "2",
+            onClick: () => {
+                setSelectedCredits("2");
+                updateFilters("credits", "2");
+            },
+        },
+        {
+            label: "3",
+            onClick: () => {
+                setSelectedCredits("3");
+                updateFilters("credits", "3");
+            },
+        },
+        {
+            label: "4",
+            onClick: () => {
+                setSelectedCredits("4");
+                updateFilters("credits", "4");
+            },
+        },
+    ];
+    const formatMenuItems = [
+        {
+            label: "All",
+            onClick: () => {
+                setSelectedFormat("All");
+                updateFilters("format", "All");
+            },
+        },
+        {
+            label: "Live",
+            onClick: () => {
+                setSelectedFormat("Live");
+                updateFilters("format", "Live");
+            },
+        },
+        {
+            label: "On-Demand",
+            onClick: () => {
+                setSelectedFormat("On-Demand");
+                updateFilters("format", "On-Demand");
+            },
+        }
+    ];
 
     const [selectedCategory, setSelectedCategory] = useState<string>("All");
     const [selectedRating, setSelectedRating] = useState<string>("All");
@@ -34,63 +157,23 @@ export default function CatalogSearchBar({ onSearch }: CatalogSearchBarProps) {
                 </button>
             </form>
 
-            {/* Filters */}
-            <div className="flex flex-wrap gap-4">
-
-                {/* Category Filter */}
-                <div className="relative">
-                    <select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="block appearance-none w-44 bg-gray-200 border border-gray-300 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    >
-                        <option value="All">Category</option>
-                        <option value="Science">Science</option>
-                        <option value="Arts">Arts</option>
-                        <option value="Technology">Technology</option>
-                    </select>
-                </div>
-
-                {/* Rating Filter */}
-                <div className="relative">
-                    <select
-                        value={selectedRating}
-                        onChange={(e) => setSelectedRating(e.target.value)}
-                        className="block appearance-none w-44 bg-gray-200 border border-gray-300 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    >
-                        <option value="All">Rating</option>
-                        <option value="5">5 Stars</option>
-                        <option value="4">4 Stars</option>
-                        <option value="3">3 Stars</option>
-                    </select>
-                </div>
-
-                {/* Credits Filter */}
-                <div className="relative">
-                    <select
-                        value={selectedCredits}
-                        onChange={(e) => setSelectedCredits(e.target.value)}
-                        className="block appearance-none w-44 bg-gray-200 border border-gray-300 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    >
-                        <option value="All">Credits</option>
-                        <option value="1">1 Credit</option>
-                        <option value="2">2 Credits</option>
-                        <option value="3">3 Credits</option>
-                    </select>
-                </div>
-
-                {/* Format Filter */}
-                <div className="relative">
-                    <select
-                        value={selectedFormat}
-                        onChange={(e) => setSelectedFormat(e.target.value)}
-                        className="block appearance-none w-44 bg-gray-200 border border-gray-300 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    >
-                        <option value="All">Format</option>
-                        <option value="Online">Online</option>
-                        <option value="In-Person">In-Person</option>
-                    </select>
-                </div>
+            <div className="flex space-x-4">
+                <Dropdown
+                    buttonLabel={`Category: ${selectedCategory}`}
+                    menuItems={categoryMenuItems}
+                />
+                <Dropdown
+                    buttonLabel={`Rating: ${selectedRating}`}
+                    menuItems={ratingMenuItems}
+                />
+                <Dropdown
+                    buttonLabel={`Credits: ${selectedCredits}`}
+                    menuItems={creditsMenuItems}
+                />
+                <Dropdown
+                    buttonLabel={`Format: ${selectedFormat}`}
+                    menuItems={formatMenuItems}
+                />
             </div>
         </div>
     );
