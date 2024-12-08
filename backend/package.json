@@ -16,7 +16,8 @@
     "express": "^4.21.0",
     "firebase": "^11.0.1",
     "firebase-admin": "^12.7.0",
-    "mongoose": "^8.7.0"
+    "mongoose": "^8.7.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
