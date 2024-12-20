@@ -58,7 +58,7 @@ const Sidebar = ({ children }: { children?: ReactNode }) => {
         <li>
           <Mic />
           <Link to="#">
-            <i className="fas fa-home"></i> Podcast
+            <i className="fas fa-home"></i> Podcasts
           </Link>
         </li>
         <li>
