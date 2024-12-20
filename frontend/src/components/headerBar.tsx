@@ -19,43 +19,33 @@ const HeaderBar = () => {
       <ul className="header-menu">
         <li className={activeItem === "home" ? "active" : ""}>
           <Link to="/" onClick={() => handleItemClick("home")}>
-            <i className="fas fa-home"></i> Home
+            Home
           </Link>
         </li>
         <li className={activeItem === "about" ? "active" : ""}>
           <Link to="/about" onClick={() => handleItemClick("about")}>
-            <i className="fas fa-info-circle"></i> About
+            About
           </Link>
         </li>
         <li className={activeItem === "programs" ? "active" : ""}>
           <Link to="/programs" onClick={() => handleItemClick("programs")}>
-            <i className="fas fa-th-list"></i> Programs
+            Programs
           </Link>
         </li>
         <li>
-          <Link to="/">
-            <i className="fas fa-home"></i> Calendar
-          </Link>
+          <Link to="/">Calendar</Link>
         </li>
         <li>
-          <Link to="/">
-            <i className="fas fa-home"></i> How to help
-          </Link>
+          <Link to="/">How to help</Link>
         </li>
         <li>
-          <Link to="/">
-            <i className="fas fa-home"></i> News
-          </Link>
+          <Link to="/">News</Link>
         </li>
         <li>
-          <Link to="/">
-            <i className="fas fa-home"></i> Contact
-          </Link>
+          <Link to="/">Contact</Link>
         </li>
         <li>
-          <Link to="/">
-            <i className="fas fa-home"></i> Portal
-          </Link>
+          <Link to="/">Portal</Link>
         </li>
       </ul>
     </div>

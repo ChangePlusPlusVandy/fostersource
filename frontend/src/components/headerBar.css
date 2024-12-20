@@ -32,6 +32,10 @@
   margin-right: 0.5rem;
 }
 
+.header-menu li:hover a:hover {
+  color: #f79518;
+}
+
 body {
   font-family: "Poppins", sans-serif; /* Apply Poppins font to the body */
   font-size: large;
