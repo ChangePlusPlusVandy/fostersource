@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { Link } from "react-router-dom";
 import "./sidebar.css";
 import {
@@ -16,19 +16,30 @@ import {
 const Sidebar = ({ children }: { children?: ReactNode }) => {
   const user = "Lil Ghosty";
   const role = "Child";
+
+  const [activeItem, setActiveItem] = useState<string>("");
+
+  const handleItemClick = (item: string) => {
+    setActiveItem(item);
+  };
+
   return (
     <div className="sidebar mr-3">
-      <div className="profile flex flex-row w-full mb-4">
-        <img src="../../../assets/cute_ghost.jpeg" alt="Profile" />
+      <div className="profile flex flex-row w-full">
+        <img
+          src="assets/cute_ghost.jpeg"
+          alt="Profile"
+          className="profile-pic"
+        />
         <div className="pl-3 align-middle">
-          <p className="text-xl font-medium">{user}</p>
-          <p className="text-xs text-gray-600">{role}</p>
+          <p className="text-xl font-medium text-wrap">{user}</p>
+          <p className="text-xs text-gray-600 mt-1">{role}</p>
         </div>
       </div>
       <ul className="menu">
-        <li>
+        <li className={activeItem === "home" ? "active" : ""}>
           <House />
-          <Link to="/">
+          <Link to="/" onClick={() => handleItemClick("home")}>
             <i className="fas fa-home"></i> Home
           </Link>
         </li>
