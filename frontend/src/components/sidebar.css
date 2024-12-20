@@ -42,6 +42,7 @@
   vertical-align: middle;
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .menu a {
@@ -51,8 +52,16 @@
   align-items: center;
 }
 
-.menu a i {
-  margin-right: 10px;
+.menu li svg {
+  margin-right: 1rem;
+}
+
+.menu li:hover a:hover {
+  color: #f79518;
+}
+
+.menu li:hover svg {
+  color: #f79518;
 }
 
 .menu li.active {

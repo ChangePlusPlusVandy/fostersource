@@ -40,56 +40,40 @@ const Sidebar = ({ children }: { children?: ReactNode }) => {
         <li className={activeItem === "home" ? "active" : ""}>
           <House />
           <Link to="/" onClick={() => handleItemClick("home")}>
-            <i className="fas fa-home"></i> Home
+            Home
           </Link>
         </li>
         <li>
           <LayoutDashboard />
-          <Link to="#">
-            <i className="fas fa-home"></i> Dashboard
-          </Link>
+          <Link to="#">Dashboard</Link>
         </li>
         <li>
           <BookOpen />
-          <Link to="#">
-            <i className="fas fa-home"></i> Catalog
-          </Link>
+          <Link to="#">Catalog</Link>
         </li>
         <li>
           <Mic />
-          <Link to="#">
-            <i className="fas fa-home"></i> Podcasts
-          </Link>
+          <Link to="#">Podcasts</Link>
         </li>
         <li>
           <Calendar />
-          <Link to="#">
-            <i className="fas fa-home"></i> Calendar
-          </Link>
+          <Link to="#">Calendar</Link>
         </li>
         <li>
           <MessageCircleQuestion />
-          <Link to="#">
-            <i className="fas fa-home"></i> FAQs
-          </Link>
+          <Link to="#">FAQs</Link>
         </li>
         <li>
           <ShoppingCart />
-          <Link to="#">
-            <i className="fas fa-home"></i> Cart
-          </Link>
+          <Link to="#">Cart</Link>
         </li>
         <li>
           <Phone />
-          <Link to="#">
-            <i className="fas fa-home"></i> Contact
-          </Link>
+          <Link to="#">Contact</Link>
         </li>
         <li>
           <LogOut />
-          <Link to="#">
-            <i className="fas fa-home"></i> Logout
-          </Link>
+          <Link to="#">Logout</Link>
         </li>
       </ul>
     </div>
