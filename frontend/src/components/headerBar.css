@@ -41,10 +41,10 @@ body {
   font-size: large;
 }
 
-@media (max-width: 1040px) {
+@media (max-width: 1140px) {
   .header-image {
-    margin-left: 5rem; /* Reduce left margin */
-    margin-right: 5rem; /* Reduce right margin */
+    margin-left: 5rem;
+    margin-right: 5rem;
   }
 
   .header-menu {
@@ -52,13 +52,14 @@ body {
   }
 }
 
-@media (max-width: 810px) {
+/* TODO: @kohrachel add hamburger menu support for widths less than 900px */
+@media (max-width: 900px) {
   .header {
     height: 80px;
   }
   .header-image {
-    margin-left: 2rem; /* Reduce left margin */
-    margin-right: 2rem; /* Reduce right margin */
+    margin-left: 2rem;
+    margin-right: 2rem;
   }
 
   .header-menu {

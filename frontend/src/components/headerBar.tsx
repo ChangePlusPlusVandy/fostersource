@@ -47,6 +47,9 @@ const HeaderBar = () => {
         <li>
           <Link to="/">Portal</Link>
         </li>
+        <li>
+          <Link to="/">🇺🇸 English</Link>
+        </li>
       </ul>
     </div>
   );
