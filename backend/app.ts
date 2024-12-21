@@ -40,4 +40,6 @@ app.use("/api/payments", paymentRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
+module.exports = app;
+
 export default app;
