@@ -1,7 +1,9 @@
 // tests/videoController.test.ts
-const request = require('supertest');
-const app = require('../app');
-const Video = require('../models/videoModel');
+
+import request from "supertest";
+import app from "../app";
+import Video from "../models/videoModel";
+import mongoose from "mongoose";
 
 describe('Video Controller - Get Videos', () => {
   it('should return all videos', async () => {
