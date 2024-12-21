@@ -37,61 +37,70 @@ const Sidebar = ({ children }: { children?: ReactNode }) => {
         </div>
       </div>
       <ul className="menu">
-        <li className={activeItem === "home" ? "active" : ""}>
+        <li
+          className={activeItem === "home" ? "active" : ""}
+          onClick={() => handleItemClick("home")}
+        >
           <House />
-          <Link to="/" onClick={() => handleItemClick("home")}>
-            Home
-          </Link>
+          <Link to="/">Home</Link>
         </li>
 
-        <li className={activeItem === "dashboard" ? "active" : ""}>
+        <li
+          className={activeItem === "dashboard" ? "active" : ""}
+          onClick={() => handleItemClick("dashboard")}
+        >
           <LayoutDashboard />
-          <Link to="/" onClick={() => handleItemClick("dashboard")}>
-            Dashboard
-          </Link>
+          <Link to="/">Dashboard</Link>
         </li>
-        <li className={activeItem === "catalog" ? "active" : ""}>
+        <li
+          className={activeItem === "catalog" ? "active" : ""}
+          onClick={() => handleItemClick("catalog")}
+        >
           <BookOpen />
-          <Link to="/" onClick={() => handleItemClick("catalog")}>
-            Catalog
-          </Link>
+          <Link to="/">Catalog</Link>
         </li>
-        <li className={activeItem === "podcasts" ? "active" : ""}>
+        <li
+          className={activeItem === "podcasts" ? "active" : ""}
+          onClick={() => handleItemClick("podcasts")}
+        >
           <Mic />
-          <Link to="/" onClick={() => handleItemClick("podcasts")}>
-            Podcasts
-          </Link>
+          <Link to="/">Podcasts</Link>
         </li>
-        <li className={activeItem === "calendar" ? "active" : ""}>
+        <li
+          className={activeItem === "calendar" ? "active" : ""}
+          onClick={() => handleItemClick("calendar")}
+        >
           <Calendar />
-          <Link to="/" onClick={() => handleItemClick("calendar")}>
-            Calendar
-          </Link>
+          <Link to="/">Calendar</Link>
         </li>
-        <li className={activeItem === "faqs" ? "active" : ""}>
+        <li
+          className={activeItem === "faqs" ? "active" : ""}
+          onClick={() => handleItemClick("faqs")}
+        >
           <MessageCircleQuestion />
-          <Link to="/" onClick={() => handleItemClick("faqs")}>
-            FAQs
-          </Link>
+          <Link to="/">FAQs</Link>
         </li>
-        <li className={activeItem === "cart" ? "active" : ""}>
+        <li
+          className={activeItem === "cart" ? "active" : ""}
+          onClick={() => handleItemClick("cart")}
+        >
           <ShoppingCart />
-          <Link to="/" onClick={() => handleItemClick("cart")}>
-            Cart
-          </Link>
+          <Link to="/">Cart</Link>
         </li>
-        <li className={activeItem === "contact" ? "active" : ""}>
+        <li
+          className={activeItem === "contact" ? "active" : ""}
+          onClick={() => handleItemClick("contact")}
+        >
           <Phone />
-          <Link to="/" onClick={() => handleItemClick("contact")}>
-            Contact
-          </Link>
+          <Link to="/">Contact</Link>
         </li>
         <div className="logout">
-          <li className={activeItem === "logout" ? "active" : ""}>
+          <li
+            className={activeItem === "logout" ? "active" : ""}
+            onClick={() => handleItemClick("logout")}
+          >
             <LogOut />
-            <Link to="/" onClick={() => handleItemClick("logout")}>
-              Logout
-            </Link>
+            <Link to="/">Logout</Link>
           </li>
         </div>
       </ul>
