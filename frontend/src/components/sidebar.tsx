@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import { ReactNode, useState } from "react";
 import { Link } from "react-router-dom";
 import "./sidebar.css";
 import {
@@ -14,8 +14,8 @@ import {
 } from "lucide-react"; // Can change if want to use a different icon library
 
 const Sidebar = ({ children }: { children?: ReactNode }) => {
-  const user = "Lil Ghosty";
-  const role = "Child";
+  const user = "First L.";
+  const role = "Role";
 
   const [activeItem, setActiveItem] = useState<string>("");
 
