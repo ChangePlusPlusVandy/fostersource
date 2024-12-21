@@ -5,7 +5,6 @@
   height: 90%;
   max-height: min-content;
   background-color: #ffffff;
-  padding: 1.8rem;
   margin-right: 0.75rem;
   margin-left: 0.75rem;
   height: 80vh;
@@ -18,7 +17,10 @@
   vertical-align: middle;
   text-align: left;
   font: medium;
-  margin-top: 0.2rem;
+  max-width: 70%;
+  margin-top: 1.8rem;
+  margin-left: 1.8rem;
+  margin-right: 1.8rem;
   margin-bottom: 20px;
   align-items: center;
 }
@@ -33,16 +35,18 @@
 .menu {
   font-weight: 500;
   list-style-type: none;
-  padding: 0;
   margin-top: 2.5rem;
 }
 
 .menu li {
-  margin-top: 2.2rem;
   vertical-align: middle;
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+  padding-left: 1.8rem;
+  padding-right: 1.8rem;
 }
 
 .menu a {
@@ -71,6 +75,27 @@
 
 .menu li.active a {
   color: #f79518;
+}
+
+.menu .logout {
+  margin-bottom: 1.2rem;
+}
+
+.menu .logout li:hover a {
+  color: #be0000 !important;
+}
+
+.menu .logout li:hover svg {
+  color: #be0000 !important;
+}
+
+.menu .logout li.active {
+  background-color: #f7181833 !important;
+  color: #be0000 !important;
+}
+
+.menu .logout li.active a {
+  color: #be0000 !important;
 }
 
 body {

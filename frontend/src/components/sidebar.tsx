@@ -43,38 +43,57 @@ const Sidebar = ({ children }: { children?: ReactNode }) => {
             Home
           </Link>
         </li>
-        <li>
+
+        <li className={activeItem === "dashboard" ? "active" : ""}>
           <LayoutDashboard />
-          <Link to="#">Dashboard</Link>
+          <Link to="/" onClick={() => handleItemClick("dashboard")}>
+            Dashboard
+          </Link>
         </li>
-        <li>
+        <li className={activeItem === "catalog" ? "active" : ""}>
           <BookOpen />
-          <Link to="#">Catalog</Link>
+          <Link to="/" onClick={() => handleItemClick("catalog")}>
+            Catalog
+          </Link>
         </li>
-        <li>
+        <li className={activeItem === "podcasts" ? "active" : ""}>
           <Mic />
-          <Link to="#">Podcasts</Link>
+          <Link to="/" onClick={() => handleItemClick("podcasts")}>
+            Podcasts
+          </Link>
         </li>
-        <li>
+        <li className={activeItem === "calendar" ? "active" : ""}>
           <Calendar />
-          <Link to="#">Calendar</Link>
+          <Link to="/" onClick={() => handleItemClick("calendar")}>
+            Calendar
+          </Link>
         </li>
-        <li>
+        <li className={activeItem === "faqs" ? "active" : ""}>
           <MessageCircleQuestion />
-          <Link to="#">FAQs</Link>
+          <Link to="/" onClick={() => handleItemClick("faqs")}>
+            FAQs
+          </Link>
         </li>
-        <li>
+        <li className={activeItem === "cart" ? "active" : ""}>
           <ShoppingCart />
-          <Link to="#">Cart</Link>
+          <Link to="/" onClick={() => handleItemClick("cart")}>
+            Cart
+          </Link>
         </li>
-        <li>
+        <li className={activeItem === "contact" ? "active" : ""}>
           <Phone />
-          <Link to="#">Contact</Link>
+          <Link to="/" onClick={() => handleItemClick("contact")}>
+            Contact
+          </Link>
         </li>
-        <li>
-          <LogOut />
-          <Link to="#">Logout</Link>
-        </li>
+        <div className="logout">
+          <li className={activeItem === "logout" ? "active" : ""}>
+            <LogOut />
+            <Link to="/" onClick={() => handleItemClick("logout")}>
+              Logout
+            </Link>
+          </li>
+        </div>
       </ul>
     </div>
   );
