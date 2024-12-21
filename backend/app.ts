@@ -11,6 +11,7 @@ import questionResponseRoutes from "./routes/questionResponseRoutes";
 import progressRoutes from "./routes/progressRoutes";
 import courseRoutes from "./routes/courseRoutes";
 import videoRoutes from "./routes/videoRoutes";
+import paymentRoutes from "./routes/paymentRoutes";
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
@@ -33,6 +34,7 @@ app.use("/api/questionResponses", questionResponseRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/videos", videoRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // Error middleware
 app.use(notFound);
