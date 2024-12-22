@@ -3,6 +3,7 @@ import app from "../app";
 import mongoose from "mongoose";
 import Payment from "../models/paymentModel";
 import User from "../models/userModel";
+import jwt from "jsonwebtoken";
 
 describe("GET /api/payments", () => {
   beforeEach(async () => {

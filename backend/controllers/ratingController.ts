@@ -21,7 +21,7 @@ export const getRatings = async (
     if (courseId) {
       query.courseId = String(courseId);
     }
-    
+
     // Add threshold filters
     if (minRating !== undefined) {
       query.rating = { ...query.rating, $gte: Number(minRating) }; // Greater than or equal to minRating
@@ -64,12 +64,12 @@ export const createRating = async (
       res.status(400).json({ message: "User ID and rating are required." });
       return;
     }
-    if (rating > 10){
+    if (rating > 10) {
       res.status(400).json({ message: "Rating must be between 1 and 10." });
       return;
     }
 
-    const newRating = new Rating({ userId, rating });
+    const newRating = new Rating({ userId, rating, courseId });
     const savedRating = await newRating.save();
 
     res.status(201).json(savedRating);
@@ -92,7 +92,9 @@ export const updateRating = async (
   const { id } = req.params;
 
   try {
-    const updatedRating = await Rating.findOneAndUpdate({ _id: id }, req.body, { new: true });
+    const updatedRating = await Rating.findOneAndUpdate({ _id: id }, req.body, {
+      new: true,
+    });
 
     if (!updatedRating) {
       res.status(404).json({ message: "Rating not found." });
@@ -127,12 +129,12 @@ export const deleteRating = async (
     }
 
     await Course.findByIdAndUpdate(
-      deletedRating.courseId, 
+      deletedRating.courseId,
       { $pull: { ratings: id } },
       { new: true }
-    ); 
+    );
 
-    await Rating.deleteOne({ _id: id }); 
+    await Rating.deleteOne({ _id: id });
 
     res.status(204).send(); // No content
   } catch (error) {
