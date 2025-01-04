@@ -1,6 +1,5 @@
 import { auth } from "./firebaseConfig";
 import {
-  getAuth,
   sendPasswordResetEmail as resetEmail,
   confirmPasswordReset as confirm,
 } from "firebase/auth";
