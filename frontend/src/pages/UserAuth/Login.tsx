@@ -1,46 +1,31 @@
 import React, { useState } from "react";
-import { register } from "../services/firebaseAuthService";
+import { signIn } from "../../services/firebaseAuthService";
 
-const Register: React.FC = () => {
-  const [name, setName] = useState("");
+const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
     try {
-      await register(email, password);
+      const token = await signIn(email, password);
+      if (!token) throw new Error("No token received");
+      localStorage.setItem("jwt", token);
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+      setError(err.message);
     }
   };
 
   return (
     <div className="flex items-center justify-center h-screen bg-orange-500">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-3xl font-bold text-center text-black">Register</h2>
+        <h2 className="text-3xl font-bold text-center text-black">Login</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block mb-1 text-sm font-medium text-black">Name</label>
-            <input
-              type="text"
-              className="w-full px-4 py-2 border rounded-lg"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
           <div>
             <label className="block mb-1 text-sm font-medium text-black">Email</label>
             <input
@@ -68,30 +53,28 @@ const Register: React.FC = () => {
               {showPassword ? "Hide" : "Show"}
             </button>
           </div>
-          <div>
-            <label className="block mb-1 text-sm font-medium text-black">
-              Confirm Password
+          <div className="flex items-center justify-between">
+            <label className="flex items-center">
+              <input type="checkbox" className="mr-2" />
+              <span className="text-sm text-black">Remember me</span>
             </label>
-            <input
-              type="password"
-              className="w-full px-4 py-2 border rounded-lg"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+            <a href="/reset-password" className="text-sm text-orange-600 hover:underline">
+              Forgot Password?
+            </a>
+
           </div>
           <button
             type="submit"
             className="w-full px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition ease-in-out duration-200"
-            >
-         Register
-        </button>
+          >
+            Log In
+          </button>
 
         </form>
         <p className="text-center text-sm text-black">
-          Already have an account?{" "}
-          <a href="/login" className="text-orange-600 hover:underline">
-            Log In
+          Don’t have an account?{" "}
+          <a href="/register" className="text-orange-600 hover:underline">
+            Register
           </a>
         </p>
       </div>
@@ -99,4 +82,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default Login;

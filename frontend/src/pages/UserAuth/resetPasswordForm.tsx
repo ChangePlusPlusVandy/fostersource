@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { confirmPasswordReset } from "../services/firebaseAuthService";
+import { confirmPasswordReset } from "../../services/firebaseAuthService";
 import { useNavigate, useParams } from "react-router-dom";
 
 const ResetPasswordForm: React.FC = () => {

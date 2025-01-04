@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { sendPasswordResetEmail } from "../services/firebaseAuthService";
+import { sendPasswordResetEmail } from "../../services/firebaseAuthService";
 
 const ResetPassword: React.FC = () => {
   const [email, setEmail] = useState("");
