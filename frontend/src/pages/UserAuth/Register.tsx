@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { register } from "../../services/firebaseAuthService";
+import authService from "../../services/authService";
 
 const Register: React.FC = () => {
   const [name, setName] = useState("");
@@ -12,16 +12,15 @@ const Register: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
-
+  
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
+  
     try {
-      const token = await register(email, password);
-      if (!token) throw new Error("No token received");
-      localStorage.setItem("jwt", token);
+      await authService.register(email, password, name);
+      window.location.href = "/catalog";
     } catch (err: any) {
       setError(err.message);
     }

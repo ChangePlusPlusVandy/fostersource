@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { signIn } from "../../services/firebaseAuthService";
+import authService from "../../services/authService";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -12,9 +12,8 @@ const Login: React.FC = () => {
     setError("");
 
     try {
-      const token = await signIn(email, password);
-      if (!token) throw new Error("No token received");
-      localStorage.setItem("jwt", token);
+      await authService.login(email, password);
+      window.location.href = "/catalog";
     } catch (err: any) {
       setError(err.message);
     }
