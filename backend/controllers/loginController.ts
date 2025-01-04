@@ -16,7 +16,6 @@ export const checkUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Verify Firebase token
     const decodedToken = await admin.auth().verifyIdToken(firebaseToken as string);
     if (decodedToken.uid !== firebaseId) {
       throw new Error("Firebase token mismatch");
@@ -35,7 +34,6 @@ export const checkUser = async (req: Request, res: Response): Promise<void> => {
       { expiresIn: "1h" }
     );
 
-    // Get a new Firebase ID token to use as refresh token
     const refreshToken = await admin.auth().createCustomToken(user.firebaseId);
 
     res.status(200).send({
