@@ -21,6 +21,7 @@ const Login: React.FC = () => {
   };
 
   return (
+    // will add foster source nav bar after Rachel finishes component for it since she's working on that part currently
     <div className="flex items-center justify-center h-screen bg-orange-500">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-3xl font-bold text-center text-black">Login</h2>

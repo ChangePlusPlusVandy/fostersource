@@ -20,6 +20,7 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
+    // will add foster source navbar after Rachel finishes the component since she's working on that currently
     <div className="flex items-center justify-center h-screen bg-orange-500">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-3xl font-bold text-center text-black">Forgot Password</h2>

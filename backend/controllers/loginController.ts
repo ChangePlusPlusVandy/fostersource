@@ -99,7 +99,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     res.status(201).json({
       user: savedUser,
       token,
-      message: "User created successfully",
+      message: "User created",
     });
   } catch (error) {
     res.status(500).json({ message: "Failed to create user", error });
