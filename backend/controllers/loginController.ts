@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import User from "../models/userModel";
+import admin from "../firebase/firebaseAdmin";
 
 // @desc    Get whether login is valid and return token
 // @route   GET /api/login
@@ -8,10 +9,17 @@ import User from "../models/userModel";
 export const checkUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { firebaseId } = req.query;
+    const firebaseToken = req.headers['firebase-token'];
 
-    if (!firebaseId) {
-      res.status(400).send({ message: "No firebase ID provided" });
+    if (!firebaseId || !firebaseToken) {
+      res.status(400).send({ message: "Missing required authentication data" });
       return;
+    }
+
+    // Verify Firebase token
+    const decodedToken = await admin.auth().verifyIdToken(firebaseToken as string);
+    if (decodedToken.uid !== firebaseId) {
+      throw new Error("Firebase token mismatch");
     }
 
     const user = await User.findOne({ firebaseId });
@@ -21,15 +29,19 @@ export const checkUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { id: user._id, firebaseId: user.firebaseId, role: user.role },
       process.env.JWT_SECRET as string,
       { expiresIn: "1h" }
     );
 
+    // Get a new Firebase ID token to use as refresh token
+    const refreshToken = await admin.auth().createCustomToken(user.firebaseId);
+
     res.status(200).send({
       user,
-      token,
+      accessToken,
+      refreshToken,
       message: "User found",
     });
   } catch (error) {
