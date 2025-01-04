@@ -5,6 +5,7 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -20,7 +21,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-orange-400">
+    <div className="flex items-center justify-center h-screen bg-orange-500">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-3xl font-bold text-center text-black">Login</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
