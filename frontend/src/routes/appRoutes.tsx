@@ -5,6 +5,7 @@ import Catalog from "../pages/Catalog/Catalog"
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ResetPassword from "../pages/resetPassword";
+import ResetPasswordForm from "../pages/resetPasswordForm";
 
 const AppRoutes: React.FC = () => (
   <Router>
@@ -14,6 +15,7 @@ const AppRoutes: React.FC = () => (
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordForm />} />
     </Routes>
   </Router>
 );
