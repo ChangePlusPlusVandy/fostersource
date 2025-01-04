@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import authService from "../services/authService";
 import Home from "../pages/Home";
 import Catalog from "../pages/Catalog/Catalog";
 import Login from "../pages/UserAuth/Login";
@@ -8,11 +9,13 @@ import ResetPassword from "../pages/UserAuth/resetPassword";
 import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-  const token = localStorage.getItem("jwt");
-  if (token) {
+  const isAuthenticated = authService.isAuthenticated();
+
+  if (isAuthenticated) {
     return children;
-  } 
-  return <Navigate to="/login" />;
+  } else {
+    return <Navigate to="/login" />;
+  }
 };
 
 const AppRoutes: React.FC = () => (
