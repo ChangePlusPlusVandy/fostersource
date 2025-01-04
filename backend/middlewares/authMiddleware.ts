@@ -10,13 +10,12 @@ export const verifyToken = async (
   req: Request,
   res: Response,
   next: NextFunction
-):Promise<void> => {
+): Promise<void> => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
 
-    
     if (!token) {
-      throw new Error("No token provided"); 
+      throw new Error("No token provided");
     }
 
     const decodedToken = await admin.auth().verifyIdToken(token);
@@ -32,7 +31,6 @@ export const verifyToken = async (
     (req as AuthenticatedRequest).user = dbUser;
     next();
   } catch (error) {
-    // res.status(403).json({ message: "Unauthorized" });
-    next(error);
+    res.status(403).json({ message: "Unauthorized" });
   }
 };

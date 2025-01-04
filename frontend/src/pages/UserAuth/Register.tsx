@@ -19,9 +19,11 @@ const Register: React.FC = () => {
     }
 
     try {
-      await register(email, password);
+      const token = await register(email, password);
+      if (!token) throw new Error("No token received");
+      localStorage.setItem("jwt", token);
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+      setError(err.message);
     }
   };
 

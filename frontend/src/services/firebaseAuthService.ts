@@ -4,7 +4,6 @@ import {
   confirmPasswordReset as confirm,
 } from "firebase/auth";
 
-//to avoid Firebase error messages in login, doesnt work though. Will fix later
 const getErrorMessage = (errorCode: string): string => {
   switch (errorCode) {
     case "auth/invalid-email":
@@ -32,7 +31,7 @@ export const signIn = async (email: string, password: string) => {
     const idToken = await userCredential.user?.getIdToken();
     return idToken;
   } catch (error: any) {
-    const errorCode = error.code || "unknown";
+    const errorCode = error.code;
     throw new Error(getErrorMessage(errorCode));
   }
 };
@@ -43,7 +42,7 @@ export const register = async (email: string, password: string) => {
     const idToken = await userCredential.user?.getIdToken();
     return idToken;
   } catch (error: any) {
-    const errorCode = error.code || "unknown";
+    const errorCode = error.code;
     throw new Error(getErrorMessage(errorCode));
   }
 };
@@ -56,15 +55,16 @@ export const signOut = async () => {
     throw new Error("An error occurred while signing out. Please try again.");
   }
 };
+
 export const sendPasswordResetEmail = async (email: string) => {
   try {
     await resetEmail(auth, email, {
       url: "http://localhost:3000/reset-password",
-      handleCodeInApp: true, //need to go to firebase console and change the link from the default reset link
+      handleCodeInApp: true,
     });
     console.log("Password reset email sent.");
   } catch (error: any) {
-    const errorCode = error.code || "unknown";
+    const errorCode = error.code;
     throw new Error(getErrorMessage(errorCode));
   }
 };
@@ -74,7 +74,7 @@ export const confirmPasswordReset = async (code: string, newPassword: string) =>
     await confirm(auth, code, newPassword);
     console.log("Password reset confirmed.");
   } catch (error: any) {
-    const errorCode = error.code || "unknown";
+    const errorCode = error.code;
     throw new Error(getErrorMessage(errorCode));
   }
 };

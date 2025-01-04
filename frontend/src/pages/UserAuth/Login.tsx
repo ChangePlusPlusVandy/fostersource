@@ -61,7 +61,6 @@ const Login: React.FC = () => {
             <a href="/reset-password" className="text-sm text-orange-600 hover:underline">
               Forgot Password?
             </a>
-
           </div>
           <button
             type="submit"
@@ -69,7 +68,6 @@ const Login: React.FC = () => {
           >
             Log In
           </button>
-
         </form>
         <p className="text-center text-sm text-black">
           Don’t have an account?{" "}
