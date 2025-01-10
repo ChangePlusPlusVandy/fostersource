@@ -11,6 +11,7 @@
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   border-radius: 0.7rem;
   overflow: auto;
+  transition: width 0.3s;
 }
 
 .profile {
@@ -30,6 +31,7 @@
   width: 70px;
   height: 70px;
   border-radius: 50%;
+  transition: all 0.3s;
 }
 
 .menu {
@@ -119,4 +121,20 @@
 body {
   font-family: "Poppins", sans-serif; /* Apply Poppins font to the body */
   font-size: large;
+}
+
+@media (max-width: 768px) {
+  .profile-pic {
+    height: 50px;
+    width: 50px;
+    justify-self: center;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
+  .sidebar {
+    min-width: 0px;
+    max-width: 100px;
+    width: 80px;
+  }
 }
