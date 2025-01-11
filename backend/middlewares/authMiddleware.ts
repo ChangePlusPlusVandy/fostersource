@@ -7,17 +7,18 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export const verifyToken = async (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
-) => {
-  const token = req.headers.authorization?.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-
+):Promise<void> => {
   try {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    
+    if (!token) {
+      throw new Error("No token provided"); 
+    }
+
     const decodedToken = await admin.auth().verifyIdToken(token);
 
     const dbUser = await User.findOne({ firebaseId: decodedToken.uid })
@@ -25,13 +26,13 @@ export const verifyToken = async (
       .populate("payments");
 
     if (!dbUser) {
-      return res.status(403).json({ message: "User not found in database" });
+      throw new Error("User not found in database");
     }
 
-    req.user = dbUser;
+    (req as AuthenticatedRequest).user = dbUser;
     next();
   } catch (error) {
-    console.error("Token verification error:", error);
-    res.status(403).json({ message: "Unauthorized" });
+    // res.status(403).json({ message: "Unauthorized" });
+    next(error);
   }
 };
