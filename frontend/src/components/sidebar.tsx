@@ -12,21 +12,9 @@ import {
   Phone,
   LogOut,
 } from "lucide-react";
+import { isConditionalExpression } from "typescript";
 
-export const items = () => [
-  {
-    icon: <House />,
-    description: "Home",
-    href: "#",
-  },
-  {
-    icon: <LayoutDashboard />,
-    description: "Dashboard",
-    href: "#",
-  },
-];
-
-export function Sidebar({ children }: { children?: ReactNode }) {
+export function Sidebar() {
   const user = "First L.";
   const role = "Child";
 
@@ -60,18 +48,50 @@ export function Sidebar({ children }: { children?: ReactNode }) {
           </div>
         )}
       </div>
-      <ul className="menu">
-        <SidebarItems />
-      </ul>
+
+      <SidebarItems />
     </div>
   );
 }
 
-interface SidebarItemsProps {
-  icon: any;
-  description: string | null;
-  href: string | null;
-}
+export const items = [
+  {
+    icon: <House />,
+    description: "Home",
+    href: "#",
+  },
+  {
+    icon: <LayoutDashboard />,
+    description: "Dashboard",
+    href: "#",
+  },
+  {
+    icon: <BookOpen />,
+    description: "Catalog",
+    href: "#",
+  },
+  {
+    icon: <Mic />,
+    description: "Podcasts",
+    href: "#",
+  },
+  {
+    icon: <Calendar />,
+    description: "Calendar",
+    href: "#",
+  },
+  {
+    icon: <MessageCircleQuestion />,
+    description: "FAQs",
+    href: "#",
+  },
+  { icon: <ShoppingCart />, description: "Cart", href: "#" },
+  {
+    icon: <LogOut />,
+    description: "Logout",
+    href: "#",
+  },
+];
 
 export function SidebarItems() {
   const handleItemClick = (item: string) => {
@@ -95,74 +115,22 @@ export function SidebarItems() {
 
   const [activeItem, setActiveItem] = useState<string>("");
 
-  return (
-    <>
-      <li
-        className={activeItem === "home" ? "active" : ""}
-        onClick={() => handleItemClick("home")}
-      >
-        <House />
-        {!isCollapsed && <Link to="/">Home</Link>}
-      </li>
+  const sidebarItems = items.map(({ icon, description, href }) => {
+    const active = activeItem === description ? "active" : "";
+    const logout = description === "Logout" ? "logout" : "";
 
-      <li
-        className={activeItem === "dashboard" ? "active" : ""}
-        onClick={() => handleItemClick("dashboard")}
-      >
-        <LayoutDashboard />
-        {!isCollapsed && <Link to="/">Dashboard</Link>}
-      </li>
-      <li
-        className={activeItem === "catalog" ? "active" : ""}
-        onClick={() => handleItemClick("catalog")}
-      >
-        <BookOpen />
-        {!isCollapsed && <Link to="/">Catalog</Link>}
-      </li>
-      <li
-        className={activeItem === "podcasts" ? "active" : ""}
-        onClick={() => handleItemClick("podcasts")}
-      >
-        <Mic />
-        {!isCollapsed && <Link to="/">Podcasts</Link>}
-      </li>
-      <li
-        className={activeItem === "calendar" ? "active" : ""}
-        onClick={() => handleItemClick("calendar")}
-      >
-        <Calendar />
-        {!isCollapsed && <Link to="/">Calendar</Link>}
-      </li>
-      <li
-        className={activeItem === "faqs" ? "active" : ""}
-        onClick={() => handleItemClick("faqs")}
-      >
-        <MessageCircleQuestion />
-        {!isCollapsed && <Link to="/">FAQs</Link>}
-      </li>
-      <li
-        className={activeItem === "cart" ? "active" : ""}
-        onClick={() => handleItemClick("cart")}
-      >
-        <ShoppingCart />
-        {!isCollapsed && <Link to="/">Cart</Link>}
-      </li>
-      <li
-        className={activeItem === "contact" ? "active" : ""}
-        onClick={() => handleItemClick("contact")}
-      >
-        <Phone />
-        {!isCollapsed && <Link to="/">Contact</Link>}
-      </li>
-      <div className="logout">
+    return (
+      <div className={`${logout}`}>
         <li
-          className={activeItem === "logout" ? "active" : ""}
-          onClick={() => handleItemClick("logout")}
+          className={`${active}`}
+          onClick={() => handleItemClick(description)}
         >
-          <LogOut />
-          {!isCollapsed && <Link to="/">Logout</Link>}
+          {icon}
+          <Link to={href}>{description}</Link>
         </li>
       </div>
-    </>
-  );
+    );
+  });
+
+  return <ul className="menu mb-4">{sidebarItems}</ul>;
 }

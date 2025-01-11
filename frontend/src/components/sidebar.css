@@ -37,7 +37,6 @@
 .menu {
   font-weight: 500;
   list-style-type: none;
-  margin-top: 2.5rem;
 }
 
 .menu li {
@@ -91,10 +90,6 @@
   background-color: #f79518;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
-}
-
-.menu .logout {
-  margin-bottom: 1.2rem;
 }
 
 .menu .logout li:hover a {
