@@ -2,7 +2,6 @@
   width: 20%;
   min-width: 240px;
   max-width: 300px;
-  height: 90%;
   max-height: min-content;
   background-color: #ffffff;
   margin-right: 0.75rem;
@@ -11,14 +10,13 @@
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   border-radius: 0.7rem;
   overflow: auto;
-  transition: width 0.3s;
+  transition: all 0.3s;
 }
 
 .profile {
   vertical-align: middle;
-  text-align: left;
   font: medium;
-  max-width: 70%;
+  max-width: 75%;
   margin-top: 1.8rem;
   margin-left: 1.8rem;
   margin-right: 1.8rem;
@@ -31,7 +29,12 @@
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  transition: all 0.3s;
+}
+
+.login {
+  background-color: #f79518;
+  text-align: center;
+  border-radius: 0.5rem;
 }
 
 .menu {
@@ -53,13 +56,8 @@
 
 .menu a {
   text-decoration: none;
-  color: #333;
   display: flex;
   align-items: center;
-}
-
-.menu li svg {
-  margin-right: 1rem;
 }
 
 .menu li:hover a {
@@ -67,7 +65,7 @@
 }
 
 .menu li:hover svg {
-  color: #f79518;
+  color: #f79618;
 }
 
 .menu li.active {
@@ -119,17 +117,25 @@ body {
 }
 
 @media (max-width: 768px) {
-  .profile-pic {
-    height: 50px;
-    width: 50px;
-    justify-self: center;
-    margin-left: 0px;
-    margin-right: 0px;
+  .sidebar {
+    min-width: 70px;
+    width: 70px;
+    padding-left: 0;
   }
 
-  .sidebar {
-    min-width: 0px;
-    max-width: 100px;
-    width: 80px;
+  .menu li {
+    padding-left: 1.5rem;
+  }
+
+  .profile {
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-left: 0.95rem;
+    margin-right: 0px;
+    max-width: 60%;
+  }
+  .login {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
