@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
-import Sidebar from "../components/sidebar";
+import { Sidebar } from "../components/sidebar";
 import HeaderBar from "../components/headerBar";
 
 const AppRoutes: React.FC = () => (
