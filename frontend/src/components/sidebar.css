@@ -10,7 +10,7 @@
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   border-radius: 0.7rem;
   overflow: auto;
-  transition: all 0.3s;
+  transition: all 0.2s;
 }
 
 .profile {

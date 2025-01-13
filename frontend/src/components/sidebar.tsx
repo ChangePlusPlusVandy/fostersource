@@ -168,16 +168,19 @@ export function SidebarItems({ isCollapsed, isLoggedIn }: SidebarItemsProps) {
     );
   });
 
+  const active = activeItem === "logout" ? "active" : "";
   const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
   return (
     <ul className="menu mb-4">
       {sidebarItems}
       {isLoggedIn && (
-        <li className="logout" onClick={() => handleItemClick("logout")}>
-          <div className={`${iconDescMargin}`}>{logout.icon}</div>
-          <Link to="#">{!isCollapsed && logout.description}</Link>
-        </li>
+        <div className="logout">
+          <li className={`${active}`} onClick={() => handleItemClick("logout")}>
+            <div className={`${iconDescMargin}`}>{logout.icon}</div>
+            <Link to="#">{!isCollapsed && logout.description}</Link>
+          </li>
+        </div>
       )}
     </ul>
   );
