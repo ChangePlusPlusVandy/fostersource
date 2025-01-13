@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { Link } from "react-router-dom";
 import "./sidebar.css";
 import {
@@ -68,17 +68,18 @@ export const logout = {
   href: "#",
 };
 
+// State of collapsibility, abstracted
+interface SidebarProps {
+  isCollapsed: boolean;
+  setIsCollapsed: Dispatch<SetStateAction<boolean>>;
+}
+
 // The Sidebar itself
-export function Sidebar() {
+export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   // User Info
   const name = userInfo.name;
   const role = userInfo.role;
   const isLoggedIn = userInfo.isLoggedIn;
-
-  // State to handle collapsibility
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(
-    window.innerWidth < 768
-  );
 
   // Automatically collapse sidebar for narrow screens
   useEffect(() => {
