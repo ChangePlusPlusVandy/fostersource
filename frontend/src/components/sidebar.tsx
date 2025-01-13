@@ -14,7 +14,7 @@ import {
   LogIn,
 } from "lucide-react";
 
-// TODO User information
+// User information
 export const userInfo = {
   name: "First L.",
   role: "Role",
@@ -61,6 +61,7 @@ export const items = [
   },
 ];
 
+// Logout information for conditional rendering
 export const logout = {
   icon: <LogOut />,
   description: "Logout",
@@ -111,7 +112,7 @@ interface ProfileProps {
   role?: string;
 }
 
-// Display profile picture
+// Display either profile information or log in button
 export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
   return (
     <div className="profile flex flex-row items-center w-full">
@@ -125,18 +126,18 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
         </div>
       )}
       {isLoggedIn && (
-          <img
-            src="assets/cute_ghost.jpeg"
-            alt="Profile"
-            className="profile-pic"
-          />
-        ) &&
-        !isCollapsed && (
-          <div className="pl-3 align-middle">
-            <p className="text-xl font-medium text-wrap">{name}</p>
-            <p className="text-xs text-gray-600 mt-1">{role}</p>
-          </div>
-        )}
+        <img
+          src="assets/cute_ghost.jpeg"
+          alt="Profile"
+          className="profile-pic"
+        />
+      )}
+      {!isCollapsed && (
+        <div className="pl-3 align-middle">
+          <p className="text-xl font-medium text-wrap">{name}</p>
+          <p className="text-xs text-gray-600 mt-1">{role}</p>
+        </div>
+      )}
     </div>
   );
 }
