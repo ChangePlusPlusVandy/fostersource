@@ -18,7 +18,7 @@ import {
 export const userInfo = {
   name: "First L.",
   role: "Role",
-  isLoggedIn: true,
+  isLoggedIn: false,
 };
 
 // All sidebar entries
@@ -133,7 +133,7 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
           className="profile-pic"
         />
       )}
-      {!isCollapsed && (
+      {isLoggedIn && !isCollapsed && (
         <div className="pl-3 align-middle">
           <p className="text-xl font-medium text-wrap">{name}</p>
           <p className="text-xs text-gray-600 mt-1">{role}</p>
