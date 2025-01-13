@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import "./headerBar.css";
 
 export const headerItems = [
@@ -41,18 +42,15 @@ export const headerItems = [
   },
 ];
 
+interface HeaderBarProps {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+}
+
 // The Header Bar
-const HeaderBar = () => {
-  const [activeItem, setActiveItem] = useState<string>("");
-
-  const handleItemClick = (item: string) => {
-    setActiveItem(item);
-  };
-
+export function HeaderBar({ isOpen, setIsOpen }: HeaderBarProps) {
   // State to handle collapsibility
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(
-    window.innerWidth < 768
-  );
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   // Automatically collapse header bar for narrow screens
   useEffect(() => {
@@ -69,13 +67,26 @@ const HeaderBar = () => {
   return (
     <div className="header flex flex-row w-full mb-3">
       <FosterSourceLogo />
-      <HeaderItems />
+      {!isCollapsed ? (
+        <HeaderItems displayOptions="header-menu flex-row" />
+      ) : (
+        <ul className="header-hamburger">
+          <a href="#" className="w-full">
+            <button
+              className="rounded p-3 flex gap-3 justify-end text-center w-full"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X /> : <Menu />}
+            </button>
+          </a>
+        </ul>
+      )}
     </div>
   );
-};
+}
 
 // Display the Fostersource logo
-export function FosterSourceLogo() {
+function FosterSourceLogo() {
   return (
     <img
       src="/assets/fostersource-logo.png"
@@ -85,15 +96,20 @@ export function FosterSourceLogo() {
   );
 }
 
+interface HeaderItemsProps {
+  displayOptions: string;
+  outline?: string;
+}
+
 // Display and handle header bar entries
-export function HeaderItems() {
+export function HeaderItems({ displayOptions, outline }: HeaderItemsProps) {
   const headerItemList = headerItems.map(({ description, href }) => (
-    <li>
+    <li className="border-black border-solid">
       <Link to={href}>{description}</Link>
     </li>
   ));
 
-  return <ul className="header-menu">{headerItemList}</ul>;
+  return <ul className={`${displayOptions}`}>{headerItemList}</ul>;
 }
 
 export default HeaderBar;
