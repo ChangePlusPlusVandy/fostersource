@@ -41,28 +41,28 @@ export default function CatalogSearchBar({ onSearch,updateFilters }: CatalogSear
         {
             label: "1+",
             onClick: () => {
-                setSelectedRating("1");
+                setSelectedRating("1+");
                 updateFilters("rating", "1");
             },
         },
         {
             label: "2+",
             onClick: () => {
-                setSelectedRating("2");
+                setSelectedRating("2+");
                 updateFilters("rating", "2");
             },
         },
         {
             label: "3+",
             onClick: () => {
-                setSelectedRating("3");
+                setSelectedRating("3+");
                 updateFilters("rating", "3");
             },
         },
         {
             label: "4+",
             onClick: () => {
-                setSelectedRating("4");
+                setSelectedRating("4+");
                 updateFilters("rating", "4");
             },
         },
@@ -134,11 +134,29 @@ export default function CatalogSearchBar({ onSearch,updateFilters }: CatalogSear
             },
         }
     ];
+    const costMenuItems = [
+        {
+            label: "All",
+            onClick: () => {
+                setSelectedCost("All");
+                updateFilters("cost", "All");
+            },
+        },
+        {
+            label: "Free",
+            onClick: () => {
+                setSelectedCost("Free");
+                updateFilters("cost", "0");
+            },
+        },
+    ];
 
     const [selectedCategory, setSelectedCategory] = useState<string>("All");
     const [selectedRating, setSelectedRating] = useState<string>("All");
     const [selectedCredits, setSelectedCredits] = useState<string>("All");
     const [selectedFormat, setSelectedFormat] = useState<string>("All");
+    const [selectedCost, setSelectedCost] = useState<string>("All");
+
 
     return (
         <div className="flex flex-col gap-4 mb-6">
@@ -173,6 +191,10 @@ export default function CatalogSearchBar({ onSearch,updateFilters }: CatalogSear
                 <Dropdown
                     buttonLabel={`Format: ${selectedFormat}`}
                     menuItems={formatMenuItems}
+                />
+                <Dropdown
+                    buttonLabel={`Cost: ${selectedCost}`}
+                    menuItems={costMenuItems}
                 />
             </div>
         </div>

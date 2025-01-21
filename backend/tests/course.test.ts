@@ -17,7 +17,7 @@ const courseData1 = {
   components: [],
   isLive: true,
   categories: ["Category 1", "Category 2"],
-  creditCount: 3,
+  creditNumber: 3,
   description: "This is a description for Course A",
   thumbnailPath: "/path/to/thumbnail1.jpg",
   cost: 12345,
@@ -31,7 +31,7 @@ const courseData2 = {
   components: [],
   isLive: false,
   categories: ["Category 3"],
-  creditCount: 4,
+  creditNumber: 4,
   description: "This is a description for Course B",
   thumbnailPath: "/path/to/thumbnail2.jpg",
   cost: 0,
@@ -77,7 +77,7 @@ describe("POST /api/courses", () => {
       .send(incompleteCourseData);
     expect(res.statusCode).toBe(400);
     expect(res.body.message).toBe(
-      "Please provide className, isLive, creditCount, description, and thumbnailPath"
+      "Please provide className, isLive, creditNumber, description, and thumbnailPath"
     );
   });
 
@@ -87,7 +87,7 @@ describe("POST /api/courses", () => {
     expect(res.body.data.className).toBe("Course A");
     expect(res.body.data.isLive).toBe(true);
     expect(res.body.data.categories).toEqual(["Category 1", "Category 2"]);
-    expect(res.body.data.creditCount).toBe(3);
+    expect(res.body.data.creditNumber).toBe(3);
     expect(res.body.data.description).toBe(
       "This is a description for Course A"
     );
@@ -104,7 +104,7 @@ describe("POST /api/courses", () => {
       const existingCourseData = {
         className: "Course A",
         isLive: true,
-        creditCount: 3,
+        creditNumber: 3,
         description: "This is a description for Course A",
         thumbnailPath: "/path/to/thumbnail1.jpg",
         cost: 12345,
@@ -128,7 +128,7 @@ describe("PUT /api/courses/:id", () => {
   });
 
   it("should update a course", async () => {
-    const updates = { className: "Course C", isLive: false, creditCount: 5 };
+    const updates = { className: "Course C", isLive: false, creditNumber: 5 };
 
     const res = await request(app)
       .put(`/api/courses/${courseId}`)
@@ -136,7 +136,7 @@ describe("PUT /api/courses/:id", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.data.className).toBe("Course C");
     expect(res.body.data.isLive).toBe(false);
-    expect(res.body.data.creditCount).toBe(5);
+    expect(res.body.data.creditNumber).toBe(5);
   });
 
   it("should return 404 if course is not found", async () => {

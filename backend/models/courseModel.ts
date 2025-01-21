@@ -9,10 +9,11 @@ export interface ICourse extends Document {
   components: Object[];
   isLive: boolean;
   categories: string[];
-  creditCount: number;
+    creditNumber: number;
   description: string;
   thumbnailPath: string;
   cost: number;
+  instructor: string;
 }
 
 const CourseSchema: Schema = new Schema(
@@ -29,10 +30,11 @@ const CourseSchema: Schema = new Schema(
     components: [{ type: Schema.Types.Mixed, required: false }],
     isLive: { type: Boolean, required: true },
     categories: [{ type: String, required: false }],
-    creditCount: { type: Number, required: true },
+    creditNumber: { type: Number, required: true },
     description: { type: String, required: true },
     thumbnailPath: { type: String, required: true },
     cost: { type: Number, required: true },
+    instructor: { type: String, required: false },
   },
   {
     timestamps: true,

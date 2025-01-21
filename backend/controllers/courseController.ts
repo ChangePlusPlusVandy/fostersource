@@ -46,7 +46,7 @@ export const createCourse = async (
       components,
       isLive,
       categories,
-      creditCount,
+      creditNumber,
       description,
       thumbnailPath,
       cost,
@@ -56,7 +56,7 @@ export const createCourse = async (
     if (
       !className ||
       !isLive ||
-      !creditCount ||
+      !creditNumber ||
       !description ||
       !thumbnailPath ||
       !cost
@@ -64,7 +64,7 @@ export const createCourse = async (
       res.status(400).json({
         success: false,
         message:
-          "Please provide className, isLive, creditCount, description, and thumbnailPath",
+          "Please provide className, isLive, creditNumber, description, and thumbnailPath",
       });
       return;
     }
@@ -88,7 +88,7 @@ export const createCourse = async (
       components,
       isLive,
       categories,
-      creditCount,
+      creditNumber,
       description,
       thumbnailPath,
       cost,
