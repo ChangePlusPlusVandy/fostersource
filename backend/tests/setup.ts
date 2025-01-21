@@ -32,3 +32,11 @@ afterAll(async () => {
   await mongoose.connection.close();
   await mongo.stop();
 });
+
+// Mock the verifyToken middleware globally
+jest.mock("../middlewares/authMiddleware.ts", () => ({
+  verifyToken: (req: any, res: any, next: any) => {
+    req.user = { userId: "mockedUserId" }; // Mock user object
+    next();
+  },
+}));

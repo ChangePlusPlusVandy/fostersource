@@ -1,6 +1,7 @@
 import request from "supertest";
 import app from "../app";
 import Rating from "../models/ratingModel";
+import Course from "../models/courseModel";
 import mongoose from "mongoose";
 
 // Dummy ObjectId for testing
@@ -13,6 +14,7 @@ describe("GET /api/ratings", () => {
     const rating = await Rating.create({
       userId: mockUserId,
       rating: 4,
+      courseId: new mongoose.Types.ObjectId().toString(),
     });
     ratingId = (rating._id as mongoose.Types.ObjectId).toString();
   });
@@ -25,13 +27,17 @@ describe("GET /api/ratings", () => {
   });
 
   it("should retrieve ratings for a specific user", async () => {
-    const res = await request(app).get(`/api/ratings`).query({ userId: mockUserId });
+    const res = await request(app)
+      .get(`/api/ratings`)
+      .query({ userId: mockUserId });
     expect(res.statusCode).toBe(200);
     expect(res.body[0].userId).toBe(mockUserId);
   });
 
   it("should return 404 if no ratings are found for the user", async () => {
-    const res = await request(app).get(`/api/ratings`).query({ userId: new mongoose.Types.ObjectId() });
+    const res = await request(app)
+      .get(`/api/ratings`)
+      .query({ userId: new mongoose.Types.ObjectId().toString() });
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe("No ratings found for this user.");
   });
@@ -39,9 +45,11 @@ describe("GET /api/ratings", () => {
 
 describe("POST /api/ratings", () => {
   it("should create a new rating for a user", async () => {
-    const res = await request(app)
-      .post("/api/ratings")
-      .send({ userId: mockUserId, rating: 5 });
+    const res = await request(app).post("/api/ratings").send({
+      userId: mockUserId,
+      rating: 5,
+      courseId: new mongoose.Types.ObjectId().toString(),
+    });
 
     expect(res.statusCode).toBe(201);
     expect(res.body.rating).toBe(5);
@@ -74,6 +82,7 @@ describe("PUT /api/ratings/:id", () => {
     const rating = await Rating.create({
       userId: mockUserId,
       rating: 4,
+      courseId: new mongoose.Types.ObjectId().toString(),
     });
     ratingId = (rating._id as mongoose.Types.ObjectId).toString();
   });
@@ -91,7 +100,9 @@ describe("PUT /api/ratings/:id", () => {
 
   it("should return 404 if rating is not found", async () => {
     const nonExistentRatingId = new mongoose.Types.ObjectId();
-    const res = await request(app).delete(`/api/ratings/${nonExistentRatingId}`);
+    const res = await request(app).delete(
+      `/api/ratings/${nonExistentRatingId}`
+    );
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe("Rating not found.");
   });
@@ -101,19 +112,35 @@ describe("DELETE /api/ratings/:id", () => {
   let ratingId: string;
 
   beforeEach(async () => {
+    const course = await Course.create({
+      ratings: [],
+      className: "Sample Course",
+    });
+    
     const rating = await Rating.create({
       userId: mockUserId,
+      courseId: course._id,
       rating: 4,
     });
+
     ratingId = (rating._id as mongoose.Types.ObjectId).toString();
   });
 
   it("should delete a rating successfully", async () => {
-    const res = await request(app).delete(`/api/ratings/${ratingId}`);
+    const rating = await Rating.findById(ratingId);
 
-    // Check that the response status code is 204 (No Content)
+    const courseBeforeDeletion = await Course.findById(rating?.courseId);
+    expect(courseBeforeDeletion).not.toBeNull();
+    expect(courseBeforeDeletion?.ratings.map(id => id.toString())).toContain(ratingId);
+
+    // Delete the rating
+    const res = await request(app).delete(`/api/ratings/${ratingId}`);
     expect(res.statusCode).toBe(204);
     
+    const courseAfterDeletion = await Course.findById(rating?.courseId);
+    expect(courseAfterDeletion).not.toBeNull();
+    expect(courseAfterDeletion?.ratings.map(id => id.toString())).not.toContain(ratingId);
+
     // Try to retrieve the deleted rating to ensure it's gone
     const ratingCheck = await Rating.findById(ratingId);
     expect(ratingCheck).toBeNull();
@@ -121,7 +148,9 @@ describe("DELETE /api/ratings/:id", () => {
 
   it("should return 404 if rating is not found", async () => {
     const nonExistentRatingId = new mongoose.Types.ObjectId();
-    const res = await request(app).delete(`/api/ratings/${nonExistentRatingId}`);
+    const res = await request(app).delete(
+      `/api/ratings/${nonExistentRatingId}`
+    );
 
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe("Rating not found.");

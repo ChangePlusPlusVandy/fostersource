@@ -1,0 +1,73 @@
+.header {
+  width: 100%;
+  height: 4rem;
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  background-color: white;
+  align-items: center;
+  transition: height 0.3s;
+}
+
+.header-image {
+  height: 45px;
+  margin-left: 12rem;
+  margin-right: 12rem;
+  transition: margin 0.3s;
+}
+
+.header-menu {
+  display: flex;
+  flex: 1;
+  justify-content: space-around;
+  /* flex-direction: row; */
+  text-align: center;
+}
+
+.header-menu li {
+  font-variant-caps: all-petite-caps;
+  font-size: medium;
+  line-height: 0.8;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.header-menu li:hover a:hover {
+  color: #f79518;
+}
+
+.header-hamburger {
+  display: flex;
+  flex: 1;
+  justify-content: end;
+  flex-direction: row;
+  text-align: center;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  font-size: large;
+}
+
+@media (max-width: 1140px) {
+  .header-image {
+    margin-left: 5rem;
+    margin-right: 5rem;
+  }
+
+  .header-menu {
+    justify-content: space-between; /* Adjust spacing for smaller screens */
+  }
+}
+
+/* TODO: @kohrachel add hamburger menu support for widths less than 900px */
+@media (max-width: 900px) {
+  .header-image {
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
+
+  .header-menu {
+    justify-content: space-between; /* Adjust spacing for smaller screens */
+  }
+}
