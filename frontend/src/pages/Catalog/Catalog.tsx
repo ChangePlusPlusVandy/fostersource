@@ -14,11 +14,14 @@ export default function Catalog() {
             discussion: "An interactive discussion about computational thinking.",
             components: ["Lectures", "Labs", "Quizzes"],
             handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-            Ratings: [
+            ratings: [
                 // { userId: "user1", courseId: "cs101", rating: 2 },
                 // { userId: "user2", courseId: "cs101", rating: 2 },
             ],
-            isLive: false
+            isLive: false,
+            cost: 100,
+            categories: ["Technology"],
+            thumbnailPath: ""
         },
         {
             className: "Advanced Mathematics",
@@ -28,11 +31,14 @@ export default function Catalog() {
             discussion: "Weekly seminars focusing on real-world problem-solving.",
             components: ["Lectures", "Projects", "Exams"],
             handouts: ["syllabus.pdf", "formulas.pdf"],
-            Ratings: [
+            ratings: [
                 { userId: "user3", courseId: "math201", rating: 4 },
                 { userId: "user4", courseId: "math201", rating: 3 },
             ],
-            isLive: false
+            isLive: false,
+            cost: 0,
+            categories: [],
+            thumbnailPath: ""
         },
         {
             className: "Introduction to Philosophy",
@@ -42,12 +48,14 @@ export default function Catalog() {
             discussion: "Weekly discussions about classic and modern philosophical texts.",
             components: ["Lectures", "Essays", "Group Work"],
             handouts: ["syllabus.pdf", "plato.pdf", "kant.pdf"],
-            Ratings: [
+            ratings: [
                 { userId: "user5", courseId: "phil101", rating: 4 },
                 { userId: "user6", courseId: "phil101", rating: 4 },
             ],
-            isLive: true
-
+            isLive: true,
+            cost: 200,
+            categories: [],
+            thumbnailPath: ""
         },
     ]
 
@@ -58,6 +66,8 @@ export default function Catalog() {
     const [selectedRating, setSelectedRating] = useState<string>("All");
     const [selectedCredits, setSelectedCredits] = useState<string>("All");
     const [selectedFormat, setSelectedFormat] = useState<string>("All");
+    const [selectedCost, setSelectedCost] = useState<string>("All");
+
 
     useEffect(() => {
         // Populate with dummy courses for testing
@@ -73,14 +83,15 @@ export default function Catalog() {
             );
         }
 
-        //IDK what a category is lol
-        // if(selectedCategory !== "All"){
-
-        // }
+        if(selectedCategory !== "All"){
+            filtered = filtered.filter((course) =>
+                course.categories.includes(selectedCategory)
+            );
+        }
 
         if(selectedRating !== "All"){
             filtered = filtered.filter((course) =>
-                course.Ratings.length > 0 ? (course.Ratings.reduce((sum, r) => sum + r.rating, 0) / course.Ratings.length) >= parseInt(selectedRating) : false
+                course.ratings.length > 0 ? (course.ratings.reduce((sum, r) => sum + r.rating, 0) / course.ratings.length) >= parseInt(selectedRating) : false
             );
         }
 
@@ -102,9 +113,14 @@ export default function Catalog() {
                 );
             }
         }
-        console.log(filtered)
+
+        if(selectedCost !== "All"){
+            filtered = filtered.filter((course) =>
+                course.cost === 0
+            );
+        }
         setFilteredCourses(filtered);
-    }, [searchQuery, selectedCategory, selectedRating, selectedCredits, selectedFormat]);
+    }, [searchQuery, selectedCategory, selectedRating, selectedCredits, selectedFormat, selectedCost]);
 
 
     const handleSearch = (query: string) => {
@@ -126,6 +142,9 @@ export default function Catalog() {
                 break;
             case "format":
                 setSelectedFormat(filterValue)
+                break;
+            case "cost":
+                setSelectedCost(filterValue)
                 break;
         }
     };

@@ -7,6 +7,13 @@ export interface ICourse extends Document {
   className: string;
   discussion: string;
   components: Object[];
+  isLive: boolean;
+  categories: string[];
+    creditNumber: number;
+  description: string;
+  thumbnailPath: string;
+  cost: number;
+  instructor: string;
 }
 
 const CourseSchema: Schema = new Schema(
@@ -21,9 +28,16 @@ const CourseSchema: Schema = new Schema(
     className: { type: String, required: true },
     discussion: { type: String, required: false },
     components: [{ type: Schema.Types.Mixed, required: false }],
+    isLive: { type: Boolean, required: true },
+    categories: [{ type: String, required: false }],
+    creditNumber: { type: Number, required: true },
+    description: { type: String, required: true },
+    thumbnailPath: { type: String, required: true },
+    cost: { type: Number, required: true },
+    instructor: { type: String, required: false },
   },
   {
-    timestamps: true, // Enable automatic createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 

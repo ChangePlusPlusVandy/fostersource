@@ -12,9 +12,10 @@ export const getCourses = async (
   try {
     const filters = req.query;
 
+    // Populate ratings and components fields as needed
     const courseResponses = await Course.find(filters)
       .populate(["ratings", "components"])
-      .exec(); 
+      .exec();
 
     res.status(200).json({
       success: true,
@@ -37,34 +38,63 @@ export const createCourse = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { handouts, ratings, className, discussion, components } = req.body; 
+    const {
+      handouts,
+      ratings,
+      className,
+      discussion,
+      components,
+      isLive,
+      categories,
+      creditNumber,
+      description,
+      thumbnailPath,
+      cost,
+    } = req.body;
 
-    if (!className) {
+    // Validate required fields
+    if (
+      !className ||
+      !isLive ||
+      !creditNumber ||
+      !description ||
+      !thumbnailPath ||
+      !cost
+    ) {
       res.status(400).json({
         success: false,
-        message: "Please provide className",
+        message:
+          "Please provide className, isLive, creditNumber, description, and thumbnailPath",
       });
       return;
     }
-    
-    let existingCourse = await Course.findOne({ className }); 
+
+    // Check for existing course
+    let existingCourse = await Course.findOne({ className });
     if (existingCourse) {
       res.status(200).json({
         data: existingCourse,
-        message: "Course already exists"
+        message: "Course already exists",
       });
       return;
     }
 
+    // Create a new course instance
     const newCourseResponse = new Course({
-      handouts, 
-      ratings, 
-      className, 
-      discussion, 
-      components
+      handouts,
+      ratings,
+      className,
+      discussion,
+      components,
+      isLive,
+      categories,
+      creditNumber,
+      description,
+      thumbnailPath,
+      cost,
     });
 
-    const savedCourseResponse = await newCourseResponse.save(); 
+    const savedCourseResponse = await newCourseResponse.save();
 
     res.status(201).json({
       success: true,
@@ -86,35 +116,35 @@ export const updateCourse = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { id } = req.params; 
-    const updates = req.body; 
+    const { id } = req.params;
+    const updates = req.body;
 
+    // Find and update the course
     const updatedCourse = await Course.findByIdAndUpdate(id, updates, {
-      new: true, 
+      new: true,
       runValidators: true,
-    }); 
+    });
 
     if (!updatedCourse) {
       res.status(404).json({
-        success: false, 
-        message: "Course entry not found"
-      }); 
+        success: false,
+        message: "Course entry not found",
+      });
       return;
     }
 
-    const savedCourse = await updatedCourse?.save(); 
+    const savedCourse = await updatedCourse?.save();
 
     res.status(200).json({
-      success: true, 
-      data: savedCourse, 
-    }); 
+      success: true,
+      data: savedCourse,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Internal service error.",
     });
   }
-
 };
 
 // @desc    Delete a course
@@ -125,9 +155,9 @@ export const deleteCourse = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { id } = req.params; 
+    const { id } = req.params;
 
-    const courseResponse = await Course.findById(id); 
+    const courseResponse = await Course.findById(id);
 
     if (!courseResponse) {
       res.status(404).json({
@@ -137,11 +167,13 @@ export const deleteCourse = async (
       return;
     }
 
-    await Rating.deleteMany({ _id: { $in: courseResponse.ratings }});
+    // Delete associated ratings
+    await Rating.deleteMany({ _id: { $in: courseResponse.ratings } });
 
-    // TODO: component handling
+    // TODO: Handle deletion of associated components if needed
 
-    await Course.deleteOne({ _id: id }); 
+    // Delete the course
+    await Course.deleteOne({ _id: id });
 
     res.status(200).json({
       success: true,
@@ -153,5 +185,4 @@ export const deleteCourse = async (
       message: "Internal service error.",
     });
   }
-
 };

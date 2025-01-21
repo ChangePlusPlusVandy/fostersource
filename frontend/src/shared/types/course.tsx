@@ -12,6 +12,9 @@ export type Course = {
     discussion: string,
     components: any[],
     handouts: string[],
-    Ratings: Rating[],
-    isLive: boolean
+    ratings: Rating[],
+    isLive: boolean,
+    cost: number,
+    categories: string[];
+    thumbnailPath: string;
 }
