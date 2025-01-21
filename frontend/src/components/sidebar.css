@@ -1,0 +1,146 @@
+.sidebar {
+  width: 20%;
+  min-width: 240px;
+  max-width: 300px;
+  max-height: min-content;
+  background-color: #ffffff;
+  margin-right: 0.75rem;
+  margin-left: 0.75rem;
+  height: 80vh;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  border-radius: 0.7rem;
+  overflow: auto;
+  transition: all 0.2s;
+}
+
+.profile {
+  vertical-align: middle;
+  font: medium;
+  max-width: 75%;
+  margin-top: 1.8rem;
+  margin-left: 1.8rem;
+  margin-right: 1.8rem;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.profile-pic {
+  vertical-align: middle;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+
+.login {
+  background-color: #f79518;
+  text-align: center;
+  border-radius: 0.5rem;
+}
+
+.menu {
+  font-weight: 500;
+  list-style-type: none;
+}
+
+.menu li {
+  vertical-align: middle;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+  padding-left: 1.8rem;
+  padding-right: 1.8rem;
+  position: relative;
+}
+
+.menu a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.menu li:hover a {
+  color: #f79518;
+}
+
+.menu li:hover svg {
+  color: #f79618;
+}
+
+.menu li.active {
+  background-color: #f7951833;
+  color: #e28815;
+}
+
+.menu li.active a {
+  color: #e28815;
+}
+
+.menu li.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 65%;
+  background-color: #f79518;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.menu .logout li:hover a {
+  color: #be0000 !important;
+}
+
+.menu .logout li:hover svg {
+  color: #be0000 !important;
+}
+
+.menu .logout li.active {
+  background-color: #f7181833 !important;
+  color: #be0000 !important;
+}
+
+.menu .logout li.active a {
+  color: #be0000 !important;
+}
+
+.menu .logout li.active::after {
+  background-color: #be0000 !important;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  font-size: large;
+}
+
+@media (max-width: 768px) {
+  .profile-pic {
+    width: 40px;
+    height: 40px;
+  }
+
+  .sidebar {
+    min-width: 70px;
+    width: 70px;
+    padding-left: 0;
+  }
+
+  .menu li {
+    padding-left: 1.5rem;
+  }
+
+  .profile {
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-left: 0.95rem;
+    margin-right: 0px;
+    max-width: 60%;
+  }
+  .login {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
