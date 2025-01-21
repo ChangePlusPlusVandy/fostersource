@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "../pages/Home";
-import { Sidebar } from "../components/sidebar";
-import HeaderBar, { HeaderItems } from "../components/headerBar";
+import Home from "../pages/HomePage/Home";
+import { Sidebar } from "../components/Sidebar/sidebar";
+import HeaderBar, { HeaderItems } from "../components/HeaderBar/headerBar";
 
 function AppRoutes() {
   const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
