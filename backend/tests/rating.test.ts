@@ -5,7 +5,6 @@ import Course from "../models/courseModel";
 import mongoose from "mongoose";
 
 // Dummy ObjectId for testing
-const mockCourseId = new mongoose.Types.ObjectId().toString();
 const mockUserId = new mongoose.Types.ObjectId().toString();
 
 describe("GET /api/ratings", () => {
@@ -38,7 +37,7 @@ describe("GET /api/ratings", () => {
   it("should return 404 if no ratings are found for the user", async () => {
     const res = await request(app)
       .get(`/api/ratings`)
-      .query({ userId: new mongoose.Types.ObjectId() });
+      .query({ userId: new mongoose.Types.ObjectId().toString() });
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe("No ratings found for this user.");
   });
@@ -113,43 +112,34 @@ describe("DELETE /api/ratings/:id", () => {
   let ratingId: string;
 
   beforeEach(async () => {
-    // Create a course with an empty ratings array
     const course = await Course.create({
-      id: mockCourseId,
-      _id: mockCourseId,
-      className: "Sample Course",
       ratings: [],
+      className: "Sample Course",
     });
-    console.log("Created course:", course); // This should print the course details
-
+    
     const rating = await Rating.create({
       userId: mockUserId,
+      courseId: course._id,
       rating: 4,
-      courseId: new mongoose.Types.ObjectId().toString(),
     });
-    ratingId = (rating._id as mongoose.Types.ObjectId).toString();
 
-    // Add the created rating to the course's ratings array
-    await Course.findByIdAndUpdate(mockCourseId, { // NEW CODE
-      $push: { ratings: rating._id }, // NEW CODE
-    });
+    ratingId = (rating._id as mongoose.Types.ObjectId).toString();
   });
 
   it("should delete a rating successfully", async () => {
-    // First, check that the rating is indeed in the Course's ratings before deletion
-    const courseBeforeDeletion = await Course.findById(mockCourseId); // NEW CODE
-    console.log("Course before deletion:", courseBeforeDeletion); // Debugging
-    expect(courseBeforeDeletion?.ratings).toContain(ratingId); // NEW CODE
+    const rating = await Rating.findById(ratingId);
+
+    const courseBeforeDeletion = await Course.findById(rating?.courseId);
+    expect(courseBeforeDeletion).not.toBeNull();
+    expect(courseBeforeDeletion?.ratings.map(id => id.toString())).toContain(ratingId);
 
     // Delete the rating
     const res = await request(app).delete(`/api/ratings/${ratingId}`);
-
-    // Check that the response status code is 204 (No Content)
     expect(res.statusCode).toBe(204);
-
-    // Check that the rating is removed from the Course's ratings array
-    const courseAfterDeletion = await Course.findById(mockCourseId); // NEW CODE
-    expect(courseAfterDeletion?.ratings).not.toContain(ratingId); // NEW CODE
+    
+    const courseAfterDeletion = await Course.findById(rating?.courseId);
+    expect(courseAfterDeletion).not.toBeNull();
+    expect(courseAfterDeletion?.ratings.map(id => id.toString())).not.toContain(ratingId);
 
     // Try to retrieve the deleted rating to ensure it's gone
     const ratingCheck = await Rating.findById(ratingId);

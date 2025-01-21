@@ -25,7 +25,7 @@ const ratingSchema: Schema = new Schema(
   }
 );
 
-// Middleware to automatically add rating to course's rratings array after saving
+// Middleware to automatically add rating to course's ratings array after saving
 ratingSchema.post("save", async function (doc) {
   if (doc.courseId) {
     try {
@@ -35,19 +35,6 @@ ratingSchema.post("save", async function (doc) {
     } catch (error) {
       console.error("Failed to update course's ratings array:", error);
     }
-  }
-});
-
-// Middleware to automatically remove the rating from the course's ratings array
-ratingSchema.post("deleteOne", async function (doc) {
-  try {
-    // Remove the rating reference from the course's ratings array
-    await Course.updateMany(
-      { ratings: doc._id }, // Find courses that have this rating in their ratings array
-      { $pull: { ratings: doc._id } } // Remove the rating from the ratings array
-    );
-  } catch (error) {
-    console.error("Failed to remove rating from course:", error);
   }
 });
 
