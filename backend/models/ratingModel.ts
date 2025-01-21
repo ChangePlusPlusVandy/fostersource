@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 import Course from "./courseModel";
 
 export interface IRating extends Document {
-  userId: string;
+  userId: mongoose.Types.ObjectId;
   courseId: {
     type: mongoose.Types.ObjectId; 
     ref: "Course";
@@ -12,7 +12,7 @@ export interface IRating extends Document {
 
 const ratingSchema: Schema = new Schema(
   {
-    userId: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, required: true },
     courseId: { 
       type: mongoose.Types.ObjectId, 
       ref: "Course",
@@ -25,7 +25,7 @@ const ratingSchema: Schema = new Schema(
   }
 );
 
-// Middleware to automatically add payment to user's payments array after saving
+// Middleware to automatically add rating to course's ratings array after saving
 ratingSchema.post("save", async function (doc) {
   if (doc.courseId) {
     try {
@@ -37,7 +37,6 @@ ratingSchema.post("save", async function (doc) {
     }
   }
 });
-
 
 const Rating: Model<IRating> = mongoose.model<IRating>(
   "Rating",
