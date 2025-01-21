@@ -6,16 +6,16 @@ import Rating from "../models/ratingModel";
 // @route   GET /api/courses
 // @access  Public
 export const getCourses = async (
-    req: Request,
-    res: Response
+  req: Request,
+  res: Response
 ): Promise<void> => {
   try {
     const filters = req.query;
 
     // Populate ratings and components fields as needed
     const courseResponses = await Course.find(filters)
-        .populate(["ratings", "components"])
-        .exec();
+      .populate(["ratings", "components"])
+      .exec();
 
     res.status(200).json({
       success: true,
@@ -34,8 +34,8 @@ export const getCourses = async (
 // @route   POST /api/courses
 // @access  Public
 export const createCourse = async (
-    req: Request,
-    res: Response
+  req: Request,
+  res: Response
 ): Promise<void> => {
   try {
     const {
@@ -48,14 +48,23 @@ export const createCourse = async (
       categories,
       creditCount,
       description,
-      thumbnailPath
+      thumbnailPath,
+      cost,
     } = req.body;
 
     // Validate required fields
-    if (!className || !isLive || !creditCount || !description || !thumbnailPath) {
+    if (
+      !className ||
+      !isLive ||
+      !creditCount ||
+      !description ||
+      !thumbnailPath ||
+      !cost
+    ) {
       res.status(400).json({
         success: false,
-        message: "Please provide className, isLive, creditCount, description, and thumbnailPath",
+        message:
+          "Please provide className, isLive, creditCount, description, and thumbnailPath",
       });
       return;
     }
@@ -82,6 +91,7 @@ export const createCourse = async (
       creditCount,
       description,
       thumbnailPath,
+      cost,
     });
 
     const savedCourseResponse = await newCourseResponse.save();
@@ -102,8 +112,8 @@ export const createCourse = async (
 // @route   PUT /api/courses/:id
 // @access  Public
 export const updateCourse = async (
-    req: Request,
-    res: Response
+  req: Request,
+  res: Response
 ): Promise<void> => {
   try {
     const { id } = req.params;
@@ -141,8 +151,8 @@ export const updateCourse = async (
 // @route   DELETE /api/courses/:id
 // @access  Public
 export const deleteCourse = async (
-    req: Request,
-    res: Response
+  req: Request,
+  res: Response
 ): Promise<void> => {
   try {
     const { id } = req.params;

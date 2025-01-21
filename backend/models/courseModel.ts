@@ -12,6 +12,7 @@ export interface ICourse extends Document {
   creditCount: number;
   description: string;
   thumbnailPath: string;
+  cost: number;
 }
 
 const CourseSchema: Schema = new Schema(
@@ -31,6 +32,7 @@ const CourseSchema: Schema = new Schema(
     creditCount: { type: Number, required: true },
     description: { type: String, required: true },
     thumbnailPath: { type: String, required: true },
+    cost: { type: Number, required: true },
   },
   {
     timestamps: true,
