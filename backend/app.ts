@@ -11,9 +11,12 @@ import questionResponseRoutes from "./routes/questionResponseRoutes";
 import progressRoutes from "./routes/progressRoutes";
 import courseRoutes from "./routes/courseRoutes";
 import videoRoutes from "./routes/videoRoutes";
+import paymentRoutes from "./routes/paymentRoutes";
+import loginRoutes from "./routes/loginRoutes";
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
+import { verifyToken } from "./middlewares/authMiddleware";
 
 const app: Application = express();
 
@@ -24,18 +27,23 @@ app.use(cors());
 app.use(express.json());
 
 // Use routes
-app.use("/api/users", userRoutes);
-app.use("/api/ratings", ratingRoutes);
-app.use("/api/surveys", surveyRoutes);
-app.use("/api/surveyResponses", surveyResponseRoutes);
-app.use("/api/questions", questionRoutes);
-app.use("/api/questionResponses", questionResponseRoutes);
-app.use("/api/progress", progressRoutes);
-app.use("/api/courses", courseRoutes);
-app.use("/api/videos", videoRoutes);
+app.use("/api/users", verifyToken, userRoutes);
+app.use("/api/ratings", verifyToken, ratingRoutes);
+app.use("/api/surveys", verifyToken, surveyRoutes);
+app.use("/api/surveyResponses", verifyToken, surveyResponseRoutes);
+app.use("/api/questions", verifyToken, questionRoutes);
+app.use("/api/questionResponses", verifyToken, questionResponseRoutes);
+app.use("/api/progress", verifyToken, progressRoutes);
+app.use("/api/courses", verifyToken, courseRoutes);
+app.use("/api/videos", verifyToken, videoRoutes);
+app.use("/api/payments", verifyToken, paymentRoutes);
+
+app.use("/api/login", loginRoutes); 
 
 // Error middleware
 app.use(notFound);
 app.use(errorHandler);
+
+module.exports = app;
 
 export default app;

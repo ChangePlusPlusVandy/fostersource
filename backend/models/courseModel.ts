@@ -1,15 +1,9 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { IRating } from "./ratingModel";
 
-export interface Rating {
-  ratingId: string;
-  userId: string;
-  rating: number;
-}
-
-export interface Course extends Document {
-  id: string;
+export interface ICourse extends Document {
   handouts: string[];
-  ratings: Rating[];
+  ratings: IRating[];
   className: string;
   discussion: string;
   components: Object[];
@@ -17,24 +11,22 @@ export interface Course extends Document {
 
 const CourseSchema: Schema = new Schema(
   {
-    id: { type: String, required: true },
     handouts: [{ type: String, required: false }],
     ratings: [
       {
         type: Schema.Types.ObjectId,
         ref: "Rating",
-        required: false,
       },
     ],
     className: { type: String, required: true },
     discussion: { type: String, required: false },
-    components: [{ type: Schema.Types.Mixed, required: true }],
+    components: [{ type: Schema.Types.Mixed, required: false }],
   },
   {
     timestamps: true, // Enable automatic createdAt and updatedAt fields
   }
 );
 
-const Course: Model<Course> = mongoose.model<Course>("Course", CourseSchema);
+const Course: Model<ICourse> = mongoose.model<ICourse>("Course", CourseSchema);
 
 export default Course;

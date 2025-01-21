@@ -4,6 +4,7 @@ import User from "../models/userModel";
 import mongoose from "mongoose";
 import Payment from "../models/paymentModel";
 import Progress from "../models/progressModel";
+import QuestionResponse from "..//models/questionResponseModel";
 
 const userData1 = {
   firebaseId: "12345",

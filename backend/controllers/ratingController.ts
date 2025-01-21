@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Rating from "../models/ratingModel";
+import Course from "../models/courseModel";
 
 // @desc    Get all ratings or filter by query parameters
 // @route   GET /api/ratings
@@ -9,7 +10,7 @@ export const getRatings = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { userId, minRating, maxRating } = req.query; // Filters
+    const { userId, courseId, minRating, maxRating } = req.query; // Filters
 
     // Create a query object
     const query: { [key: string]: any } = {};
@@ -17,7 +18,10 @@ export const getRatings = async (
     if (userId) {
       query.userId = String(userId);
     }
-    
+    if (courseId) {
+      query.courseId = String(courseId);
+    }
+
     // Add threshold filters
     if (minRating !== undefined) {
       query.rating = { ...query.rating, $gte: Number(minRating) }; // Greater than or equal to minRating
@@ -53,19 +57,19 @@ export const createRating = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { userId, rating } = req.body;
+    const { userId, courseId, rating } = req.body;
 
     // Validate the data
     if (!userId || rating == null) {
       res.status(400).json({ message: "User ID and rating are required." });
       return;
     }
-    if (rating > 10){
+    if (rating > 10) {
       res.status(400).json({ message: "Rating must be between 1 and 10." });
       return;
     }
 
-    const newRating = new Rating({ userId, rating });
+    const newRating = new Rating({ userId, rating, courseId });
     const savedRating = await newRating.save();
 
     res.status(201).json(savedRating);
@@ -88,7 +92,9 @@ export const updateRating = async (
   const { id } = req.params;
 
   try {
-    const updatedRating = await Rating.findOneAndUpdate({ _id: id }, req.body, { new: true });
+    const updatedRating = await Rating.findOneAndUpdate({ _id: id }, req.body, {
+      new: true,
+    });
 
     if (!updatedRating) {
       res.status(404).json({ message: "Rating not found." });
@@ -121,6 +127,14 @@ export const deleteRating = async (
       res.status(404).json({ message: "Rating not found." });
       return;
     }
+
+    await Course.findByIdAndUpdate(
+      deletedRating.courseId,
+      { $pull: { ratings: id } },
+      { new: true }
+    );
+
+    await Rating.deleteOne({ _id: id });
 
     res.status(204).send(); // No content
   } catch (error) {
