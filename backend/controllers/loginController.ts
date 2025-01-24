@@ -55,8 +55,6 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     const {
       firebaseId,
       email,
-      isColorado,
-      role,
       name,
       address1,
       address2,
@@ -67,51 +65,117 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       phone,
       progress,
       payments,
+      role = "foster parent", // Default role
+      isColorado = true, // Default value
     } = req.body;
 
-    let user = await User.findOne({ firebaseId });
+    const firebaseToken = req.headers.authorization?.split(" ")[1];
 
-    if (user) {
-      const token = jwt.sign(
-        { id: user._id, firebaseId: user.firebaseId, role: user.role },
-        process.env.JWT_SECRET as string,
-        { expiresIn: "1h" }
-      );
-
-      res.status(200).json({ user, token, message: "User already exists" });
+    if (!firebaseToken) {
+      res.status(401).json({ message: "No Firebase token provided" });
       return;
     }
 
+    // Verify Firebase token
+    const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+    
+    if (decodedToken.uid !== firebaseId) {
+      res.status(401).json({ message: "Invalid Firebase token" });
+      return;
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ firebaseId });
+
+    if (user) {
+      res.status(400).json({ message: "User already exists" });
+      return;
+    }
+
+    // Create new user
     const newUser = new User({
       firebaseId,
       email,
-      isColorado,
-      role,
       name,
-      address1,
+      role,
+      isColorado,
       address2,
-      city,
-      state,
-      zip,
-      certification,
-      phone,
       progress,
       payments,
+      address1: "",
+      city: "",
+      state: "",
+      zip: "",
+      certification: "",
+      phone: "",
     });
 
     const savedUser = await newUser.save();
-    const token = jwt.sign(
+
+    // Generate JWT token
+    const accessToken = jwt.sign(
       { id: savedUser._id, firebaseId: savedUser.firebaseId, role: savedUser.role },
       process.env.JWT_SECRET as string,
       { expiresIn: "1h" }
     );
 
+    const refreshToken = await admin.auth().createCustomToken(savedUser.firebaseId);
+
     res.status(201).json({
       user: savedUser,
-      token,
-      message: "User created",
+      accessToken,
+      refreshToken,
+      message: "User created successfully",
     });
   } catch (error) {
+    console.error("Create user error:", error);
     res.status(500).json({ message: "Failed to create user", error });
+  }
+};
+
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { firebaseId, email } = req.body;
+    const firebaseToken = req.headers.authorization?.split(" ")[1];
+
+    if (!firebaseToken) {
+      res.status(401).json({ message: "No Firebase token provided" });
+      return;
+    }
+
+    // Verify Firebase token
+    const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
+    
+    if (decodedToken.uid !== firebaseId) {
+      res.status(401).json({ message: "Invalid Firebase token" });
+      return;
+    }
+
+    // Find user in database
+    let user = await User.findOne({ firebaseId });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    // Generate JWT token
+    const accessToken = jwt.sign(
+      { id: user._id, firebaseId: user.firebaseId, role: user.role },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    );
+
+    const refreshToken = await admin.auth().createCustomToken(user.firebaseId);
+
+    res.status(200).json({
+      user,
+      accessToken,
+      refreshToken,
+      message: "Login successful"
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Login failed", error });
   }
 };

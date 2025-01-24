@@ -18,11 +18,19 @@ const Register: React.FC = () => {
       return;
     }
   
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+  
     try {
+      console.log("Starting registration process...");
       await authService.register(email, password, name);
+      console.log("Registration successful!");
       window.location.href = "/catalog";
     } catch (err: any) {
-      setError(err.message);
+      console.error("Registration error:", err);
+      setError(err.message || "Registration failed. Please try again.");
     }
   };
 

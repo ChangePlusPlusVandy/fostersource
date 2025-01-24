@@ -20,13 +20,20 @@ import { verifyToken } from "./middlewares/authMiddleware";
 
 const app: Application = express();
 
-// Enable CORS
-app.use(cors());
+// CORS configuration - must be before any routes
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5001'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  maxAge: 86400 // 24 hours
+}));
 
 // Middleware to parse JSON
 app.use(express.json());
 
 // Use routes
+app.use("/api/login", loginRoutes);
 app.use("/api/users", verifyToken, userRoutes);
 app.use("/api/ratings", verifyToken, ratingRoutes);
 app.use("/api/surveys", verifyToken, surveyRoutes);
@@ -37,8 +44,6 @@ app.use("/api/progress", verifyToken, progressRoutes);
 app.use("/api/courses", verifyToken, courseRoutes);
 app.use("/api/videos", verifyToken, videoRoutes);
 app.use("/api/payments", verifyToken, paymentRoutes);
-
-app.use("/api/login", loginRoutes); 
 
 // Error middleware
 app.use(notFound);
