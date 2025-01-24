@@ -55,7 +55,7 @@ export const createCourse = async (
 		// Validate required fields
 		if (
 			!className ||
-			!isLive ||
+			isLive === undefined ||
 			!creditNumber ||
 			!description ||
 			!thumbnailPath ||
@@ -99,6 +99,7 @@ export const createCourse = async (
 		res.status(201).json({
 			success: true,
 			data: savedCourseResponse,
+			message: "chungus",
 		});
 	} catch (error) {
 		res.status(500).json({
