@@ -1,9 +1,9 @@
 import express from "express";
 import {
-  getCourses,
-  createCourse,
-  updateCourse,
-  deleteCourse,
+	getCourses,
+	createCourse,
+	updateCourse,
+	deleteCourse,
 } from "../controllers/courseController";
 
 const router = express.Router();

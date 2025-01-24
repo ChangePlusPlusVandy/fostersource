@@ -1,9 +1,9 @@
 import express from "express";
 import {
-  getPayments,
-  createPayment,
-  updatePayment,
-  deletePayment,
+	getPayments,
+	createPayment,
+	updatePayment,
+	deletePayment,
 } from "../controllers/paymentController";
 
 const router = express.Router();

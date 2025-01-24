@@ -1,9 +1,9 @@
 import express from "express";
 import {
-  getSurveys,
-  createSurvey,
-  updateSurvey,
-  deleteSurvey,
+	getSurveys,
+	createSurvey,
+	updateSurvey,
+	deleteSurvey,
 } from "../controllers/surveyController";
 
 const router = express.Router();

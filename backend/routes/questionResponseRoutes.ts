@@ -1,9 +1,9 @@
 import express from "express";
 import {
-  getQuestionResponses,
-  createQuestionResponse,
-  updateQuestionResponse,
-  deleteQuestionResponse,
+	getQuestionResponses,
+	createQuestionResponse,
+	updateQuestionResponse,
+	deleteQuestionResponse,
 } from "../controllers/questionResponseController";
 
 const router = express.Router();

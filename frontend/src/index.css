@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .half-star {
-    background: linear-gradient(to right, orange 50%, gray 50%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+	background: linear-gradient(to right, orange 50%, gray 50%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
 }

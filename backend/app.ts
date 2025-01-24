@@ -38,7 +38,7 @@ app.use("/api/courses", verifyToken, courseRoutes);
 app.use("/api/videos", verifyToken, videoRoutes);
 app.use("/api/payments", verifyToken, paymentRoutes);
 
-app.use("/api/login", loginRoutes); 
+app.use("/api/login", loginRoutes);
 
 // Error middleware
 app.use(notFound);

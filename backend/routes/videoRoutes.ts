@@ -1,9 +1,9 @@
 import express from "express";
 import {
-  getVideos,
-  createVideo,
-  updateVideo,
-  deleteVideo,
+	getVideos,
+	createVideo,
+	updateVideo,
+	deleteVideo,
 } from "../controllers/videoController";
 
 const router = express.Router();

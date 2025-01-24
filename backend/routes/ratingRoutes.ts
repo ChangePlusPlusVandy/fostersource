@@ -1,9 +1,9 @@
 import express from "express";
 import {
-  getRatings,
-  createRating,
-  updateRating,
-  deleteRating,
+	getRatings,
+	createRating,
+	updateRating,
+	deleteRating,
 } from "../controllers/ratingController";
 
 const router = express.Router();
