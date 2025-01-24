@@ -34,12 +34,14 @@ jobs:
 
       - name: Commit and Push Changes
         working-directory: ./frontend
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout ${{ github.head_ref }}
           git add .
           git commit -m "Auto-format code with Prettier"
-          git push origin "HEAD:${GITHUB_REF#refs/heads/}"
+          git push origin ${{ github.head_ref }}
 
   prettier-backend:
     name: Prettier Backend
@@ -66,9 +68,11 @@ jobs:
 
       - name: Commit and Push Changes
         working-directory: ./backend
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout ${{ github.head_ref }}
           git add .
           git commit -m "Auto-format code with Prettier"
-          git push origin "HEAD:${GITHUB_REF#refs/heads/}"
+          git push origin ${{ github.head_ref }}
