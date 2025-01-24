@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  prettier:
-    name: Prettier
+  prettier-frontend:
+    name: Prettier Frontend
     runs-on: ubuntu-latest
 
     steps:
@@ -39,8 +39,44 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin ${{ github.head_ref }}:${{ github.head_ref }} # Ensure the branch is fetched
-          git checkout ${{ github.head_ref }}                           # Check out the branch
+          git fetch origin ${{ github.head_ref }}:${{ github.head_ref }}
+          git checkout ${{ github.head_ref }}
           git add .
-          git commit -m "Auto-format code with Prettier"
+          git commit -m "Auto-format code with Prettier (Frontend)"
+          git push origin ${{ github.head_ref }}
+
+  prettier-backend:
+    name: Prettier Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          # Fetch all branches to ensure the target branch is available
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Run Prettier and Format Code
+        working-directory: ./backend
+        run: npm run format
+
+      - name: Commit and Push Changes
+        working-directory: ./backend
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin ${{ github.head_ref }}:${{ github.head_ref }}
+          git checkout ${{ github.head_ref }}
+          git add .
+          git commit -m "Auto-format code with Prettier (Backend)"
           git push origin ${{ github.head_ref }}
