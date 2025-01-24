@@ -21,10 +21,7 @@ function AppRoutes() {
 				}}
 			>
 				<div style={{ width: "100%" }}>
-					<HeaderBar
-						isOpen={isHeaderBarOpen}
-						setIsOpen={setIsHeaderBarOpen}
-					/>
+					<HeaderBar isOpen={isHeaderBarOpen} setIsOpen={setIsHeaderBarOpen} />
 				</div>
 				<div style={{ display: "flex", flex: 1 }}>
 					<div style={{ display: "flex", alignItems: "center" }}>

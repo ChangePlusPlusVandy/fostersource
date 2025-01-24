@@ -42,10 +42,8 @@ export default function CatalogCourseComponent({
 						<span className="mr-1">
 							{course.ratings.length > 0
 								? (
-										course.ratings.reduce(
-											(sum, r) => sum + r.rating,
-											0
-										) / course.ratings.length
+										course.ratings.reduce((sum, r) => sum + r.rating, 0) /
+										course.ratings.length
 									).toFixed(1)
 								: "No ratings"}
 						</span>
@@ -54,10 +52,8 @@ export default function CatalogCourseComponent({
 								parseInt(
 									course.ratings.length > 0
 										? (
-												course.ratings.reduce(
-													(sum, r) => sum + r.rating,
-													0
-												) / course.ratings.length
+												course.ratings.reduce((sum, r) => sum + r.rating, 0) /
+												course.ratings.length
 											).toFixed(1)
 										: "0"
 								)
@@ -80,20 +76,16 @@ export default function CatalogCourseComponent({
 				</div>
 
 				{/* Description */}
-				<p className="text-gray-600 mt-4 text-sm">
-					{course.description}
-				</p>
+				<p className="text-gray-600 mt-4 text-sm">{course.description}</p>
 
 				{/* Instructor */}
 				<p className="text-gray-500 text-sm mt-2">
-					<span className="font-semibold">Speaker:</span>{" "}
-					{course.instructor}
+					<span className="font-semibold">Speaker:</span> {course.instructor}
 				</p>
 
 				<div className="flex items-center gap-4 mt-6">
 					<button className="bg-orange-500 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-orange-600 transition">
-						Register (
-						{course.cost === 0 ? "Free" : `$${course.cost}`})
+						Register ({course.cost === 0 ? "Free" : `$${course.cost}`})
 					</button>
 					<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
 						Learn More

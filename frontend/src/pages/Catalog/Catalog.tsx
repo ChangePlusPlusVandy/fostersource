@@ -11,8 +11,7 @@ export default function Catalog() {
 				"Learn the basics of computer science, programming, and problem-solving.",
 			instructor: "Dr. Alice Johnson",
 			creditNumber: 3,
-			discussion:
-				"An interactive discussion about computational thinking.",
+			discussion: "An interactive discussion about computational thinking.",
 			components: ["Lectures", "Labs", "Quizzes"],
 			handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
 			ratings: [
@@ -26,12 +25,10 @@ export default function Catalog() {
 		},
 		{
 			className: "Advanced Mathematics",
-			description:
-				"Dive into complex mathematical theories and applications.",
+			description: "Dive into complex mathematical theories and applications.",
 			instructor: "Professor Bob Smith",
 			creditNumber: 4,
-			discussion:
-				"Weekly seminars focusing on real-world problem-solving.",
+			discussion: "Weekly seminars focusing on real-world problem-solving.",
 			components: ["Lectures", "Projects", "Exams"],
 			handouts: ["syllabus.pdf", "formulas.pdf"],
 			ratings: [
@@ -83,9 +80,7 @@ export default function Catalog() {
 		let filtered = courses;
 		if (searchQuery !== "") {
 			filtered = filtered.filter((course) =>
-				course.className
-					.toLowerCase()
-					.includes(searchQuery.toLowerCase())
+				course.className.toLowerCase().includes(searchQuery.toLowerCase())
 			);
 		}
 
@@ -160,9 +155,7 @@ export default function Catalog() {
 	return (
 		<div className="bg-gray-100 min-h-screen w-full">
 			<div className="container mx-auto py-6">
-				<h1 className="text-3xl font-bold text-gray-800 mb-6">
-					Catalog
-				</h1>
+				<h1 className="text-3xl font-bold text-gray-800 mb-6">Catalog</h1>
 				<CatalogSearchBar
 					onSearch={handleSearch}
 					updateFilters={updateFilters}
