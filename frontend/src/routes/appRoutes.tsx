@@ -4,6 +4,13 @@ import Home from "../pages/HomePage/Home";
 import { Sidebar } from "../components/Sidebar/sidebar";
 import HeaderBar, { HeaderItems } from "../components/HeaderBar/headerBar";
 import Catalog from "../pages/Catalog/Catalog";
+import About from "../pages/AboutPage/About";
+import Calendar from "../pages/CalendarPage/Calendar";
+import Contact from "../pages/ContactPage/Contact";
+import Help from "../pages/HelpPage/Help";
+import News from "../pages/NewsPage/News";
+import Portal from "../pages/PortalPage/Portal";
+import Programs from "../pages/ProgramsPage/Programs";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -33,6 +40,13 @@ function AppRoutes() {
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route path="/catalog" element={<Catalog />} />
+						<Route path="/about" element={<About />} />
+						<Route path="/calendar" element={<Calendar />} />
+						<Route path="/contact" element={<Contact />} />
+						<Route path="/help" element={<Help />} />
+						<Route path="/news" element={<News />} />
+						<Route path="/portal" element={<Portal />} />
+						<Route path="/programs" element={<Programs />} />
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (
