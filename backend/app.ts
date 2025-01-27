@@ -21,16 +21,20 @@ import { verifyToken } from "./middlewares/authMiddleware";
 const app: Application = express();
 
 // CORS configuration - must be before any routes
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5001'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  maxAge: 86400 // 24 hours
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:5001"], // Allowed origins
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Headers frontend can send
+    exposedHeaders: ["Content-Type", "Authorization"], // Headers frontend can access
+    credentials: true, // Allows cookies or credentials to be sent
+  })
+);
 
 // Middleware to parse JSON
 app.use(express.json());
+
+app.options("*", cors());
 
 // Use routes
 app.use("/api/login", loginRoutes);

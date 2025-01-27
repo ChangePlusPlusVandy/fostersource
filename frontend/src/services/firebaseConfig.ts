@@ -5,13 +5,13 @@ import "firebase/compat/auth";
 // import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBGqnlj6jZvr69SA_IKJhh8HprSlwDYTlo",
-  authDomain: "foster-source.firebaseapp.com",
-  projectId: "foster-source",
-  storageBucket: "foster-source.appspot.com",
-  messagingSenderId: "417942148543",
-  appId: "1:417942148543:web:0b12d7d4bb0823d0623d0a",
-  measurementId: "G-18XPBENMJT",
+  apiKey: "AIzaSyCjrihHfWN9_MWR98IpqsFo4LGpd1tOViQ",
+  authDomain: "foster-source-ccbd9.firebaseapp.com",
+  projectId: "foster-source-ccbd9",
+  storageBucket: "foster-source-ccbd9.firebasestorage.app",
+  messagingSenderId: "922379251706",
+  appId: "1:922379251706:web:9536272907f90c05e53e43",
+  measurementId: "G-RCL1YFPQZQ",
 };
 
 // const app = initializeApp(firebaseConfig);

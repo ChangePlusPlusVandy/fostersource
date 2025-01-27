@@ -9,14 +9,18 @@ import admin from "../firebase/firebaseAdmin";
 export const checkUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { firebaseId } = req.query;
-    const firebaseToken = req.headers['firebase-token'];
+    const firebaseToken = req.headers["firebase-token"];
+
+    console.log("trying to login");
 
     if (!firebaseId || !firebaseToken) {
       res.status(400).send({ message: "Missing required authentication data" });
       return;
     }
 
-    const decodedToken = await admin.auth().verifyIdToken(firebaseToken as string);
+    const decodedToken = await admin
+      .auth()
+      .verifyIdToken(firebaseToken as string);
     if (decodedToken.uid !== firebaseId) {
       throw new Error("Firebase token mismatch");
     }
@@ -50,7 +54,10 @@ export const checkUser = async (req: Request, res: Response): Promise<void> => {
 // @desc    Create a new user and return token
 // @route   POST /api/login
 // @access  Public
-export const createUser = async (req: Request, res: Response): Promise<void> => {
+export const createUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const {
       firebaseId,
@@ -78,7 +85,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 
     // Verify Firebase token
     const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
-    
+
     if (decodedToken.uid !== firebaseId) {
       res.status(401).json({ message: "Invalid Firebase token" });
       return;
@@ -102,24 +109,30 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       address2,
       progress,
       payments,
-      address1: "",
-      city: "",
-      state: "",
-      zip: "",
-      certification: "",
-      phone: "",
+      address1: "N/A",
+      city: "N/A",
+      state: "N/A",
+      zip: "N/A",
+      certification: "N/A",
+      phone: "N/A",
     });
 
     const savedUser = await newUser.save();
 
     // Generate JWT token
     const accessToken = jwt.sign(
-      { id: savedUser._id, firebaseId: savedUser.firebaseId, role: savedUser.role },
+      {
+        id: savedUser._id,
+        firebaseId: savedUser.firebaseId,
+        role: savedUser.role,
+      },
       process.env.JWT_SECRET as string,
       { expiresIn: "1h" }
     );
 
-    const refreshToken = await admin.auth().createCustomToken(savedUser.firebaseId);
+    const refreshToken = await admin
+      .auth()
+      .createCustomToken(savedUser.firebaseId);
 
     res.status(201).json({
       user: savedUser,
@@ -145,7 +158,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     // Verify Firebase token
     const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
-    
+
     if (decodedToken.uid !== firebaseId) {
       res.status(401).json({ message: "Invalid Firebase token" });
       return;
@@ -172,7 +185,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       user,
       accessToken,
       refreshToken,
-      message: "Login successful"
+      message: "Login successful",
     });
   } catch (error) {
     console.error("Login error:", error);
