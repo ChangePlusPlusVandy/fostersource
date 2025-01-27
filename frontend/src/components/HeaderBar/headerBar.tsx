@@ -6,35 +6,35 @@ import "./headerBar.css";
 export const headerItems = [
 	{
 		description: "Home",
-		href: "#",
+		href: "/",
 	},
 	{
 		description: "About",
-		href: "#",
+		href: "/about",
 	},
 	{
 		description: "Programs",
-		href: "#",
+		href: "/programs",
 	},
 	{
 		description: "Calendar",
-		href: "#",
+		href: "/calendar",
 	},
 	{
 		description: "How to Help",
-		href: "#",
+		href: "/help",
 	},
 	{
 		description: "News",
-		href: "#",
+		href: "/news",
 	},
 	{
 		description: "Contact",
-		href: "#",
+		href: "/contact",
 	},
 	{
 		description: "Portal",
-		href: "#",
+		href: "/portal",
 	},
 	{
 		description: "🇺🇸 English",
