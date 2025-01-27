@@ -34,13 +34,11 @@ describe("Video Controller - Get Videos", () => {
 //tests create video
 describe("Video Controller - Create Video", () => {
 	it("should create a new video", async () => {
-		const res = await request(app)
-			.post("/api/videos")
-			.send({
-				title: "New Video",
-				description: "New Description",
-				published: true,
-			});
+		const res = await request(app).post("/api/videos").send({
+			title: "New Video",
+			description: "New Description",
+			published: true,
+		});
 
 		expect(res.status).toBe(201);
 		expect(res.body.success).toBe(true);
@@ -66,13 +64,11 @@ describe("Video Controller - Update Video", () => {
 			published: false,
 		});
 
-		const res = await request(app)
-			.put(`/api/videos/${video._id}`)
-			.send({
-				title: "Updated Title",
-				description: "Updated Desc",
-				published: true,
-			});
+		const res = await request(app).put(`/api/videos/${video._id}`).send({
+			title: "Updated Title",
+			description: "Updated Desc",
+			published: true,
+		});
 
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
