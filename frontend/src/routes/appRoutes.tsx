@@ -1,15 +1,35 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+	BrowserRouter as Router,
+	Routes,
+	Route,
+	Navigate,
+} from "react-router-dom";
 import Home from "../pages/HomePage/Home";
 import { Sidebar } from "../components/Sidebar/sidebar";
 import HeaderBar, { HeaderItems } from "../components/HeaderBar/headerBar";
 import Catalog from "../pages/Catalog/Catalog";
+import Login from "../pages/UserAuth/Login";
+import Register from "../pages/UserAuth/Register";
+import ResetPassword from "../pages/UserAuth/resetPassword";
+import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
+import authService from "../services/authService";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
 	const [isCollapsed, setIsCollapsed] = useState<boolean>(
 		window.innerWidth < 768
 	);
+
+	const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+		const isAuthenticated = authService.isAuthenticated();
+
+		if (isAuthenticated) {
+			return children;
+		} else {
+			return <Navigate to="/login" />;
+		}
+	};
 
 	return (
 		<Router>
@@ -32,7 +52,21 @@ function AppRoutes() {
 					</div>
 					<Routes>
 						<Route path="/" element={<Home />} />
-						<Route path="/catalog" element={<Catalog />} />
+						<Route
+							path="/catalog"
+							element={
+								<PrivateRoute>
+									<Catalog />
+								</PrivateRoute>
+							}
+						/>
+						<Route path="/login" element={<Login />} />
+						<Route path="/register" element={<Register />} />
+						<Route path="/reset-password" element={<ResetPassword />} />
+						<Route
+							path="/reset-password/:token"
+							element={<ResetPasswordForm />}
+						/>
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (
