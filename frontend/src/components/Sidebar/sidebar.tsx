@@ -26,7 +26,7 @@ export const items = [
 	{
 		icon: <House />,
 		description: "Home",
-		href: "#",
+		href: "/",
 	},
 	{
 		icon: <LayoutDashboard />,
@@ -36,7 +36,7 @@ export const items = [
 	{
 		icon: <BookOpen />,
 		description: "Catalog",
-		href: "#",
+		href: "/catalog",
 	},
 	{
 		icon: <Mic />,
