@@ -23,13 +23,13 @@ function AppRoutes() {
 				<div style={{ width: "100%" }}>
 					<HeaderBar isOpen={isHeaderBarOpen} setIsOpen={setIsHeaderBarOpen} />
 				</div>
-				<div style={{ display: "flex", flex: 1 }}>
-					<div style={{ display: "flex", alignItems: "center" }}>
+					<div style={{ position: "absolute", display: "flex", alignItems: "center", top: "25%" }}>
 						<Sidebar
 							isCollapsed={isCollapsed}
 							setIsCollapsed={setIsCollapsed}
 						/>
 					</div>
+				<div style={{ display: "flex", flex: 1, overflow: "auto", paddingLeft: isCollapsed ? "6rem" : "17rem"}}>
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route path="/catalog" element={<Catalog />} />
