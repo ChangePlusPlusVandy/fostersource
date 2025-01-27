@@ -54,7 +54,7 @@ export default function Home() {
                 className="absolute inset-0"
                 style={{
                   backgroundColor: "#F79518",
-                  opacity: 0.7,
+                  opacity: 0.6,
                 }}
               ></div>
 
@@ -74,10 +74,10 @@ export default function Home() {
                 {/* Animated Button */}
                 <motion.button
                   whileHover={{
-                    scale: 1.02, // Slightly enlarge the button
-                    boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)", // Add shadow
+                    scale: 1.02, 
+                    boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)", 
                   }}
-                  whileTap={{ scale: 0.93 }} // Shrink slightly on click
+                  whileTap={{ scale: 0.93 }} 
                   className="bg-black text-white px-6 py-2 rounded-lg shadow hover:bg-gray-800 transition duration-200"
                 >
                   Learn More
