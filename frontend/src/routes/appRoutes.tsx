@@ -22,7 +22,6 @@ import ResetPassword from "../pages/UserAuth/resetPassword";
 import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
 
-
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
 	const [isCollapsed, setIsCollapsed] = useState<boolean>(
