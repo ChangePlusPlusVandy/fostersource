@@ -131,11 +131,11 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 		<div className="profile flex flex-row items-center w-full">
 			{!isLoggedIn && (
 				<div className="w-full flex justify-center">
-					<a href="#" className="w-full">
+					<Link to={"/login"} className="w-full">
 						<button className="login text-white rounded p-3 flex gap-3 justify-center text-center w-full">
 							<LogIn /> {!isCollapsed && "Login"}
 						</button>
-					</a>
+					</Link>
 				</div>
 			)}
 			{isLoggedIn && (
