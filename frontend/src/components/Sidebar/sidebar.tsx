@@ -86,9 +86,8 @@ export function Sidebar({
 	setIsLoggedIn,
 }: SidebarProps) {
 	// User Info
-	const name = JSON.parse(localStorage.user).name;
-	const role = userInfo.role;
-
+	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
+	const role = isLoggedIn ? userInfo.role : "Log In";
 	// Automatically collapse sidebar for narrow screens
 	useEffect(() => {
 		const handleResize = () => {
