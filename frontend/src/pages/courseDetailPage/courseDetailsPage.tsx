@@ -2,21 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchCourseDetails } from "../../services/courseDetailServices";
 import { FaStar } from "react-icons/fa";
+import {dummyCourses} from "../../shared/DummyCourses";
 
-interface Course {
-  handouts: string[];
-  ratings: number[];
-  className: string;
-  discussion: string;
-  components: string[]; // Array of Survey and Video components
-  isLive: boolean;
-  categories: string[];
-  creditNumber: number;
-  description: string;
-  thumbnailPath: string;
-  cost: number;
-  instructor: string;
-}
+import { Course } from "../../shared/types/course";
 
 type Component = Survey | Video;
 
@@ -37,22 +25,33 @@ interface Survey {
 }
 
 const CoursePage: React.FC = () => {
+    function tempDataParse() {
+        for(let course of dummyCourses){
+            if (courseId === course.className.toLowerCase().trim().replaceAll(" ", "-")){
+                return course;
+            }
+        }
+        return {
+            className: "Introduction to Computer Science",
+            description:
+                "Learn the basics of computer science, programming, and problem-solving.",
+            instructor: "Dr. Alice Johnson",
+            creditNumber: 3,
+            discussion: "An interactive discussion about computational thinking.",
+            components: ["Lectures", "Labs", "Quizzes"],
+            handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
+            ratings: [
+                { userId: "user1", courseId: "cs101", rating: 2 },
+                { userId: "user2", courseId: "cs101", rating: 2 },
+            ],
+            isLive: false,
+            cost: 100,
+            categories: ["Technology"],
+            thumbnailPath: "",
+        }
+    }
   const { courseId } = useParams<{ courseId: string }>();
-  const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
-    className: "Introduction to Computer Science",
-    description:
-      "Learn the basics of computer science, programming, and problem-solving.",
-    instructor: "Dr. Alice Johnson",
-    creditNumber: 3,
-    discussion: "An interactive discussion about computational thinking.",
-    components: ["Lectures", "Labs", "Quizzes"],
-    handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-    ratings: [],
-    isLive: false,
-    cost: 100,
-    categories: ["Technology"],
-    thumbnailPath: "",
-  });
+  const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(tempDataParse());
   const [starRating, setStarRating] = useState(-1);
   const [isAdded, setIsAdded] = useState(false);
   const [surveyLength, setSurveyLength] = useState(-1);
@@ -87,22 +86,6 @@ const CoursePage: React.FC = () => {
 
       // }
 
-      const dummyData = {
-        className: "Introduction to Computer Science",
-        description:
-          "Learn the basics of computer science, programming, and problem-solving.",
-        instructor: "Dr. Alice Johnson",
-        creditNumber: 3,
-        discussion: "An interactive discussion about computational thinking.",
-        components: ["Lectures", "Labs", "Quizzes"],
-        handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-        ratings: [],
-        isLive: false,
-        cost: 100,
-        categories: ["Technology"],
-        thumbnailPath: "",
-      };
-      setCourseDetailsData(dummyData);
     };
     fetchData();
   }, []);
@@ -115,7 +98,7 @@ const CoursePage: React.FC = () => {
         let num = 0;
         let times = 0;
         for (let i = 0; i < courseDetailsData.ratings.length; i++) {
-          num += courseDetailsData.ratings[i];
+          num += courseDetailsData.ratings[i].rating;
           times++;
         }
         average = num / times;
@@ -134,8 +117,8 @@ const CoursePage: React.FC = () => {
   };
 
   return (
-    <div style={{ backgroundColor: "#F2F2F2", margin: 0 }}>
-      <div style={{ marginTop: "155px", marginLeft: "250px" }}>
+    <div style={{ margin: 0 }}>
+      <div style={{ marginLeft: "10vw" }}>
         <div>
           <div>
             <button
@@ -144,7 +127,7 @@ const CoursePage: React.FC = () => {
                 height: "38px",
                 backgroundColor: "#D9D9D9",
                 borderRadius: "5px",
-                fontSize: "12px",
+                fontSize: "16px",
               }}
             >
               {" "}
@@ -174,7 +157,7 @@ const CoursePage: React.FC = () => {
                 textAlign: "center",
                 lineHeight: "50px",
                 color: "white",
-                fontSize: "12px",
+                fontSize: "16px",
                 transform: "translateY(10px)",
                 marginLeft: "150px",
                 border: "none",
@@ -237,7 +220,7 @@ const CoursePage: React.FC = () => {
               <p
                 style={{
                   textAlign: "left",
-                  fontSize: "12px",
+                  fontSize: "16px",
                   margin: "0",
                   lineHeight: "1.5",
                   fontWeight: 400,
@@ -271,7 +254,7 @@ const CoursePage: React.FC = () => {
                 <span
                   style={{
                     fontWeight: 600,
-                    fontSize: "12px",
+                    fontSize: "16px",
                     lineHeight: "18px",
                   }}
                 >
@@ -284,7 +267,7 @@ const CoursePage: React.FC = () => {
                 <br />
                 <span
                   style={{
-                    fontSize: "16pz",
+                    fontSize: "16px",
                     lineHeight: "24px",
                     fontWeight: 500,
                   }}
@@ -304,14 +287,14 @@ const CoursePage: React.FC = () => {
                 </span>{" "}
                 <br />
                 {/*Needs to be complete*/}
-                <span style={{ fontWeight: 500, fontSize: "12px" }}>
+                <span style={{ fontWeight: 500, fontSize: "16px" }}>
                   Instructor Description
                 </span>
               </p>
               <p
                 style={{
                   fontWeight: 400,
-                  fontSize: "12px",
+                  fontSize: "16px",
                   lineHeight: "18px",
                 }}
               >
@@ -347,7 +330,8 @@ const DisplayThumbnail = ({ thumbnail }: { thumbnail: string }) => {
   return (
     <div style={{ margin: "20px 0", textAlign: "center" }}>
       <img
-        src={thumbnail}
+          src={"https://st2.depositphotos.com/2769299/7314/i/450/depositphotos_73146775-stock-photo-a-stack-of-books-on.jpg"}
+        // src={thumbnail}
         alt="No Picture Found"
         style={{
           maxWidth: "121px",
@@ -362,7 +346,7 @@ const ButtonLabel = ({ component }: { component: String }) => {
   return (
     <div
       style={{
-        width: "62px",
+          padding: "10px",
         height: "18px",
         backgroundColor: "#F79518",
         borderRadius: "20px",
@@ -374,7 +358,7 @@ const ButtonLabel = ({ component }: { component: String }) => {
       <p
         style={{
           margin: 0,
-          fontSize: "10px",
+          fontSize: "14px",
           color: "#FFFFFF",
           lineHeight: "15px",
           fontWeight: 500,
@@ -455,7 +439,7 @@ const DisplayBar = ({
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              fontSize: "12px",
+              fontSize: "16px",
               color: "#FFFFFF",
               fontWeight: 600,
             }}
@@ -483,7 +467,7 @@ const DisplayBar = ({
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              fontSize: "12px",
+              fontSize: "16px",
               color: "#FFFFFF",
               fontWeight: 600,
             }}
@@ -511,7 +495,7 @@ const DisplayBar = ({
               justifyContent: "center",
               alignItems: "center",
 
-              fontSize: "12px",
+              fontSize: "16px",
               color: "#FFFFFF",
               fontWeight: 600,
             }}
@@ -538,7 +522,7 @@ const DisplayBar = ({
         {currentPage === "Webinar" && (
           <p
             style={{
-              fontSize: "12px",
+              fontSize: "16px",
               fontWeight: 600,
               textAlign: "left",
               margin: "20px 0",
@@ -548,7 +532,7 @@ const DisplayBar = ({
             <div>
               <p
                 style={{
-                  fontSize: "12px",
+                  fontSize: "16px",
                   fontWeight: 600,
                   textAlign: "left",
                   margin: "10px 0",
@@ -576,7 +560,7 @@ const DisplayBar = ({
                   textAlign: "center",
                   lineHeight: "50px",
                   color: "white",
-                  fontSize: "12px",
+                  fontSize: "16px",
                   transform: "translateY(10px)",
                   border: "none",
                   marginTop: "20px",
@@ -598,7 +582,7 @@ const DisplayBar = ({
                   textAlign: "center",
                   lineHeight: "50px",
                   color: "white",
-                  fontSize: "12px",
+                  fontSize: "16px",
                   transform: "translateY(10px)",
                   border: "none",
                   marginTop: "10px",
@@ -614,7 +598,7 @@ const DisplayBar = ({
         {currentPage === "Survey" && (
           <p
             style={{
-              fontSize: "12px",
+              fontSize: "16px",
               fontWeight: 600,
               textAlign: "left",
               margin: "20px 0",
@@ -634,7 +618,7 @@ const DisplayBar = ({
                   textAlign: "center",
                   lineHeight: "50px",
                   color: "white",
-                  fontSize: "12px",
+                  fontSize: "16px",
                   transform: "translateY(10px)",
                   border: "none",
                   marginTop: "30px",
@@ -651,7 +635,7 @@ const DisplayBar = ({
         {currentPage === "Certificate" && (
           <p
             style={{
-              fontSize: "12px",
+              fontSize: "16px",
               fontWeight: "bold",
               textAlign: "left",
               margin: "20px 0",
@@ -660,7 +644,7 @@ const DisplayBar = ({
             Certificate
             <p
               style={{
-                fontSize: "12px",
+                fontSize: "16px",
                 fontWeight: 600,
                 textAlign: "left",
               }}
@@ -679,7 +663,7 @@ const DisplayBar = ({
                   textAlign: "center",
                   lineHeight: "50px",
                   color: "white",
-                  fontSize: "12px",
+                  fontSize: "16px",
                   border: "none",
                   marginTop: "30px",
                 }}
@@ -722,7 +706,7 @@ const StarDisplay = ({
           gap: "10px", // Adds spacing between elements
         }}
       >
-        <p style={{ fontSize: "12px", margin: 0, fontWeight: "bold" }}>
+        <p style={{ fontSize: "16px", margin: 0, fontWeight: "bold" }}>
           {rating === -1 ? "No ratings yet" : rating}
         </p>
         <ul
@@ -748,10 +732,10 @@ const StarDisplay = ({
             </li>
           ))}
         </ul>
-        <p style={{ fontSize: "12px", margin: 0 }}>
+        <p style={{ fontSize: "16px", margin: 0 }}>
           {courseDetailsData.creditNumber} Credits{" "}
         </p>
-        <p style={{ fontSize: "12px", margin: 0 }}>
+        <p style={{ fontSize: "16px", margin: 0 }}>
           Live Events I couldn't find the data where when it is live is stored
         </p>
       </div>
