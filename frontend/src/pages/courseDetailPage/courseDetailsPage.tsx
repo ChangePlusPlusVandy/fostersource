@@ -1,24 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchCourseDetails } from "../../services/courseDetailServices"
+import { fetchCourseDetails } from "../../services/courseDetailServices";
 import { FaStar } from "react-icons/fa";
 
 interface Course {
-  _id: string;
   handouts: string[];
-  ratings: number[]; 
+  ratings: number[];
   className: string;
   discussion: string;
-  components: Component[]; // Array of Survey and Video components
+  components: string[]; // Array of Survey and Video components
   isLive: boolean;
   categories: string[];
   creditNumber: number;
   description: string;
   thumbnailPath: string;
   cost: number;
-  createdAt: string; 
-  updatedAt: string; 
-  __v: number;
   instructor: string;
 }
 
@@ -26,7 +22,7 @@ type Component = Survey | Video;
 
 // Survey with a type field
 interface Video {
-  type: "Video"; 
+  type: "Video";
   _id: string;
   onDemand: boolean;
   meetingID: number;
@@ -35,57 +31,85 @@ interface Video {
 
 // Video with a type field
 interface Survey {
-  type: "Survey"; 
+  type: "Survey";
   _id: string;
   questions: string[];
 }
 
 const CoursePage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
-  const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(null);
-  const [starRating, setStarRating] = useState(-1)
+  const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
+    className: "Introduction to Computer Science",
+    description:
+      "Learn the basics of computer science, programming, and problem-solving.",
+    instructor: "Dr. Alice Johnson",
+    creditNumber: 3,
+    discussion: "An interactive discussion about computational thinking.",
+    components: ["Lectures", "Labs", "Quizzes"],
+    handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
+    ratings: [],
+    isLive: false,
+    cost: 100,
+    categories: ["Technology"],
+    thumbnailPath: "",
+  });
+  const [starRating, setStarRating] = useState(-1);
   const [isAdded, setIsAdded] = useState(false);
-  const [surveyLength, setSurveyLength] = useState(-1)
-  const [creditHours, setCreditHours] = useState(0)
-  const [thumbnailpath, setThumbnailpath] = useState("")
+  const [surveyLength, setSurveyLength] = useState(-1);
+  const [creditHours, setCreditHours] = useState(0);
+  const [thumbnailpath, setThumbnailpath] = useState("");
   useEffect(() => {
-    console.log("useEffect being used")
+    console.log("useEffect being used");
     const fetchData = async () => {
       if (!courseId) {
-        console.error("No Id detected")
+        console.error("No Id detected");
         return;
       }
-      try {
-        const courseDetails: Course = await fetchCourseDetails(courseId);
-        setCourseDetailsData(courseDetails);
-        if (courseDetails) {
-          const surveys = courseDetails.components.filter(
-            (component): component is Survey => component.type === "Survey"
-          );
-          const totalQuestions = surveys.reduce(
-            (sum, survey) => sum + survey.questions.length,
-            0
-          );
-          setSurveyLength(totalQuestions);
-          const credit = courseDetails.creditNumber
-          setCreditHours(credit)
-          setThumbnailpath(courseDetails.thumbnailPath)
-        }
+      // try {
+      //   const courseDetails: Course = await fetchCourseDetails(courseId);
+      //   setCourseDetailsData(courseDetails);
+      //   if (courseDetails) {
+      //     const surveys = courseDetails.components.filter(
+      //       (component): component is Survey => component.type === "Survey"
+      //     );
+      //     const totalQuestions = surveys.reduce(
+      //       (sum, survey) => sum + survey.questions.length,
+      //       0
+      //     );
+      //     setSurveyLength(totalQuestions);
+      //     const credit = courseDetails.creditNumber
+      //     setCreditHours(credit)
+      //     setThumbnailpath(courseDetails.thumbnailPath)
+      //   }
 
+      // } catch (e) {
+      //   console.error("Error loading course data");
 
+      // }
 
-      } catch (e) {
-        console.error("Error loading course data");
-
-      }
-    }
+      const dummyData = {
+        className: "Introduction to Computer Science",
+        description:
+          "Learn the basics of computer science, programming, and problem-solving.",
+        instructor: "Dr. Alice Johnson",
+        creditNumber: 3,
+        discussion: "An interactive discussion about computational thinking.",
+        components: ["Lectures", "Labs", "Quizzes"],
+        handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
+        ratings: [],
+        isLive: false,
+        cost: 100,
+        categories: ["Technology"],
+        thumbnailPath: "",
+      };
+      setCourseDetailsData(dummyData);
+    };
     fetchData();
-  }, [courseId]);
+  }, []);
   useEffect(() => {
     if (!courseDetailsData) {
-      console.log("Error in fetching data")
-    }
-    else {
+      console.log("Error in fetching data");
+    } else {
       if (courseDetailsData.ratings.length !== 0) {
         let average = 0;
         let num = 0;
@@ -103,26 +127,43 @@ const CoursePage: React.FC = () => {
   }, [courseDetailsData]);
 
   if (!courseDetailsData) {
-    return (
-      <div>
-        Loading Course Data
-      </div>
-    )
+    return <div>Loading Course Data</div>;
   }
   const handleClick = () => {
     setIsAdded(true);
-  }
+  };
 
   return (
     <div style={{ backgroundColor: "#F2F2F2", margin: 0 }}>
-
       <div style={{ marginTop: "155px", marginLeft: "250px" }}>
         <div>
           <div>
-            <button style={{ width: "154px", height: "38px", backgroundColor: "#D9D9D9", borderRadius: "5px", fontSize: "12px" }}> Back to Catalog</button>
+            <button
+              style={{
+                width: "154px",
+                height: "38px",
+                backgroundColor: "#D9D9D9",
+                borderRadius: "5px",
+                fontSize: "12px",
+              }}
+            >
+              {" "}
+              Back to Catalog
+            </button>
           </div>
-          <div style={{ marginTop: "79px", lineHeight: "48px", display: "flex" }}>
-            <p style={{ fontSize: "32px", fontWeight: "bold", margin: "0", lineHeight: "1.2" }}>{courseDetailsData.className}</p>
+          <div
+            style={{ marginTop: "79px", lineHeight: "48px", display: "flex" }}
+          >
+            <p
+              style={{
+                fontSize: "32px",
+                fontWeight: "bold",
+                margin: "0",
+                lineHeight: "1.2",
+              }}
+            >
+              {courseDetailsData.className}
+            </p>
             <button
               onClick={handleClick}
               style={{
@@ -149,11 +190,16 @@ const CoursePage: React.FC = () => {
           </div>
           {/* Stars */}
           <div style={{ marginTop: "0x" }}>
-            <StarDisplay rating={starRating} courseDetailsData={courseDetailsData} />
+            <StarDisplay
+              rating={starRating}
+              courseDetailsData={courseDetailsData}
+            />
           </div>
           <ul style={{ display: "flex", gap: "5px" }}>
             {courseDetailsData.categories.map((component, index) => (
-              <li key={index}><ButtonLabel component={component} /></li>
+              <li key={index}>
+                <ButtonLabel component={component} />
+              </li>
             ))}
           </ul>
           {/* Filters */}
@@ -173,8 +219,6 @@ const CoursePage: React.FC = () => {
               gap: "10px",
             }}
           >
-
-
             {/*Overview Rectangle*/}
             <div
               style={{
@@ -187,15 +231,15 @@ const CoursePage: React.FC = () => {
                 alignItems: "flex-start",
                 justifyContent: "flex-start",
                 padding: "10px",
-                marginTop: "65px"
+                marginTop: "65px",
               }}
             >
               <p
                 style={{
                   textAlign: "left",
                   fontSize: "12px",
-                  margin: "0", 
-                  lineHeight: "1.5", 
+                  margin: "0",
+                  lineHeight: "1.5",
                   fontWeight: 400,
                 }}
               >
@@ -204,7 +248,6 @@ const CoursePage: React.FC = () => {
                 {courseDetailsData.discussion}
               </p>
             </div>
-
 
             {/*Speaker discription rectangle*/}
             <div
@@ -217,28 +260,64 @@ const CoursePage: React.FC = () => {
                 display: "flex",
               }}
             >
-              <p style={{
-                textAlign: "left",
-                margin: "0",
-                lineHeight: "1.5",
-                width: "150px",
-              }}>
-                <span style={{ fontWeight: 600, fontSize: "12px", lineHeight: "18px" }}>Speaker</span><br />
-                <span><DisplayThumbnail thumbnail={thumbnailpath} /></span> <br />
-                <span style={{ fontSize: "16pz", lineHeight: "24px", fontWeight: 500 }}>{courseDetailsData.instructor}</span> <br />
-                <span> <ul style={{ display: "flex", gap: "5px" }}>
-                  {courseDetailsData.categories.map((component, index) => (
-                    <li key={index}><ButtonLabel component={component} /></li>
-                  ))}
-                </ul> </span> <br />
+              <p
+                style={{
+                  textAlign: "left",
+                  margin: "0",
+                  lineHeight: "1.5",
+                  width: "150px",
+                }}
+              >
+                <span
+                  style={{
+                    fontWeight: 600,
+                    fontSize: "12px",
+                    lineHeight: "18px",
+                  }}
+                >
+                  Speaker
+                </span>
+                <br />
+                <span>
+                  <DisplayThumbnail thumbnail={thumbnailpath} />
+                </span>{" "}
+                <br />
+                <span
+                  style={{
+                    fontSize: "16pz",
+                    lineHeight: "24px",
+                    fontWeight: 500,
+                  }}
+                >
+                  {courseDetailsData.instructor}
+                </span>{" "}
+                <br />
+                <span>
+                  {" "}
+                  <ul style={{ display: "flex", gap: "5px" }}>
+                    {courseDetailsData.categories.map((component, index) => (
+                      <li key={index}>
+                        <ButtonLabel component={component} />
+                      </li>
+                    ))}
+                  </ul>{" "}
+                </span>{" "}
+                <br />
                 {/*Needs to be complete*/}
-                <span style={{ fontWeight: 500, fontSize: "12px" }}>Instructor Description</span>
+                <span style={{ fontWeight: 500, fontSize: "12px" }}>
+                  Instructor Description
+                </span>
               </p>
-              <p style={{ fontWeight: 400, fontSize: "12px", lineHeight: "18px" }}>
+              <p
+                style={{
+                  fontWeight: 400,
+                  fontSize: "12px",
+                  lineHeight: "18px",
+                }}
+              >
                 {courseDetailsData.description}
               </p>
             </div>
-
           </div>
           <div
             style={{
@@ -253,15 +332,17 @@ const CoursePage: React.FC = () => {
           >
             <p style={{ textAlign: "left" }}>
               <p>Content</p>
-              <DisplayBar surveyLength={surveyLength} creditHours={creditHours} />
+              <DisplayBar
+                surveyLength={surveyLength}
+                creditHours={creditHours}
+              />
             </p>
           </div>
         </div>
       </div>
     </div>
-
   );
-}
+};
 const DisplayThumbnail = ({ thumbnail }: { thumbnail: string }) => {
   return (
     <div style={{ margin: "20px 0", textAlign: "center" }}>
@@ -290,22 +371,41 @@ const ButtonLabel = ({ component }: { component: String }) => {
         justifyContent: "center", // Horizontally center the text
       }}
     >
-      <p style={{ margin: 0, fontSize: "10px", color: "#FFFFFF", lineHeight: "15px", fontWeight: 500, font: "Poppins" }}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: "10px",
+          color: "#FFFFFF",
+          lineHeight: "15px",
+          fontWeight: 500,
+          font: "Poppins",
+        }}
+      >
         {component}
       </p>
     </div>
   );
 };
 
-{/*Displays the progress bar of webinar, survey, and certificate*/ }
+{
+  /*Displays the progress bar of webinar, survey, and certificate*/
+}
 
-const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, creditHours: number }) => {
+const DisplayBar = ({
+  surveyLength,
+  creditHours,
+}: {
+  surveyLength: number;
+  creditHours: number;
+}) => {
   const [currentPage, setCurrentPage] = useState("Webinar");
   const [surveyColor, setSurveyColor] = useState("#D9D9D9");
   const [certificateColor, setCertificateColor] = useState("#D9D9D9");
   const testNetwork = async () => {
     try {
-      const response = await fetch("https://jsonplaceholder.typicode.com/posts/1"); // Test API endpoint
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/posts/1"
+      ); // Test API endpoint
       if (response.ok) {
         alert("Network is working!");
       } else {
@@ -317,20 +417,19 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
   };
   const handleWebinarClick = () => {
     setCurrentPage("Webinar");
-    setSurveyColor("#D9D9D9")
-    setCertificateColor("#D9D9D9")
-
+    setSurveyColor("#D9D9D9");
+    setCertificateColor("#D9D9D9");
   };
   const handleSurveyClick = () => {
     setSurveyColor("#FEC781"); // Turn survey button orange
     setCertificateColor("#D9D9D9"); // Turn certificate button orange
-    setCurrentPage("Survey")
+    setCurrentPage("Survey");
   };
 
   const handleCertificateClick = () => {
     setSurveyColor("#FEC781"); // Turn survey button orange
     setCertificateColor("#FEC781"); // Turn certificate button orange
-    setCurrentPage("Certificate")
+    setCurrentPage("Certificate");
   };
   return (
     <div>
@@ -370,7 +469,8 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
             width: "163px",
             height: "36px",
             backgroundColor: surveyColor,
-            clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
+            clipPath:
+              "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
             margin: "0 -20px 0 0",
             padding: "0",
             border: "none",
@@ -446,15 +546,16 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
           >
             Webinar <br />
             <div>
-              <p style={{
-                fontSize: "12px",
-                fontWeight: 600,
-                textAlign: "left",
-                margin: "10px 0",
-                gap: "3px",
-                display: "flex",
-                flexDirection: "column"
-              }}
+              <p
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  textAlign: "left",
+                  margin: "10px 0",
+                  gap: "3px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
               >
                 {/*Needs to be complete*/}
                 <div>Date</div>
@@ -478,14 +579,15 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
                   fontSize: "12px",
                   transform: "translateY(10px)",
                   border: "none",
-                  marginTop: "20px"
+                  marginTop: "20px",
                 }}
               >
                 {/*Needs to be complete*/}
                 <p style={{ transform: "translateY(-5px)", margin: 0 }}>
                   Add to Calander
                 </p>
-              </button> <br />
+              </button>{" "}
+              <br />
               <button
                 onClick={testNetwork}
                 style={{
@@ -499,7 +601,7 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
                   fontSize: "12px",
                   transform: "translateY(10px)",
                   border: "none",
-                  marginTop: "10px"
+                  marginTop: "10px",
                 }}
               >
                 <p style={{ transform: "translateY(-5px)", margin: 0 }}>
@@ -519,8 +621,8 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
             }}
           >
             Survey <br />
-            Amount:  <span style={{ fontWeight: 200 }}>{surveyLength} questions</span>
-
+            Amount:{" "}
+            <span style={{ fontWeight: 200 }}>{surveyLength} questions</span>
             <div>
               {/*Needs to be complete*/}
               <button
@@ -535,7 +637,7 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
                   fontSize: "12px",
                   transform: "translateY(10px)",
                   border: "none",
-                  marginTop: "30px"
+                  marginTop: "30px",
                 }}
               >
                 {/*Needs to be complete*/}
@@ -545,10 +647,6 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
               </button>
             </div>
           </p>
-
-
-
-
         )}
         {currentPage === "Certificate" && (
           <p
@@ -567,7 +665,8 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
                 textAlign: "left",
               }}
             >
-              Amount:  <span style={{ fontWeight: 200 }}>{creditHours} questions</span>
+              Amount:{" "}
+              <span style={{ fontWeight: 200 }}>{creditHours} questions</span>
             </p>
             <div style={{ textAlign: "left" }}>
               {/*Needs to be complete*/}
@@ -582,7 +681,7 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
                   color: "white",
                   fontSize: "12px",
                   border: "none",
-                  marginTop: "30px"
+                  marginTop: "30px",
                 }}
               >
                 {/*Needs to be complete*/}
@@ -592,21 +691,27 @@ const DisplayBar = ({ surveyLength, creditHours }: { surveyLength: number, credi
               </button>
             </div>
           </p>
-
         )}
       </div>
     </div>
   );
 };
 
-{/*Displays the stars, credit numbers, and live event time*/ }
-const StarDisplay = ({ rating, courseDetailsData }: { rating: number, courseDetailsData: Course }) => {
-  let stars = Array(0).fill(0)
+{
+  /*Displays the stars, credit numbers, and live event time*/
+}
+const StarDisplay = ({
+  rating,
+  courseDetailsData,
+}: {
+  rating: number;
+  courseDetailsData: Course;
+}) => {
+  let stars = Array(0).fill(0);
   if (rating === -1) {
-    stars = Array(0).fill(0)
-  }
-  else {
-    stars = Array(rating).fill(0)
+    stars = Array(0).fill(0);
+  } else {
+    stars = Array(rating).fill(0);
   }
   return (
     <div>
@@ -617,7 +722,9 @@ const StarDisplay = ({ rating, courseDetailsData }: { rating: number, courseDeta
           gap: "10px", // Adds spacing between elements
         }}
       >
-        <p style={{ fontSize: "12px", margin: 0, fontWeight: "bold" }}>{rating === -1 ? "No ratings yet" : rating}</p>
+        <p style={{ fontSize: "12px", margin: 0, fontWeight: "bold" }}>
+          {rating === -1 ? "No ratings yet" : rating}
+        </p>
         <ul
           style={{
             display: "flex",
@@ -634,12 +741,19 @@ const StarDisplay = ({ rating, courseDetailsData }: { rating: number, courseDeta
                 marginRight: "5px",
               }}
             >
-              <FaStar size={10} color={index <= rating ? "#FFD700" : "#a9a9a9"} />
+              <FaStar
+                size={10}
+                color={index <= rating ? "#FFD700" : "#a9a9a9"}
+              />
             </li>
           ))}
         </ul>
-        <p style={{ fontSize: "12px", margin: 0 }}>{courseDetailsData.creditNumber} Credits </p>
-        <p style={{ fontSize: "12px", margin: 0 }}>Live Events I couldn't find the data where when it is live is stored</p>
+        <p style={{ fontSize: "12px", margin: 0 }}>
+          {courseDetailsData.creditNumber} Credits{" "}
+        </p>
+        <p style={{ fontSize: "12px", margin: 0 }}>
+          Live Events I couldn't find the data where when it is live is stored
+        </p>
       </div>
     </div>
   );
