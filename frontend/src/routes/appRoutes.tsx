@@ -46,6 +46,7 @@ function AppRoutes() {
 					display: "flex",
 					flexDirection: "column",
 					height: "100vh",
+					backgroundColor: "#eeeeee"
 				}}
 			>
 				<div style={{ width: "100%" }}>

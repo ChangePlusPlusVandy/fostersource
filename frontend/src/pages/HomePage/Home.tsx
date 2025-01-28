@@ -4,7 +4,7 @@ import {logout} from "../../components/Sidebar/sidebar";
 
 export default function Home() {
   return (
-    <div className="bg-gray-100 min-h-screen flex w-full">
+    <div className="min-h-screen flex w-full">
       <div className="flex-grow">
         <main className="container mx-auto py-8 px-6 max-w-screen-lg">
           {/* Welcome Section */}

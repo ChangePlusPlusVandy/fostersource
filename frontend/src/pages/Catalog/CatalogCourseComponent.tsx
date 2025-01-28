@@ -88,7 +88,7 @@ export default function CatalogCourseComponent({
 					<button className="bg-orange-500 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-orange-600 transition">
 						Register ({course.cost === 0 ? "Free" : `$${course.cost}`})
 					</button>
-					<Link to={`/courseDetails?${course.className.toLowerCase().trim().replaceAll(" ", "-")}`}>
+					<Link to={`/courseDetails?courseId=${course.className.toLowerCase().trim().replaceAll(" ", "-")}`}>
 						<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
 							Learn More
 						</button>

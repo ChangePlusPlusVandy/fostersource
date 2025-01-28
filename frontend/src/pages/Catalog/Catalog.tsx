@@ -99,7 +99,7 @@ export default function Catalog() {
 	};
 
 	return (
-		<div className="bg-gray-100 min-h-screen w-full">
+		<div className="min-h-screen w-full">
 			<div className="container mx-auto py-6">
 				<h1 className="text-3xl font-bold text-gray-800 mb-6">Catalog</h1>
 				<CatalogSearchBar

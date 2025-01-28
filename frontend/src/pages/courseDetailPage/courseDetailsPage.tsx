@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {Link, useSearchParams} from "react-router-dom";
 import { fetchCourseDetails } from "../../services/courseDetailServices";
 import { FaStar } from "react-icons/fa";
 import {dummyCourses} from "../../shared/DummyCourses";
@@ -25,7 +25,11 @@ interface Survey {
 }
 
 const CoursePage: React.FC = () => {
+    const [searchParams] = useSearchParams();
+    const courseId = searchParams.get('courseId');
+
     function tempDataParse() {
+        console.log(courseId)
         for(let course of dummyCourses){
             if (courseId === course.className.toLowerCase().trim().replaceAll(" ", "-")){
                 return course;
@@ -50,7 +54,6 @@ const CoursePage: React.FC = () => {
             thumbnailPath: "",
         }
     }
-  const { courseId } = useParams<{ courseId: string }>();
   const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(tempDataParse());
   const [starRating, setStarRating] = useState(-1);
   const [isAdded, setIsAdded] = useState(false);
@@ -121,18 +124,21 @@ const CoursePage: React.FC = () => {
       <div style={{ marginLeft: "10vw" }}>
         <div>
           <div>
-            <button
-              style={{
-                width: "154px",
-                height: "38px",
-                backgroundColor: "#D9D9D9",
-                borderRadius: "5px",
-                fontSize: "16px",
-              }}
-            >
-              {" "}
-              Back to Catalog
-            </button>
+              <Link to={"/catalog"}>
+                  <button
+                      style={{
+                          width: "154px",
+                          height: "38px",
+                          backgroundColor: "#D9D9D9",
+                          borderRadius: "5px",
+                          fontSize: "16px",
+                      }}
+                  >
+                      {" "}
+                      Back to Catalog
+                  </button>
+              </Link>
+            
           </div>
           <div
             style={{ marginTop: "79px", lineHeight: "48px", display: "flex" }}
@@ -172,7 +178,7 @@ const CoursePage: React.FC = () => {
             </button>
           </div>
           {/* Stars */}
-          <div style={{ marginTop: "0x" }}>
+          <div style={{ marginTop: "10px" }}>
             <StarDisplay
               rating={starRating}
               courseDetailsData={courseDetailsData}
@@ -288,7 +294,7 @@ const CoursePage: React.FC = () => {
                 <br />
                 {/*Needs to be complete*/}
                 <span style={{ fontWeight: 500, fontSize: "16px" }}>
-                  Instructor Description
+                  Instructor Description: Not implemented
                 </span>
               </p>
               <p
@@ -477,7 +483,7 @@ const DisplayBar = ({
         </button>
         <button
           style={{
-            width: "150px",
+            width: "200px",
             height: "36px",
             backgroundColor: certificateColor,
             clipPath: "polygon(0 0, 85% 0, 85% 100%, 0 100%, 15% 50%)",
@@ -736,7 +742,7 @@ const StarDisplay = ({
           {courseDetailsData.creditNumber} Credits{" "}
         </p>
         <p style={{ fontSize: "16px", margin: 0 }}>
-          Live Events I couldn't find the data where when it is live is stored
+            {courseDetailsData.isLive? "Live" : "On-Demand"}
         </p>
       </div>
     </div>
