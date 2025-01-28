@@ -19,7 +19,7 @@ import authService from "../../services/authService";
 // User information
 export const userInfo = {
 	name: "First L.",
-	role: "Role",
+	role: "Foster Parent",
 	isLoggedIn: false,
 };
 
@@ -86,7 +86,7 @@ export function Sidebar({
 	setIsLoggedIn,
 }: SidebarProps) {
 	// User Info
-	const name = userInfo.name;
+	const name = JSON.parse(localStorage.user).name;
 	const role = userInfo.role;
 
 	// Automatically collapse sidebar for narrow screens
@@ -140,7 +140,8 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 			)}
 			{isLoggedIn && (
 				<img
-					src="assets/cute_ghost.jpeg"
+					src={"https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png"}
+					// src="assets/cute_ghost.jpeg"
 					alt="Profile"
 					className="profile-pic"
 				/>
