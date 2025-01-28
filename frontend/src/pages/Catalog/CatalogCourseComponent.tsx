@@ -1,5 +1,6 @@
 import React from "react";
 import { Course } from "../../shared/types/course";
+import { Link } from "react-router-dom";
 
 interface CatalogCourseComponentProps {
 	course: Course;
@@ -87,14 +88,18 @@ export default function CatalogCourseComponent({
 					<button className="bg-orange-500 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-orange-600 transition">
 						Register ({course.cost === 0 ? "Free" : `$${course.cost}`})
 					</button>
-					<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
-						Learn More
-					</button>
+					<Link
+						to={`/courseDetails?courseId=${course.className.toLowerCase().trim().replaceAll(" ", "-")}`}
+					>
+						<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
+							Learn More
+						</button>
+					</Link>
 				</div>
 			</div>
 			<div className="w-1/4 bg-gray-300">
 				<img
-					src="https://via.placeholder.com/150"
+					src="https://st2.depositphotos.com/2769299/7314/i/450/depositphotos_73146775-stock-photo-a-stack-of-books-on.jpg"
 					alt="Course"
 					className="object-cover w-full h-full"
 				/>
