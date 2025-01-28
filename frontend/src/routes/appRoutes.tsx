@@ -28,10 +28,10 @@ function AppRoutes() {
 		window.innerWidth < 768
 	);
 
-	const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-		const isAuthenticated = authService.isAuthenticated();
+	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated())
 
-		if (isAuthenticated) {
+	const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+		if (isLoggedIn) {
 			return children;
 		} else {
 			return <Navigate to="/login" />;
@@ -58,7 +58,7 @@ function AppRoutes() {
 						top: "25%",
 					}}
 				>
-					<Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+					<Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
 				</div>
 				<div
 					style={{

@@ -14,6 +14,8 @@ import {
 	LogIn,
 } from "lucide-react";
 
+import authService from "../../services/authService";
+
 // User information
 export const userInfo = {
 	name: "First L.",
@@ -72,14 +74,15 @@ export const logout = {
 interface SidebarProps {
 	isCollapsed: boolean;
 	setIsCollapsed: Dispatch<SetStateAction<boolean>>;
+	isLoggedIn: boolean;
+	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 }
 
 // The Sidebar itself
-export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
+export function Sidebar({ isCollapsed, setIsCollapsed, isLoggedIn, setIsLoggedIn }: SidebarProps) {
 	// User Info
 	const name = userInfo.name;
 	const role = userInfo.role;
-	const isLoggedIn = userInfo.isLoggedIn;
 
 	// Automatically collapse sidebar for narrow screens
 	useEffect(() => {
@@ -101,7 +104,7 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 				name={name}
 				role={role}
 			/>
-			<SidebarItems isCollapsed={isCollapsed} isLoggedIn={isLoggedIn} />
+			<SidebarItems isCollapsed={isCollapsed} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
 		</div>
 	);
 }
@@ -146,14 +149,27 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 interface SidebarItemsProps {
 	isLoggedIn: boolean;
 	isCollapsed: boolean;
+	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 }
 
 // Display and handle sidebar entries
-export function SidebarItems({ isCollapsed, isLoggedIn }: SidebarItemsProps) {
+export function SidebarItems({ isCollapsed, isLoggedIn, setIsLoggedIn }: SidebarItemsProps) {
 	// Helper function for active tab highlighting
 	const handleItemClick = (item: string) => {
 		setActiveItem(item);
 	};
+
+	const handleLogOut = async () => {
+		handleItemClick("logout")
+		try {
+			await authService.logout();
+		} catch (err: any) {
+			console.error("Login error:", err);
+		} finally {
+			setIsLoggedIn(authService.isAuthenticated())
+			window.location.href = "/login";
+		}
+	}
 
 	const [activeItem, setActiveItem] = useState<string>("");
 
@@ -177,7 +193,7 @@ export function SidebarItems({ isCollapsed, isLoggedIn }: SidebarItemsProps) {
 			{sidebarItems}
 			{isLoggedIn && (
 				<div className="logout">
-					<li className={`${active}`} onClick={() => handleItemClick("logout")}>
+					<li className={`${active}`} onClick={() => handleLogOut()}>
 						<div className={`${iconDescMargin}`}>{logout.icon}</div>
 						<Link to={logout.href}>{!isCollapsed && logout.description}</Link>
 					</li>

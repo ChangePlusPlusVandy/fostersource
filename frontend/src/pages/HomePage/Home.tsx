@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import {Link} from "react-router-dom";
+import {logout} from "../../components/Sidebar/sidebar";
 
 export default function Home() {
   return (
@@ -86,40 +88,45 @@ export default function Home() {
             </motion.div>
 
             {/* Catalog Tile */}
-            <motion.div
-              className="relative overflow-hidden shadow-lg mx-auto"
-              style={{
-                width: "90%",
-                maxWidth: "600px",
-                aspectRatio: "16/9",
-                borderRadius: "20px",
-              }}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0px 4px 10px rgba(0,0,0,0.3)",
-                transition: { duration: 0.15 },
-              }}
-            >
-              <img
-                src="/images/catalogHomePage.png"
-                alt="Catalog Background"
-                className="absolute inset-0 w-full h-full object-cover filter grayscale"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-end justify-center pb-4">
-                <h2
-                  className="text-white font-poppins font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-1"
-                  style={{
-                    fontSize: "clamp(1.25rem, 1.8vw, 2rem)",
-                    lineHeight: "1.2",
-                  }}
+
+            <Link to={"/catalog"}>
+                <motion.div
+                    className="relative overflow-hidden shadow-lg mx-auto"
+                    style={{
+                        width: "90%",
+                        maxWidth: "600px",
+                        aspectRatio: "16/9",
+                        borderRadius: "20px",
+                    }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                    whileHover={{
+                        scale: 1.05,
+                        boxShadow: "0px 4px 10px rgba(0,0,0,0.3)",
+                        transition: { duration: 0.15 },
+                    }}
                 >
-                  Catalog
-                </h2>
-              </div>
-            </motion.div>
+                    <img
+                        src="/images/catalogHomePage.png"
+                        alt="Catalog Background"
+                        className="absolute inset-0 w-full h-full object-cover filter grayscale"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-end justify-center pb-4">
+                        <h2
+                            className="text-white font-poppins font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-1"
+                            style={{
+                                fontSize: "clamp(1.25rem, 1.8vw, 2rem)",
+                                lineHeight: "1.2",
+                            }}
+                        >
+                            Catalog
+                        </h2>
+                    </div>
+                </motion.div>
+            </Link>
+
+
 
             {/* In-Person Training Tile */}
             <motion.div
