@@ -578,7 +578,7 @@ const DisplayBar = ({
 							>
 								{/*Needs to be complete*/}
 								<p style={{ transform: "translateY(-5px)", margin: 0 }}>
-									Add to Calander
+									Add to Calendar
 								</p>
 							</button>{" "}
 							<br />
