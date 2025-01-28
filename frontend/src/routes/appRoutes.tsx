@@ -29,7 +29,7 @@ function AppRoutes() {
 		window.innerWidth < 768
 	);
 
-	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated())
+	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
 
 	const PrivateRoute = ({ children }: { children: JSX.Element }) => {
 		if (isLoggedIn) {
@@ -46,7 +46,7 @@ function AppRoutes() {
 					display: "flex",
 					flexDirection: "column",
 					height: "100vh",
-					backgroundColor: "#eeeeee"
+					backgroundColor: "#eeeeee",
 				}}
 			>
 				<div style={{ width: "100%" }}>
@@ -60,7 +60,12 @@ function AppRoutes() {
 						top: "25%",
 					}}
 				>
-					<Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+					<Sidebar
+						isCollapsed={isCollapsed}
+						setIsCollapsed={setIsCollapsed}
+						isLoggedIn={isLoggedIn}
+						setIsLoggedIn={setIsLoggedIn}
+					/>
 				</div>
 				<div
 					style={{
@@ -94,7 +99,7 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
-            <Route path="/courseDetails" element={<CoursePage />} />
+						<Route path="/courseDetails" element={<CoursePage />} />
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (
