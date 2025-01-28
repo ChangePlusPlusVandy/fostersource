@@ -140,7 +140,9 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 			)}
 			{isLoggedIn && (
 				<img
-					src={"https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png"}
+					src={
+						"https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png"
+					}
 					// src="assets/cute_ghost.jpeg"
 					alt="Profile"
 					className="profile-pic"
