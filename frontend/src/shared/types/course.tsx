@@ -1,8 +1,4 @@
-export type Rating = {
-	userId: string;
-	courseId: string;
-	rating: number;
-};
+import {Rating} from "./rating";
 
 export type Course = {
 	className: string;

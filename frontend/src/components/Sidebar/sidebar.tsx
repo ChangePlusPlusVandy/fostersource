@@ -33,7 +33,7 @@ export const items = [
 	{
 		icon: <LayoutDashboard />,
 		description: "Dashboard",
-		href: "#",
+		href: "/dashboard",
 	},
 	{
 		icon: <BookOpen />,

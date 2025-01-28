@@ -22,6 +22,7 @@ import ResetPassword from "../pages/UserAuth/resetPassword";
 import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
+import Dashboard from "../pages/Dashboard/dashboard";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -89,6 +90,14 @@ function AppRoutes() {
 							element={
 								<PrivateRoute>
 									<Catalog />
+								</PrivateRoute>
+							}
+						/>
+						<Route
+							path="/dashboard"
+							element={
+								<PrivateRoute>
+									<Dashboard />
 								</PrivateRoute>
 							}
 						/>
