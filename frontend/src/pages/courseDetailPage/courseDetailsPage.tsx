@@ -660,7 +660,7 @@ const DisplayBar = ({
 							}}
 						>
 							Amount:{" "}
-							<span style={{ fontWeight: 200 }}>{creditHours} questions</span>
+							<span style={{ fontWeight: 200 }}>{creditHours} Credit Hours </span>
 						</p>
 						<div style={{ textAlign: "left" }}>
 							{/*Needs to be complete*/}
