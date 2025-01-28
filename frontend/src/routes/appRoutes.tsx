@@ -21,6 +21,7 @@ import Register from "../pages/UserAuth/Register";
 import ResetPassword from "../pages/UserAuth/resetPassword";
 import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
+import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -92,6 +93,7 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
+            <Route path="/courseDetails" element={<CoursePage />} />
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (
