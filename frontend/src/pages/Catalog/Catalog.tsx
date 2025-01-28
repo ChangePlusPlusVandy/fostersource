@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Course } from "../../shared/types/course";
 import CatalogCourseComponent from "./CatalogCourseComponent";
 import CatalogSearchBar from "./CatalogSearchBar";
-import {dummyCourses} from "../../shared/DummyCourses";
+import { dummyCourses } from "../../shared/DummyCourses";
 
 export default function Catalog() {
-
-
 	const [courses, setCourses] = useState<Course[]>(dummyCourses);
 	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");

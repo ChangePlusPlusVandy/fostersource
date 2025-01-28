@@ -79,7 +79,12 @@ interface SidebarProps {
 }
 
 // The Sidebar itself
-export function Sidebar({ isCollapsed, setIsCollapsed, isLoggedIn, setIsLoggedIn }: SidebarProps) {
+export function Sidebar({
+	isCollapsed,
+	setIsCollapsed,
+	isLoggedIn,
+	setIsLoggedIn,
+}: SidebarProps) {
 	// User Info
 	const name = userInfo.name;
 	const role = userInfo.role;
@@ -104,7 +109,11 @@ export function Sidebar({ isCollapsed, setIsCollapsed, isLoggedIn, setIsLoggedIn
 				name={name}
 				role={role}
 			/>
-			<SidebarItems isCollapsed={isCollapsed} isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
+			<SidebarItems
+				isCollapsed={isCollapsed}
+				isLoggedIn={isLoggedIn}
+				setIsLoggedIn={setIsLoggedIn}
+			/>
 		</div>
 	);
 }
@@ -153,23 +162,27 @@ interface SidebarItemsProps {
 }
 
 // Display and handle sidebar entries
-export function SidebarItems({ isCollapsed, isLoggedIn, setIsLoggedIn }: SidebarItemsProps) {
+export function SidebarItems({
+	isCollapsed,
+	isLoggedIn,
+	setIsLoggedIn,
+}: SidebarItemsProps) {
 	// Helper function for active tab highlighting
 	const handleItemClick = (item: string) => {
 		setActiveItem(item);
 	};
 
 	const handleLogOut = async () => {
-		handleItemClick("logout")
+		handleItemClick("logout");
 		try {
 			await authService.logout();
 		} catch (err: any) {
 			console.error("Login error:", err);
 		} finally {
-			setIsLoggedIn(authService.isAuthenticated())
+			setIsLoggedIn(authService.isAuthenticated());
 			window.location.href = "/login";
 		}
-	}
+	};
 
 	const [activeItem, setActiveItem] = useState<string>("");
 
