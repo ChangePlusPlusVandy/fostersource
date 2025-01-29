@@ -19,10 +19,12 @@ export interface ICourse extends Document {
 
 const CourseSchema: Schema = new Schema(
 	{
-		students: [{
-			type: Schema.Types.ObjectId,
-			ref: "User",
-		}],
+		students: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "User",
+			},
+		],
 		handouts: [{ type: String, required: false }],
 		ratings: [
 			{
