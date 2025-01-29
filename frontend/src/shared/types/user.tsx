@@ -1,5 +1,5 @@
-import {Payment} from "./payment";
-import {Progress} from "./progress";
+import { Payment } from "./payment";
+import { Progress } from "./progress";
 
 export type User = {
     firebaseId: string;

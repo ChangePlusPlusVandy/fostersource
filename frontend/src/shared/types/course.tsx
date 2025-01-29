@@ -1,4 +1,4 @@
-import {Rating} from "./rating";
+import { Rating } from "./rating";
 
 export type Course = {
 	className: string;
