@@ -39,6 +39,7 @@ export const getOrCreateUser = async (
 			phone,
 			progress,
 			payments,
+			cart
 		} = req.body;
 
 		let user = await User.findOne({ firebaseId });
@@ -63,6 +64,7 @@ export const getOrCreateUser = async (
 			phone,
 			progress,
 			payments,
+			cart
 		});
 
 		const savedUser = await newUser.save();

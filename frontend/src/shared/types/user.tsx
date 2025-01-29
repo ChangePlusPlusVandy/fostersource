@@ -26,4 +26,5 @@ export type User = {
     phone: string;
     progress: Progress[];
     payments: Payment[];
+    cart: string[];
 }

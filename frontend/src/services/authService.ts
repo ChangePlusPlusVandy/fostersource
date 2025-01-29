@@ -190,7 +190,7 @@ class AuthService {
 					firebaseId: userCredential.user.uid,
 					email,
 					name,
-					role: "foster parent",
+					role: "Foster Parent",
 					isColorado: true,
 				},
 				{

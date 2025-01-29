@@ -19,7 +19,7 @@ import authService from "../../services/authService";
 // User information
 export const userInfo = {
 	name: "First L.",
-	role: "Foster Parent",
+	role: localStorage.user? localStorage.user.role : null,
 	isLoggedIn: false,
 };
 
@@ -55,7 +55,7 @@ export const items = [
 		description: "FAQs",
 		href: "#",
 	},
-	{ icon: <ShoppingCart />, description: "Cart", href: "#" },
+	{ icon: <ShoppingCart />, description: "Cart", href: "/cart" },
 	{
 		icon: <Phone />,
 		description: "Contact",
@@ -170,12 +170,12 @@ export function SidebarItems({
 	setIsLoggedIn,
 }: SidebarItemsProps) {
 	// Helper function for active tab highlighting
-	const handleItemClick = (item: string) => {
-		setActiveItem(item);
-	};
+	// const handleItemClick = (item: string) => {
+	// 	setActiveItem(item);
+	// };
 
 	const handleLogOut = async () => {
-		handleItemClick("logout");
+		// handleItemClick("logout");
 		try {
 			await authService.logout();
 		} catch (err: any) {
@@ -186,14 +186,14 @@ export function SidebarItems({
 		}
 	};
 
-	const [activeItem, setActiveItem] = useState<string>("");
+	const [activeItem, setActiveItem] = useState<string>(window.location.pathname);
 
 	const sidebarItems = items.map(({ icon, description, href }) => {
-		const active = activeItem === description ? "active" : "";
+		const active = activeItem === href  ? "active" : "";
 		const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
 		return (
-			<li className={`${active}`} onClick={() => handleItemClick(description)}>
+			<li className={`${active}`} onClick={() => setActiveItem(window.location.pathname)}>
 				<div className={`${iconDescMargin}`}>{icon}</div>
 				<Link to={href}>{!isCollapsed && description}</Link>
 			</li>

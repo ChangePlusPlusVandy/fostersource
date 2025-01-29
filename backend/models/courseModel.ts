@@ -14,10 +14,15 @@ export interface ICourse extends Document {
 	thumbnailPath: string;
 	cost: number;
 	instructor: string;
+	students: mongoose.Types.ObjectId[]; //for the users
 }
 
 const CourseSchema: Schema = new Schema(
 	{
+		students: [{
+			type: Schema.Types.ObjectId,
+			ref: "User",
+		}],
 		handouts: [{ type: String, required: false }],
 		ratings: [
 			{

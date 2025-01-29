@@ -23,6 +23,7 @@ import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 import Dashboard from "../pages/Dashboard/dashboard";
+import Cart from "../pages/CartPage/cart";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -98,6 +99,14 @@ function AppRoutes() {
 							element={
 								<PrivateRoute>
 									<Dashboard />
+								</PrivateRoute>
+							}
+						/>
+						<Route
+							path="/cart"
+							element={
+								<PrivateRoute>
+									<Cart />
 								</PrivateRoute>
 							}
 						/>
