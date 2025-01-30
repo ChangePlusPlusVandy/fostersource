@@ -191,14 +191,19 @@ export function SidebarItems({
 		}
 	};
 
-	const [activeItem, setActiveItem] = useState<string>(window.location.pathname);
+	const [activeItem, setActiveItem] = useState<string>(
+		window.location.pathname
+	);
 
 	const sidebarItems = items.map(({ icon, description, href }) => {
-		const active = activeItem === href  ? "active" : "";
+		const active = activeItem === href ? "active" : "";
 		const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
 		return (
-			<li className={`${active}`} onClick={() => setActiveItem(window.location.pathname)} key={description}>
+			<li
+				className={`${active}`}
+				onClick={() => setActiveItem(window.location.pathname)}
+			>
 				<div className={`${iconDescMargin}`}>{icon}</div>
 				<Link to={href}>{!isCollapsed && description}  {description === "Cart" && cartItemCount !== 0 ? `(${cartItemCount})` : ""}</Link>
 			</li>

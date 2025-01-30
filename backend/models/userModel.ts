@@ -71,12 +71,12 @@ const userSchema: Schema = new Schema(
 				ref: "Payment",
 			},
 		],
-		cart:[
+		cart: [
 			{
 				type: Schema.Types.ObjectId,
 				ref: "User",
-			}
-		]
+			},
+		],
 	},
 	{
 		timestamps: true,
