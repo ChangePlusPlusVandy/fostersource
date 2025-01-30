@@ -121,7 +121,10 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
-						<Route path="/courseDetails" element={<CoursePage setCartItemCount={setCartItemCount}/>} />
+						<Route
+							path="/courseDetails"
+							element={<CoursePage setCartItemCount={setCartItemCount} />}
+						/>
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (

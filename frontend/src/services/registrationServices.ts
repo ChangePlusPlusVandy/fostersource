@@ -4,8 +4,8 @@ const backendUrl = "http://localhost:5001";
 
 export async function addToCart(course: Course) {
 	let user = localStorage.getItem("user")
-		// @ts-ignore
-		? JSON.parse(localStorage.getItem("user"))
+		? // @ts-ignore
+			JSON.parse(localStorage.getItem("user"))
 		: null;
 
 	let cartCourseInfo = {
