@@ -1,12 +1,16 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { Course } from "../../shared/types/course";
+import { Link } from "react-router-dom";
+import { addToCart } from "../../services/registrationServices";
 
 interface CatalogCourseComponentProps {
 	course: Course;
+	setCartItemCount: Dispatch<SetStateAction<number>>;
 }
 
 export default function CatalogCourseComponent({
 	course,
+	setCartItemCount,
 }: CatalogCourseComponentProps) {
 	const renderStars = (rating: number) => {
 		const fullStars = Math.floor(rating);
@@ -29,6 +33,14 @@ export default function CatalogCourseComponent({
 			</div>
 		);
 	};
+
+	async function handleRegister(course: Course) {
+		await addToCart(course).then(() => {
+			setCartItemCount(
+				localStorage.user ? JSON.parse(localStorage.user).cart.length : 0
+			);
+		});
+	}
 
 	return (
 		<div className="flex bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
@@ -69,7 +81,10 @@ export default function CatalogCourseComponent({
 
 				<div className="flex flex-wrap mt-3 gap-2">
 					{course.components.map((component, index) => (
-						<span className="bg-orange-200 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full">
+						<span
+							className="bg-orange-200 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full"
+							key={course.className + component}
+						>
 							{component}
 						</span>
 					))}
@@ -84,17 +99,24 @@ export default function CatalogCourseComponent({
 				</p>
 
 				<div className="flex items-center gap-4 mt-6">
-					<button className="bg-orange-500 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-orange-600 transition">
+					<button
+						className="bg-orange-500 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-orange-600 transition"
+						onClick={() => handleRegister(course)}
+					>
 						Register ({course.cost === 0 ? "Free" : `$${course.cost}`})
 					</button>
-					<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
-						Learn More
-					</button>
+					<Link
+						to={`/courseDetails?courseId=${course.className.toLowerCase().trim().replaceAll(" ", "-")}`}
+					>
+						<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
+							Learn More
+						</button>
+					</Link>
 				</div>
 			</div>
 			<div className="w-1/4 bg-gray-300">
 				<img
-					src="https://via.placeholder.com/150"
+					src="https://st2.depositphotos.com/2769299/7314/i/450/depositphotos_73146775-stock-photo-a-stack-of-books-on.jpg"
 					alt="Course"
 					className="object-cover w-full h-full"
 				/>
