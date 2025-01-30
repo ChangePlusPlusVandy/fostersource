@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { fetchCourseDetails } from "../../services/courseDetailServices";
 import { FaStar } from "react-icons/fa";
 import { dummyCourses } from "../../shared/DummyCourses";
 
 import { Course } from "../../shared/types/course";
+import {addToCart} from "../../services/registrationServices";
 
 type Component = Survey | Video;
 
@@ -23,8 +24,12 @@ interface Survey {
 	_id: string;
 	questions: string[];
 }
-
-const CoursePage: React.FC = () => {
+interface CatalogProps {
+	setCartItemCount: Dispatch<SetStateAction<number>>;
+}
+const CoursePage = ({
+	  setCartItemCount
+  }:CatalogProps) => {
 	const [searchParams] = useSearchParams();
 	const courseId = searchParams.get("courseId");
 
@@ -174,7 +179,13 @@ const CoursePage: React.FC = () => {
 							}}
 							disabled={isAdded} // Disable the button once clicked
 						>
-							<p style={{ transform: "translateY(-5px)", margin: 0 }}>
+							<p style={{ transform: "translateY(-5px)", margin: 0 }} onClick={async () => {
+								await addToCart(courseDetailsData).then(() => {
+									setCartItemCount(
+										localStorage.user ? JSON.parse(localStorage.user).cart.length : 0
+									);
+								})
+							}}>
 								{isAdded ? "Added to Cart" : "Add to Cart"}
 							</p>
 						</button>
