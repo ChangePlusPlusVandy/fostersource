@@ -19,7 +19,7 @@ import authService from "../../services/authService";
 // User information
 export const userInfo = {
 	name: "First L.",
-	role: localStorage.user? localStorage.user.role : null,
+	role: localStorage.user? localStorage.user.role : "No role",
 	isLoggedIn: false,
 };
 
@@ -76,6 +76,7 @@ interface SidebarProps {
 	setIsCollapsed: Dispatch<SetStateAction<boolean>>;
 	isLoggedIn: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+	cartItemCount: number;
 }
 
 // The Sidebar itself
@@ -84,10 +85,11 @@ export function Sidebar({
 	setIsCollapsed,
 	isLoggedIn,
 	setIsLoggedIn,
+	cartItemCount
 }: SidebarProps) {
 	// User Info
 	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
-	const role = isLoggedIn ? userInfo.role : "Log In";
+	const role = isLoggedIn ?  JSON.parse(localStorage.user).role : "Log In";
 	// Automatically collapse sidebar for narrow screens
 	useEffect(() => {
 		const handleResize = () => {
@@ -112,6 +114,7 @@ export function Sidebar({
 				isCollapsed={isCollapsed}
 				isLoggedIn={isLoggedIn}
 				setIsLoggedIn={setIsLoggedIn}
+				cartItemCount={cartItemCount}
 			/>
 		</div>
 	);
@@ -161,6 +164,7 @@ interface SidebarItemsProps {
 	isLoggedIn: boolean;
 	isCollapsed: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+	cartItemCount: number;
 }
 
 // Display and handle sidebar entries
@@ -168,6 +172,7 @@ export function SidebarItems({
 	isCollapsed,
 	isLoggedIn,
 	setIsLoggedIn,
+	cartItemCount
 }: SidebarItemsProps) {
 	// Helper function for active tab highlighting
 	// const handleItemClick = (item: string) => {
@@ -193,9 +198,9 @@ export function SidebarItems({
 		const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
 		return (
-			<li className={`${active}`} onClick={() => setActiveItem(window.location.pathname)}>
+			<li className={`${active}`} onClick={() => setActiveItem(window.location.pathname)} key={description}>
 				<div className={`${iconDescMargin}`}>{icon}</div>
-				<Link to={href}>{!isCollapsed && description}</Link>
+				<Link to={href}>{!isCollapsed && description}  {description === "Cart" && cartItemCount !== 0 ? `(${cartItemCount})` : ""}</Link>
 			</li>
 		);
 	});

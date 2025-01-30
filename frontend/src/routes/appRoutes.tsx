@@ -32,6 +32,7 @@ function AppRoutes() {
 	);
 
 	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
+	const [cartItemCount, setCartItemCount] = useState(localStorage.user? JSON.parse(localStorage.user).cart.length : 0)
 
 	const PrivateRoute = ({ children }: { children: JSX.Element }) => {
 		if (isLoggedIn) {
@@ -67,6 +68,7 @@ function AppRoutes() {
 						setIsCollapsed={setIsCollapsed}
 						isLoggedIn={isLoggedIn}
 						setIsLoggedIn={setIsLoggedIn}
+						cartItemCount = {cartItemCount}
 					/>
 				</div>
 				<div
@@ -90,7 +92,7 @@ function AppRoutes() {
 							path="/catalog"
 							element={
 								<PrivateRoute>
-									<Catalog />
+									<Catalog setCartItemCount={setCartItemCount} />
 								</PrivateRoute>
 							}
 						/>

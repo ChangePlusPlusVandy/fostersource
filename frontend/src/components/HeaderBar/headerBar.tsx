@@ -104,12 +104,12 @@ interface HeaderItemsProps {
 // Display and handle header bar entries
 export function HeaderItems({ displayOptions, outline }: HeaderItemsProps) {
 	const headerItemList = headerItems.map(({ description, href }) => (
-		<li className="border-black border-solid">
+		<li className="border-black border-solid" key={description}>
 			<Link to={href}>{description}</Link>
 		</li>
 	));
 
-	return <ul className={`${displayOptions}`}>{headerItemList}</ul>;
+	return <ul className={`${displayOptions}`} >{headerItemList}</ul>;
 }
 
 export default HeaderBar;
