@@ -1,16 +1,13 @@
-import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Course } from "../../shared/types/course";
 import CatalogCourseComponent from "./CatalogCourseComponent";
 import CatalogSearchBar from "./CatalogSearchBar";
 import { dummyCourses } from "../../shared/DummyCourses";
 
 interface CatalogProps {
-	setCartItemCount:  Dispatch<SetStateAction<number>>;
+	setCartItemCount: Dispatch<SetStateAction<number>>;
 }
-export default function Catalog({
-	setCartItemCount
-	}:CatalogProps
-) {
+export default function Catalog({ setCartItemCount }: CatalogProps) {
 	const [courses, setCourses] = useState<Course[]>(dummyCourses);
 	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
@@ -115,7 +112,11 @@ export default function Catalog({
 			<div className="container mx-auto">
 				<div className="flex flex-col gap-6">
 					{filteredCourses.map((course, index) => (
-						<CatalogCourseComponent key={index} course={course} setCartItemCount={setCartItemCount} />
+						<CatalogCourseComponent
+							key={index}
+							course={course}
+							setCartItemCount={setCartItemCount}
+						/>
 					))}
 				</div>
 			</div>

@@ -19,7 +19,7 @@ import authService from "../../services/authService";
 // User information
 export const userInfo = {
 	name: "First L.",
-	role: localStorage.user? localStorage.user.role : "No role",
+	role: localStorage.user ? localStorage.user.role : "No role",
 	isLoggedIn: false,
 };
 
@@ -85,11 +85,11 @@ export function Sidebar({
 	setIsCollapsed,
 	isLoggedIn,
 	setIsLoggedIn,
-	cartItemCount
+	cartItemCount,
 }: SidebarProps) {
 	// User Info
 	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
-	const role = isLoggedIn ?  JSON.parse(localStorage.user).role : "Log In";
+	const role = isLoggedIn ? JSON.parse(localStorage.user).role : "Log In";
 	// Automatically collapse sidebar for narrow screens
 	useEffect(() => {
 		const handleResize = () => {
@@ -172,7 +172,7 @@ export function SidebarItems({
 	isCollapsed,
 	isLoggedIn,
 	setIsLoggedIn,
-	cartItemCount
+	cartItemCount,
 }: SidebarItemsProps) {
 	// Helper function for active tab highlighting
 	// const handleItemClick = (item: string) => {
@@ -205,7 +205,12 @@ export function SidebarItems({
 				onClick={() => setActiveItem(window.location.pathname)}
 			>
 				<div className={`${iconDescMargin}`}>{icon}</div>
-				<Link to={href}>{!isCollapsed && description}  {description === "Cart" && cartItemCount !== 0 ? `(${cartItemCount})` : ""}</Link>
+				<Link to={href}>
+					{!isCollapsed && description}{" "}
+					{description === "Cart" && cartItemCount !== 0
+						? `(${cartItemCount})`
+						: ""}
+				</Link>
 			</li>
 		);
 	});

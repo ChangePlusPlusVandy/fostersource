@@ -109,7 +109,7 @@ export function HeaderItems({ displayOptions, outline }: HeaderItemsProps) {
 		</li>
 	));
 
-	return <ul className={`${displayOptions}`} >{headerItemList}</ul>;
+	return <ul className={`${displayOptions}`}>{headerItemList}</ul>;
 }
 
 export default HeaderBar;
