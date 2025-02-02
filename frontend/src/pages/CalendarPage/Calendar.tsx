@@ -183,16 +183,20 @@ const renderCalendar = () => {
 
                                 return (
                                     <div key={`${day}-${hour}`} className="border p-2 min-h-[60px] min-w-[150px]">
-                                        {currentHourEvents.map(event => (
-                                            <div
-                                                key={event.id}
-                                                className="bg-orange-500 text-white text-xs p-1 rounded cursor-pointer mx-1"
-                                                onMouseEnter={(e) => handleMouseEnter(event, e)}
-                                                onMouseLeave={handleMouseLeave}
-                                            >
-                                                {event.title}
-                                            </div>
-                                        ))}
+                                        <div className="flex flex-col gap-y-2">
+    										{currentHourEvents.map(event => (
+												<div
+												key={event.id}
+												className="bg-orange-500 text-white text-xs p-[6px] rounded cursor-pointer w-full max-w-[95%] overflow-hidden mx-auto"
+												onMouseEnter={(e) => handleMouseEnter(event, e)}
+												onMouseLeave={handleMouseLeave}
+											>
+												{event.title}
+											</div>
+											
+
+    										))}
+										</div>
                                     </div>
                                 );
                             })}
