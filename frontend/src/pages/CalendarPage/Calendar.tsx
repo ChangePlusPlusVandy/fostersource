@@ -208,56 +208,66 @@ const renderCalendar = () => {
         );
     }
 
-    if (view === 'day') {
-        const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
-        const dayEvents = dummyEvents.filter(event => isSameDay(event.date, currentDate));
+	if (view === 'day') {
+		const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
+		const dayEvents = dummyEvents.filter(event => isSameDay(event.date, currentDate));
 
-        return (
-            <div className="w-full overflow-auto">
-                <div className="grid grid-cols-6 border min-w-full w-full max-w-[800px] mx-auto">
-                    <div className="border-r p-4 text-base font-medium bg-white sticky left-0">
-					<div className="flex items-center space-x-1">
-    					<span className="font-bold">{format(currentDate, 'EEEE')},</span>
-    					<span className={`text-sm font-bold inline-flex ${isToday(currentDate) ? 'bg-orange-500 text-white rounded-full w-6 h-6 items-center justify-center' : ''}`}>
-        					{format(currentDate, 'd')}
-   						</span>
+		return (
+			<div className="w-full overflow-auto">
+				<div className="grid grid-cols-6 border min-w-full">
+					<div className="border-r bg-white sticky left-0 w-32">
+						<div className="p-4 text-base">
+							<div className="flex flex-col">
+								<span className="font-bold whitespace-nowrap">
+									{format(currentDate, 'EEEE')}
+								</span>
+								<div className={`mt-1 text-sm font-bold inline-flex ${
+									isToday(currentDate) 
+										? 'bg-orange-500 text-white rounded-full w-6 h-6 items-center justify-center' 
+										: ''
+								}`}>
+									{format(currentDate, 'd')}
+								</div>
+							</div>
+						</div>
 					</div>
-                    </div>
-                    <div className="col-span-5 p-1 min-h-[60px]">
-                        {hours.map(hour => {
-                            const currentHourEvents = dayEvents.filter(event => 
-                                format(event.date, 'H') === format(hour, 'H')
-                            );
 
-                            return (
-                                <div key={hour.toString()} className="border-b py-2">
-                                    <div className="flex justify-between items-start px-4">
-                                        <div className="text-sm text-gray-500 w-20">
-                                            {format(hour, 'h a')}
-                                        </div>
-                                        <div className="flex-1 space-y-1 ml-4">
-                                            {currentHourEvents.map(event => (
-                                                <div
-                                                    key={event.id}
-                                                    className="bg-orange-500 text-white text-sm p-2 rounded cursor-pointer"
-                                                    onMouseEnter={(e) => handleMouseEnter(event, e)}
-                                                    onMouseLeave={handleMouseLeave}
-                                                >
-                                                    {event.title}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
-        );
-    }
+					{/* Main content area with fixed width */}
+					<div className="col-span-5 min-w-[600px]">
+						{hours.map(hour => {
+							const currentHourEvents = dayEvents.filter(event => 
+								format(event.date, 'H') === format(hour, 'H')
+							);
 
-    return <div>No view available</div>;
+							return (
+								<div key={hour.toString()} className="border-b">
+									<div className="flex items-start px-4 py-2">
+										<div className="text-sm text-gray-500 w-16 flex-shrink-0">
+											{format(hour, 'h a')}
+										</div>
+										<div className="flex-1 space-y-1 ml-4">
+											{currentHourEvents.map(event => (
+												<div
+													key={event.id}
+													className="bg-orange-500 text-white text-sm p-2 rounded cursor-pointer"
+													onMouseEnter={(e) => handleMouseEnter(event, e)}
+													onMouseLeave={handleMouseLeave}
+												>
+													{event.title}
+												</div>
+											))}
+										</div>
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	return <div>No view available</div>;
 };
 
     return (
