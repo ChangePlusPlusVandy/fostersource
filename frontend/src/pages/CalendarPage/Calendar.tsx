@@ -17,13 +17,14 @@ import {
 } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+//calendar event to be implemented in database (logic implemented for now)
 interface CalendarEvent {
-    id: string;
-    title: string;
-    date: Date;
-    type: 'webinar' | 'course' | 'meeting';
-    description?: string;
-    creditHours?: number;
+	id: string; // unique identifier for each event
+    title: string; // event title
+    date: Date; // date and time of the event
+    type: 'webinar' | 'course' | 'meeting'; // type of event
+    description?: string; // event description (made it optional not sure if it's mandatory to have one)
+    creditHours?: number; // likely used for courses (made it optional not sure if it's mandator to have one)
 }
 
 const getDaysInInterval = (start: Date, end: Date) => {
@@ -47,7 +48,7 @@ export default function Calendar() {
         y: 0,
     });
 
-    const dummyEvents: CalendarEvent[] = [
+    const dummyEvents: CalendarEvent[] = [ //replace with DB call
         {
             id: '1',
             title: 'Body Positivity for Children in Care - Live Virtual',
