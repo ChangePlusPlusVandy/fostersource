@@ -208,7 +208,7 @@ const renderCalendar = () => {
         );
     }
 
-	if (view === 'day') {
+    if (view === 'day') {
 		const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
 		const dayEvents = dummyEvents.filter(event => isSameDay(event.date, currentDate));
 
@@ -231,8 +231,6 @@ const renderCalendar = () => {
 							</div>
 						</div>
 					</div>
-
-					{/* Main content area with fixed width */}
 					<div className="col-span-5 min-w-[600px]">
 						{hours.map(hour => {
 							const currentHourEvents = dayEvents.filter(event => 
