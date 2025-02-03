@@ -1,22 +1,22 @@
 import axios from "axios";
 
 interface Course {
-    _id: string;
     handouts: string[];
-    ratings: number[]; 
+    ratings: number[];
     className: string;
     discussion: string;
-    components: Component[]; // Array of Survey and Video components
+    components: String[];
     isLive: boolean;
     categories: string[];
     creditNumber: number;
-    description: string;
+    courseDescription: string;
     thumbnailPath: string;
     cost: number;
-    createdAt: string; 
-    updatedAt: string; 
-    __v: number;
-    instructor: string;
+    instructorName: string;
+    instructorDescription: string;
+    instructorRole: string;
+    lengthCourse: number;
+    time: Date;
   }
   
 

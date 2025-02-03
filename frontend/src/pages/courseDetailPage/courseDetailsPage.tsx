@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchCourseDetails } from "../../services/courseDetailServices";
 import { FaStar } from "react-icons/fa";
 
@@ -8,14 +8,18 @@ interface Course {
   ratings: number[];
   className: string;
   discussion: string;
-  components: string[]; // Array of Survey and Video components
+  components: String[];
   isLive: boolean;
   categories: string[];
   creditNumber: number;
-  description: string;
+  courseDescription: string;
   thumbnailPath: string;
   cost: number;
-  instructor: string;
+  instructorName: string;
+  instructorDescription: string;
+  instructorRole: string;
+  lengthCourse: number;
+  time: Date;
 }
 
 type Component = Survey | Video;
@@ -40,9 +44,9 @@ const CoursePage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
     className: "Introduction to Computer Science",
-    description:
+    courseDescription:
       "Learn the basics of computer science, programming, and problem-solving.",
-    instructor: "Dr. Alice Johnson",
+    instructorName: "Dr. Alice Johnson",
     creditNumber: 3,
     discussion: "An interactive discussion about computational thinking.",
     components: ["Lectures", "Labs", "Quizzes"],
@@ -52,12 +56,32 @@ const CoursePage: React.FC = () => {
     cost: 100,
     categories: ["Technology"],
     thumbnailPath: "",
+    instructorDescription: "PhD at Vandy",
+    instructorRole: "Moderator",
+    lengthCourse: 2,
+    time: new Date("2024-10-15T00:00:00.000Z"),
   });
   const [starRating, setStarRating] = useState(-1);
   const [isAdded, setIsAdded] = useState(false);
   const [surveyLength, setSurveyLength] = useState(-1);
   const [creditHours, setCreditHours] = useState(0);
   const [thumbnailpath, setThumbnailpath] = useState("");
+  const [dateEvent, setDateEvent] = useState(new Date());
+  //const navigate = useNavigate();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+
+
+  const handleBackToCatalog = () => {
+    //navigate("/catalog"); // Change to the desired route
+  };
+
   useEffect(() => {
     console.log("useEffect being used");
     const fetchData = async () => {
@@ -89,9 +113,9 @@ const CoursePage: React.FC = () => {
 
       const dummyData = {
         className: "Introduction to Computer Science",
-        description:
+        courseDescription:
           "Learn the basics of computer science, programming, and problem-solving.",
-        instructor: "Dr. Alice Johnson",
+        instructorName: "Dr. Alice Johnson",
         creditNumber: 3,
         discussion: "An interactive discussion about computational thinking.",
         components: ["Lectures", "Labs", "Quizzes"],
@@ -101,6 +125,10 @@ const CoursePage: React.FC = () => {
         cost: 100,
         categories: ["Technology"],
         thumbnailPath: "",
+        instructorDescription: "PhD at Vandy",
+        instructorRole: "Moderator",
+        lengthCourse: 2,
+        time: new Date("2024-12-16T00:00:00.000Z"),
       };
       setCourseDetailsData(dummyData);
     };
@@ -120,6 +148,7 @@ const CoursePage: React.FC = () => {
         }
         average = num / times;
         setStarRating(average);
+        setDateEvent(courseDetailsData.time)
       } else {
         setStarRating(-1);
       }
@@ -146,6 +175,7 @@ const CoursePage: React.FC = () => {
                 borderRadius: "5px",
                 fontSize: "12px",
               }}
+              onClick={handleBackToCatalog}
             >
               {" "}
               Back to Catalog
@@ -193,6 +223,7 @@ const CoursePage: React.FC = () => {
             <StarDisplay
               rating={starRating}
               courseDetailsData={courseDetailsData}
+              dateEvent={dateEvent}
             />
           </div>
           <ul style={{ display: "flex", gap: "5px" }}>
@@ -289,7 +320,7 @@ const CoursePage: React.FC = () => {
                     fontWeight: 500,
                   }}
                 >
-                  {courseDetailsData.instructor}
+                  {courseDetailsData.instructorName}
                 </span>{" "}
                 <br />
                 <span>
@@ -305,7 +336,7 @@ const CoursePage: React.FC = () => {
                 <br />
                 {/*Needs to be complete*/}
                 <span style={{ fontWeight: 500, fontSize: "12px" }}>
-                  Instructor Description
+                  {courseDetailsData.instructorDescription}
                 </span>
               </p>
               <p
@@ -315,7 +346,7 @@ const CoursePage: React.FC = () => {
                   lineHeight: "18px",
                 }}
               >
-                {courseDetailsData.description}
+                {courseDetailsData.courseDescription}
               </p>
             </div>
           </div>
@@ -335,6 +366,8 @@ const CoursePage: React.FC = () => {
               <DisplayBar
                 surveyLength={surveyLength}
                 creditHours={creditHours}
+                courseDetailsData={courseDetailsData}
+                dateEvent={dateEvent}
               />
             </p>
           </div>
@@ -394,13 +427,44 @@ const ButtonLabel = ({ component }: { component: String }) => {
 const DisplayBar = ({
   surveyLength,
   creditHours,
+  courseDetailsData,
+  dateEvent,
 }: {
   surveyLength: number;
   creditHours: number;
+  courseDetailsData: Course;
+  dateEvent: Date;
 }) => {
   const [currentPage, setCurrentPage] = useState("Webinar");
   const [surveyColor, setSurveyColor] = useState("#D9D9D9");
   const [certificateColor, setCertificateColor] = useState("#D9D9D9");
+  const [survey, setSurvey] = useState(false);
+  const [surveyButton, setSurveyButton] = useState("Cannot access until webinar")
+  const date = courseDetailsData.time;
+  console.log(courseDetailsData.time)
+
+  useEffect(() => {
+    const webinarEnd = courseDetailsData.time;
+    webinarEnd.setHours(webinarEnd.getHours() + 2); // 2 hours after the current time
+    const checkTime = () => {
+      console.log("Check Time Running");
+      console.log(webinarEnd);
+      const currentTime = new Date(); // Get updated time
+      if (currentTime.getTime() > webinarEnd.getTime()) {
+        setSurvey(true);
+        setSurveyButton("Survey");
+      }
+    };
+
+    checkTime(); // Run immediately when component mounts
+
+    const interval = setInterval(checkTime, 1000 * 60); // Run every 1 minute
+
+    return () => clearInterval(interval); // Cleanup when component unmounts
+  }, []);
+
+
+
   const testNetwork = async () => {
     try {
       const response = await fetch(
@@ -431,6 +495,17 @@ const DisplayBar = ({
     setCertificateColor("#FEC781"); // Turn certificate button orange
     setCurrentPage("Certificate");
   };
+  const handleCalendarClick = () => {
+
+  }
+  const handleAccessSurveyClick = () => {
+
+  }
+
+  {/* Needs to be complete once certificate page is out */ }
+  const handleAccessCertificate = () => {
+
+  }
   return (
     <div>
       <div style={{ display: "flex" }}>
@@ -517,6 +592,7 @@ const DisplayBar = ({
             }}
           >
             Certificate
+            Insert Certificate
           </p>
         </button>
         <button
@@ -558,15 +634,19 @@ const DisplayBar = ({
                 }}
               >
                 {/*Needs to be complete*/}
-                <div>Date</div>
+                <div>Date {dateEvent.toLocaleDateString()}</div>
                 {/*Needs to be complete*/}
-                <div>Time</div>
+                <div>Time {dateEvent.toLocaleTimeString("en-US", {
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                })} </div>
                 {/*Needs to be complete*/}
-                <div>Length</div>
+                <div>Length {courseDetailsData.lengthCourse}</div>
               </p>
             </div>
             <div>
-              {/*Needs to be complete*/}
+              {/*Needs to be complete add to calendar button*/}
               <button
                 style={{
                   width: "168px",
@@ -584,7 +664,7 @@ const DisplayBar = ({
               >
                 {/*Needs to be complete*/}
                 <p style={{ transform: "translateY(-5px)", margin: 0 }}>
-                  Add to Calander
+                  Add to Calendar
                 </p>
               </button>{" "}
               <br />
@@ -625,11 +705,12 @@ const DisplayBar = ({
             <span style={{ fontWeight: 200 }}>{surveyLength} questions</span>
             <div>
               {/*Needs to be complete*/}
+
               <button
                 style={{
                   width: "168px",
                   height: "38px",
-                  backgroundColor: "#F79518",
+                  backgroundColor: survey ? "#F79518" : "#F79518",
                   borderRadius: "5px",
                   textAlign: "center",
                   lineHeight: "50px",
@@ -638,13 +719,19 @@ const DisplayBar = ({
                   transform: "translateY(10px)",
                   border: "none",
                   marginTop: "30px",
+                  opacity: survey ? 1 : 0.6,
                 }}
+                disabled={!survey}
               >
+
                 {/*Needs to be complete*/}
+
                 <p style={{ transform: "translateY(-5px)", margin: 0 }}>
-                  Cannot access until Webinar
+                  {surveyButton}
                 </p>
+
               </button>
+
             </div>
           </p>
         )}
@@ -703,9 +790,11 @@ const DisplayBar = ({
 const StarDisplay = ({
   rating,
   courseDetailsData,
+  dateEvent,
 }: {
   rating: number;
   courseDetailsData: Course;
+  dateEvent: Date;
 }) => {
   let stars = Array(0).fill(0);
   if (rating === -1) {
@@ -752,7 +841,11 @@ const StarDisplay = ({
           {courseDetailsData.creditNumber} Credits{" "}
         </p>
         <p style={{ fontSize: "12px", margin: 0 }}>
-          Live Events I couldn't find the data where when it is live is stored
+          Live Web Event {dateEvent.toLocaleDateString()} at {dateEvent.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          })}
         </p>
       </div>
     </div>
