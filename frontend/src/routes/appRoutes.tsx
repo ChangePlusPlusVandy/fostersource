@@ -95,7 +95,7 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
-            <Route path="/courseDetails" element={<CoursePage />} />
+						<Route path="/courseDetails" element={<CoursePage />} />
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (
