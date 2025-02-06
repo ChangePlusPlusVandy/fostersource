@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IHandout extends Document {
-    id: string;
     courseId: string;
     fileUrl: string;
     fileType: string;
