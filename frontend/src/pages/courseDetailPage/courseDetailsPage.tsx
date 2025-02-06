@@ -586,7 +586,7 @@ const DisplayBar = ({
                 <p style={{ transform: "translateY(-5px)", margin: 0 }}>
                   Add to Calander
                 </p>
-              </button>{" "}
+              </button>
               <br />
               <button
                 onClick={testNetwork}
@@ -608,6 +608,28 @@ const DisplayBar = ({
                   Test Network
                 </p>
               </button>
+              <br />
+              <button
+                style={{
+                  width: "168px",
+                  height: "38px",
+                  backgroundColor: "#F79518",
+                  borderRadius: "5px",
+                  textAlign: "center",
+                  lineHeight: "50px",
+                  color: "white",
+                  fontSize: "12px",
+                  transform: "translateY(10px)",
+                  border: "none",
+                  marginTop: "10px",
+                }}
+              >
+                {/*Needs to be complete*/}
+                <p style={{ transform: "translateY(-5px)", margin: 0 }}>
+                  Handout
+                </p>
+              </button>
+              
             </div>
           </p>
         )}
