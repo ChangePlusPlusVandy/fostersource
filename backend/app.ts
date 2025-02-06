@@ -16,7 +16,7 @@ import loginRoutes from "./routes/loginRoutes";
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
-import { verifyToken } from "./middlewares/authMiddleware";
+import { verifyFirebaseAuth } from "./middlewares/authMiddleware";
 
 const app: Application = express();
 
@@ -32,8 +32,21 @@ app.use(
 			}
 		},
 		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed HTTP methods
-		allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Headers frontend can send
-		exposedHeaders: ["Content-Type", "Authorization"], // Headers frontend can access
+		allowedHeaders: [
+			"Content-Type",
+			"Authorization",
+			"X-Requested-With",
+			"refresh-token",
+			"new-access-token",
+			"new-refresh-token",
+		], // Headers frontend can send
+		exposedHeaders: [
+			"Content-Type",
+			"Authorization",
+			"refresh-token",
+			"new-access-token",
+			"new-refresh-token",
+		], // Headers frontend can access
 		credentials: true, // Allows cookies or credentials to be sent
 	})
 );
@@ -45,16 +58,16 @@ app.options("*", cors());
 
 // Use routes
 app.use("/api/login", loginRoutes);
-app.use("/api/users", verifyToken, userRoutes);
-app.use("/api/ratings", verifyToken, ratingRoutes);
-app.use("/api/surveys", verifyToken, surveyRoutes);
-app.use("/api/surveyResponses", verifyToken, surveyResponseRoutes);
-app.use("/api/questions", verifyToken, questionRoutes);
-app.use("/api/questionResponses", verifyToken, questionResponseRoutes);
-app.use("/api/progress", verifyToken, progressRoutes);
-app.use("/api/courses", verifyToken, courseRoutes);
-app.use("/api/videos", verifyToken, videoRoutes);
-app.use("/api/payments", verifyToken, paymentRoutes);
+app.use("/api/users", verifyFirebaseAuth, userRoutes);
+app.use("/api/ratings", verifyFirebaseAuth, ratingRoutes);
+app.use("/api/surveys", verifyFirebaseAuth, surveyRoutes);
+app.use("/api/surveyResponses", verifyFirebaseAuth, surveyResponseRoutes);
+app.use("/api/questions", verifyFirebaseAuth, questionRoutes);
+app.use("/api/questionResponses", verifyFirebaseAuth, questionResponseRoutes);
+app.use("/api/progress", verifyFirebaseAuth, progressRoutes);
+app.use("/api/courses", verifyFirebaseAuth, courseRoutes);
+app.use("/api/videos", verifyFirebaseAuth, videoRoutes);
+app.use("/api/payments", verifyFirebaseAuth, paymentRoutes);
 
 // Error middleware
 app.use(notFound);

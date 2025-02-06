@@ -5,6 +5,8 @@ import { FaStar } from "react-icons/fa";
 import { dummyCourses } from "../../shared/DummyCourses";
 
 import { Course } from "../../shared/types/course";
+// import axios from "../../services/axiosConfig";
+import apiClient from "../../services/apiClient";
 
 type Component = Survey | Video;
 
@@ -64,6 +66,24 @@ const CoursePage: React.FC = () => {
 	const [surveyLength, setSurveyLength] = useState(-1);
 	const [creditHours, setCreditHours] = useState(0);
 	const [thumbnailpath, setThumbnailpath] = useState("");
+
+	//================ Working axios request ======================
+
+	const fetchCourses = async () => {
+		try {
+			const response = await apiClient.get("/courses");
+			console.log(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	useEffect(() => {
+		fetchCourses();
+	}, []);
+
+	//=============================================================
+
 	useEffect(() => {
 		console.log("useEffect being used");
 		const fetchData = async () => {
