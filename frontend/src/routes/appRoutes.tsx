@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Home from "../pages/HomePage/Home";
 import { Sidebar } from "../components/Sidebar/sidebar";
+import GlobalBlackBar from "../components/GlobalBlackBar/globalBlackBar";
 import HeaderBar, { HeaderItems } from "../components/HeaderBar/headerBar";
 import Catalog from "../pages/Catalog/Catalog";
 import Calendar from "../pages/CalendarPage/Calendar";
@@ -43,6 +44,7 @@ function AppRoutes() {
 					backgroundColor: "#eeeeee",
 				}}
 			>
+				<GlobalBlackBar />
 				<div style={{ width: "100%" }}>
 					<HeaderBar isOpen={isHeaderBarOpen} setIsOpen={setIsHeaderBarOpen} />
 				</div>
