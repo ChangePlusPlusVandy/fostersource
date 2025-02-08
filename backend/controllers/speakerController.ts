@@ -9,7 +9,7 @@ export const getSpeakers = async (
 	res: Response
 ): Promise<void> => {
 	try {
-        const filters = req.query;
+		const filters = req.query;
 		const speakers = await Speaker.find(filters);
 
 		res.status(200).json(speakers);
@@ -30,7 +30,8 @@ export const createSpeaker = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		const { id, name, title, email, company, bio, disclosures, image } = req.body; 
+		const { id, name, title, email, company, bio, disclosures, image } =
+			req.body;
 
 		// Check if speaker exists
 		const existingSpeaker = await Speaker.findOne({ id });
@@ -47,12 +48,12 @@ export const createSpeaker = async (
 		const speaker = new Speaker({
 			id,
 			name,
-            title,
-            email, 
-            company,
-            bio, 
-            disclosures,
-            image
+			title,
+			email,
+			company,
+			bio,
+			disclosures,
+			image,
 		});
 		await speaker.save();
 

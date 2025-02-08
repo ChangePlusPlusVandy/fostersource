@@ -9,7 +9,7 @@ export const getInstructors = async (
 	res: Response
 ): Promise<void> => {
 	try {
-        const filters = req.query;
+		const filters = req.query;
 		const instructors = await Instructor.find(filters);
 
 		res.status(200).json(instructors);
