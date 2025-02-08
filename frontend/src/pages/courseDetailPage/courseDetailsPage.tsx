@@ -6,6 +6,8 @@ import { dummyCourses } from "../../shared/DummyCourses";
 
 import { Course } from "../../shared/types/course";
 import { addToCart } from "../../services/registrationServices";
+// import axios from "../../services/axiosConfig";
+import apiClient from "../../services/apiClient";
 
 type Component = Survey | Video;
 
@@ -67,6 +69,24 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [surveyLength, setSurveyLength] = useState(-1);
 	const [creditHours, setCreditHours] = useState(0);
 	const [thumbnailpath, setThumbnailpath] = useState("");
+
+	//================ Working axios request ======================
+
+	const fetchCourses = async () => {
+		try {
+			const response = await apiClient.get("/courses");
+			console.log(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	useEffect(() => {
+		fetchCourses();
+	}, []);
+
+	//=============================================================
+
 	useEffect(() => {
 		console.log("useEffect being used");
 		const fetchData = async () => {
@@ -352,10 +372,7 @@ const DisplayThumbnail = ({ thumbnail }: { thumbnail: string }) => {
 	return (
 		<div style={{ margin: "20px 0", textAlign: "center" }}>
 			<img
-				src={
-					"https://st2.depositphotos.com/2769299/7314/i/450/depositphotos_73146775-stock-photo-a-stack-of-books-on.jpg"
-				}
-				// src={thumbnail}
+				src={thumbnail}
 				alt="No Picture Found"
 				style={{
 					maxWidth: "121px",
@@ -370,7 +387,7 @@ const ButtonLabel = ({ component }: { component: String }) => {
 	return (
 		<div
 			style={{
-				padding: "10px",
+				width: "62px",
 				height: "18px",
 				backgroundColor: "#F79518",
 				borderRadius: "20px",
@@ -382,7 +399,7 @@ const ButtonLabel = ({ component }: { component: String }) => {
 			<p
 				style={{
 					margin: 0,
-					fontSize: "14px",
+					fontSize: "10px",
 					color: "#FFFFFF",
 					lineHeight: "15px",
 					fontWeight: 500,
@@ -463,7 +480,7 @@ const DisplayBar = ({
 							display: "flex",
 							justifyContent: "center",
 							alignItems: "center",
-							fontSize: "16px",
+							fontSize: "12px",
 							color: "#FFFFFF",
 							fontWeight: 600,
 						}}
@@ -491,7 +508,7 @@ const DisplayBar = ({
 							display: "flex",
 							justifyContent: "center",
 							alignItems: "center",
-							fontSize: "16px",
+							fontSize: "12px",
 							color: "#FFFFFF",
 							fontWeight: 600,
 						}}
@@ -501,7 +518,7 @@ const DisplayBar = ({
 				</button>
 				<button
 					style={{
-						width: "200px",
+						width: "150px",
 						height: "36px",
 						backgroundColor: certificateColor,
 						clipPath: "polygon(0 0, 85% 0, 85% 100%, 0 100%, 15% 50%)",
