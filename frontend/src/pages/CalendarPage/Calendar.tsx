@@ -57,7 +57,7 @@ export default function Calendar() {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await axios.get("/api/courses");
+                const response = await axios.get("http://localhost:5001/api/courses");
                 const courseData = response.data;
 
                 

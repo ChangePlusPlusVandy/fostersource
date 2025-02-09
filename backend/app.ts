@@ -13,6 +13,7 @@ import courseRoutes from "./routes/courseRoutes";
 import videoRoutes from "./routes/videoRoutes";
 import paymentRoutes from "./routes/paymentRoutes";
 import loginRoutes from "./routes/loginRoutes";
+import certificateRoutes from "./routes/certificateRoutes"
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
@@ -48,6 +49,7 @@ app.use("/api/progress", verifyToken, progressRoutes);
 app.use("/api/courses", verifyToken, courseRoutes);
 app.use("/api/videos", verifyToken, videoRoutes);
 app.use("/api/payments", verifyToken, paymentRoutes);
+app.use("/api/certificates", verifyToken, certificateRoutes);
 
 // Error middleware
 app.use(notFound);

@@ -7,6 +7,14 @@ import Certificate from "../models/certificateModel";
 export const createCertificate = async (req: Request, res: Response): Promise<void> => {
     const { name, courseTitle, creditHours, dateCompleted } = req.body;
 
+    if (!name || !courseTitle || !creditHours || !dateCompleted) {
+        res.status(400).json({
+            success: false,
+            message: "Required fields are missing.",
+        });
+        return;
+    }
+
     try {
         const newCertificate = new Certificate({
             name,
@@ -16,14 +24,10 @@ export const createCertificate = async (req: Request, res: Response): Promise<vo
         });
 
         const savedCertificate = await newCertificate.save();
-        res.status(201).json({
-            success: true,
-            data: savedCertificate,
-        });
+        res.status(201).json(savedCertificate);
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error creating certificate.",
+        res.status(400).json({
+            message: "Error creating certificate.", error
         });
     }
 };
@@ -33,15 +37,11 @@ export const createCertificate = async (req: Request, res: Response): Promise<vo
 // @access  Public
 export const getCertificates = async (req: Request, res: Response): Promise<void> => {
     try {
-        const certificates = await Certificate.find();
-        res.status(200).json({
-            success: true,
-            data: certificates,
-        });
+        const certificates = await Certificate.find(req.query);
+        res.status(200).json(certificates);
     } catch (error) {
         res.status(500).json({
-            success: false,
-            message: "Error fetching certificates.",
+            message: "Error fetching certificates.", error
         });
     }
 };
@@ -56,25 +56,19 @@ export const updateCertificate = async (req: Request, res: Response): Promise<vo
     try {
         const updatedCertificate = await Certificate.findByIdAndUpdate(id, updates, {
             new: true,
-            runValidators: true,
         });
 
         if (!updatedCertificate) {
             res.status(404).json({
-                success: false,
-                message: "Certificate not found.",
+                message: "Certificate not found"
             });
             return;
         }
 
-        res.status(200).json({
-            success: true,
-            data: updatedCertificate,
-        });
+        res.status(200).json(updateCertificate);
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error updating certificate.",
+        res.status(400).json({
+            message: "Error updating certificate.", error
         });
     }
 };
@@ -82,6 +76,7 @@ export const updateCertificate = async (req: Request, res: Response): Promise<vo
 // @desc    Delete a certificate
 // @route   DELETE /api/certificates/:id
 // @access  Public
+
 export const deleteCertificate = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
 
@@ -90,20 +85,15 @@ export const deleteCertificate = async (req: Request, res: Response): Promise<vo
 
         if (!deletedCertificate) {
             res.status(404).json({
-                success: false,
-                message: "Certificate not found.",
+                message: "Certificate not found"
             });
             return;
         }
 
-        res.status(200).json({
-            success: true,
-            message: "Certificate deleted successfully.",
-        });
+        res.status(200).json({message:"Certificate deleted successfully"});
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error deleting certificate.",
+        res.status(400).json({
+            message: "Error deleting certificate.", error
         });
     }
-}; 
+};
