@@ -201,6 +201,7 @@ export function SidebarItems({
 
 		return (
 			<li
+				key={href+description}
 				className={`${active}`}
 				onClick={() => setActiveItem(window.location.pathname)}
 			>

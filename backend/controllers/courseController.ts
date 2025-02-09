@@ -10,6 +10,7 @@ export const getCourses = async (
 	res: Response
 ): Promise<void> => {
 	try {
+		console.log("called")
 		const filters = req.query;
 
 		// Populate ratings and components fields as needed
@@ -22,6 +23,43 @@ export const getCourses = async (
 			count: courseResponses.length,
 			data: courseResponses,
 		});
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: "Internal service error.",
+		});
+	}
+};
+
+// @desc    Get a specific course by a valid id
+// @route   GET /api/courses/:id
+// @access  Public
+export const getCourseById = async (req: Request, res: Response): Promise<void> => {
+	try {
+		const { id } = req.params; // Get the course ID from the URL params
+
+		if (id) {
+			// Find course by ID and populate related fields
+			const course = await Course.findById(id).populate(["ratings", "components"]).exec();
+
+			if (!course) {
+				res.status(404).json({
+					success: false,
+					message: "Course not found.",
+				});
+				return;
+			}
+
+			res.status(200).json({
+				success: true,
+				data: course,
+			});
+		} else {
+			res.status(401).json({
+				success: false,
+				message: "Invalid ID",
+			});
+		}
 	} catch (error) {
 		res.status(500).json({
 			success: false,
@@ -59,12 +97,12 @@ export const createCourse = async (
 			!creditNumber ||
 			!description ||
 			!thumbnailPath ||
-			!cost
+			!cost === undefined
 		) {
 			res.status(400).json({
 				success: false,
 				message:
-					"Please provide className, isLive, creditNumber, description, and thumbnailPath",
+					"Please provide className, isLive, creditNumber, description, cost, and thumbnailPath",
 			});
 			return;
 		}

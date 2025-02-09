@@ -1,12 +1,10 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { fetchCourseDetails } from "../../services/courseDetailServices";
 import { FaStar } from "react-icons/fa";
 import { dummyCourses } from "../../shared/DummyCourses";
 
 import { Course } from "../../shared/types/course";
 import { addToCart } from "../../services/registrationServices";
-// import axios from "../../services/axiosConfig";
 import apiClient from "../../services/apiClient";
 
 type Component = Survey | Video;
@@ -32,92 +30,27 @@ interface CatalogProps {
 const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [searchParams] = useSearchParams();
 	const courseId = searchParams.get("courseId");
-
-	function tempDataParse() {
-		console.log(courseId);
-		for (let course of dummyCourses) {
-			if (
-				courseId === course.className.toLowerCase().trim().replaceAll(" ", "-")
-			) {
-				return course;
-			}
-		}
-		return {
-			className: "Introduction to Computer Science",
-			description:
-				"Learn the basics of computer science, programming, and problem-solving.",
-			instructor: "Dr. Alice Johnson",
-			creditNumber: 3,
-			discussion: "An interactive discussion about computational thinking.",
-			components: ["Lectures", "Labs", "Quizzes"],
-			handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-			ratings: [
-				{ userId: "user1", courseId: "cs101", rating: 2 },
-				{ userId: "user2", courseId: "cs101", rating: 2 },
-			],
-			isLive: false,
-			cost: 100,
-			categories: ["Technology"],
-			thumbnailPath: "",
-		};
-	}
-	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(
-		tempDataParse()
-	);
+	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(null);
 	const [starRating, setStarRating] = useState(-1);
 	const [isAdded, setIsAdded] = useState(false);
 	const [surveyLength, setSurveyLength] = useState(-1);
 	const [creditHours, setCreditHours] = useState(0);
-	const [thumbnailpath, setThumbnailpath] = useState("");
+	const [thumbnailPath, setThumbnailPath] = useState("");
 
 	//================ Working axios request ======================
-
-	const fetchCourses = async () => {
-		try {
-			const response = await apiClient.get("/courses");
-			console.log(response.data);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	useEffect(() => {
+		async function fetchCourses() {
+			try {
+				console.log(courseId)
+				const response = await apiClient.get(`/courses/${courseId}`);
+				setCourseDetailsData(response.data.data)
+			} catch (error) {
+				console.error(error);
+			}
+		}
 		fetchCourses();
 	}, []);
 
-	//=============================================================
-
-	useEffect(() => {
-		console.log("useEffect being used");
-		const fetchData = async () => {
-			if (!courseId) {
-				console.error("No Id detected");
-				return;
-			}
-			// try {
-			//   const courseDetails: Course = await fetchCourseDetails(courseId);
-			//   setCourseDetailsData(courseDetails);
-			//   if (courseDetails) {
-			//     const surveys = courseDetails.components.filter(
-			//       (component): component is Survey => component.type === "Survey"
-			//     );
-			//     const totalQuestions = surveys.reduce(
-			//       (sum, survey) => sum + survey.questions.length,
-			//       0
-			//     );
-			//     setSurveyLength(totalQuestions);
-			//     const credit = courseDetails.creditNumber
-			//     setCreditHours(credit)
-			//     setThumbnailpath(courseDetails.thumbnailPath)
-			//   }
-
-			// } catch (e) {
-			//   console.error("Error loading course data");
-
-			// }
-		};
-		fetchData();
-	}, []);
 	useEffect(() => {
 		if (!courseDetailsData) {
 			console.log("Error in fetching data");
@@ -304,7 +237,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 								</span>
 								<br />
 								<span>
-									<DisplayThumbnail thumbnail={thumbnailpath} />
+									<DisplayThumbnail thumbnail={thumbnailPath} />
 								</span>{" "}
 								<br />
 								<span
@@ -355,13 +288,13 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							paddingLeft: "20px",
 						}}
 					>
-						<p style={{ textAlign: "left" }}>
+						<div style={{ textAlign: "left" }}>
 							<p>Content</p>
 							<DisplayBar
 								surveyLength={surveyLength}
 								creditHours={creditHours}
 							/>
-						</p>
+						</div>
 					</div>
 				</div>
 			</div>

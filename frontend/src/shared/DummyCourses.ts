@@ -8,14 +8,11 @@ export const dummyCourses = [
 		discussion: "An interactive discussion about computational thinking.",
 		components: ["Lectures", "Labs", "Quizzes"],
 		handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-		ratings: [
-			{ userId: "user1", courseId: "cs101", rating: 2 },
-			{ userId: "user2", courseId: "cs101", rating: 2 },
-		],
+		ratings: [],
 		isLive: false,
 		cost: 100,
 		categories: ["Technology"],
-		thumbnailPath: "",
+		thumbnailPath: "blah",
 	},
 	{
 		className: "Advanced Mathematics",
@@ -25,14 +22,12 @@ export const dummyCourses = [
 		discussion: "Weekly seminars focusing on real-world problem-solving.",
 		components: ["Lectures", "Projects", "Exams"],
 		handouts: ["syllabus.pdf", "formulas.pdf"],
-		ratings: [
-			// { userId: "user3", courseId: "math201", rating: 4 },
-			// { userId: "user4", courseId: "math201", rating: 3 },
-		],
+		ratings: [],
+
 		isLive: false,
 		cost: 0,
 		categories: [],
-		thumbnailPath: "",
+		thumbnailPath: "blah",
 	},
 	{
 		className: "Introduction to Philosophy",
@@ -44,13 +39,10 @@ export const dummyCourses = [
 			"Weekly discussions about classic and modern philosophical texts.",
 		components: ["Lectures", "Essays", "Group Work"],
 		handouts: ["syllabus.pdf", "plato.pdf", "kant.pdf"],
-		ratings: [
-			{ userId: "user5", courseId: "phil101", rating: 4 },
-			{ userId: "user6", courseId: "phil101", rating: 4 },
-		],
+		ratings: [],
 		isLive: true,
 		cost: 200,
 		categories: [],
-		thumbnailPath: "",
+		thumbnailPath: "blah",
 	},
 ];

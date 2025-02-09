@@ -106,7 +106,7 @@ export default function CatalogCourseComponent({
 						Register ({course.cost === 0 ? "Free" : `$${course.cost}`})
 					</button>
 					<Link
-						to={`/courseDetails?courseId=${course.className.toLowerCase().trim().replaceAll(" ", "-")}`}
+						to={`/courseDetails?courseId=${course._id}`}
 					>
 						<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
 							Learn More

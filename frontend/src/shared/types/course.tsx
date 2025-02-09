@@ -13,4 +13,5 @@ export type Course = {
 	cost: number;
 	categories: string[];
 	thumbnailPath: string;
+	_id: string;
 };

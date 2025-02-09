@@ -3,12 +3,13 @@ import { Course } from "../../shared/types/course";
 import CatalogCourseComponent from "./CatalogCourseComponent";
 import CatalogSearchBar from "./CatalogSearchBar";
 import { dummyCourses } from "../../shared/DummyCourses";
+import apiClient from "../../services/apiClient";
 
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
 }
 export default function Catalog({ setCartItemCount }: CatalogProps) {
-	const [courses, setCourses] = useState<Course[]>(dummyCourses);
+	const [courses, setCourses] = useState<Course[]>([]);
 	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -18,9 +19,17 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 	const [selectedCost, setSelectedCost] = useState<string>("All");
 
 	useEffect(() => {
-		// Populate with dummy courses for testing
-		setCourses(dummyCourses);
-		setFilteredCourses(dummyCourses);
+		async function fetchData() {
+			try {
+				const response = await apiClient.get("/courses");
+				setCourses(response.data.data)
+				setFilteredCourses(response.data.data);
+			} catch (error) {
+				console.error(error);
+			}
+		}
+		fetchData()
+
 	}, []);
 
 	useEffect(() => {

@@ -11,7 +11,6 @@ async function getFirebaseToken(): Promise<string | null> {
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
 			if (user) {
 				const token = await user.getIdToken(true);
-				console.log("🔥 Sending Firebase Token:", token);
 				resolve(token);
 			} else {
 				console.warn("⚠️ No authenticated user found");
