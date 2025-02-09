@@ -41,7 +41,7 @@ export default function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [view, setView] = useState<"month" | "week" | "day">("month");
-    const [events, setEvents] = useState<CalendarEvent[]>([]); // State for events
+    const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [tooltip, setTooltip] = useState<{
         visible: boolean;
         event?: CalendarEvent;
@@ -55,10 +55,9 @@ export default function Calendar() {
     });
 
     useEffect(() => {
-        // Fetch events from the API
         const fetchEvents = async () => {
             try {
-                const response = await axios.get("/api/courses"); 
+                const response = await axios.get("/api/courses");
                 const courseData = response.data;
 
                 
@@ -66,7 +65,7 @@ export default function Calendar() {
                     id: course._id,
                     title: course.className,
                     date: new Date(course.date),
-                    type: "course",
+                    type: course.courseType,
                     description: course.description,
                     creditHours: course.creditNumber,
                 }));
