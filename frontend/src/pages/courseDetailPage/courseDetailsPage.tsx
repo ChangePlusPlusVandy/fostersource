@@ -30,7 +30,9 @@ interface CatalogProps {
 const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [searchParams] = useSearchParams();
 	const courseId = searchParams.get("courseId");
-	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(null);
+	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(
+		null
+	);
 	const [starRating, setStarRating] = useState(-1);
 	const [isAdded, setIsAdded] = useState(false);
 	const [surveyLength, setSurveyLength] = useState(-1);
@@ -41,9 +43,9 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	useEffect(() => {
 		async function fetchCourses() {
 			try {
-				console.log(courseId)
+				console.log(courseId);
 				const response = await apiClient.get(`/courses/${courseId}`);
-				setCourseDetailsData(response.data.data)
+				setCourseDetailsData(response.data.data);
 			} catch (error) {
 				console.error(error);
 			}

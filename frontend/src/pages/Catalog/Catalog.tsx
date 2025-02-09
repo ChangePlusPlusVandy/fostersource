@@ -22,14 +22,13 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 		async function fetchData() {
 			try {
 				const response = await apiClient.get("/courses");
-				setCourses(response.data.data)
+				setCourses(response.data.data);
 				setFilteredCourses(response.data.data);
 			} catch (error) {
 				console.error(error);
 			}
 		}
-		fetchData()
-
+		fetchData();
 	}, []);
 
 	useEffect(() => {
