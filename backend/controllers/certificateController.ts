@@ -56,19 +56,21 @@ export const updateCertificate = async (req: Request, res: Response): Promise<vo
     try {
         const updatedCertificate = await Certificate.findByIdAndUpdate(id, updates, {
             new: true,
+            runValidators: true, // Ensures data integrity
         });
 
         if (!updatedCertificate) {
             res.status(404).json({
-                message: "Certificate not found"
+                message: "Certificate not found",
             });
             return;
         }
 
-        res.status(200).json(updateCertificate);
+        res.status(200).json(updatedCertificate);
     } catch (error) {
         res.status(400).json({
-            message: "Error updating certificate.", error
+            message: "Error updating certificate.",
+            error,
         });
     }
 };

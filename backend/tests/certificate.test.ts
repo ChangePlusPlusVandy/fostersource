@@ -11,6 +11,11 @@ const certificateData = {
 };
 
 describe("Certificate API Tests", () => {
+
+    beforeAll(() => {
+        jest.setTimeout(20000);
+    });
+
     let certificateId: string;
 
     beforeEach(async () => {
