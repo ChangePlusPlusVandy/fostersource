@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
     format,
     startOfMonth,
@@ -10,21 +10,21 @@ import {
     addMonths,
     subMonths,
     addDays,
-	subDays,
+    subDays,
     addWeeks,
     subWeeks,
     isToday,
-} from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+} from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import axios from "axios"; // Import axios for API calls
 
-//calendar event to be implemented in database (logic implemented for now)
 interface CalendarEvent {
-	id: string; // unique identifier for each event
-    title: string; // event title
-    date: Date; // date and time of the event
-    type: 'webinar' | 'course' | 'meeting'; // type of event
-    description?: string; // event description (made it optional not sure if it's mandatory to have one)
-    creditHours?: number; // likely used for courses (made it optional not sure if it's mandator to have one)
+    id: string;
+    title: string;
+    date: Date;
+    type: "webinar" | "course" | "meeting";
+    description?: string;
+    creditHours?: number;
 }
 
 const getDaysInInterval = (start: Date, end: Date) => {
@@ -40,30 +40,56 @@ const getDaysInInterval = (start: Date, end: Date) => {
 export default function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [view, setView] = useState<'month' | 'week' | 'day'>('month');
-    const [tooltip, setTooltip] = useState<{ visible: boolean; event?: CalendarEvent; x: number; y: number }>({
+    const [view, setView] = useState<"month" | "week" | "day">("month");
+    const [events, setEvents] = useState<CalendarEvent[]>([]); // State for events
+    const [tooltip, setTooltip] = useState<{
+        visible: boolean;
+        event?: CalendarEvent;
+        x: number;
+        y: number;
+    }>({
         visible: false,
         event: undefined,
         x: 0,
         y: 0,
     });
 
-    const dummyEvents: CalendarEvent[] = [ //replace with DB call
-        {
-            id: '1',
-            title: 'Body Positivity for Children in Care - Live Virtual',
-            date: new Date(2025, 0, 28, 10, 0),
-            type: 'webinar',
-            description: 'In this session, we will discuss the importance of promoting body acceptance among youth.',
-            creditHours: 2,
-        }
-    ];
+    useEffect(() => {
+        // Fetch events from the API
+        const fetchEvents = async () => {
+            try {
+                const response = await axios.get("/api/courses"); 
+                const courseData = response.data;
+
+                
+                const calendarEvents = courseData.map((course: any) => ({
+                    id: course._id,
+                    title: course.className,
+                    date: new Date(course.date),
+                    type: "course",
+                    description: course.description,
+                    creditHours: course.creditNumber,
+                }));
+
+                setEvents(calendarEvents);
+            } catch (error) {
+                console.error("Error fetching events:", error);
+            }
+        };
+
+        fetchEvents();
+    }, []);
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const calendarStart = startOfWeek(monthStart);
     const calendarEnd = endOfWeek(monthEnd);
     const daysInMonth = getDaysInInterval(calendarStart, calendarEnd);
+
+    const getEventsForDate = (date: Date) => {
+        return events.filter((event) => isSameDay(event.date, date));
+    };
+
 
     const navigateDate = (direction: 'prev' | 'next') => {
         switch (view) {
@@ -84,9 +110,6 @@ export default function Calendar() {
 		setSelectedDate(new Date());
     };
 
-    const getEventsForDate = (date: Date) => {
-        return dummyEvents.filter(event => isSameDay(event.date, date));
-    };
 
     const handleMouseEnter = (event: CalendarEvent, e: React.MouseEvent) => {
         setTooltip({
@@ -177,7 +200,7 @@ const renderCalendar = () => {
                                 {format(hour, 'h a')}
                             </div>
                             {daysInWeek.map(day => {
-                                const currentHourEvents = dummyEvents.filter(event => 
+                                const currentHourEvents = events.filter(event => 
                                     isSameDay(event.date, day) && 
                                     format(event.date, 'H') === format(hour, 'H')
                                 );
@@ -210,7 +233,7 @@ const renderCalendar = () => {
 
     if (view === 'day') {
 		const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
-		const dayEvents = dummyEvents.filter(event => isSameDay(event.date, currentDate));
+		const dayEvents = events.filter(event => isSameDay(event.date, currentDate));
 
 		return (
 			<div className="w-full overflow-auto">
