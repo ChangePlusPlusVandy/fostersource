@@ -10,7 +10,7 @@ export const getCourses = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		console.log("called")
+		console.log("called");
 		const filters = req.query;
 
 		// Populate ratings and components fields as needed
@@ -34,13 +34,18 @@ export const getCourses = async (
 // @desc    Get a specific course by a valid id
 // @route   GET /api/courses/:id
 // @access  Public
-export const getCourseById = async (req: Request, res: Response): Promise<void> => {
+export const getCourseById = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	try {
 		const { id } = req.params; // Get the course ID from the URL params
 
 		if (id) {
 			// Find course by ID and populate related fields
-			const course = await Course.findById(id).populate(["ratings", "components"]).exec();
+			const course = await Course.findById(id)
+				.populate(["ratings", "components"])
+				.exec();
 
 			if (!course) {
 				res.status(404).json({
