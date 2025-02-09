@@ -16,7 +16,7 @@ import {
     isToday,
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import axios from "axios"; // Import axios for API calls
+import axios from "axios";
 
 interface CalendarEvent {
     id: string;
@@ -89,7 +89,11 @@ export default function Calendar() {
         return events.filter((event) => isSameDay(event.date, date));
     };
 
-
+    const goToToday = () => {
+        setCurrentDate(new Date()); 
+        setSelectedDate(new Date());
+    };
+    
     const navigateDate = (direction: 'prev' | 'next') => {
         switch (view) {
             case 'month':
@@ -102,11 +106,6 @@ export default function Calendar() {
                 setCurrentDate(direction === 'next' ? addDays(currentDate, 1) : subDays(currentDate, 1));
                 break;
         }
-    };
-
-    const goToToday = () => {
-        setCurrentDate(new Date());
-		setSelectedDate(new Date());
     };
 
 
