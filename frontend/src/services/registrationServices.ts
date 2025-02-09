@@ -23,8 +23,10 @@ export async function addToCart(course: Course) {
 		user.cart.push(cartCourseInfo);
 
 		try {
-			const response = await apiClient.put(`/users/${user._id}`, {cart: JSON.stringify(user.cart)});
-			console.log(response)
+			const response = await apiClient.put(`/users/${user._id}`, {
+				cart: JSON.stringify(user.cart),
+			});
+			console.log(response);
 		} catch (error) {
 			console.error(error);
 		}
