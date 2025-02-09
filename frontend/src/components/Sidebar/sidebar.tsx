@@ -46,7 +46,7 @@ export const items = [
 	{
 		icon: <Calendar />,
 		description: "Calendar",
-		href: "#",
+		href: "/calendar",
 	},
 	{
 		icon: <MessageCircleQuestion />,
