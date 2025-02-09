@@ -203,7 +203,7 @@ export default function CatalogSearchBar({
 					menuItems={creditsMenuItems}
 				/>
 				<Dropdown
-					buttonLabel={`Format: ${selectedFormat}`} 
+					buttonLabel={`Format: ${selectedFormat}`}
 					menuItems={formatMenuItems}
 				/>
 				<Dropdown

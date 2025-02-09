@@ -6,7 +6,7 @@ export default function Home() {
 	const navigate = useNavigate();
 
 	// Function to redirect to Catalog page with filters applied
-	const handleFilterRedirect = (format : string) => {
+	const handleFilterRedirect = (format: string) => {
 		navigate(`/catalog?format=${format}`);
 	};
 
@@ -59,9 +59,7 @@ export default function Home() {
 							/>
 
 							{/* Orange Overlay */}
-							<div
-								className="absolute inset-0 bg-orange-500 opacity-0 group-hover:opacity-60 transition-opacity duration-300"
-							></div>
+							<div className="absolute inset-0 bg-orange-500 opacity-0 group-hover:opacity-60 transition-opacity duration-300"></div>
 
 							{/* Text and Button Overlay */}
 							<div className="absolute inset-0 flex flex-col items-center justify-end text-center px-4 pb-4">

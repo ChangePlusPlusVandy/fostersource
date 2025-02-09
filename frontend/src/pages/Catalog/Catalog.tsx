@@ -110,7 +110,7 @@ export default function Catalog() {
 				<CatalogSearchBar
 					onSearch={handleSearch}
 					updateFilters={updateFilters}
-					initialFormat={selectedFormat} 
+					initialFormat={selectedFormat}
 				/>
 			</div>
 
