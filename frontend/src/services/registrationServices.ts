@@ -1,4 +1,5 @@
 import { Course } from "../shared/types/course";
+import apiClient from "./apiClient";
 
 const backendUrl = "http://localhost:5001";
 
@@ -20,12 +21,15 @@ export async function addToCart(course: Course) {
 
 	if (!isCourseInCart) {
 		user.cart.push(cartCourseInfo);
+
+		try {
+			const response = await apiClient.put(`/users/${user._id}`, {cart: JSON.stringify(user.cart)});
+			console.log(response)
+		} catch (error) {
+			console.error(error);
+		}
 		localStorage.setItem("user", JSON.stringify(user));
 	}
-
-	// for testing purposes to clear cart before the cart page is made
-	// user.cart = []
-	// localStorage.setItem("user", JSON.stringify(user));
 
 	console.log(localStorage.getItem("user"));
 }
