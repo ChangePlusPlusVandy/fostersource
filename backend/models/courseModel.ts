@@ -14,6 +14,7 @@ export interface ICourse extends Document {
 	thumbnailPath: string;
 	cost: number;
 	instructor: string;
+	courseType: "webinar" | "course" | "meeting";
 }
 
 const CourseSchema: Schema = new Schema(
@@ -35,6 +36,7 @@ const CourseSchema: Schema = new Schema(
 		thumbnailPath: { type: String, required: true },
 		cost: { type: Number, required: true },
 		instructor: { type: String, required: false },
+		courseType: { type: String, enum: ["webinar", "course", "meeting"], required: true },
 	},
 	{
 		timestamps: true,
