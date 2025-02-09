@@ -1,21 +1,59 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dropdown from "../../components/dropdown-select";
 
 interface CatalogSearchBarProps {
 	onSearch: (query: string) => void;
 	updateFilters: (filterType: string, filterValue: string) => void;
+	initialFormat: string; // ✅ Accept format filter from parent (Catalog.tsx)
 }
 
 export default function CatalogSearchBar({
 	onSearch,
 	updateFilters,
+	initialFormat,
 }: CatalogSearchBarProps) {
+	// Sync selected format with the filter from Catalog.tsx
+	const [selectedFormat, setSelectedFormat] = useState<string>(initialFormat);
+	const [selectedCategory, setSelectedCategory] = useState<string>("All");
+	const [selectedRating, setSelectedRating] = useState<string>("All");
+	const [selectedCredits, setSelectedCredits] = useState<string>("All");
+	const [selectedCost, setSelectedCost] = useState<string>("All");
+
+	// Update dropdown when `initialFormat` changes
+	useEffect(() => {
+		setSelectedFormat(initialFormat);
+	}, [initialFormat]);
+
 	const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const formData = new FormData(event.currentTarget);
 		const query = formData.get("searchQuery") as string;
 		onSearch(query);
 	};
+
+	const formatMenuItems = [
+		{
+			label: "All",
+			onClick: () => {
+				setSelectedFormat("All");
+				updateFilters("format", "All");
+			},
+		},
+		{
+			label: "Live",
+			onClick: () => {
+				setSelectedFormat("Live");
+				updateFilters("format", "Live");
+			},
+		},
+		{
+			label: "On-Demand",
+			onClick: () => {
+				setSelectedFormat("On-Demand");
+				updateFilters("format", "On-Demand");
+			},
+		},
+	];
 
 	const categoryMenuItems = [
 		{
@@ -33,6 +71,7 @@ export default function CatalogSearchBar({
 			},
 		},
 	];
+
 	const ratingMenuItems = [
 		{
 			label: "All",
@@ -77,6 +116,7 @@ export default function CatalogSearchBar({
 			},
 		},
 	];
+
 	const creditsMenuItems = [
 		{
 			label: "All",
@@ -114,29 +154,7 @@ export default function CatalogSearchBar({
 			},
 		},
 	];
-	const formatMenuItems = [
-		{
-			label: "All",
-			onClick: () => {
-				setSelectedFormat("All");
-				updateFilters("format", "All");
-			},
-		},
-		{
-			label: "Live",
-			onClick: () => {
-				setSelectedFormat("Live");
-				updateFilters("format", "Live");
-			},
-		},
-		{
-			label: "On-Demand",
-			onClick: () => {
-				setSelectedFormat("On-Demand");
-				updateFilters("format", "On-Demand");
-			},
-		},
-	];
+
 	const costMenuItems = [
 		{
 			label: "All",
@@ -153,12 +171,6 @@ export default function CatalogSearchBar({
 			},
 		},
 	];
-
-	const [selectedCategory, setSelectedCategory] = useState<string>("All");
-	const [selectedRating, setSelectedRating] = useState<string>("All");
-	const [selectedCredits, setSelectedCredits] = useState<string>("All");
-	const [selectedFormat, setSelectedFormat] = useState<string>("All");
-	const [selectedCost, setSelectedCost] = useState<string>("All");
 
 	return (
 		<div className="flex flex-col gap-4 mb-6">
@@ -191,7 +203,7 @@ export default function CatalogSearchBar({
 					menuItems={creditsMenuItems}
 				/>
 				<Dropdown
-					buttonLabel={`Format: ${selectedFormat}`}
+					buttonLabel={`Format: ${selectedFormat}`} 
 					menuItems={formatMenuItems}
 				/>
 				<Dropdown

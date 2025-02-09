@@ -1,8 +1,15 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../components/Sidebar/sidebar";
 
 export default function Home() {
+	const navigate = useNavigate();
+
+	// Function to redirect to Catalog page with filters applied
+	const handleFilterRedirect = (format : string) => {
+		navigate(`/catalog?format=${format}`);
+	};
+
 	return (
 		<div className="bg-gray-100 min-h-screen flex w-full">
 			<div className="flex-grow">
@@ -169,9 +176,9 @@ export default function Home() {
 							/>
 
 							{/* Buttons and Overlay */}
-							<div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end items-center px-4 pb-4">
+							<div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end items-center px-4 pb-6">
 								{/* Buttons */}
-								<div className="flex space-x-4 mb-4">
+								<div className="flex space-x-4 mb-2">
 									<motion.button
 										whileHover={{
 											scale: 1.1,
@@ -180,6 +187,7 @@ export default function Home() {
 										}}
 										whileTap={{ scale: 0.95 }}
 										className="bg-orange-500 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow-md"
+										onClick={() => handleFilterRedirect("Live")}
 									>
 										Upcoming
 									</motion.button>
@@ -192,6 +200,7 @@ export default function Home() {
 										}}
 										whileTap={{ scale: 0.95 }}
 										className="bg-orange-500 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow-md"
+										onClick={() => handleFilterRedirect("On-Demand")}
 									>
 										On-Demand
 									</motion.button>
