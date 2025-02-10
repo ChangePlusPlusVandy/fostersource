@@ -61,7 +61,7 @@ export const getOrCreateWebinar = async (
 		const savedWebinar = await newWebinar.save();
 		res
 			.status(201)
-			.json({ user: savedWebinar, message: "Webinar created successfully" });
+			.json({ webinar: savedWebinar, message: "Webinar created successfully" });
 	} catch (error) {
 		res.status(400).json({ message: "Failed to get or create webinar", error });
 	}
@@ -109,7 +109,7 @@ export const deleteWebinar = async (
 		if (!webinar) {
 			res.status(404).json({
 				success: false,
-				message: "User not found.",
+				message: "Webinar not found.",
 			});
 			return;
 		}
