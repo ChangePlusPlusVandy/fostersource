@@ -232,6 +232,7 @@
 import firebase from "firebase/compat";
 import { auth } from "./firebaseConfig";
 import apiClient from "./apiClient"; // Use the shared API client for consistency
+import axios from "axios";
 
 interface AuthState {
 	isAuthenticated: boolean;
@@ -260,14 +261,11 @@ class AuthService {
 		return AuthService.instance;
 	}
 
-	private async updateAuthState(user: firebase.User | null): Promise<void> {
+	private async updateAuthState(user: any, token: string): Promise<void> {
 		if (user) {
 			this.authState.user = user;
 			this.authState.isAuthenticated = true;
 			localStorage.setItem("user", JSON.stringify(user));
-
-			// 🔥 Automatically attach Firebase token to API client
-			const token = await user.getIdToken(true);
 			apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 		} else {
 			this.authState.user = null;
@@ -279,14 +277,33 @@ class AuthService {
 
 	async login(email: string, password: string): Promise<void> {
 		try {
-			console.log("🔐 Attempting Firebase login...");
 			const userCredential = await auth.signInWithEmailAndPassword(
 				email,
 				password
 			);
-			console.log("✅ Firebase login successful");
 
-			await this.updateAuthState(userCredential.user);
+			if (!userCredential.user) {
+				throw new Error("Failed to create Firebase user");
+			}
+
+			const firebaseToken = await userCredential.user?.getIdToken();
+
+			const response = await axios.post(
+				"http://localhost:5001/api/login",
+				{
+					firebaseId: userCredential.user.uid,
+					email: userCredential.user.email,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${firebaseToken}`,
+					},
+				}
+			);
+
+			const user = response.data.user;
+
+			await this.updateAuthState(user, firebaseToken);
 		} catch (error: any) {
 			console.error("Login error:", error);
 			throw new Error(error.message || "Login failed. Please try again.");
@@ -296,7 +313,12 @@ class AuthService {
 	async logout(): Promise<void> {
 		try {
 			await auth.signOut();
-			await this.updateAuthState(null);
+			localStorage.removeItem("user");
+			this.authState = {
+				isAuthenticated: false,
+				user: null,
+			};
+			delete axios.defaults.headers.common["Authorization"];
 		} catch (error) {
 			console.error("Logout failed:", error);
 			throw error;
@@ -313,14 +335,44 @@ class AuthService {
 
 	async register(email: string, password: string, name: string): Promise<void> {
 		try {
-			console.log("📌 Registering new user...");
 			const userCredential = await auth.createUserWithEmailAndPassword(
 				email,
 				password
 			);
-			console.log("Firebase user created");
 
-			await this.updateAuthState(userCredential.user);
+			if (!userCredential.user) {
+				throw new Error("Failed to create Firebase user");
+			}
+
+			const firebaseToken = await userCredential.user?.getIdToken();
+
+			const baseURL = "http://localhost:5001";
+			console.log(
+				"Making backend request to:",
+				`${baseURL}/api/login/register`
+			);
+
+			const response = await axios.post(
+				`${baseURL}/api/login/register`,
+				{
+					firebaseId: userCredential.user.uid,
+					email,
+					name,
+					role: "foster parent",
+					isColorado: true,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${firebaseToken}`,
+						"Content-Type": "application/json",
+					},
+					withCredentials: true,
+				}
+			);
+
+			const user = response.data.user;
+
+			await this.updateAuthState(user, firebaseToken);
 		} catch (error: any) {
 			console.error("Registration error:", error);
 			throw new Error(
