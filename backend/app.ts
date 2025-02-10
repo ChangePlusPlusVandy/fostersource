@@ -13,7 +13,7 @@ import courseRoutes from "./routes/courseRoutes";
 import videoRoutes from "./routes/videoRoutes";
 import paymentRoutes from "./routes/paymentRoutes";
 import loginRoutes from "./routes/loginRoutes";
-import certificateRoutes from "./routes/certificateRoutes"
+import certificateRoutes from "./routes/certificateRoutes";
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";

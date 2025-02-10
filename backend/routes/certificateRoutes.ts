@@ -1,5 +1,10 @@
 import express from "express";
-import { createCertificate, getCertificates, updateCertificate, deleteCertificate } from "../controllers/certificateController";
+import {
+	createCertificate,
+	getCertificates,
+	updateCertificate,
+	deleteCertificate,
+} from "../controllers/certificateController";
 
 const router = express.Router();
 
@@ -15,4 +20,4 @@ router.put("/:id", updateCertificate);
 // DELETE certificate by ID
 router.delete("/:id", deleteCertificate);
 
-export default router; 
+export default router;

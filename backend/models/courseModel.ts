@@ -36,7 +36,11 @@ const CourseSchema: Schema = new Schema(
 		thumbnailPath: { type: String, required: true },
 		cost: { type: Number, required: true },
 		instructor: { type: String, required: false },
-		courseType: { type: String, enum: ["webinar", "course", "meeting"], required: true },
+		courseType: {
+			type: String,
+			enum: ["webinar", "course", "meeting"],
+			required: true,
+		},
 	},
 	{
 		timestamps: true,
