@@ -123,7 +123,7 @@ export default function Calendar() {
 const renderCalendar = () => {
     if (view === 'month') {
         return (
-            <div className="w-full overflow-auto">
+            <div className="w-full h-[calc(100vh-220px)] overflow-auto">
                 <div className="grid min-w-[800px] w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(150px, 1fr))' }}>
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
                         <div key={day} className="text-center font-semibold p-2 border-b">
@@ -223,7 +223,7 @@ const renderCalendar = () => {
                                 return (
                                     <div 
                                         key={`${day}-${hour}`} 
-                                        className={`border-r border-b min-h-[90px] relative cursor-pointer transition-colors
+                                        className={`border-r border-b min-h-[60px] relative cursor-pointer transition-colors
                                             ${isSelected ? 'bg-orange-50 hover:bg-orange-50' : 'hover:bg-gray-50'}`}
                                         onClick={() => setSelectedDate(currentDateTime)}
                                     >
@@ -259,9 +259,9 @@ const renderCalendar = () => {
         const dayEvents = events.filter(event => isSameDay(event.date, currentDate));
 
         return (
-            <div className="w-full overflow-auto">
+            <div className="w-full h-[calc(100vh-220px)] overflow-auto">
                 <div className="grid grid-cols-6 border min-w-full">
-                    <div className="border-r bg-white sticky left-0 w-32">
+                    <div className="border-r bg-white sticky top-0 z-10 w-32">
                         <div className="p-4 text-base">
                             <div className="flex flex-col">
                                 <span className="font-bold whitespace-nowrap">
@@ -287,11 +287,11 @@ const renderCalendar = () => {
                             return (
                                 <div 
                                     key={hour.toString()} 
-                                    className={`border-b cursor-pointer transition-colors
+                                    className={`border-b min-h-[50px] cursor-pointer transition-colors
                                         ${isSelected ? 'bg-orange-50 hover:bg-orange-50' : 'hover:bg-gray-50'}`}
                                     onClick={() => setSelectedDate(hour)}
                                 >
-                                    <div className="flex items-start px-4 py-2">
+                                    <div className="flex items-start p-1.5">
                                         <div className="text-sm text-gray-500 w-16 flex-shrink-0">
                                             {format(hour, 'h a')}
                                         </div>
@@ -299,11 +299,16 @@ const renderCalendar = () => {
                                             {currentHourEvents.map(event => (
                                                 <div
                                                     key={event.id}
-                                                    className="bg-orange-500 text-white text-sm p-2 rounded cursor-pointer"
+                                                    className="bg-orange-500 text-white text-sm p-1.5 rounded cursor-pointer hover:bg-orange-600 transition-colors"
                                                     onMouseEnter={(e) => handleMouseEnter(event, e)}
                                                     onMouseLeave={handleMouseLeave}
                                                 >
-                                                    {event.title}
+                                                    <div className="font-bold">
+                                                        {format(event.date, 'h:mm a')}
+                                                    </div>
+                                                    <div className="mt-0.5">
+                                                        {event.title}
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
