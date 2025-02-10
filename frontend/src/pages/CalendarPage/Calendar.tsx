@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
     format,
     startOfMonth,
@@ -120,9 +121,16 @@ export default function Calendar() {
         setTooltip({ ...tooltip, visible: false });
     };
 
+    const bounceAnimation = {
+        initial: { opacity: 0, y: 15 },
+        animate: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 150, damping: 20 } },
+    };
+
 const renderCalendar = () => {
+
     if (view === 'month') {
         return (
+            <motion.div {...bounceAnimation} className="w-full h-[calc(100vh-220px)] overflow-auto">
             <div className="w-full h-[calc(100vh-220px)] overflow-auto">
                 <div className="grid min-w-[800px] w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(150px, 1fr))' }}>
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
@@ -168,6 +176,7 @@ const renderCalendar = () => {
                     })}
                 </div>
             </div>
+            </motion.div>
         );
     }
 
@@ -178,6 +187,7 @@ const renderCalendar = () => {
         const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
     
         return (
+            <motion.div {...bounceAnimation} className="w-full h-[calc(100vh-220px)] overflow-auto">
             <div className="w-full h-[calc(100vh-220px)] overflow-auto">
                 <div className="grid border w-full" style={{ gridTemplateColumns: '100px repeat(7, minmax(140px, 1fr))' }}>
                     <div className="border-r bg-white sticky top-0 z-10 w-[100px] border-b"></div>
@@ -251,6 +261,7 @@ const renderCalendar = () => {
                     ))}
                 </div>
             </div>
+            </motion.div>
         );
     }
 
@@ -259,6 +270,7 @@ const renderCalendar = () => {
         const dayEvents = events.filter(event => isSameDay(event.date, currentDate));
 
         return (
+            <motion.div {...bounceAnimation} className="w-full h-[calc(100vh-220px)] overflow-auto">
             <div className="w-full h-[calc(100vh-220px)] overflow-auto">
                 <div className="grid grid-cols-6 border min-w-full">
                     <div className="border-r bg-white sticky top-0 z-10 w-32">
@@ -319,6 +331,7 @@ const renderCalendar = () => {
                     </div>
                 </div>
             </div>
+            </motion.div>
         );
     }
 
@@ -386,9 +399,9 @@ const renderCalendar = () => {
                     </div>
                 </div>
 
-                <div className="px-3 py-4">
+                <motion.div key={view} {...bounceAnimation} className="px-3 py-4">
                     {renderCalendar()}
-                </div>
+                </motion.div>
 
                 {tooltip.visible && tooltip.event && (
                     <div
