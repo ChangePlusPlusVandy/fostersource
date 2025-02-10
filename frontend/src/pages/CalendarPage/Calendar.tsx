@@ -129,9 +129,9 @@ export default function Calendar() {
 const renderCalendar = () => {
 
     if (view === 'month') {
-            return (
-                <motion.div {...bounceAnimation} className="w-full max-w-[800px] h-[calc(100vh-220px)] overflow-auto mx-auto"> {/* Adjusted max width */}
-                    <div className="grid min-w-[600px] w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(100px, 1fr))' }}> {/* Reduced column width */}
+        return (
+            <motion.div {...bounceAnimation} className="w-full h-[calc(100vh-220px)] overflow-auto">
+                <div className="grid min-w-[800px] w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(100px, 1fr))' }}>
                         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
                             <div key={day} className="text-center font-semibold p-2 border-b">
                                 {day}
@@ -185,8 +185,8 @@ const renderCalendar = () => {
             const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
         
             return (
-                <motion.div {...bounceAnimation} className="w-full max-w-[800px] h-[calc(100vh-220px)] overflow-auto mx-auto"> {/* Adjusted max width */}
-                    <div className="grid border w-full" style={{ gridTemplateColumns: '100px repeat(7, minmax(100px, 1fr))' }}> {/* Reduced column width */}
+                <motion.div {...bounceAnimation} className="w-full h-[calc(100vh-220px)] overflow-auto">
+                    <div className="grid border min-w-[800px] w-full" style={{ gridTemplateColumns: '100px repeat(7, minmax(100px, 1fr))' }}>
                         <div className="border-r bg-white sticky top-0 z-10 w-[100px] border-b"></div>
                         {daysInWeek.map((day, index) => (
                             <div 
@@ -264,10 +264,10 @@ const renderCalendar = () => {
         if (view === 'day') {
             const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
             const dayEvents = events.filter(event => isSameDay(event.date, currentDate));
-
+    
             return (
                 <motion.div {...bounceAnimation} className="w-full h-[calc(100vh-220px)] overflow-auto">
-                    <div className="grid grid-cols-6 border min-w-full">
+                    <div className="grid grid-cols-6 border min-w-[800px] w-full">
                         <div className="border-r bg-white sticky top-0 z-10 w-32">
                             <div className="p-4 text-base">
                                 <div className="flex flex-col">
@@ -333,8 +333,8 @@ const renderCalendar = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-16"> {/* Adjusted padding for top and bottom */}
-            <div className="bg-white rounded-lg shadow p-6"> {/* Added padding to the inner container */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-16"> 
+            <div className="bg-white rounded-lg shadow p-6">
                 <div className="flex items-center justify-between px-6 py-4 border-b">
                     <h2 className="text-2xl font-semibold">
                         {format(currentDate, 'MMMM yyyy')}
