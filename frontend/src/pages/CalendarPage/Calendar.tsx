@@ -130,6 +130,7 @@ const renderCalendar = () => {
 
     if (view === 'month') {
         return (
+            
             <motion.div {...bounceAnimation} className="w-full h-[calc(100vh-220px)] overflow-auto">
             <div className="w-full h-[calc(100vh-220px)] overflow-auto">
                 <div className="grid min-w-[800px] w-full" style={{ gridTemplateColumns: 'repeat(7, minmax(150px, 1fr))' }}>
@@ -339,9 +340,9 @@ const renderCalendar = () => {
 };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-12">
-            <div className="bg-white rounded-lg shadow">
-                <div className="flex items-center justify-between px-6 py-4 border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> {/* Adjusted padding for top and bottom */}
+        <div className="bg-white rounded-lg shadow p-6"> {/* Added padding to the inner container */}
+            <div className="flex items-center justify-between px-6 py-4 border-b">
                     <h2 className="text-2xl font-semibold">
                         {format(currentDate, 'MMMM yyyy')}
                     </h2>

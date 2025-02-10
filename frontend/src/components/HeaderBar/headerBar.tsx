@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import "./headerBar.css";
-// need to update these refs to foster source's main page
+
 export const headerItems = [
 	{
 		description: "Home",
@@ -18,7 +18,7 @@ export const headerItems = [
 	},
 	{
 		description: "Calendar",
-		href: "/calendar",
+		href: "https://fostersource.org/calendar/",
 	},
 	{
 		description: "How to Help",
