@@ -1,14 +1,13 @@
 import { Request, response, Response } from "express";
 import Video from "../models/videoModel";
-// TODO: FINISH
-// @desc    Get all videos or filter videos by query parameters
-// @route   GET /api/videos
-// @access  Public
 
 // @desc    Get all videos or filter videos by query parameters
 // @route   GET /api/videos
 // @access  Public
-export const getVideos = async (req: Request, res: Response): Promise<void> => {
+export const getVideos = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	try {
 		const query = req.query;
 
@@ -17,14 +16,14 @@ export const getVideos = async (req: Request, res: Response): Promise<void> => {
 		if (query.title) {
 			filters.title = { $regex: query.title, $options: "i" };
 		}
-		if (query.genre) {
-			filters.genre = query.genre;
+		if (query.courseId) {
+			filters.courseId = query.courseId;
 		}
 		if (query.published) {
 			filters.published = query.published === "true";
 		}
 
-		const videos = await Video.find(filters);
+		const videos = await Video.find(filters).populate("courseId");
 
 		res.status(200).json({
 			success: true,
@@ -32,19 +31,11 @@ export const getVideos = async (req: Request, res: Response): Promise<void> => {
 			data: videos,
 		});
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({
-				success: false,
-				message: "Server Error",
-				error: error.message,
-			});
-		} else {
-			res.status(500).json({
-				success: false,
-				message: "Server Error",
-				error: "An unexpected error occured",
-			});
-		}
+		res.status(500).json({
+			success: false,
+			message: "Server Error",
+			error: error instanceof Error ? error.message : "An unexpected error occurred",
+		});
 	}
 };
 
@@ -56,12 +47,12 @@ export const createVideo = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		const { title, description, published } = req.body;
+		const { title, description, videoUrl, courseId, published } = req.body;
 
-		if (!title || !description) {
+		if (!title || !description || !videoUrl || !courseId) {
 			res.status(400).json({
 				success: false,
-				message: "Please provide title and description",
+				message: "Please provide title, description, videoUrl, and courseId",
 			});
 			return;
 		}
@@ -69,6 +60,8 @@ export const createVideo = async (
 		const newVideo = new Video({
 			title,
 			description,
+			videoUrl,
+			courseId,
 			published: published || false,
 		});
 
@@ -79,18 +72,11 @@ export const createVideo = async (
 			data: savedVideo,
 		});
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({
-				success: false,
-				message: "Server Error",
-				error: error.message,
-			});
-		} else {
-			res.status(500).json({
-				success: false,
-				message: "An unexpected error occurred",
-			});
-		}
+		res.status(500).json({
+			success: false,
+			message: "Server Error",
+			error: error instanceof Error ? error.message : "An unexpected error occurred",
+		});
 	}
 };
 
@@ -103,11 +89,11 @@ export const updateVideo = async (
 ): Promise<void> => {
 	try {
 		const { id } = req.params;
-		const { title, description, published } = req.body;
+		const { title, description, videoUrl, courseId, published } = req.body;
 
 		const updatedVideo = await Video.findByIdAndUpdate(
 			id,
-			{ title, description, published },
+			{ title, description, videoUrl, courseId, published },
 			{ new: true, runValidators: true }
 		);
 		if (!updatedVideo) {
@@ -122,18 +108,11 @@ export const updateVideo = async (
 			data: updatedVideo,
 		});
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({
-				success: false,
-				message: "Server Error",
-				error: error.message,
-			});
-		} else {
-			res.status(500).json({
-				success: false,
-				message: "An unexpected error has occured",
-			});
-		}
+		res.status(500).json({
+			success: false,
+			message: "Server Error",
+			error: error instanceof Error ? error.message : "An unexpected error has occurred",
+		});
 	}
 };
 
@@ -160,17 +139,10 @@ export const deleteVideo = async (
 			data: deleteVideo,
 		});
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({
-				success: false,
-				message: "Server Error",
-				error: error.message,
-			});
-		} else {
-			res.status(500).json({
-				success: false,
-				message: "An unexpected error has occured",
-			});
-		}
+		res.status(500).json({
+			success: false,
+			message: "Server Error",
+			error: error instanceof Error ? error.message : "An unexpected error has occurred",
+		});
 	}
 };
