@@ -10,11 +10,11 @@ export const headerItems = [
 	},
 	{
 		description: "About",
-		href: "/about",
+		href: "https://fostersource.org/about-us/",
 	},
 	{
 		description: "Programs",
-		href: "/programs",
+		href: "https://fostersource.org/programs/",
 	},
 	{
 		description: "Calendar",
@@ -22,19 +22,19 @@ export const headerItems = [
 	},
 	{
 		description: "How to Help",
-		href: "/help",
+		href: "https://fostersource.org/volunteer/",
 	},
 	{
 		description: "News",
-		href: "/news",
+		href: "https://fostersource.org/media-and-press/",
 	},
 	{
 		description: "Contact",
-		href: "/contact",
+		href: "https://fostersource.org/contact-us/",
 	},
 	{
 		description: "Portal",
-		href: "/portal",
+		href: "https://fostersource.org/portal/",
 	},
 	{
 		description: "🇺🇸 English",

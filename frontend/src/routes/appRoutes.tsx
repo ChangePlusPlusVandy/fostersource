@@ -7,15 +7,10 @@ import {
 } from "react-router-dom";
 import Home from "../pages/HomePage/Home";
 import { Sidebar } from "../components/Sidebar/sidebar";
+import GlobalBlackBar from "../components/GlobalBlackBar/globalBlackBar";
 import HeaderBar, { HeaderItems } from "../components/HeaderBar/headerBar";
 import Catalog from "../pages/Catalog/Catalog";
-import About from "../pages/AboutPage/About";
 import Calendar from "../pages/CalendarPage/Calendar";
-import Contact from "../pages/ContactPage/Contact";
-import Help from "../pages/HelpPage/Help";
-import News from "../pages/NewsPage/News";
-import Portal from "../pages/PortalPage/Portal";
-import Programs from "../pages/ProgramsPage/Programs";
 import Login from "../pages/UserAuth/Login";
 import Register from "../pages/UserAuth/Register";
 import ResetPassword from "../pages/UserAuth/resetPassword";
@@ -29,10 +24,10 @@ function AppRoutes() {
 		window.innerWidth < 768
 	);
 
-	const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-		const isAuthenticated = authService.isAuthenticated();
+	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
 
-		if (isAuthenticated) {
+	const PrivateRoute = ({ children }: { children: JSX.Element }) => {
+		if (isLoggedIn) {
 			return children;
 		} else {
 			return <Navigate to="/login" />;
@@ -46,8 +41,10 @@ function AppRoutes() {
 					display: "flex",
 					flexDirection: "column",
 					height: "100vh",
+					backgroundColor: "#eeeeee",
 				}}
 			>
+				<GlobalBlackBar />
 				<div style={{ width: "100%" }}>
 					<HeaderBar isOpen={isHeaderBarOpen} setIsOpen={setIsHeaderBarOpen} />
 				</div>
@@ -59,7 +56,12 @@ function AppRoutes() {
 						top: "25%",
 					}}
 				>
-					<Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+					<Sidebar
+						isCollapsed={isCollapsed}
+						setIsCollapsed={setIsCollapsed}
+						isLoggedIn={isLoggedIn}
+						setIsLoggedIn={setIsLoggedIn}
+					/>
 				</div>
 				<div
 					style={{
@@ -71,13 +73,7 @@ function AppRoutes() {
 				>
 					<Routes>
 						<Route path="/" element={<Home />} />
-						<Route path="/about" element={<About />} />
 						<Route path="/calendar" element={<Calendar />} />
-						<Route path="/contact" element={<Contact />} />
-						<Route path="/help" element={<Help />} />
-						<Route path="/news" element={<News />} />
-						<Route path="/portal" element={<Portal />} />
-						<Route path="/programs" element={<Programs />} />
 						<Route
 							path="/catalog"
 							element={
@@ -93,7 +89,7 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
-            <Route path="/courseDetails" element={<CoursePage />} />
+						<Route path="/courseDetails" element={<CoursePage />} />
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (

@@ -32,18 +32,16 @@ export const checkUser = async (req: Request, res: Response): Promise<void> => {
 			return;
 		}
 
-		const accessToken = jwt.sign(
-			{ id: user._id, firebaseId: user.firebaseId, role: user.role },
-			process.env.JWT_SECRET as string,
-			{ expiresIn: "1h" }
-		);
+		// const accessToken = jwt.sign(
+		// 	{ id: user._id, firebaseId: user.firebaseId, role: user.role },
+		// 	process.env.JWT_SECRET as string,
+		// 	{ expiresIn: "1h" }
+		// );
 
-		const refreshToken = await admin.auth().createCustomToken(user.firebaseId);
+		// const refreshToken = await admin.auth().createCustomToken(user.firebaseId);
 
 		res.status(200).send({
 			user,
-			accessToken,
-			refreshToken,
 			message: "User found",
 		});
 	} catch (error) {
@@ -119,25 +117,23 @@ export const createUser = async (
 
 		const savedUser = await newUser.save();
 
-		// Generate JWT token
-		const accessToken = jwt.sign(
-			{
-				id: savedUser._id,
-				firebaseId: savedUser.firebaseId,
-				role: savedUser.role,
-			},
-			process.env.JWT_SECRET as string,
-			{ expiresIn: "1h" }
-		);
+		// // Generate JWT token
+		// const accessToken = jwt.sign(
+		// 	{
+		// 		id: savedUser._id,
+		// 		firebaseId: savedUser.firebaseId,
+		// 		role: savedUser.role,
+		// 	},
+		// 	process.env.JWT_SECRET as string,
+		// 	{ expiresIn: "1h" }
+		// );
 
-		const refreshToken = await admin
-			.auth()
-			.createCustomToken(savedUser.firebaseId);
+		// const refreshToken = await admin
+		// 	.auth()
+		// 	.createCustomToken(savedUser.firebaseId);
 
 		res.status(201).json({
 			user: savedUser,
-			accessToken,
-			refreshToken,
 			message: "User created successfully",
 		});
 	} catch (error) {
@@ -172,19 +168,17 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 			return;
 		}
 
-		// Generate JWT token
-		const accessToken = jwt.sign(
-			{ id: user._id, firebaseId: user.firebaseId, role: user.role },
-			process.env.JWT_SECRET as string,
-			{ expiresIn: "1h" }
-		);
+		// // Generate JWT token
+		// const accessToken = jwt.sign(
+		// 	{ id: user._id, firebaseId: user.firebaseId, role: user.role },
+		// 	process.env.JWT_SECRET as string,
+		// 	{ expiresIn: "1h" }
+		// );
 
-		const refreshToken = await admin.auth().createCustomToken(user.firebaseId);
+		// const refreshToken = await admin.auth().createCustomToken(user.firebaseId);
 
 		res.status(200).json({
 			user,
-			accessToken,
-			refreshToken,
 			message: "Login successful",
 		});
 	} catch (error) {

@@ -29,13 +29,13 @@ interface CalendarEvent {
 }
 
 const getDaysInInterval = (start: Date, end: Date) => {
-    const days: Date[] = [];
-    let currentDate = start;
-    while (currentDate <= end) {
-        days.push(currentDate);
-        currentDate = addDays(currentDate, 1);
-    }
-    return days;
+	const days: Date[] = [];
+	let currentDate = start;
+	while (currentDate <= end) {
+		days.push(currentDate);
+		currentDate = addDays(currentDate, 1);
+	}
+	return days;
 };
 
 export default function Calendar() {
