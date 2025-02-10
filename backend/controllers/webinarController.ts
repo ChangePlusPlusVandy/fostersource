@@ -4,11 +4,14 @@ import Webinar from "../models/webinarModel";
 // @desc    Get all webinars or by filter
 // @route   GET /api/webinars
 // @access  Public
-export const getWebinar = async (req: Request, res: Response): Promise<void> => {
+export const getWebinar = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	try {
-		const filters = req.query; 
+		const filters = req.query;
 
-		const webinars = await Webinar.find(filters); 
+		const webinars = await Webinar.find(filters);
 		res.status(200).json({
 			success: true,
 			count: webinars.length,
@@ -32,13 +35,13 @@ export const getOrCreateWebinar = async (
 ): Promise<void> => {
 	try {
 		const {
-			serviceType, 
-            meetingID, 
-            startTime, 
-            duration, 
-            authParticipants, 
-            autoRecord, 
-            enablePractice,
+			serviceType,
+			meetingID,
+			startTime,
+			duration,
+			authParticipants,
+			autoRecord,
+			enablePractice,
 		} = req.body;
 
 		let webinar = await Webinar.findOne({ meetingID });
@@ -49,13 +52,13 @@ export const getOrCreateWebinar = async (
 		}
 
 		const newWebinar = new Webinar({
-			serviceType, 
-            meetingID, 
-            startTime, 
-            duration, 
-            authParticipants, 
-            autoRecord, 
-            enablePractice,
+			serviceType,
+			meetingID,
+			startTime,
+			duration,
+			authParticipants,
+			autoRecord,
+			enablePractice,
 		});
 
 		const savedWebinar = await newWebinar.save();
@@ -118,8 +121,7 @@ export const deleteWebinar = async (
 
 		res.status(200).json({
 			success: true,
-			message:
-				"Webinar deleted successfully.",
+			message: "Webinar deleted successfully.",
 		});
 	} catch (error) {
 		res.status(500).json({

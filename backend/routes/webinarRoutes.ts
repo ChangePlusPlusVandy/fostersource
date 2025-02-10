@@ -1,9 +1,9 @@
 import express from "express";
 import {
-    getWebinar, 
-    getOrCreateWebinar,
-    updateWebinar, 
-    deleteWebinar
+	getWebinar,
+	getOrCreateWebinar,
+	updateWebinar,
+	deleteWebinar,
 } from "../controllers/webinarController";
 
 const router = express.Router();
