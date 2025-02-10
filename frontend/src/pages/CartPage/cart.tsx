@@ -10,7 +10,7 @@ interface CartItem {
 }
 export default function Cart() {
 	const user = JSON.parse(localStorage.getItem("user") || "{}");
-	const cartItems: CartItem[] = user?.cart || [];
+	const cartItems: CartItem[] = user?.cart ? JSON.parse(user.cart) : [];
 	const totalCost = cartItems.reduce((sum, item) => sum + item.cost, 0);
 
 	const handleRemoveItem = (course: {

@@ -304,6 +304,7 @@ class AuthService {
 			const user = response.data.user;
 
 			await this.updateAuthState(user, firebaseToken);
+
 		} catch (error: any) {
 			console.error("Login error:", error);
 			throw new Error(error.message || "Login failed. Please try again.");

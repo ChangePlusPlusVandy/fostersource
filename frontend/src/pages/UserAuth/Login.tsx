@@ -15,13 +15,17 @@ const Login: React.FC = () => {
 
 		try {
 			await authService.login(email, password);
+
 			window.location.href = "/catalog";
 		} catch (err: any) {
 			console.error("Login error:", err);
 			setError(err.message || "Login failed. Please try again.");
 		} finally {
 			setIsLoading(false);
+
 		}
+		console.log(localStorage.user)
+
 	};
 
 	return (

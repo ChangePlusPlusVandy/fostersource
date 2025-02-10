@@ -9,6 +9,11 @@ export async function addToCart(course: Course) {
 			JSON.parse(localStorage.getItem("user"))
 		: null;
 
+	if(!user.cart){
+		user.cart = []
+		localStorage.setItem("user", JSON.stringify(user))
+	}
+
 	let cartCourseInfo = {
 		className: course.className,
 		cost: course.cost,
@@ -26,7 +31,6 @@ export async function addToCart(course: Course) {
 			const response = await apiClient.put(`/users/${user._id}`, {
 				cart: JSON.stringify(user.cart),
 			});
-			console.log(response);
 		} catch (error) {
 			console.error(error);
 		}
@@ -52,6 +56,13 @@ export async function removeFromCart(course: {
 			instructor: string;
 		}) => item.className !== course.className
 	);
-	localStorage.setItem("user", JSON.stringify(user));
+	try {
+		const response = await apiClient.put(`/users/${user._id}`, {
+			cart: JSON.stringify(user.cart),
+		});
+		localStorage.setItem("user", JSON.stringify(user));
+	} catch (error) {
+		console.error(error);
+	}
 	window.location.reload();
 }
