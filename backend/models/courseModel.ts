@@ -19,6 +19,7 @@ export interface ICourse extends Document {
     instructorRole: string;
     lengthCourse: number;
     time: Date;
+	isInPerson: boolean;
 }
 
 
@@ -45,6 +46,7 @@ const CourseSchema: Schema = new Schema(
         lengthCourse: {type: Number, required: true},
         time: {type: Date, required: true},
         instructorName: {type: String, required: true},
+		isInPerson: {type: Boolean, required: true}
     },
     {
         timestamps: true,

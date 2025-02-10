@@ -17,6 +17,7 @@ interface Course {
     instructorRole: string;
     lengthCourse: number;
     time: Date;
+    isInPerson: Boolean;
   }
   
 

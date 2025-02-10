@@ -59,6 +59,7 @@ export const createCourse = async (
             lengthCourse,
             time,
             instructorName,
+			isInPerson,
         } = req.body;
 
 
@@ -72,12 +73,13 @@ export const createCourse = async (
             !cost ||
             !lengthCourse ||
             !time ||
-            !instructorName
+            !instructorName ||
+			!isInPerson
         ) {
             res.status(400).json({
                 success: false,
                 message:
-                    "Please provide className, isLive, creditNumber, description, and thumbnailPath",
+                    "Please provide className, isLive, creditNumber, thumbnailPath, cost, lengthCourse, time, instructorName, and isInPerson",
             });
             return;
         }
