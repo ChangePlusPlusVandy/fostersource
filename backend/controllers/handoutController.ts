@@ -132,7 +132,7 @@ export const deleteHandout = async (req: Request, res: Response): Promise<void> 
 		if (!deletedHandout) {
 			res.status(404).json({
 				success: false,
-				message: `Handout with id ${id} doesn't exist`,
+				message: `Handout with id ${id} not found`,
 			});
 			return;
 		}
