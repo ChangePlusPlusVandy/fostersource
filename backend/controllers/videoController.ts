@@ -4,10 +4,7 @@ import Video from "../models/videoModel";
 // @desc    Get all videos or filter videos by query parameters
 // @route   GET /api/videos
 // @access  Public
-export const getVideos = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
+export const getVideos = async (req: Request, res: Response): Promise<void> => {
 	try {
 		const query = req.query;
 
@@ -34,7 +31,8 @@ export const getVideos = async (
 		res.status(500).json({
 			success: false,
 			message: "Server Error",
-			error: error instanceof Error ? error.message : "An unexpected error occurred",
+			error:
+				error instanceof Error ? error.message : "An unexpected error occurred",
 		});
 	}
 };
@@ -75,7 +73,8 @@ export const createVideo = async (
 		res.status(500).json({
 			success: false,
 			message: "Server Error",
-			error: error instanceof Error ? error.message : "An unexpected error occurred",
+			error:
+				error instanceof Error ? error.message : "An unexpected error occurred",
 		});
 	}
 };
@@ -111,7 +110,10 @@ export const updateVideo = async (
 		res.status(500).json({
 			success: false,
 			message: "Server Error",
-			error: error instanceof Error ? error.message : "An unexpected error has occurred",
+			error:
+				error instanceof Error
+					? error.message
+					: "An unexpected error has occurred",
 		});
 	}
 };
@@ -142,7 +144,10 @@ export const deleteVideo = async (
 		res.status(500).json({
 			success: false,
 			message: "Server Error",
-			error: error instanceof Error ? error.message : "An unexpected error has occurred",
+			error:
+				error instanceof Error
+					? error.message
+					: "An unexpected error has occurred",
 		});
 	}
 };

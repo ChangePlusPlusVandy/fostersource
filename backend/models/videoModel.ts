@@ -15,7 +15,11 @@ const videoSchema: Schema = new Schema(
 		title: { type: String, required: true },
 		description: { type: String },
 		videoUrl: { type: String, required: true },
-		courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
+		courseId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Course",
+			required: true,
+		},
 		published: { type: Boolean, required: true },
 	},
 	{
