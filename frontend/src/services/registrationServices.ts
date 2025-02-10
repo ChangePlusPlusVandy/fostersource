@@ -9,9 +9,9 @@ export async function addToCart(course: Course) {
 			JSON.parse(localStorage.getItem("user"))
 		: null;
 
-	if(!user.cart){
-		user.cart = []
-		localStorage.setItem("user", JSON.stringify(user))
+	if (!user.cart) {
+		user.cart = [];
+		localStorage.setItem("user", JSON.stringify(user));
 	}
 
 	let cartCourseInfo = {

@@ -22,10 +22,8 @@ const Login: React.FC = () => {
 			setError(err.message || "Login failed. Please try again.");
 		} finally {
 			setIsLoading(false);
-
 		}
-		console.log(localStorage.user)
-
+		console.log(localStorage.user);
 	};
 
 	return (
