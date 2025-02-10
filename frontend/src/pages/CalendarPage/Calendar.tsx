@@ -178,47 +178,74 @@ const renderCalendar = () => {
         const weekEnd = endOfWeek(currentDate);
         const daysInWeek = getDaysInInterval(weekStart, weekEnd);
         const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
-
+    
         return (
-            <div className="w-full overflow-auto">
-                <div className="grid grid-cols-8 gap-1 min-w-full">
-                    <div className="border-b p-2 sticky left-0 bg-white"></div>
-                    {daysInWeek.map(day => (
-                        <div key={day.toString()} className="text-center font-semibold p-2 border-b min-w-[150px]">
-                            <div>{format(day, 'EEE')}</div>
-                            <div className={`text-sm inline-flex ${isToday(day) ? 'bg-orange-500 text-white rounded-full w-6 h-6 items-center justify-center' : ''}`}>
-                                {format(day, 'd')}
+            <div className="w-full h-[calc(100vh-220px)] overflow-auto">
+                <div className="grid border w-full" style={{ gridTemplateColumns: '100px repeat(7, minmax(140px, 1fr))' }}>
+                    {/* Header row with bottom border */}
+                    <div className="border-r bg-white sticky top-0 z-10 w-[100px] border-b"></div>
+                    {daysInWeek.map((day, index) => (
+                        <div 
+                            key={day.toString()} 
+                            className={`border-r p-3 text-center bg-white sticky top-0 z-10 border-b`}
+                        >
+                            <div className="flex flex-col items-center space-y-1">
+                                <span className="font-semibold text-base">
+                                    {format(day, 'EEE')}
+                                </span>
+                                <div className={`text-lg font-bold inline-flex ${
+                                    isToday(day) 
+                                        ? 'bg-orange-500 text-white rounded-full w-8 h-8 items-center justify-center' 
+                                        : ''
+                                }`}>
+                                    {format(day, 'd')}
+                                </div>
                             </div>
                         </div>
                     ))}
-
+    
+                    {/* Time slots */}
                     {hours.map(hour => (
                         <React.Fragment key={hour.toString()}>
-                            <div className="border-r p-2 text-sm text-gray-500 sticky left-0 bg-white">
-                                {format(hour, 'h a')}
+                            {/* Time column */}
+                            <div className="border-r border-b bg-white sticky left-0 w-[100px]">
+                                <div className="px-3 py-4 text-sm text-gray-500">
+                                    {format(hour, 'h a')}
+                                </div>
                             </div>
+    
+                            {/* Event cells for each day */}
                             {daysInWeek.map(day => {
-                                const currentHourEvents = events.filter(event => 
+                                const currentDateTime = new Date(day);
+                                currentDateTime.setHours(hour.getHours(), 0, 0, 0);
+                                const dayEvents = events.filter(event => 
                                     isSameDay(event.date, day) && 
-                                    format(event.date, 'H') === format(hour, 'H')
+                                    format(event.date, 'H') === format(currentDateTime, 'H')
                                 );
-
+    
                                 return (
-                                    <div key={`${day}-${hour}`} className="border p-2 min-h-[60px] min-w-[150px]">
-                                        <div className="flex flex-col gap-y-2">
-    										{currentHourEvents.map(event => (
-												<div
-												key={event.id}
-												className="bg-orange-500 text-white text-xs p-[6px] rounded cursor-pointer w-full max-w-[95%] overflow-hidden mx-auto"
-												onMouseEnter={(e) => handleMouseEnter(event, e)}
-												onMouseLeave={handleMouseLeave}
-											>
-												{event.title}
-											</div>
-											
-
-    										))}
-										</div>
+                                    <div 
+                                        key={`${day}-${hour}`} 
+                                        className="border-r border-b min-h-[90px] relative group"
+                                    >
+                                        <div className="absolute inset-0 group-hover:bg-gray-50 transition-colors"></div>
+                                        <div className="relative p-2">
+                                            {dayEvents.map(event => (
+                                                <div
+                                                    key={event.id}
+                                                    className="bg-orange-500 text-white p-2 rounded mb-1 cursor-pointer hover:bg-orange-600 transition-colors"
+                                                    onMouseEnter={(e) => handleMouseEnter(event, e)}
+                                                    onMouseLeave={handleMouseLeave}
+                                                >
+                                                    <div className="font-bold text-sm">
+                                                        {format(event.date, 'h:mm a')}
+                                                    </div>
+                                                    <div className="text-sm mt-0.5">
+                                                        {event.title}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 );
                             })}
