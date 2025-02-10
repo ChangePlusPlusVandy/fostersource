@@ -59,7 +59,6 @@ export default function Calendar() {
             try {
                 const response = await axios.get("http://localhost:5001/api/courses");
                 const courseData = response.data;
-
                 
                 const calendarEvents = courseData.map((course: any) => ({
                     id: course._id,
@@ -90,7 +89,7 @@ export default function Calendar() {
     };
 
     const goToToday = () => {
-        setCurrentDate(new Date()); 
+        setCurrentDate(new Date());
         setSelectedDate(new Date());
     };
     
@@ -107,7 +106,6 @@ export default function Calendar() {
                 break;
         }
     };
-
 
     const handleMouseEnter = (event: CalendarEvent, e: React.MouseEvent) => {
         setTooltip({
@@ -140,9 +138,9 @@ const renderCalendar = () => {
                         return (
                             <div
                                 key={day.toString()}
-                                className={`min-h-[100px] p-2 border ${
-                                    isSelected ? 'bg-orange-50' : ''
-                                } ${!isCurrentMonth ? 'text-gray-400' : ''}`}
+                                className={`min-h-[100px] p-2 border cursor-pointer transition-colors
+                                    ${isSelected ? 'bg-orange-50 hover:bg-orange-50' : 'hover:bg-gray-50'}
+                                    ${!isCurrentMonth ? 'text-gray-400' : ''}`}
                                 onClick={() => setSelectedDate(day)}
                             >
                                 <div className="font-medium mb-1 flex items-center">
@@ -182,7 +180,6 @@ const renderCalendar = () => {
         return (
             <div className="w-full h-[calc(100vh-220px)] overflow-auto">
                 <div className="grid border w-full" style={{ gridTemplateColumns: '100px repeat(7, minmax(140px, 1fr))' }}>
-                    {/* Header row with bottom border */}
                     <div className="border-r bg-white sticky top-0 z-10 w-[100px] border-b"></div>
                     {daysInWeek.map((day, index) => (
                         <div 
@@ -204,17 +201,14 @@ const renderCalendar = () => {
                         </div>
                     ))}
     
-                    {/* Time slots */}
                     {hours.map(hour => (
                         <React.Fragment key={hour.toString()}>
-                            {/* Time column */}
                             <div className="border-r border-b bg-white sticky left-0 w-[100px]">
                                 <div className="px-3 py-4 text-sm text-gray-500">
                                     {format(hour, 'h a')}
                                 </div>
                             </div>
     
-                            {/* Event cells for each day */}
                             {daysInWeek.map(day => {
                                 const currentDateTime = new Date(day);
                                 currentDateTime.setHours(hour.getHours(), 0, 0, 0);
@@ -222,13 +216,17 @@ const renderCalendar = () => {
                                     isSameDay(event.date, day) && 
                                     format(event.date, 'H') === format(currentDateTime, 'H')
                                 );
+                                const isSelected = selectedDate && 
+                                    isSameDay(day, selectedDate) && 
+                                    format(selectedDate, 'H') === format(currentDateTime, 'H');
     
                                 return (
                                     <div 
                                         key={`${day}-${hour}`} 
-                                        className="border-r border-b min-h-[90px] relative group"
+                                        className={`border-r border-b min-h-[90px] relative cursor-pointer transition-colors
+                                            ${isSelected ? 'bg-orange-50 hover:bg-orange-50' : 'hover:bg-gray-50'}`}
+                                        onClick={() => setSelectedDate(currentDateTime)}
                                     >
-                                        <div className="absolute inset-0 group-hover:bg-gray-50 transition-colors"></div>
                                         <div className="relative p-2">
                                             {dayEvents.map(event => (
                                                 <div
@@ -257,63 +255,69 @@ const renderCalendar = () => {
     }
 
     if (view === 'day') {
-		const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
-		const dayEvents = events.filter(event => isSameDay(event.date, currentDate));
+        const hours = Array.from({ length: 24 }, (_, i) => new Date(currentDate.setHours(i, 0, 0, 0)));
+        const dayEvents = events.filter(event => isSameDay(event.date, currentDate));
 
-		return (
-			<div className="w-full overflow-auto">
-				<div className="grid grid-cols-6 border min-w-full">
-					<div className="border-r bg-white sticky left-0 w-32">
-						<div className="p-4 text-base">
-							<div className="flex flex-col">
-								<span className="font-bold whitespace-nowrap">
-									{format(currentDate, 'EEEE')}
-								</span>
-								<div className={`mt-1 text-sm font-bold inline-flex ${
-									isToday(currentDate) 
-										? 'bg-orange-500 text-white rounded-full w-6 h-6 items-center justify-center' 
-										: ''
-								}`}>
-									{format(currentDate, 'd')}
-								</div>
-							</div>
-						</div>
-					</div>
-					<div className="col-span-5 min-w-[600px]">
-						{hours.map(hour => {
-							const currentHourEvents = dayEvents.filter(event => 
-								format(event.date, 'H') === format(hour, 'H')
-							);
+        return (
+            <div className="w-full overflow-auto">
+                <div className="grid grid-cols-6 border min-w-full">
+                    <div className="border-r bg-white sticky left-0 w-32">
+                        <div className="p-4 text-base">
+                            <div className="flex flex-col">
+                                <span className="font-bold whitespace-nowrap">
+                                    {format(currentDate, 'EEEE')}
+                                </span>
+                                <div className={`mt-1 text-sm font-bold inline-flex ${
+                                    isToday(currentDate) 
+                                        ? 'bg-orange-500 text-white rounded-full w-6 h-6 items-center justify-center' 
+                                        : ''
+                                }`}>
+                                    {format(currentDate, 'd')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-span-5 min-w-[600px]">
+                        {hours.map(hour => {
+                            const currentHourEvents = dayEvents.filter(event => 
+                                format(event.date, 'H') === format(hour, 'H')
+                            );
+                            const isSelected = selectedDate && format(selectedDate, 'H') === format(hour, 'H');
 
-							return (
-								<div key={hour.toString()} className="border-b">
-									<div className="flex items-start px-4 py-2">
-										<div className="text-sm text-gray-500 w-16 flex-shrink-0">
-											{format(hour, 'h a')}
-										</div>
-										<div className="flex-1 space-y-1 ml-4">
-											{currentHourEvents.map(event => (
-												<div
-													key={event.id}
-													className="bg-orange-500 text-white text-sm p-2 rounded cursor-pointer"
-													onMouseEnter={(e) => handleMouseEnter(event, e)}
-													onMouseLeave={handleMouseLeave}
-												>
-													{event.title}
-												</div>
-											))}
-										</div>
-									</div>
-								</div>
-							);
-						})}
-					</div>
-				</div>
-			</div>
-		);
-	}
+                            return (
+                                <div 
+                                    key={hour.toString()} 
+                                    className={`border-b cursor-pointer transition-colors
+                                        ${isSelected ? 'bg-orange-50 hover:bg-orange-50' : 'hover:bg-gray-50'}`}
+                                    onClick={() => setSelectedDate(hour)}
+                                >
+                                    <div className="flex items-start px-4 py-2">
+                                        <div className="text-sm text-gray-500 w-16 flex-shrink-0">
+                                            {format(hour, 'h a')}
+                                        </div>
+                                        <div className="flex-1 space-y-1 ml-4">
+                                            {currentHourEvents.map(event => (
+                                                <div
+                                                    key={event.id}
+                                                    className="bg-orange-500 text-white text-sm p-2 rounded cursor-pointer"
+                                                    onMouseEnter={(e) => handleMouseEnter(event, e)}
+                                                    onMouseLeave={handleMouseLeave}
+                                                >
+                                                    {event.title}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
-	return <div>No view available</div>;
+    return <div>No view available</div>;
 };
 
     return (
