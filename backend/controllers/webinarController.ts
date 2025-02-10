@@ -4,7 +4,7 @@ import Webinar from "../models/webinarModel";
 // @desc    Get all webinars or by filter
 // @route   GET /api/webinars
 // @access  Public
-export const getUsers = async (req: Request, res: Response): Promise<void> => {
+export const getWebinar = async (req: Request, res: Response): Promise<void> => {
 	try {
 		const filters = req.query; 
 
@@ -70,7 +70,7 @@ export const getOrCreateWebinar = async (
 // @desc    Update a webinar
 // @route   PUT /api/webinars/:id
 // @access  Public
-export const updateUser = async (
+export const updateWebinar = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
@@ -97,7 +97,7 @@ export const updateUser = async (
 // @desc    Delete a webinar
 // @route   DELETE /api/webinars/:id
 // @access  Public
-export const deleteUser = async (
+export const deleteWebinar = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
