@@ -22,36 +22,83 @@ const Pagination = ({
     }
   };
 
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+
+    if (totalPages <= 3) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => handlePageChange(i)}
+            className={`px-4 py-2 min-w-[40px] ${currentPage === i ? 'text-white bg-[#8757a3] rounded-lg' : 'hover:bg-gray-50'}`}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      pageNumbers.push(
+        <button key={1} onClick={() => handlePageChange(1)}
+          className={`px-4 py-2 min-w-[40px] ${currentPage === 1 ? 'text-white bg-[#8757a3] rounded-lg' : 'hover:bg-gray-50'}`}
+        >
+          1
+        </button>
+      );
+
+      if (currentPage > 2) {
+        pageNumbers.push(<span key="ellipsis-1" className="px-4 py-2">...</span>);
+      }
+
+      let startPage = Math.max(2, currentPage);
+      let endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => handlePageChange(i)}
+            className={`px-4 py-2 min-w-[40px] ${currentPage === i ? 'text-white bg-[#8757a3] rounded-lg' : 'hover:bg-gray-50'}`}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      if (currentPage < totalPages - 2) {
+        pageNumbers.push(<span key="ellipsis-2" className="px-4 py-2">...</span>);
+      }
+
+      pageNumbers.push(
+        <button key={totalPages} onClick={() => handlePageChange(totalPages)}
+          className={`px-4 py-2 min-w-[40px] ${currentPage === totalPages ? 'text-white bg-[#8757a3] rounded-lg' : 'hover:bg-gray-50'}`}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    return pageNumbers;
+  };
+
   return (
     <div className="flex items-center rounded-lg border bg-white overflow-hidden shadow-sm">
       <button 
-        onClick={() => handlePageChange(1)}
+        onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className="px-3 py-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:hover:text-gray-400"
-        aria-label="First page"
+        aria-label="Previous page"
       >
         &#171;
       </button>
 
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-        <button
-          key={page}
-          onClick={() => handlePageChange(page)}
-          className={`px-4 py-2 min-w-[40px] ${
-            currentPage === page 
-              ? 'text-white bg-[#8757a3] rounded-lg'
-              : 'hover:bg-gray-50'
-          }`}
-        >
-          {page}
-        </button>
-      ))}
+      {renderPageNumbers()}
 
       <button 
-        onClick={() => handlePageChange(totalPages)}
+        onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="px-3 py-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:hover:text-gray-400"
-        aria-label="Last page"
+        aria-label="Next page"
       >
         &#187;
       </button>
@@ -181,11 +228,11 @@ const AddDiscountModal: React.FC<AddDiscountModalProps> = ({ isOpen, onClose, on
 };
 
 export default function DiscountsPage() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
   const [discounts, setDiscounts] = useState<Discount[]>([
-    ...Array(8).fill(null).map((_, i) => ({
+    ...Array(50).fill(null).map((_, i) => ({
       id: i + 1,
       code: 'newmexico',
       amount: 25.00,
@@ -231,7 +278,7 @@ export default function DiscountsPage() {
     const updatedDiscounts = discounts.filter(d => d.id !== id);
     setDiscounts(updatedDiscounts);
 
-    const totalPages = Math.ceil(updatedDiscounts.length / itemsPerPage);
+    const totalPages: number = Math.ceil(updatedDiscounts.length / itemsPerPage);
     if (currentPage > totalPages) {
       setCurrentPage(totalPages > 0 ? totalPages : 1);
     }
@@ -253,10 +300,16 @@ export default function DiscountsPage() {
     setIsModalOpen(false);
   };
 
-  const totalPages = Math.ceil(discounts.length / itemsPerPage);
+  const totalPages: number = Math.ceil(discounts.length / itemsPerPage);
   const displayedDiscounts = discounts
     .filter(discount => discount.code.toLowerCase().includes(searchQuery.toLowerCase()))
     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-gray-100">
@@ -361,7 +414,7 @@ export default function DiscountsPage() {
                 <Pagination 
                   currentPage={currentPage}
                   totalPages={totalPages || 1}
-                  onPageChange={setCurrentPage}
+                  onPageChange={handlePageChange}
                 />
               </div>
             </>
