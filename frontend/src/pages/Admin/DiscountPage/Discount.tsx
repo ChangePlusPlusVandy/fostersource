@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Edit2, Trash2, Users, Layers } from 'lucide-react';
 
 interface Discount {
@@ -6,6 +6,8 @@ interface Discount {
   code: string;
   amount: number;
   date: string;
+  time: string;
+  timeZone: string;
   selected: boolean;
 }
 
@@ -57,18 +59,137 @@ const Pagination = ({
   );
 };
 
+const timeZones = [
+  'Pacific Time (PST)',
+  'Mountain Time (MT)',
+  'Central Time (CST)',
+  'Eastern Time (EST)',
+  'Alaska Time (AKT)',
+  'Hawaii-Aleutian Time (HAT)',
+];
+
+const times = Array.from({ length: 24 * 2 }, (_, i) => {
+  const hour = i % 24;
+  const period = hour < 12 ? 'AM' : 'PM';
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+  const minutes = i % 2 === 0 ? '00' : '30';
+  return `${displayHour}:${minutes} ${period}`;
+});
+
+interface AddDiscountModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAdd: (newDiscount: { code: string; amount: number; date: string; time: string; timeZone: string }) => void;
+}
+
+const AddDiscountModal: React.FC<AddDiscountModalProps> = ({ isOpen, onClose, onAdd }) => {
+  const [newDiscount, setNewDiscount] = useState({ code: '', amount: 0, date: '', time: '', timeZone: '' });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onAdd(newDiscount);
+    setNewDiscount({ code: '', amount: 0, date: '', time: '', timeZone: '' });
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="text-xl font-bold mb-4">Add Discount</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={newDiscount.code}
+            onChange={(e) => setNewDiscount({ ...newDiscount, code: e.target.value })}
+            className="border rounded-lg px-4 py-2 mb-4 w-full"
+            placeholder="Discount Code"
+            required
+          />
+          <input
+            type="number"
+            value={newDiscount.amount}
+            onChange={(e) => setNewDiscount({ ...newDiscount, amount: parseFloat(e.target.value) })}
+            className="border rounded-lg px-4 py-2 mb-4 w-full"
+            placeholder="Amount"
+            required
+          />
+          <input
+            type="date"
+            value={newDiscount.date}
+            onChange={(e) => setNewDiscount({ ...newDiscount, date: e.target.value })}
+            className="border rounded-lg px-4 py-2 mb-4 w-full"
+            required
+          />
+          <select
+            value={newDiscount.time}
+            onChange={(e) => setNewDiscount({ ...newDiscount, time: e.target.value })}
+            className="border rounded-lg px-4 py-2 mb-4 w-full"
+            required
+          >
+            <option value="">Select Time</option>
+            {times.map((time) => (
+              <option key={time} value={time}>{time}</option>
+            ))}
+          </select>
+          <select
+            value={newDiscount.timeZone}
+            onChange={(e) => setNewDiscount({ ...newDiscount, timeZone: e.target.value })}
+            className="border rounded-lg px-4 py-2 mb-4 w-full"
+            required
+          >
+            <option value="">Select Time Zone</option>
+            {timeZones.map((zone) => (
+              <option key={zone} value={zone}>{zone}</option>
+            ))}
+          </select>
+          <div className="flex justify-end">
+            <button type="button" onClick={onClose} className="mr-2 text-gray-500">Cancel</button>
+            <button type="submit" className="bg-[#8757a3] text-white px-4 py-2 rounded-lg">Add Discount</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default function DiscountsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Set the number of items per page
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [discounts, setDiscounts] = useState<Discount[]>([
     ...Array(8).fill(null).map((_, i) => ({
       id: i + 1,
       code: 'newmexico',
       amount: 25.00,
-      date: '09/01/2023 - 1:00AM (CDT)',
+      date: '09/01/2023',
+      time: '12:00 AM',
+      timeZone: '(PST)',
       selected: false
     }))
   ]);
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      const itemHeight = 100; 
+      const windowHeight = window.innerHeight;
+      const headerHeight = 100;
+      const footerHeight = 50;
+
+      const availableHeight = windowHeight - headerHeight - footerHeight;
+      const newItemsPerPage = Math.floor(availableHeight / itemHeight);
+      setItemsPerPage(newItemsPerPage > 0 ? newItemsPerPage : 1);
+    };
+
+    updateItemsPerPage();
+    window.addEventListener('resize', updateItemsPerPage);
+
+    return () => {
+      window.removeEventListener('resize', updateItemsPerPage);
+    };
+  }, []);
 
   const selectedCount = discounts.filter(d => d.selected).length;
 
@@ -80,6 +201,11 @@ export default function DiscountsPage() {
 
   const handleDelete = (id: number) => {
     setDiscounts(discounts.filter(d => d.id !== id));
+  };
+
+  const handleAddDiscount = (newDiscount: { code: string; amount: number; date: string; time: string; timeZone: string }) => {
+    const newId = discounts.length ? Math.max(...discounts.map(d => d.id)) + 1 : 1;
+    setDiscounts([...discounts, { id: newId, ...newDiscount, selected: false }]);
   };
 
   const totalPages = Math.ceil(discounts.length / itemsPerPage);
@@ -121,6 +247,7 @@ export default function DiscountsPage() {
             <button 
               className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
               style={{ backgroundColor: '#8757a3' }}
+              onClick={() => setIsModalOpen(true)}
             >
               Add Discount
             </button>
@@ -157,7 +284,7 @@ export default function DiscountsPage() {
                   <span className="font-medium">${discount.amount.toFixed(2)}</span>
                 </div>
                 <div className="flex items-center justify-end space-x-8 flex-1">
-                  <span className="text-gray-500">{discount.date}</span>
+                  <span className="text-gray-500">{discount.date} {discount.time} {discount.timeZone}</span>
                   <div className="flex gap-4">
                     <button><Edit2 className="w-4 h-4 text-gray-400" /></button>
                     <button onClick={() => handleDelete(discount.id)}>
@@ -178,6 +305,12 @@ export default function DiscountsPage() {
           </div>
         </div>
       </div>
+
+      <AddDiscountModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onAdd={handleAddDiscount} 
+      />
     </div>
   );
 }
