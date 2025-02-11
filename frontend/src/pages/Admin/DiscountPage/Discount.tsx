@@ -60,12 +60,12 @@ const Pagination = ({
 };
 
 const timeZones = [
-  'Pacific Time (PST)',
-  'Mountain Time (MT)',
-  'Central Time (CST)',
-  'Eastern Time (EST)',
-  'Alaska Time (AKT)',
-  'Hawaii-Aleutian Time (HAT)',
+  '(PST)',
+  '(MST)',
+  '(CST)',
+  '(EST)',
+  '(AKT)',
+  '(HAT)',
 ];
 
 const times = Array.from({ length: 24 * 2 }, (_, i) => {
@@ -157,6 +157,7 @@ const AddDiscountModal: React.FC<AddDiscountModalProps> = ({ isOpen, onClose, on
 export default function DiscountsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [searchQuery, setSearchQuery] = useState('');
   const [discounts, setDiscounts] = useState<Discount[]>([
     ...Array(8).fill(null).map((_, i) => ({
       id: i + 1,
@@ -209,7 +210,9 @@ export default function DiscountsPage() {
   };
 
   const totalPages = Math.ceil(discounts.length / itemsPerPage);
-  const displayedDiscounts = discounts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const displayedDiscounts = discounts
+    .filter(discount => discount.code.toLowerCase().includes(searchQuery.toLowerCase()))
+    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="w-full min-h-screen bg-gray-100">
@@ -223,6 +226,8 @@ export default function DiscountsPage() {
             <div className="relative w-full">
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-4 pr-16 py-3 rounded-lg border bg-white text-gray-800 placeholder-gray-400"
                 placeholder="Search discounts..."
               />
