@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Edit2, Trash2 } from 'lucide-react';
+import { Search, Edit2, Trash2, Users, Layers } from 'lucide-react';
 
 interface Discount {
   id: number;
@@ -16,7 +16,7 @@ export default function DiscountsPage() {
       code: 'newmexico',
       amount: 25.00,
       date: '09/01/2023 - 1:00AM (CDT)',
-      selected: i === 0
+      selected: i < 3
     }))
   ]);
 
@@ -85,12 +85,14 @@ export default function DiscountsPage() {
                   />
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{discount.code}</span>
-                    <span 
-                      className="text-xs px-2 py-0.5 rounded-full text-white"
-                      style={{ 
-                        backgroundColor: '#8757a3'
-                      }}
-                    >%</span>
+                    <div className="flex items-center gap-1">
+                      <div className="p-1 rounded-full" style={{ backgroundColor: '#8757a3' }}>
+                        <Users className="w-3 h-3 text-white" />
+                      </div>
+                      <div className="p-1 rounded-full" style={{ backgroundColor: '#8757a3' }}>
+                        <Layers className="w-3 h-3 text-white" />
+                      </div>
+                    </div>
                   </div>
                   <span className="font-medium">${discount.amount.toFixed(2)}</span>
                 </div>
