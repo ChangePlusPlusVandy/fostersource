@@ -290,64 +290,73 @@ export default function DiscountsPage() {
             <button 
               className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
               style={{ backgroundColor: '#8757a3' }}
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setDiscountToEdit(null); // Reset for adding a new discount
+                setIsModalOpen(true);
+              }}
             >
               Add Discount
             </button>
           </div>
 
-          <div className="space-y-3">
-            {displayedDiscounts.map((discount) => (
-              <div
-                key={discount.id}
-                className={`flex items-center justify-between w-full p-4 rounded-lg border`}
-                style={{
-                  backgroundColor: discount.selected ? '#f5f0f7' : 'white'
-                }}
-              >
-                <div className="flex items-center space-x-8 flex-1">
-                  <input
-                    type="checkbox"
-                    checked={discount.selected}
-                    onChange={() => toggleSelection(discount.id)}
-                    className="w-5 h-5"
-                    style={{ accentColor: '#8757a3' }}
-                  />
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{discount.code}</span>
-                    <div className="flex items-center gap-1">
-                      <div className="p-1 rounded-full" style={{ backgroundColor: '#8757a3' }}>
-                        <Users className="w-3 h-3 text-white" />
+          {displayedDiscounts.length === 0 ? (
+            <div className="text-center text-gray-500">No discounts found.</div>
+          ) : (
+            <>
+              <div className="space-y-3">
+                {displayedDiscounts.map((discount) => (
+                  <div
+                    key={discount.id}
+                    className={`flex items-center justify-between w-full p-4 rounded-lg border`}
+                    style={{
+                      backgroundColor: discount.selected ? '#f5f0f7' : 'white'
+                    }}
+                  >
+                    <div className="flex items-center space-x-8 flex-1">
+                      <input
+                        type="checkbox"
+                        checked={discount.selected}
+                        onChange={() => toggleSelection(discount.id)}
+                        className="w-5 h-5"
+                        style={{ accentColor: '#8757a3' }}
+                      />
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{discount.code}</span>
+                        <div className="flex items-center gap-1">
+                          <div className="p-1 rounded-full" style={{ backgroundColor: '#8757a3' }}>
+                            <Users className="w-3 h-3 text-white" />
+                          </div>
+                          <div className="p-1 rounded-full" style={{ backgroundColor: '#8757a3' }}>
+                            <Layers className="w-3 h-3 text-white" />
+                          </div>
+                        </div>
                       </div>
-                      <div className="p-1 rounded-full" style={{ backgroundColor: '#8757a3' }}>
-                        <Layers className="w-3 h-3 text-white" />
+                      <span className="font-medium">${discount.amount.toFixed(2)}</span>
+                    </div>
+                    <div className="flex items-center justify-end space-x-8 flex-1">
+                      <span className="text-gray-500">{discount.date} {discount.time} {discount.timeZone}</span>
+                      <div className="flex gap-4">
+                        <button onClick={() => handleEditDiscount(discount)}>
+                          <Edit2 className="w-4 h-4 text-gray-400" />
+                        </button>
+                        <button onClick={() => handleDelete(discount.id)}>
+                          <Trash2 className="w-4 h-4 text-gray-400" />
+                        </button>
                       </div>
                     </div>
                   </div>
-                  <span className="font-medium">${discount.amount.toFixed(2)}</span>
-                </div>
-                <div className="flex items-center justify-end space-x-8 flex-1">
-                  <span className="text-gray-500">{discount.date} {discount.time} {discount.timeZone}</span>
-                  <div className="flex gap-4">
-                    <button onClick={() => handleEditDiscount(discount)}>
-                      <Edit2 className="w-4 h-4 text-gray-400" />
-                    </button>
-                    <button onClick={() => handleDelete(discount.id)}>
-                      <Trash2 className="w-4 h-4 text-gray-400" />
-                    </button>
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className="flex justify-end mt-6">
-            <Pagination 
-              currentPage={currentPage}
-              totalPages={totalPages || 1}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+              <div className="flex justify-end mt-6">
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages || 1}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
 
