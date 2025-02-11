@@ -369,14 +369,17 @@ export default function DiscountsPage() {
             <div className="flex items-center gap-4">
               <span style={{ color: '#8757a3' }}>{selectedCount} Selected</span>
               <button 
-                className="text-red-600 font-bold" 
-                onClick={() => {
-                  const selectedDiscounts = discounts.filter(d => d.selected);
-                  selectedDiscounts.forEach(discount => handleDelete(discount.id));
-                }}
-              >
-                Delete
-              </button>
+              className="text-red-600 font-bold" 
+              onClick={() => {
+                setDiscounts(discounts.filter(d => !d.selected));
+                setCurrentPage(prevPage => {
+                  const totalPages = Math.ceil((discounts.filter(d => !d.selected).length) / itemsPerPage);
+                  return prevPage > totalPages ? Math.max(totalPages, 1) : prevPage;
+                });
+              }}
+            >
+              Delete
+            </button>
             </div>
             <button 
               className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
