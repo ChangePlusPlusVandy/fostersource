@@ -16,9 +16,12 @@ const Pagination = ({
   totalPages = 1,
   onPageChange = (page: number) => console.log(page)
 }) => {
+  const [showDropdown, setShowDropdown] = useState<number | null>(null);
+
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       onPageChange(page);
+      setShowDropdown(null);
     }
   };
 
@@ -47,7 +50,20 @@ const Pagination = ({
       );
 
       if (currentPage > 2) {
-        pageNumbers.push(<span key="ellipsis-1" className="px-4 py-2">...</span>);
+        pageNumbers.push(
+          <div key="ellipsis-1" className="relative">
+            <button onClick={() => setShowDropdown(1)} className="px-4 py-2">...</button>
+            {showDropdown === 1 && (
+              <div className="absolute bg-white shadow-md border rounded-md p-2">
+                {Array.from({ length: currentPage - 2 }, (_, i) => (
+                  <button key={i + 2} onClick={() => handlePageChange(i + 2)} className="block w-full px-4 py-2 hover:bg-gray-100">
+                    {i + 2}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        );
       }
 
       let startPage = Math.max(2, currentPage);
@@ -66,7 +82,20 @@ const Pagination = ({
       }
 
       if (currentPage < totalPages - 2) {
-        pageNumbers.push(<span key="ellipsis-2" className="px-4 py-2">...</span>);
+        pageNumbers.push(
+          <div key="ellipsis-2" className="relative">
+            <button onClick={() => setShowDropdown(2)} className="px-4 py-2">...</button>
+            {showDropdown === 2 && (
+              <div className="absolute bg-white shadow-md border rounded-md p-2">
+                {Array.from({ length: totalPages - (currentPage + 2) }, (_, i) => (
+                  <button key={currentPage + 2 + i} onClick={() => handlePageChange(currentPage + 2 + i)} className="block w-full px-4 py-2 hover:bg-gray-100">
+                    {currentPage + 2 + i}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        );
       }
 
       pageNumbers.push(
@@ -82,7 +111,7 @@ const Pagination = ({
   };
 
   return (
-    <div className="flex items-center rounded-lg border bg-white overflow-hidden shadow-sm">
+    <div className="flex items-center rounded-lg border bg-white overflow-hidden shadow-sm relative">
       <button 
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
