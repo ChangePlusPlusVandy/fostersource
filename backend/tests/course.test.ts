@@ -6,6 +6,7 @@ import Rating from "../models/ratingModel";
 import Survey from "../models/surveyModel";
 import Video from "../models/videoModel";
 import Question from "../models/questionModel";
+import User from "../models/userModel";
 
 const incompleteCourseData = {};
 
@@ -35,6 +36,20 @@ const courseData2 = {
 	description: "This is a description for Course B",
 	thumbnailPath: "/path/to/thumbnail2.jpg",
 	cost: 0,
+};
+
+const userData = {
+	firebaseId: "12345",
+	email: "big@chungus.com",
+	isColorado: true,
+	role: "staff",
+	name: "Big Chungus",
+	address1: "123 Chungus St",
+	city: "Denver",
+	state: "CO",
+	zip: "80014",
+	certification: "Certified",
+	phone: "1234567890",
 };
 
 describe("GET /api/courses", () => {
@@ -152,13 +167,17 @@ describe("PUT /api/courses/:id", () => {
 describe("DELETE /api/courses/:id", () => {
 	let courseId: string;
 	let ratingId: string;
+	let userId: string;
 
 	beforeEach(async () => {
 		const course = await Course.create(courseData1);
 		courseId = (course._id as mongoose.Types.ObjectId).toString();
 
+		const user = await User.create(userData);
+		userId = (user._id as mongoose.Types.ObjectId).toString();
+
 		const rating = await Rating.create({
-			userId: "12345",
+			userId: userId,
 			courseId: courseId,
 			rating: "5",
 		});

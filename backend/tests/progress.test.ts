@@ -24,6 +24,11 @@ const courseData = {
 	id: "Sample",
 	className: "Sample Course",
 	components: [],
+	cost: 0,
+	thumbnailPath: "chungus",
+	description: "chungus",
+	creditNumber: 0,
+	isLive: false,
 };
 
 describe("Progress API Tests", () => {

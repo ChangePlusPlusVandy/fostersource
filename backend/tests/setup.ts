@@ -33,10 +33,10 @@ afterAll(async () => {
 	await mongo.stop();
 });
 
-// Mock the verifyToken middleware globally
+// Mock the verifyFirebaseAuth middleware globally
 jest.mock("../middlewares/authMiddleware.ts", () => ({
-	verifyToken: (req: any, res: any, next: any) => {
-		req.user = { userId: "mockedUserId" }; // Mock user object
+	verifyFirebaseAuth: async (req: any, res: any, next: any) => {
+		req.user = { uid: "mockedUid", email: "mocked@example.com" }; // Mocked user data
 		next();
 	},
 }));

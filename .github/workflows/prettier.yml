@@ -1,10 +1,10 @@
 name: Prettier Auto-Format
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-  push:
+  pull_request:
     branches:
       - main
 
@@ -32,24 +32,6 @@ jobs:
         working-directory: ./frontend
         run: npm run format
 
-      - name: Commit and Push Changes (If Any)
-        working-directory: ./frontend
-        if: github.event_name == 'pull_request'
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin ${{ github.head_ref }}:${{ github.head_ref }}
-          git checkout ${{ github.head_ref }}
-
-          # Check for changes
-          if [[ -n $(git status --porcelain) ]]; then
-            git add .
-            git commit -m "Auto-format code with Prettier (Frontend)"
-            git push origin ${{ github.head_ref }}
-          else
-            echo "No formatting changes detected."
-          fi
-
   prettier-backend:
     name: Prettier Backend
     runs-on: ubuntu-latest
@@ -72,21 +54,3 @@ jobs:
       - name: Run Prettier and Format Code
         working-directory: ./backend
         run: npm run format
-
-      - name: Commit and Push Changes (If Any)
-        working-directory: ./backend
-        if: github.event_name == 'pull_request'
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin ${{ github.head_ref }}:${{ github.head_ref }}
-          git checkout ${{ github.head_ref }}
-
-          # Check for changes
-          if [[ -n $(git status --porcelain) ]]; then
-            git add .
-            git commit -m "Auto-format code with Prettier (Backend)"
-            git push origin ${{ github.head_ref }}
-          else
-            echo "No formatting changes detected."
-          fi
