@@ -17,6 +17,7 @@ import ResetPassword from "../pages/UserAuth/resetPassword";
 import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
+import DiscountPage from "../pages/Admin/DiscountPage/Discount";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -91,6 +92,7 @@ function AppRoutes() {
 							element={<ResetPasswordForm />}
 						/>
 						<Route path="/courseDetails" element={<CoursePage />} />
+						<Route path="/admin/discounts" element={<DiscountPage />} />
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (
