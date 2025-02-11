@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Course } from "../../shared/types/course";
 import CatalogCourseComponent from "./CatalogCourseComponent";
 import CatalogSearchBar from "./CatalogSearchBar";
 import { dummyCourses } from "../../shared/DummyCourses";
 
 export default function Catalog() {
+	const location = useLocation();
 	const [courses, setCourses] = useState<Course[]>(dummyCourses);
 	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
@@ -14,14 +16,20 @@ export default function Catalog() {
 	const [selectedFormat, setSelectedFormat] = useState<string>("All");
 	const [selectedCost, setSelectedCost] = useState<string>("All");
 
+	// Read query parameters from the URL and apply filters
 	useEffect(() => {
-		// Populate with dummy courses for testing
-		setCourses(dummyCourses);
-		setFilteredCourses(dummyCourses);
-	}, []);
+		const params = new URLSearchParams(location.search);
+		const formatFilter = params.get("format");
 
+		if (formatFilter) {
+			setSelectedFormat(formatFilter);
+		}
+	}, [location.search]);
+
+	// Apply filters when the state changes
 	useEffect(() => {
 		let filtered = courses;
+
 		if (searchQuery !== "") {
 			filtered = filtered.filter((course) =>
 				course.className.toLowerCase().includes(searchQuery.toLowerCase())
@@ -51,16 +59,15 @@ export default function Catalog() {
 		}
 
 		if (selectedFormat !== "All") {
-			if (selectedFormat === "Live") {
-				filtered = filtered.filter((course) => course.isLive);
-			} else {
-				filtered = filtered.filter((course) => !course.isLive);
-			}
+			filtered = filtered.filter((course) =>
+				selectedFormat === "Live" ? course.isLive : !course.isLive
+			);
 		}
 
 		if (selectedCost !== "All") {
 			filtered = filtered.filter((course) => course.cost === 0);
 		}
+
 		setFilteredCourses(filtered);
 	}, [
 		searchQuery,
@@ -69,6 +76,7 @@ export default function Catalog() {
 		selectedCredits,
 		selectedFormat,
 		selectedCost,
+		courses,
 	]);
 
 	const handleSearch = (query: string) => {
@@ -79,7 +87,6 @@ export default function Catalog() {
 		switch (filterType) {
 			case "category":
 				setSelectedCategory(filterValue);
-				console.log("Not Implemented");
 				break;
 			case "rating":
 				setSelectedRating(filterValue);
@@ -103,14 +110,19 @@ export default function Catalog() {
 				<CatalogSearchBar
 					onSearch={handleSearch}
 					updateFilters={updateFilters}
+					initialFormat={selectedFormat}
 				/>
 			</div>
 
 			<div className="container mx-auto">
 				<div className="flex flex-col gap-6">
-					{filteredCourses.map((course, index) => (
-						<CatalogCourseComponent key={index} course={course} />
-					))}
+					{filteredCourses.length > 0 ? (
+						filteredCourses.map((course, index) => (
+							<CatalogCourseComponent key={index} course={course} />
+						))
+					) : (
+						<p className="text-gray-600 text-center">No courses found.</p>
+					)}
 				</div>
 			</div>
 		</div>

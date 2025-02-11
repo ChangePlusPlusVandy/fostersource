@@ -1,8 +1,15 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../components/Sidebar/sidebar";
 
 export default function Home() {
+	const navigate = useNavigate();
+
+	// Function to redirect to Catalog page with filters applied
+	const handleFilterRedirect = (format: string) => {
+		navigate(`/catalog?format=${format}`);
+	};
+
 	return (
 		<div className="bg-gray-100 min-h-screen flex w-full">
 			<div className="flex-grow">
@@ -28,7 +35,7 @@ export default function Home() {
 					<section className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
 						{/* Getting Started Tile */}
 						<motion.div
-							className="relative overflow-hidden shadow-lg mx-auto"
+							className="relative overflow-hidden shadow-lg mx-auto group"
 							style={{
 								width: "90%",
 								maxWidth: "600px",
@@ -52,17 +59,10 @@ export default function Home() {
 							/>
 
 							{/* Orange Overlay */}
-							<div
-								className="absolute inset-0"
-								style={{
-									backgroundColor: "#F79518",
-									opacity: 0.6,
-								}}
-							></div>
+							<div className="absolute inset-0 bg-orange-500 opacity-0 group-hover:opacity-60 transition-opacity duration-300"></div>
 
 							{/* Text and Button Overlay */}
 							<div className="absolute inset-0 flex flex-col items-center justify-end text-center px-4 pb-4">
-								{/* Title */}
 								<h2
 									className="text-white font-poppins font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-6"
 									style={{
@@ -73,7 +73,6 @@ export default function Home() {
 									Getting Started
 								</h2>
 
-								{/* Animated Button */}
 								<motion.button
 									whileHover={{
 										scale: 1.02,
@@ -88,7 +87,6 @@ export default function Home() {
 						</motion.div>
 
 						{/* Catalog Tile */}
-
 						<Link to={"/catalog"}>
 							<motion.div
 								className="relative overflow-hidden shadow-lg mx-auto"
@@ -113,13 +111,7 @@ export default function Home() {
 									className="absolute inset-0 w-full h-full object-cover filter grayscale"
 								/>
 								<div className="absolute inset-0 bg-black bg-opacity-50 flex items-end justify-center pb-4">
-									<h2
-										className="text-white font-poppins font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-1"
-										style={{
-											fontSize: "clamp(1.25rem, 1.8vw, 2rem)",
-											lineHeight: "1.2",
-										}}
-									>
+									<h2 className="text-white font-poppins font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-1">
 										Catalog
 									</h2>
 								</div>
@@ -150,13 +142,7 @@ export default function Home() {
 								className="absolute inset-0 w-full h-full object-cover filter grayscale"
 							/>
 							<div className="absolute inset-0 bg-black bg-opacity-50 flex items-end justify-center pb-4">
-								<h2
-									className="text-white font-poppins font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-1"
-									style={{
-										fontSize: "clamp(1.25rem, 1.8vw, 2rem)",
-										lineHeight: "1.2",
-									}}
-								>
+								<h2 className="text-white font-poppins font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-1">
 									In-person Training
 								</h2>
 							</div>
@@ -164,7 +150,7 @@ export default function Home() {
 
 						{/* Online Training Tile */}
 						<motion.div
-							className="relative overflow-hidden shadow-lg mx-auto"
+							className="relative overflow-hidden shadow-lg mx-auto group"
 							style={{
 								width: "90%",
 								maxWidth: "600px",
@@ -180,19 +166,46 @@ export default function Home() {
 								transition: { duration: 0.15 },
 							}}
 						>
+							{/* Background Image */}
 							<img
 								src="/images/onlineTraining.png"
 								alt="Online Training Background"
 								className="absolute inset-0 w-full h-full object-cover filter grayscale"
 							/>
-							<div className="absolute inset-0 bg-black bg-opacity-50 flex items-end justify-center pb-4">
-								<h2
-									className="text-white font-poppins font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-1"
-									style={{
-										fontSize: "clamp(1.25rem, 1.8vw, 2rem)",
-										lineHeight: "1.2",
-									}}
-								>
+
+							{/* Buttons and Overlay */}
+							<div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end items-center px-4 pb-6">
+								{/* Buttons */}
+								<div className="flex space-x-4 mb-2">
+									<motion.button
+										whileHover={{
+											scale: 1.1,
+											backgroundColor: "#E88800",
+											transition: { duration: 0.2 },
+										}}
+										whileTap={{ scale: 0.95 }}
+										className="bg-orange-500 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow-md"
+										onClick={() => handleFilterRedirect("Live")}
+									>
+										Upcoming
+									</motion.button>
+
+									<motion.button
+										whileHover={{
+											scale: 1.1,
+											backgroundColor: "#E88800",
+											transition: { duration: 0.2 },
+										}}
+										whileTap={{ scale: 0.95 }}
+										className="bg-orange-500 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow-md"
+										onClick={() => handleFilterRedirect("On-Demand")}
+									>
+										On-Demand
+									</motion.button>
+								</div>
+
+								{/* Title */}
+								<h2 className="text-white font-poppins font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl">
 									Online Training
 								</h2>
 							</div>
