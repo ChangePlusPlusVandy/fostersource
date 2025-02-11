@@ -11,8 +11,6 @@ export const checkUser = async (req: Request, res: Response): Promise<void> => {
 		const { firebaseId } = req.query;
 		const firebaseToken = req.headers["firebase-token"];
 
-		console.log("trying to login");
-
 		if (!firebaseId || !firebaseToken) {
 			res.status(400).send({ message: "Missing required authentication data" });
 			return;

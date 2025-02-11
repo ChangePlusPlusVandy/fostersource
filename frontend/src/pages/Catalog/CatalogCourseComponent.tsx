@@ -77,11 +77,12 @@ export default function CatalogCourseComponent({
 				</div>
 
 				{/* Description */}
-				<p className="text-gray-600 mt-4 text-sm">{course.description}</p>
+				<p className="text-gray-600 mt-4 text-sm">{course.courseDescription}</p>
 
 				{/* Instructor */}
 				<p className="text-gray-500 text-sm mt-2">
-					<span className="font-semibold">Speaker:</span> {course.instructor}
+					<span className="font-semibold">Speaker:</span>{" "}
+					{course.instructorName}
 				</p>
 
 				<div className="flex items-center gap-4 mt-6">

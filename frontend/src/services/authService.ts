@@ -347,10 +347,6 @@ class AuthService {
 			const firebaseToken = await userCredential.user?.getIdToken();
 
 			const baseURL = "http://localhost:5001";
-			console.log(
-				"Making backend request to:",
-				`${baseURL}/api/login/register`
-			);
 
 			const response = await axios.post(
 				`${baseURL}/api/login/register`,

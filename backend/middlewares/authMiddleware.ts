@@ -156,7 +156,6 @@ export const verifyFirebaseAuth = async (
 		}
 
 		const decodedToken = await admin.auth().verifyIdToken(token);
-		console.log("✅ User is authenticated: ", decodedToken);
 
 		req.user = {
 			uid: decodedToken.uid,
