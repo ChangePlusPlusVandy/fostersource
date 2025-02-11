@@ -87,7 +87,9 @@ const AddDiscountModal: React.FC<AddDiscountModalProps> = ({ isOpen, onClose, on
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onAdd(newDiscount);
+    // Format the date to use slashes
+    const formattedDate = newDiscount.date.split('-').reverse().join('/');
+    onAdd({ ...newDiscount, date: formattedDate }); // Pass the formatted date
     setNewDiscount({ code: '', amount: 0, date: '', time: '', timeZone: '' });
     onClose();
   };
@@ -174,10 +176,10 @@ export default function DiscountsPage() {
 
   useEffect(() => {
     const updateItemsPerPage = () => {
-      const itemHeight = 100; 
+      const itemHeight = 100; // Approximate height of each discount item in pixels
       const windowHeight = window.innerHeight;
-      const headerHeight = 100;
-      const footerHeight = 50;
+      const headerHeight = 100; // Approximate height of header and other elements
+      const footerHeight = 50; // Approximate height of footer or pagination
 
       const availableHeight = windowHeight - headerHeight - footerHeight;
       const newItemsPerPage = Math.floor(availableHeight / itemHeight);
@@ -211,7 +213,7 @@ export default function DiscountsPage() {
 
   const totalPages = Math.ceil(discounts.length / itemsPerPage);
   const displayedDiscounts = discounts
-    .filter(discount => discount.code.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(discount => discount.code.toLowerCase().includes(searchQuery.toLowerCase())) // Filter based on search query
     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
@@ -227,7 +229,7 @@ export default function DiscountsPage() {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)} // Update search query
                 className="w-full pl-4 pr-16 py-3 rounded-lg border bg-white text-gray-800 placeholder-gray-400"
                 placeholder="Search discounts..."
               />
@@ -311,6 +313,7 @@ export default function DiscountsPage() {
         </div>
       </div>
 
+      {/* Modal for Adding Discount */}
       <AddDiscountModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
