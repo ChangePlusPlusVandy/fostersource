@@ -39,7 +39,7 @@ const Pagination = ({
           onClick={() => handlePageChange(page)}
           className={`px-4 py-2 min-w-[40px] ${
             currentPage === page 
-              ? 'text-white bg-[#8757a3]' 
+              ? 'text-white bg-[#8757a3] rounded-lg'
               : 'hover:bg-gray-50'
           }`}
         >
@@ -80,16 +80,40 @@ interface AddDiscountModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (newDiscount: { code: string; amount: number; date: string; time: string; timeZone: string }) => void;
+  discountToEdit?: Discount | null;
+  onUpdate?: (updatedDiscount: Discount) => void;
+  discounts: Discount[];
 }
 
-const AddDiscountModal: React.FC<AddDiscountModalProps> = ({ isOpen, onClose, onAdd }) => {
+const AddDiscountModal: React.FC<AddDiscountModalProps> = ({ isOpen, onClose, onAdd, discountToEdit, onUpdate, discounts }) => {
   const [newDiscount, setNewDiscount] = useState({ code: '', amount: 0, date: '', time: '', timeZone: '' });
+
+  useEffect(() => {
+    if (discountToEdit) {
+      setNewDiscount({
+        code: discountToEdit.code,
+        amount: discountToEdit.amount,
+        date: discountToEdit.date,
+        time: discountToEdit.time,
+        timeZone: discountToEdit.timeZone,
+      });
+    } else {
+      setNewDiscount({ code: '', amount: 0, date: '', time: '', timeZone: '' });
+    }
+  }, [discountToEdit]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Format the date to use slashes
     const formattedDate = newDiscount.date.split('-').reverse().join('/');
-    onAdd({ ...newDiscount, date: formattedDate }); // Pass the formatted date
+
+    if (discountToEdit) {
+      if (onUpdate) {
+        onUpdate({ ...discountToEdit, ...newDiscount, date: formattedDate });
+      }
+    } else {
+      const newId = Math.max(...discounts.map(d => d.id)) + 1;
+      onAdd({ id: newId, ...newDiscount, date: formattedDate, selected: false } as Discount);
+    }
     setNewDiscount({ code: '', amount: 0, date: '', time: '', timeZone: '' });
     onClose();
   };
@@ -99,7 +123,7 @@ const AddDiscountModal: React.FC<AddDiscountModalProps> = ({ isOpen, onClose, on
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-bold mb-4">Add Discount</h2>
+        <h2 className="text-xl font-bold mb-4">{discountToEdit ? 'Edit Discount' : 'Add Discount'}</h2>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -148,7 +172,7 @@ const AddDiscountModal: React.FC<AddDiscountModalProps> = ({ isOpen, onClose, on
           </select>
           <div className="flex justify-end">
             <button type="button" onClick={onClose} className="mr-2 text-gray-500">Cancel</button>
-            <button type="submit" className="bg-[#8757a3] text-white px-4 py-2 rounded-lg">Add Discount</button>
+            <button type="submit" className="bg-[#8757a3] text-white px-4 py-2 rounded-lg">{discountToEdit ? 'Update Discount' : 'Add Discount'}</button>
           </div>
         </form>
       </div>
@@ -173,13 +197,14 @@ export default function DiscountsPage() {
   ]);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [discountToEdit, setDiscountToEdit] = useState<Discount | null>(null);
 
   useEffect(() => {
     const updateItemsPerPage = () => {
-      const itemHeight = 100; // Approximate height of each discount item in pixels
+      const itemHeight = 100; 
       const windowHeight = window.innerHeight;
-      const headerHeight = 100; // Approximate height of header and other elements
-      const footerHeight = 50; // Approximate height of footer or pagination
+      const headerHeight = 100;
+      const footerHeight = 50;
 
       const availableHeight = windowHeight - headerHeight - footerHeight;
       const newItemsPerPage = Math.floor(availableHeight / itemHeight);
@@ -211,9 +236,20 @@ export default function DiscountsPage() {
     setDiscounts([...discounts, { id: newId, ...newDiscount, selected: false }]);
   };
 
+  const handleEditDiscount = (discount: Discount) => {
+    setDiscountToEdit(discount);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateDiscount = (updatedDiscount: Discount) => {
+    setDiscounts(discounts.map(d => (d.id === updatedDiscount.id ? updatedDiscount : d)));
+    setDiscountToEdit(null);
+    setIsModalOpen(false);
+  };
+
   const totalPages = Math.ceil(discounts.length / itemsPerPage);
   const displayedDiscounts = discounts
-    .filter(discount => discount.code.toLowerCase().includes(searchQuery.toLowerCase())) // Filter based on search query
+    .filter(discount => discount.code.toLowerCase().includes(searchQuery.toLowerCase()))
     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
@@ -229,7 +265,7 @@ export default function DiscountsPage() {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-4 pr-16 py-3 rounded-lg border bg-white text-gray-800 placeholder-gray-400"
                 placeholder="Search discounts..."
               />
@@ -293,7 +329,9 @@ export default function DiscountsPage() {
                 <div className="flex items-center justify-end space-x-8 flex-1">
                   <span className="text-gray-500">{discount.date} {discount.time} {discount.timeZone}</span>
                   <div className="flex gap-4">
-                    <button><Edit2 className="w-4 h-4 text-gray-400" /></button>
+                    <button onClick={() => handleEditDiscount(discount)}>
+                      <Edit2 className="w-4 h-4 text-gray-400" />
+                    </button>
                     <button onClick={() => handleDelete(discount.id)}>
                       <Trash2 className="w-4 h-4 text-gray-400" />
                     </button>
@@ -316,8 +354,14 @@ export default function DiscountsPage() {
       {/* Modal for Adding Discount */}
       <AddDiscountModal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+        onClose={() => {
+          setIsModalOpen(false);
+          setDiscountToEdit(null);
+        }} 
         onAdd={handleAddDiscount} 
+        discountToEdit={discountToEdit}
+        onUpdate={handleUpdateDiscount}
+        discounts={discounts}
       />
     </div>
   );
