@@ -228,7 +228,13 @@ export default function DiscountsPage() {
   };
 
   const handleDelete = (id: number) => {
-    setDiscounts(discounts.filter(d => d.id !== id));
+    const updatedDiscounts = discounts.filter(d => d.id !== id);
+    setDiscounts(updatedDiscounts);
+
+    const totalPages = Math.ceil(updatedDiscounts.length / itemsPerPage);
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages > 0 ? totalPages : 1);
+    }
   };
 
   const handleAddDiscount = (newDiscount: { code: string; amount: number; date: string; time: string; timeZone: string }) => {
@@ -282,7 +288,10 @@ export default function DiscountsPage() {
               <span style={{ color: '#8757a3' }}>{selectedCount} Selected</span>
               <button 
                 className="text-red-600 font-bold" 
-                onClick={() => setDiscounts(discounts.filter(d => !d.selected))}
+                onClick={() => {
+                  const selectedDiscounts = discounts.filter(d => d.selected);
+                  selectedDiscounts.forEach(discount => handleDelete(discount.id));
+                }}
               >
                 Delete
               </button>
@@ -291,7 +300,7 @@ export default function DiscountsPage() {
               className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
               style={{ backgroundColor: '#8757a3' }}
               onClick={() => {
-                setDiscountToEdit(null); // Reset for adding a new discount
+                setDiscountToEdit(null);
                 setIsModalOpen(true);
               }}
             >
@@ -360,7 +369,6 @@ export default function DiscountsPage() {
         </div>
       </div>
 
-      {/* Modal for Adding Discount */}
       <AddDiscountModal 
         isOpen={isModalOpen} 
         onClose={() => {
