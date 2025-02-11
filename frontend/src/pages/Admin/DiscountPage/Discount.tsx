@@ -11,7 +11,7 @@ interface Discount {
 
 const Pagination = ({ 
   currentPage = 1,
-  totalPages = 2,
+  totalPages = 1,
   onPageChange = (page: number) => console.log(page)
 }) => {
   const handlePageChange = (page: number) => {
@@ -59,13 +59,14 @@ const Pagination = ({
 
 export default function DiscountsPage() {
   const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Set the number of items per page
   const [discounts, setDiscounts] = useState<Discount[]>([
     ...Array(8).fill(null).map((_, i) => ({
       id: i + 1,
       code: 'newmexico',
       amount: 25.00,
       date: '09/01/2023 - 1:00AM (CDT)',
-      selected: i < 3
+      selected: false
     }))
   ]);
 
@@ -76,6 +77,13 @@ export default function DiscountsPage() {
       d.id === id ? { ...d, selected: !d.selected } : d
     ));
   };
+
+  const handleDelete = (id: number) => {
+    setDiscounts(discounts.filter(d => d.id !== id));
+  };
+
+  const totalPages = Math.ceil(discounts.length / itemsPerPage);
+  const displayedDiscounts = discounts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="w-full min-h-screen bg-gray-100">
@@ -103,7 +111,12 @@ export default function DiscountsPage() {
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-4">
               <span style={{ color: '#8757a3' }}>{selectedCount} Selected</span>
-              <button className="text-red-500">Delete</button>
+              <button 
+                className="text-red-600 font-bold" 
+                onClick={() => setDiscounts(discounts.filter(d => !d.selected))}
+              >
+                Delete
+              </button>
             </div>
             <button 
               className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
@@ -114,7 +127,7 @@ export default function DiscountsPage() {
           </div>
 
           <div className="space-y-3">
-            {discounts.map((discount) => (
+            {displayedDiscounts.map((discount) => (
               <div
                 key={discount.id}
                 className={`flex items-center justify-between w-full p-4 rounded-lg border`}
@@ -147,7 +160,9 @@ export default function DiscountsPage() {
                   <span className="text-gray-500">{discount.date}</span>
                   <div className="flex gap-4">
                     <button><Edit2 className="w-4 h-4 text-gray-400" /></button>
-                    <button><Trash2 className="w-4 h-4 text-gray-400" /></button>
+                    <button onClick={() => handleDelete(discount.id)}>
+                      <Trash2 className="w-4 h-4 text-gray-400" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -157,7 +172,7 @@ export default function DiscountsPage() {
           <div className="flex justify-end mt-6">
             <Pagination 
               currentPage={currentPage}
-              totalPages={2}
+              totalPages={totalPages || 1}
               onPageChange={setCurrentPage}
             />
           </div>
