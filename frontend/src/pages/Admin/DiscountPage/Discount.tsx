@@ -9,7 +9,77 @@ interface Discount {
   selected: boolean;
 }
 
+// Pagination component remains the same
+const Pagination = ({ 
+  currentPage = 1,
+  totalPages = 2,
+  onPageChange = (page: number) => console.log(page)
+}) => {
+  // ... existing Pagination code ...
+  return (
+    <div className="flex items-center rounded-full border bg-white overflow-hidden shadow-sm">
+      <button 
+        onClick={() => onPageChange(1)}
+        disabled={currentPage === 1}
+        className="px-3 py-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:hover:text-gray-400"
+        aria-label="First page"
+      >
+        &#171;
+      </button>
+
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        <button
+          key={page}
+          onClick={() => onPageChange(page)}
+          className={`px-4 py-2 min-w-[40px] ${
+            currentPage === page 
+              ? 'text-white bg-[#8757a3]' 
+              : 'hover:bg-gray-50'
+          }`}
+        >
+          {page}
+        </button>
+      ))}
+
+      <button 
+        onClick={() => onPageChange(totalPages)}
+        disabled={currentPage === totalPages}
+        className="px-3 py-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:hover:text-gray-400"
+        aria-label="Last page"
+      >
+        &#187;
+      </button>
+    </div>
+  );
+};
+
+const ResizeButton = ({ isExpanded, onClick }: { isExpanded: boolean; onClick: () => void }) => (
+  <button 
+    onClick={onClick}
+    className="border rounded p-1.5 hover:bg-gray-50 transition-colors"
+    aria-label={isExpanded ? "Collapse view" : "Expand view"}
+  >
+    <svg 
+      width="16" 
+      height="16" 
+      viewBox="0 0 16 16" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={`transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+    >
+      <path 
+        d="M1 15L15 15M1 1L15 1M3.5 3.5L1 1M3.5 3.5L1 6M3.5 3.5L6 1M12.5 3.5L15 1M12.5 3.5L15 6M12.5 3.5L10 1M3.5 12.5L1 15M3.5 12.5L1 10M3.5 12.5L6 15M12.5 12.5L15 15M12.5 12.5L15 10M12.5 12.5L10 15" 
+        stroke="currentColor" 
+        strokeWidth="1.5" 
+        strokeLinecap="round"
+      />
+    </svg>
+  </button>
+);
+
 export default function DiscountsPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [discounts, setDiscounts] = useState<Discount[]>([
     ...Array(8).fill(null).map((_, i) => ({
       id: i + 1,
@@ -28,18 +98,19 @@ export default function DiscountsPage() {
     ));
   };
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <div className="w-full min-h-screen bg-gray-100">
-      <div className="max-w-screen-2xl mx-auto px-8 py-6">
+    <div className={`w-full min-h-screen bg-gray-100 ${isExpanded ? 'p-0' : ''}`}>
+      <div className={`transition-all duration-300 ${
+        isExpanded ? 'max-w-none m-0' : 'max-w-screen-2xl mx-auto px-8'
+      } py-6`}>
         <div className="bg-white border rounded-lg p-6">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Discounts</h1>
-            <button className="border rounded p-1">
-              <svg className="w-4 h-4" viewBox="0 0 16 16">
-                <path d="M3 3h10v10H3z" fill="none" stroke="currentColor" strokeWidth="2"/>
-                <path d="M13 3v10M3 3v10" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-            </button>
+            <ResizeButton isExpanded={isExpanded} onClick={toggleExpand} />
           </div>
 
           <div className="mb-6">
@@ -107,14 +178,12 @@ export default function DiscountsPage() {
             ))}
           </div>
 
-          <div className="flex justify-end gap-2 mt-6">
-            <button className="p-2 border rounded-lg">&lt;</button>
-            <button 
-              className="p-2 text-white rounded-lg"
-              style={{ backgroundColor: '#8757a3' }}
-            >1</button>
-            <button className="p-2 border rounded-lg">2</button>
-            <button className="p-2 border rounded-lg">&gt;</button>
+          <div className="flex justify-end mt-6">
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={2}
+              onPageChange={setCurrentPage}
+            />
           </div>
         </div>
       </div>
