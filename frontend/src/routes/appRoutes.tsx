@@ -18,14 +18,15 @@ function AppRoutes() {
 					display: "flex",
 					flexDirection: "column",
 					height: "100vh",
-					backgroundColor: "#ebebeb",
+					// backgroundColor: "#ebebeb",
 				}}
+				className="bg-gray-100"
 			>
 				<div style={{ width: "100%" }}>
 					<HeaderBar isOpen={isHeaderBarOpen} setIsOpen={setIsHeaderBarOpen} />
 				</div>
 				<div style={{ display: "flex", flex: 1 }}>
-					<div style={{ display: "flex", alignItems: "center"}}>
+					<div style={{ display: "flex", alignItems: "center" }}>
 						<Sidebar
 							isCollapsed={isCollapsed}
 							setIsCollapsed={setIsCollapsed}
