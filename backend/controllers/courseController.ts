@@ -107,14 +107,14 @@ export const createCourse = async (
         if (
             !className ||
             isLive === undefined ||
-            !creditNumber ||
+            creditNumber === undefined ||
             !courseDescription ||
             !thumbnailPath ||
-            !cost ||
+            cost === undefined ||
             !lengthCourse ||
             !time ||
             !instructorName ||
-			!isInPerson
+			isInPerson === undefined
         ) {
             res.status(400).json({
                 success: false,
@@ -154,6 +154,7 @@ export const createCourse = async (
             lengthCourse,
             time,
             instructorName,
+            isInPerson
         });
 
 
@@ -168,7 +169,7 @@ export const createCourse = async (
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Internal service error.",
+            message: "Internal service error." + error,
         });
     }
 };

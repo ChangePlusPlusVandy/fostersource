@@ -1,5 +1,6 @@
 import { Course } from "../shared/types/course";
 import apiClient from "./apiClient";
+import {dummyCourses} from "../shared/DummyCourses";
 
 export async function addToCart(course: Course) {
 	let user = localStorage.getItem("user")
@@ -16,11 +17,11 @@ export async function addToCart(course: Course) {
 		className: course.className,
 		cost: course.cost,
 		creditNumber: course.creditNumber,
-		instructor: course.instructor,
+		instructor: course.instructorName,
 		_id: course._id
 	};
 	const isCourseInCart = user.cart.some(
-		(cartItem: any) => cartItem.className === cartCourseInfo.className
+		(cartItem: any) => cartItem._id === cartCourseInfo._id
 	);
 
 	if (!isCourseInCart) {
@@ -111,3 +112,17 @@ export async function registerFromCart(){
 		);
 	}
 }
+
+export async function insertCoursesIndividually(){
+	try {
+		for (const course of dummyCourses) {
+			const response = await apiClient.post("/courses", course);
+			console.log(`Course inserted: ${course.className}`, response.data);
+		}
+		console.log("All courses inserted successfully!");
+	} catch (error) {
+		// @ts-ignore
+		console.error("Error inserting courses:", error.response?.data || error.message);
+	}
+};
+

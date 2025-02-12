@@ -5,6 +5,7 @@ import CatalogCourseComponent from "./CatalogCourseComponent";
 import CatalogSearchBar from "./CatalogSearchBar";
 import { dummyCourses } from "../../shared/DummyCourses";
 import apiClient from "../../services/apiClient";
+import {addToCart, insertCoursesIndividually} from "../../services/registrationServices";
 
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
@@ -119,6 +120,12 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 		}
 	};
 
+	async function registerAll() {
+		await insertCoursesIndividually().then(() => {
+			console.log("Inserted!")
+		});
+	}
+
 	return (
 		<div className="min-h-screen w-full">
 			<div className="container mx-auto py-6">
@@ -141,6 +148,9 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 					)}
 				</div>
 			</div>
+			{/*<div>*/}
+			{/*	<p onClick={() => registerAll()}> DEBUG ONLY: Add all courses individually to mongo</p>*/}
+			{/*</div>*/}
 		</div>
 	);
 }

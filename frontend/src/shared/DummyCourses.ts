@@ -10,14 +10,15 @@ export const dummyCourses = [
 		discussion: "An interactive discussion about computational thinking.",
 		components: ["Lectures", "Labs", "Quizzes"],
 		handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-		ratings: [
-			{ userId: "user1", courseId: "cs101", rating: 2 },
-			{ userId: "user2", courseId: "cs101", rating: 2 },
-		],
+		ratings: [],
+		// ratings: [
+		// 	{ userId: "user1", courseId: "cs101", rating: 2 },
+		// 	{ userId: "user2", courseId: "cs101", rating: 2 },
+		// ],
 		isLive: false,
 		cost: 100,
 		categories: ["Technology"],
-		thumbnailPath: "",
+		thumbnailPath: "Blah",
 		lengthCourse: 10, // Example: duration in weeks
 		time: new Date("2025-03-01T10:00:00Z"), // Example date
 		isInPerson: false,
@@ -38,7 +39,7 @@ export const dummyCourses = [
 		isLive: false,
 		cost: 0,
 		categories: [],
-		thumbnailPath: "",
+		thumbnailPath: "Blah",
 		lengthCourse: 12, // Example duration
 		time: new Date("2025-04-10T15:00:00Z"), // Example date
 		isInPerson: true,
@@ -56,14 +57,15 @@ export const dummyCourses = [
 			"Weekly discussions about classic and modern philosophical texts.",
 		components: ["Lectures", "Essays", "Group Work"],
 		handouts: ["syllabus.pdf", "plato.pdf", "kant.pdf"],
-		ratings: [
-			{ userId: "user1", courseId: "cs101", rating: 2 },
-			{ userId: "user2", courseId: "cs101", rating: 2 },
-		],
+		ratings: [],
+		// ratings: [
+		// 	{ userId: "user1", courseId: "cs101", rating: 2 },
+		// 	{ userId: "user2", courseId: "cs101", rating: 2 },
+		// ],
 		isLive: true,
 		cost: 200,
 		categories: [],
-		thumbnailPath: "",
+		thumbnailPath: "Blah",
 		lengthCourse: 8, // Example duration
 		time: new Date("2025-02-20T12:00:00Z"), // Example date
 		isInPerson: false,
