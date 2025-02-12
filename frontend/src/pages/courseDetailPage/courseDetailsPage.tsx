@@ -76,7 +76,6 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const fetchCourses = async () => {
 		try {
 			const response = await apiClient.get("/courses");
-			console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
@@ -91,7 +90,6 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	useEffect(() => {
 		async function fetchCourses() {
 			try {
-				console.log(courseId)
 				const response = await apiClient.get(`/courses/${courseId}`);
 				setCourseDetailsData(response.data.data)
 			} catch (error) {
@@ -103,10 +101,8 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 
 	useEffect(() => {
 		if (!courseDetailsData) {
-			console.log("Error in fetching data");
 		} else {
 			if (courseDetailsData.ratings.length !== 0) {
-				console.log(courseDetailsData.time);
 				let average = 0;
 				let num = 0;
 				let times = 0;

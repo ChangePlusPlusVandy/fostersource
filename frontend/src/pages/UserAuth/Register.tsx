@@ -24,9 +24,7 @@ const Register: React.FC = () => {
 		}
 
 		try {
-			console.log("Starting registration process...");
 			await authService.register(email, password, name);
-			console.log("Registration successful!");
 			window.location.href = "/catalog";
 		} catch (err: any) {
 			console.error("Registration error:", err);
