@@ -315,7 +315,13 @@ export default function DiscountsPage() {
 
   const handleAddDiscount = (newDiscount: { code: string; amount: number; date: string; time: string; timeZone: string }) => {
     const newId = discounts.length ? Math.max(...discounts.map(d => d.id)) + 1 : 1;
-    setDiscounts([...discounts, { id: newId, ...newDiscount, selected: false }]);
+    const updatedDiscounts = [...discounts, { id: newId, ...newDiscount, selected: false }];
+    setDiscounts(updatedDiscounts);
+    
+
+    const totalItems = updatedDiscounts.length;
+    const newPage = Math.ceil(totalItems / itemsPerPage);
+    setCurrentPage(newPage);
   };
 
   const handleEditDiscount = (discount: Discount) => {
@@ -329,7 +335,11 @@ export default function DiscountsPage() {
     setIsModalOpen(false);
   };
 
-  const totalPages: number = Math.ceil(discounts.length / itemsPerPage);
+  const totalPages: number = Math.ceil(
+    discounts.filter(discount => discount.code.toLowerCase().includes(searchQuery.toLowerCase())).length 
+    / itemsPerPage
+  );
+
   const displayedDiscounts = discounts
     .filter(discount => discount.code.toLowerCase().includes(searchQuery.toLowerCase()))
     .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
