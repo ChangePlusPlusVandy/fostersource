@@ -71,7 +71,7 @@ const userSchema: Schema = new Schema(
 				ref: "Payment",
 			},
 		],
-		cart: { type: String, required: false },
+		cart: { type: String, required: false, default: "[]" },
 	},
 	{
 		timestamps: true,

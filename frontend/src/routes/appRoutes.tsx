@@ -28,8 +28,9 @@ function AppRoutes() {
 
 	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
 	const [cartItemCount, setCartItemCount] = useState(
-		localStorage.user && JSON.parse(localStorage.user).cart
-			? JSON.parse(JSON.parse(localStorage.user).cart).length
+		localStorage.user &&
+		JSON.parse(localStorage.user).cart
+			? JSON.parse(localStorage.user).cart.length
 			: 0
 	);
 

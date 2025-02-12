@@ -10,7 +10,6 @@ export const getCourses = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		console.log("called");
 		const filters = req.query;
 
 		// Populate ratings and components fields as needed

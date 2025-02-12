@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import { Course } from "../../shared/types/course";
-import { dummyCourses } from "../../shared/DummyCourses";
-import { removeFromCart } from "../../services/registrationServices";
+import {registerFromCart, removeFromCart} from "../../services/registrationServices";
+
 interface CartItem {
 	className: string;
 	cost: number;
 	creditNumber: number;
 	instructor: string;
+	_id: string
 }
 export default function Cart() {
+
 	const user = JSON.parse(localStorage.getItem("user") || "{}");
-	const cartItems: CartItem[] = user?.cart ? JSON.parse(user.cart) : [];
+	const cartItems: CartItem[] = user?.cart ? user.cart : [];
 	const totalCost = cartItems.reduce((sum, item) => sum + item.cost, 0);
 
 	const handleRemoveItem = (course: {
@@ -23,13 +23,7 @@ export default function Cart() {
 	};
 
 	const handleCheckout = (): void => {
-		alert("Thank you for your purchase!");
-		// Clear the cart after purchase
-		if (user) {
-			user.cart = [];
-			localStorage.setItem("user", JSON.stringify(user));
-		}
-		window.location.reload(); // Refresh the page
+		registerFromCart()
 	};
 
 	return (

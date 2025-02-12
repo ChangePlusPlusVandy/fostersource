@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import User from "../models/userModel";
 import Progress from "../models/progressModel";
 import Payment from "../models/paymentModel";
+import Course from "../models/courseModel";
+import mongoose from "mongoose";
 
 // @desc    Get all users or by filter
 // @route   GET /api/users
@@ -99,7 +101,7 @@ export const updateUser = async (
 
 		res.status(200).json(updatedUser);
 	} catch (error) {
-		res.status(400).json({ message: "Failed to update user", error });
+		res.status(400).json({ message: "Failed to update user: ", error });
 	}
 };
 
@@ -140,3 +142,76 @@ export const deleteUser = async (
 		});
 	}
 };
+
+// @desc    Registers users
+// @route   PUT /api/users/register
+// @access  Public
+export const register = async (req: Request, res: Response): Promise<void> => {
+	try {
+		const { userId, courseIds } = req.body;
+
+		// Validate input
+		if (!userId || !Array.isArray(courseIds) || courseIds.length === 0) {
+			res.status(400).json({
+				success: false,
+				message: "Please provide a valid userId and an array of courseIds.",
+			});
+			return;
+		}
+
+		// Check if user exists
+		const user = await User.findById(userId);
+		if (!user) {
+			res.status(404).json({
+				success: false,
+				message: "User not found.",
+			});
+			return;
+		}
+
+		// Process each course
+		const progressPromises = courseIds.map(async (courseId: string) => {
+			// Check if course exists
+			const course = await Course.findById(courseId);
+			if (!course) {
+				throw new Error(`Course with ID ${courseId} not found.`);
+			}
+
+			// Create a progress document for the user
+			const progress = new Progress({
+				user: new mongoose.Types.ObjectId(userId),
+				course: new mongoose.Types.ObjectId(courseId),
+				isComplete: false,
+				completedComponents: {},
+				dateCompleted: null,
+			});
+			await progress.save();
+
+			// Add the user to the course's students list if not already added
+			if (!course.students.includes(new mongoose.Types.ObjectId(userId))) {
+				course.students.push(new mongoose.Types.ObjectId(userId));
+				await course.save();
+			}
+
+			return progress;
+		});
+
+		// Wait for all progress documents to be created
+		const progressResults = await Promise.all(progressPromises);
+
+		res.status(201).json({
+			success: true,
+			message: "User registered to courses successfully.",
+			progress: progressResults,
+		});
+
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			// @ts-ignore
+			message: error.message || "Internal server error.",
+		});
+	}
+};
+
+
