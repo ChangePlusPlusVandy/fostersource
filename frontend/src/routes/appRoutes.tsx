@@ -49,8 +49,9 @@ function AppRoutes() {
 					display: "flex",
 					flexDirection: "column",
 					height: "100vh",
-					backgroundColor: "#eeeeee",
+					// backgroundColor: "#ebebeb",
 				}}
+				className="bg-gray-100"
 			>
 				<GlobalBlackBar />
 				<div style={{ width: "100%" }}>

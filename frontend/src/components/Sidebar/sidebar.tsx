@@ -59,7 +59,7 @@ export const items = [
 	{
 		icon: <Phone />,
 		description: "Contact",
-		href: "#",
+		href: "mailto:info@fostersource.org",
 	},
 ];
 
@@ -145,7 +145,6 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 					src={
 						"https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png"
 					}
-					// src="assets/cute_ghost.jpeg"
 					alt="Profile"
 					className="profile-pic"
 				/>

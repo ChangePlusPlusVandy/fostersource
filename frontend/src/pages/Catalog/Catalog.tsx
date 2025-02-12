@@ -1,4 +1,5 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Course } from "../../shared/types/course";
 import CatalogCourseComponent from "./CatalogCourseComponent";
 import CatalogSearchBar from "./CatalogSearchBar";
@@ -10,6 +11,7 @@ interface CatalogProps {
 }
 export default function Catalog({ setCartItemCount }: CatalogProps) {
 	const [courses, setCourses] = useState<Course[]>([]);
+	const location = useLocation();
 	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -18,6 +20,7 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 	const [selectedFormat, setSelectedFormat] = useState<string>("All");
 	const [selectedCost, setSelectedCost] = useState<string>("All");
 
+	// Read query parameters from the URL and apply filters
 	useEffect(() => {
 		async function fetchData() {
 			try {
@@ -30,9 +33,19 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 		}
 		fetchData();
 	}, []);
+	useEffect(() => {
+		const params = new URLSearchParams(location.search);
+		const formatFilter = params.get("format");
 
+		if (formatFilter) {
+			setSelectedFormat(formatFilter);
+		}
+	}, [location.search]);
+
+	// Apply filters when the state changes
 	useEffect(() => {
 		let filtered = courses;
+
 		if (searchQuery !== "") {
 			filtered = filtered.filter((course) =>
 				course.className.toLowerCase().includes(searchQuery.toLowerCase())
@@ -62,16 +75,15 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 		}
 
 		if (selectedFormat !== "All") {
-			if (selectedFormat === "Live") {
-				filtered = filtered.filter((course) => course.isLive);
-			} else {
-				filtered = filtered.filter((course) => !course.isLive);
-			}
+			filtered = filtered.filter((course) =>
+				selectedFormat === "Live" ? course.isLive : !course.isLive
+			);
 		}
 
 		if (selectedCost !== "All") {
 			filtered = filtered.filter((course) => course.cost === 0);
 		}
+
 		setFilteredCourses(filtered);
 	}, [
 		searchQuery,
@@ -80,6 +92,7 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 		selectedCredits,
 		selectedFormat,
 		selectedCost,
+		courses,
 	]);
 
 	const handleSearch = (query: string) => {
@@ -90,7 +103,6 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 		switch (filterType) {
 			case "category":
 				setSelectedCategory(filterValue);
-				console.log("Not Implemented");
 				break;
 			case "rating":
 				setSelectedRating(filterValue);
@@ -114,18 +126,19 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 				<CatalogSearchBar
 					onSearch={handleSearch}
 					updateFilters={updateFilters}
+					initialFormat={selectedFormat}
 				/>
 			</div>
 
 			<div className="container mx-auto">
 				<div className="flex flex-col gap-6">
-					{filteredCourses.map((course, index) => (
-						<CatalogCourseComponent
-							key={index}
-							course={course}
-							setCartItemCount={setCartItemCount}
-						/>
-					))}
+					{filteredCourses.length > 0 ? (
+						filteredCourses.map((course, index) => (
+							<CatalogCourseComponent key={index} course={course} setCartItemCount={setCartItemCount} />
+						))
+					) : (
+						<p className="text-gray-600 text-center">No courses found.</p>
+					)}
 				</div>
 			</div>
 		</div>

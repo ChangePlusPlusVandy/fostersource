@@ -115,6 +115,12 @@ describe("DELETE /api/ratings/:id", () => {
 		const course = await Course.create({
 			ratings: [],
 			className: "Sample Course",
+			components: [],
+			cost: 0,
+			thumbnailPath: "chungus",
+			description: "chungus",
+			creditNumber: 0,
+			isLive: false,
 		});
 
 		const rating = await Rating.create({
