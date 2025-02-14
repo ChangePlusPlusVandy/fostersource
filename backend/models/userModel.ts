@@ -27,6 +27,7 @@ export interface IUser extends Document {
 	phone: string;
 	progress: IProgress;
 	payments: IPayment;
+	cart: string;
 }
 
 const userSchema: Schema = new Schema(
@@ -60,16 +61,17 @@ const userSchema: Schema = new Schema(
 		phone: { type: String, required: true },
 		progress: [
 			{
-				type: mongoose.Schema.Types.ObjectId,
+				type: Schema.Types.ObjectId,
 				ref: "Progress",
 			},
 		],
 		payments: [
 			{
-				type: mongoose.Schema.Types.ObjectId,
+				type: Schema.Types.ObjectId,
 				ref: "Payment",
 			},
 		],
+		cart: { type: String, required: false, default: "[]" },
 	},
 	{
 		timestamps: true,

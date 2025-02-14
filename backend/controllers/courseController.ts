@@ -33,6 +33,47 @@ export const getCourses = async (
     }
 };
 
+// @desc    Get a specific course by a valid id
+// @route   GET /api/courses/:id
+// @access  Public
+export const getCourseById = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { id } = req.params; // Get the course ID from the URL params
+
+		if (id) {
+			// Find course by ID and populate related fields
+			const course = await Course.findById(id)
+				.populate(["ratings", "components"])
+				.exec();
+
+			if (!course) {
+				res.status(404).json({
+					success: false,
+					message: "Course not found.",
+				});
+				return;
+			}
+
+			res.status(200).json({
+				success: true,
+				data: course,
+			});
+		} else {
+			res.status(401).json({
+				success: false,
+				message: "Invalid ID",
+			});
+		}
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: "Internal service error.",
+		});
+	}
+};
 
 // @desc    Create a new course
 // @route   POST /api/courses
@@ -62,19 +103,18 @@ export const createCourse = async (
 			isInPerson,
         } = req.body;
 
-
         // Validate required fields
         if (
             !className ||
             isLive === undefined ||
-            !creditNumber ||
+            creditNumber === undefined ||
             !courseDescription ||
             !thumbnailPath ||
-            !cost ||
+            cost === undefined ||
             !lengthCourse ||
             !time ||
             !instructorName ||
-			!isInPerson
+			isInPerson === undefined
         ) {
             res.status(400).json({
                 success: false,
@@ -114,6 +154,7 @@ export const createCourse = async (
             lengthCourse,
             time,
             instructorName,
+            isInPerson
         });
 
 
@@ -128,7 +169,7 @@ export const createCourse = async (
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: "Internal service error.",
+            message: "Internal service error." + error,
         });
     }
 };

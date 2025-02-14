@@ -1,8 +1,4 @@
-export type Rating = {
-	userId: string;
-	courseId: string;
-	rating: number;
-};
+import {Rating} from "./rating";
 
 export type Course = {
 	handouts: string[];
@@ -15,6 +11,7 @@ export type Course = {
 	creditNumber: number;
 	courseDescription: string;
 	thumbnailPath: string;
+	_id: string;
 	cost: number;
 	instructorName: string;
 	instructorDescription: string;

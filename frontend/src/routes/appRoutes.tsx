@@ -17,6 +17,8 @@ import ResetPassword from "../pages/UserAuth/resetPassword";
 import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
+import Dashboard from "../pages/Dashboard/dashboard";
+import Cart from "../pages/CartPage/cart";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -25,6 +27,12 @@ function AppRoutes() {
 	);
 
 	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
+	const [cartItemCount, setCartItemCount] = useState(
+		localStorage.user &&
+		JSON.parse(localStorage.user).cart
+			? JSON.parse(localStorage.user).cart.length
+			: 0
+	);
 
 	const PrivateRoute = ({ children }: { children: JSX.Element }) => {
 		if (isLoggedIn) {
@@ -62,6 +70,7 @@ function AppRoutes() {
 						setIsCollapsed={setIsCollapsed}
 						isLoggedIn={isLoggedIn}
 						setIsLoggedIn={setIsLoggedIn}
+						cartItemCount={cartItemCount}
 					/>
 				</div>
 				<div
@@ -79,7 +88,23 @@ function AppRoutes() {
 							path="/catalog"
 							element={
 								<PrivateRoute>
-									<Catalog />
+									<Catalog setCartItemCount={setCartItemCount} />
+								</PrivateRoute>
+							}
+						/>
+						<Route
+							path="/dashboard"
+							element={
+								<PrivateRoute>
+									<Dashboard />
+								</PrivateRoute>
+							}
+						/>
+						<Route
+							path="/cart"
+							element={
+								<PrivateRoute>
+									<Cart />
 								</PrivateRoute>
 							}
 						/>
@@ -90,7 +115,10 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
-						<Route path="/courseDetails" element={<CoursePage />} />
+						<Route
+							path="/courseDetails"
+							element={<CoursePage setCartItemCount={setCartItemCount} />}
+						/>
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (

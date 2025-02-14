@@ -20,7 +20,8 @@ export interface ICourse extends Document {
     lengthCourse: number;
     time: Date;
 	isInPerson: boolean;
-}
+    students: mongoose.Types.ObjectId[]; //for the users
+     }
 
 
 const CourseSchema: Schema = new Schema(
@@ -46,7 +47,13 @@ const CourseSchema: Schema = new Schema(
         lengthCourse: {type: Number, required: true},
         time: {type: Date, required: true},
         instructorName: {type: String, required: true},
-		isInPerson: {type: Boolean, required: true}
+		isInPerson: {type: Boolean, required: true},
+        students: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ]
     },
     {
         timestamps: true,

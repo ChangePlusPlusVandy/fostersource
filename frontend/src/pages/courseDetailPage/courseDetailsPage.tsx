@@ -1,19 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {
-	Link,
-	useSearchParams,
 	useNavigate,
 	useParams,
 } from "react-router-dom";
-import { fetchCourseDetails } from "../../services/courseDetailServices";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
-import { dummyCourses } from "../../shared/DummyCourses";
 
-import { Course, Rating } from "../../shared/types/course";
-// import axios from "../../services/axiosConfig";
+import { Course } from "../../shared/types/course";
+import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
-
-type Component = Survey | Video;
 
 // Survey with a type field
 interface Video {
@@ -30,10 +24,13 @@ interface Survey {
 	_id: string;
 	questions: string[];
 }
-
-const CoursePage: React.FC = () => {
+interface CatalogProps {
+	setCartItemCount: Dispatch<SetStateAction<number>>;
+}
+const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const { courseId } = useParams<{ courseId: string }>();
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
+		_id: "",
 		className: "Introduction to Computer Science",
 		courseDescription:
 			"Learn the basics of computer science, programming, and problem-solving.",
@@ -79,7 +76,6 @@ const CoursePage: React.FC = () => {
 	const fetchCourses = async () => {
 		try {
 			const response = await apiClient.get("/courses");
-			console.log(response.data);
 		} catch (error) {
 			console.error(error);
 		}
@@ -92,63 +88,21 @@ const CoursePage: React.FC = () => {
 	//=============================================================
 
 	useEffect(() => {
-		const fetchData = async () => {
-			if (!courseId) {
-				console.error("No Id detected");
-				return;
+		async function fetchCourses() {
+			try {
+				const response = await apiClient.get(`/courses/${courseId}`);
+				setCourseDetailsData(response.data.data)
+			} catch (error) {
+				console.error(error);
 			}
-			// try {
-			//   const courseDetails: Course = await fetchCourseDetails(courseId);
-			//   setCourseDetailsData(courseDetails);
-			//   if (courseDetails) {
-			//     const surveys = courseDetails.components.filter(
-			//       (component): component is Survey => component.type === "Survey"
-			//     );
-			//     const totalQuestions = surveys.reduce(
-			//       (sum, survey) => sum + survey.questions.length,
-			//       0
-			//     );
-			//     setSurveyLength(totalQuestions);
-			//     const credit = courseDetails.creditNumber
-			//     setCreditHours(credit)
-			//     setThumbnailpath(courseDetails.thumbnailPath)
-			//   }
-
-			// } catch (e) {
-			//   console.error("Error loading course data");
-
-			// }
-
-			const dummyData = {
-				className: "Introduction to Computer Science",
-				courseDescription:
-					"Learn the basics of computer science, programming, and problem-solving.",
-				instructorName: "Dr. Alice Johnson",
-				creditNumber: 3,
-				discussion: "An interactive discussion about computational thinking.",
-				components: ["Lectures", "Labs", "Quizzes"],
-				handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-				ratings: [],
-				isLive: false,
-				cost: 100,
-				categories: ["Technology"],
-				thumbnailPath: "",
-				instructorDescription: "PhD at Vandy",
-				instructorRole: "Moderator",
-				lengthCourse: 2,
-				time: new Date("2025-12-16T00:00:00.000Z"),
-				isInPerson: true,
-			};
-			setCourseDetailsData(dummyData);
-		};
-		fetchData();
+		}
+		fetchCourses();
 	}, []);
+
 	useEffect(() => {
 		if (!courseDetailsData) {
-			console.log("Error in fetching data");
 		} else {
 			if (courseDetailsData.ratings.length !== 0) {
-				console.log(courseDetailsData.time);
 				let average = 0;
 				let num = 0;
 				let times = 0;

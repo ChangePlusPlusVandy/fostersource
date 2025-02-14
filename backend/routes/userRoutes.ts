@@ -4,6 +4,7 @@ import {
 	getOrCreateUser,
 	updateUser,
 	deleteUser,
+	register,
 } from "../controllers/userController";
 
 const router = express.Router();
@@ -19,5 +20,8 @@ router.put("/:id", updateUser);
 
 // DELETE user by ID
 router.delete("/:id", deleteUser);
+
+// PUT Registers a user for a bunch of classes
+router.post("/register", register);
 
 export default router;

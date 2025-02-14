@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Progress, { IProgress } from "../models/progressModel";
+import User from "../models/userModel";
 
 // @desc    Get all progress or filter by query parameters
 // @route   GET /api/progress
@@ -76,5 +77,48 @@ export const deleteProgress = async (
 		res.status(204).send(); // Send a 204 No Content response
 	} catch (error) {
 		res.status(500);
+	}
+};
+
+
+// @desc    Registers users
+// @route   PUT /api/users/register
+// @access  Public
+export const getUserProgresses = async (req: Request, res: Response): Promise<void> => {
+	try {
+		const { userId } = req.params;
+
+		// Validate input
+		if (!userId) {
+			res.status(400).json({
+				success: false,
+				message: "User ID is required.",
+			});
+			return;
+		}
+
+		// Check if the user exists
+		const user = await User.findById(userId);
+		if (!user) {
+			res.status(404).json({
+				success: false,
+				message: "User not found.",
+			});
+			return;
+		}
+
+		// Fetch all progress records for the user
+		const progresses = await Progress.find({ user: userId }).populate("course");
+
+		res.status(200).json({
+			success: true,
+			progresses,
+		});
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			// @ts-ignore
+			message: error.message || "Internal server error.",
+		});
 	}
 };
