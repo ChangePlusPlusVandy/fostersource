@@ -1,20 +1,22 @@
-export type Rating = {
-	userId: string;
-	courseId: string;
-	rating: number;
-};
+import {Rating} from "./rating";
 
 export type Course = {
-	className: string;
-	description: string;
-	instructor: string;
-	creditNumber: number;
-	discussion: string;
-	components: any[];
 	handouts: string[];
 	ratings: Rating[];
+	className: string;
+	discussion: string;
+	components: String[];
 	isLive: boolean;
-	cost: number;
 	categories: string[];
+	creditNumber: number;
+	courseDescription: string;
 	thumbnailPath: string;
+	_id: string;
+	cost: number;
+	instructorName: string;
+	instructorDescription: string;
+	instructorRole: string;
+	lengthCourse: number;
+	time: Date;
+	isInPerson: Boolean;
 };

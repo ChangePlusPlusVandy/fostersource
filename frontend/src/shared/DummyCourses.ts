@@ -1,56 +1,73 @@
 export const dummyCourses = [
 	{
 		className: "Introduction to Computer Science",
-		description:
+		courseDescription:
 			"Learn the basics of computer science, programming, and problem-solving.",
-		instructor: "Dr. Alice Johnson",
+		instructorName: "Dr. Alice Johnson",
+		instructorDescription: "Expert in computer science education and research.",
+		instructorRole: "Professor of Computer Science",
 		creditNumber: 3,
 		discussion: "An interactive discussion about computational thinking.",
 		components: ["Lectures", "Labs", "Quizzes"],
 		handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-		ratings: [
-			{ userId: "user1", courseId: "cs101", rating: 2 },
-			{ userId: "user2", courseId: "cs101", rating: 2 },
-		],
+		ratings: [],
+		// ratings: [
+		// 	{ userId: "user1", courseId: "cs101", rating: 2 },
+		// 	{ userId: "user2", courseId: "cs101", rating: 2 },
+		// ],
 		isLive: false,
 		cost: 100,
 		categories: ["Technology"],
-		thumbnailPath: "",
+		thumbnailPath: "Blah",
+		lengthCourse: 10, // Example: duration in weeks
+		time: new Date("2025-03-01T10:00:00Z"), // Example date
+		isInPerson: false,
 	},
 	{
 		className: "Advanced Mathematics",
-		description: "Dive into complex mathematical theories and applications.",
-		instructor: "Professor Bob Smith",
+		courseDescription:
+			"Dive into complex mathematical theories and applications.",
+		instructorName: "Professor Bob Smith",
+		instructorDescription:
+			"Renowned mathematician specializing in applied mathematics.",
+		instructorRole: "Professor of Mathematics",
 		creditNumber: 4,
 		discussion: "Weekly seminars focusing on real-world problem-solving.",
 		components: ["Lectures", "Projects", "Exams"],
 		handouts: ["syllabus.pdf", "formulas.pdf"],
-		ratings: [
-			// { userId: "user3", courseId: "math201", rating: 4 },
-			// { userId: "user4", courseId: "math201", rating: 3 },
-		],
+		ratings: [], // Empty array since ratings were commented out
 		isLive: false,
 		cost: 0,
 		categories: [],
-		thumbnailPath: "",
+		thumbnailPath: "Blah",
+		lengthCourse: 12, // Example duration
+		time: new Date("2025-04-10T15:00:00Z"), // Example date
+		isInPerson: true,
 	},
 	{
 		className: "Introduction to Philosophy",
-		description:
+		courseDescription:
 			"Explore the foundational questions of human existence and thought.",
-		instructor: "Dr. Clara Davis",
+		instructorName: "Dr. Clara Davis",
+		instructorDescription:
+			"Philosopher and researcher in ethics and metaphysics.",
+		instructorRole: "Professor of Philosophy",
 		creditNumber: 3,
 		discussion:
 			"Weekly discussions about classic and modern philosophical texts.",
 		components: ["Lectures", "Essays", "Group Work"],
 		handouts: ["syllabus.pdf", "plato.pdf", "kant.pdf"],
-		ratings: [
-			{ userId: "user5", courseId: "phil101", rating: 4 },
-			{ userId: "user6", courseId: "phil101", rating: 4 },
-		],
+		ratings: [],
+		// ratings: [
+		// 	{ userId: "user1", courseId: "cs101", rating: 2 },
+		// 	{ userId: "user2", courseId: "cs101", rating: 2 },
+		// ],
 		isLive: true,
 		cost: 200,
 		categories: [],
-		thumbnailPath: "",
+		thumbnailPath: "Blah",
+		lengthCourse: 8, // Example duration
+		time: new Date("2025-02-20T12:00:00Z"), // Example date
+		isInPerson: false,
 	},
 ];

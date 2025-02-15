@@ -1,164 +1,212 @@
 import request from "supertest";
 import app from "../app";
-import Survey from "../models/surveyModel";
+import Handout from "../models/handoutModel";
 import mongoose from "mongoose";
-import Question from "../models/questionModel";
 
-const questionData = {
-	question: "What is 2 + 2?",
-	isMCQ: true,
-	answers: ["2", "3", "4", "5"],
+// Mock the Handout model
+jest.mock("../models/handoutModel");
+const mockHandout = Handout as jest.Mocked<typeof Handout>;
+
+const handoutData1 = {
+    _id: new mongoose.Types.ObjectId(),
+    courseId: "COURSE101",
+    fileUrl: "https://example.com/handout1.pdf",
+    fileType: "pdf"
 };
 
-let surveyData1: { id: string; question: mongoose.Types.ObjectId[] };
-let surveyData2: { id: string; question: mongoose.Types.ObjectId[] };
+const handoutData2 = {
+    _id: new mongoose.Types.ObjectId(),
+    courseId: "COURSE102",
+    fileUrl: "https://example.com/handout2.docx",
+    fileType: "docx"
+};
 
-beforeAll(async () => {
-	// Create actual question documents
-	const question1 = await Question.create(questionData);
-	const question2 = await Question.create({
-		...questionData,
-		question: "What is 3 + 3?",
-	});
+describe("GET /api/handouts", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
-	surveyData1 = {
-		id: "12345",
-		question: [question1._id as mongoose.Types.ObjectId],
-	};
+    it("should retrieve all handouts", async () => {
+        mockHandout.find.mockResolvedValue([handoutData1, handoutData2]);
 
-	surveyData2 = {
-		id: "54321",
-		question: [question2._id as mongoose.Types.ObjectId],
-	};
+        const res = await request(app).get("/api/handouts");
+        
+        expect(res.statusCode).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(Array.isArray(res.body.data)).toBe(true);
+        expect(res.body.data.length).toBe(2);
+        expect(mockHandout.find).toHaveBeenCalledWith({});
+    });
+
+    it("should retrieve handouts filtered by courseId", async () => {
+        mockHandout.find.mockResolvedValue([handoutData1]);
+
+        const res = await request(app)
+            .get("/api/handouts")
+            .query({ courseId: "COURSE101" });
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.length).toBe(1);
+        expect(res.body.data[0].courseId).toBe("COURSE101");
+        expect(mockHandout.find).toHaveBeenCalledWith({ courseId: "COURSE101" });
+    });
+
+    it("should handle server errors", async () => {
+        mockHandout.find.mockRejectedValue(new Error("Database error"));
+
+        const res = await request(app).get("/api/handouts");
+
+        expect(res.statusCode).toBe(500);
+        expect(res.body.success).toBe(false);
+        expect(res.body.message).toBe("Server Error");
+    });
 });
 
-describe("GET /api/surveys", () => {
-	beforeEach(async () => {
-		// First create the questions
-		const question1 = await Question.create({
-			question: "What is 2 + 2?",
-			isMCQ: true,
-			answers: ["2", "3", "4", "5"],
-		});
+describe("POST /api/handouts", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
-		const question2 = await Question.create({
-			question: "What is 3 + 3?",
-			isMCQ: true,
-			answers: ["4", "5", "6", "7"],
-		});
+    it("should create a new handout", async () => {
+        const newHandoutData = {
+            courseId: "COURSE103",
+            fileUrl: "https://example.com/handout3.pdf",
+            fileType: "pdf"
+        };
 
-		// Then create surveys with the actual question IDs
-		await Survey.create([
-			{
-				id: "12345",
-				question: [question1._id],
-			},
-			{
-				id: "54321",
-				question: [question2._id],
-			},
-		]);
-	});
+        // Mock the save method
+        mockHandout.prototype.save.mockResolvedValue({
+            _id: new mongoose.Types.ObjectId(),
+            ...newHandoutData
+        });
 
-	it("should retrieve all surveys with their questions", async () => {
-		const res = await request(app).get("/api/surveys");
-		expect(res.statusCode).toBe(200);
-		expect(Array.isArray(res.body)).toBe(true);
-		expect(res.body.length).toBe(2);
-		// Verify questions are populated
-		expect(["What is 2 + 2?", "What is 3 + 3?"]).toContain(
-			res.body[0].question[0].question
-		);
-	});
+        const res = await request(app)
+            .post("/api/handouts")
+            .send(newHandoutData);
 
-	it("should retrieve surveys by filter", async () => {
-		const res = await request(app).get("/api/surveys").query({ id: "12345" });
-		expect(res.statusCode).toBe(200);
-		expect(res.body.length).toBe(1);
-		expect(res.body[0].id).toBe("12345");
-		expect(res.body[0].question[0].question).toBe("What is 2 + 2?");
-	});
+        expect(res.statusCode).toBe(201);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.courseId).toBe(newHandoutData.courseId);
+    });
+
+    it("should return 400 if required fields are missing", async () => {
+        const incompleteData = {
+            courseId: "COURSE103"
+            // Missing fileUrl and fileType
+        };
+
+        const res = await request(app)
+            .post("/api/handouts")
+            .send(incompleteData);
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.success).toBe(false);
+        expect(res.body.message).toBe("Please provide courseId, fileUrl, and fileType");
+    });
+
+    it("should handle server errors during creation", async () => {
+        const newHandoutData = {
+            courseId: "COURSE103",
+            fileUrl: "https://example.com/handout3.pdf",
+            fileType: "pdf"
+        };
+
+        mockHandout.prototype.save.mockRejectedValue(new Error("Database error"));
+
+        const res = await request(app)
+            .post("/api/handouts")
+            .send(newHandoutData);
+
+        expect(res.statusCode).toBe(500);
+        expect(res.body.success).toBe(false);
+        expect(res.body.message).toBe("Server Error");
+    });
 });
 
-describe("POST /api/surveys - getOrCreateSurvey", () => {
-	it("should create a new survey with questions if it does not exist", async () => {
-		const res = await request(app).post("/api/surveys").send(surveyData1);
-		expect(res.statusCode).toBe(201);
-		expect(res.body.survey.id).toBe("12345");
-		expect(res.body.message).toBe("Survey created successfully");
-	});
+describe("PUT /api/handouts/:id", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
-	describe("When survey already exists", () => {
-		beforeEach(async () => {
-			await request(app).post("/api/surveys").send(surveyData1);
-		});
+    it("should update an existing handout", async () => {
+        const updates = {
+            fileUrl: "https://example.com/updated.pdf",
+            fileType: "pdf"
+        };
 
-		it("should retrieve an existing survey", async () => {
-			const existingSurveyData = {
-				id: "12345",
-				question: [new mongoose.Types.ObjectId()],
-			};
+        mockHandout.findByIdAndUpdate.mockResolvedValue({
+            ...handoutData1,
+            ...updates
+        });
 
-			const res = await request(app)
-				.post("/api/surveys")
-				.send(existingSurveyData);
-			expect(res.statusCode).toBe(200);
-			expect(res.body.survey.id).toBe("12345");
-			expect(res.body.message).toBe("Survey already exists");
-		});
-	});
+        const res = await request(app)
+            .put(`/api/handouts/${handoutData1._id}`)
+            .send(updates);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.fileUrl).toBe(updates.fileUrl);
+        expect(mockHandout.findByIdAndUpdate).toHaveBeenCalledWith(
+            handoutData1._id.toString(),
+            updates,
+            { new: true, runValidators: true }
+        );
+    });
+
+    it("should return 404 if handout is not found", async () => {
+        const nonExistentId = new mongoose.Types.ObjectId();
+        mockHandout.findByIdAndUpdate.mockResolvedValue(null);
+
+        const res = await request(app)
+            .put(`/api/handouts/${nonExistentId}`)
+            .send({ fileUrl: "https://example.com/new.pdf", fileType: "pdf" });
+
+        expect(res.statusCode).toBe(404);
+        expect(res.body.success).toBe(false);
+        expect(res.body.message).toBe(`Handout with id ${nonExistentId} not found`);
+    });
 });
 
-describe("PUT /api/surveys/:id", () => {
-	let surveyId: string;
-	beforeEach(async () => {
-		const survey = await Survey.create<any>(surveyData1);
-		surveyId = (survey._id as mongoose.Types.ObjectId).toString();
-	});
+describe("DELETE /api/handouts/:id", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
-	it("should update a survey", async () => {
-		const updates = { id: "54321" };
+    it("should delete an existing handout", async () => {
+        mockHandout.findByIdAndDelete.mockResolvedValue(handoutData1);
 
-		const res = await request(app)
-			.put(`/api/surveys/${surveyId}`)
-			.send(updates);
-		expect(res.statusCode).toBe(200);
-		expect(res.body.id).toBe("54321");
-	});
+        const res = await request(app)
+            .delete(`/api/handouts/${handoutData1._id}`);
 
-	it("should return 404 if survey is not found", async () => {
-		const nonExistentSurveyId = new mongoose.Types.ObjectId();
-		const res = await request(app)
-			.put(`/api/surveys/${nonExistentSurveyId}`)
-			.send({ id: "12345" });
-		expect(res.statusCode).toBe(404);
-		expect(res.body.message).toBe("Survey not found");
-	});
-});
+        expect(res.statusCode).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data).toBeTruthy();
+        expect(mockHandout.findByIdAndDelete).toHaveBeenCalledWith(
+            handoutData1._id.toString()
+        );
+    });
 
-describe("DELETE /api/surveys/:id", () => {
-	let surveyId: string;
+    it("should return 404 if handout to delete is not found", async () => {
+        const nonExistentId = new mongoose.Types.ObjectId();
+        mockHandout.findByIdAndDelete.mockResolvedValue(null);
 
-	beforeEach(async () => {
-		const survey = await Survey.create(surveyData1);
-		surveyId = (survey._id as mongoose.Types.ObjectId).toString();
-	});
+        const res = await request(app)
+            .delete(`/api/handouts/${nonExistentId}`);
 
-	it("should delete the requested survey", async () => {
-		const res = await request(app).delete(`/api/surveys/${surveyId}`);
-		expect(res.statusCode).toBe(200);
-		expect(res.body.message).toBe("Survey deleted successfully.");
+        expect(res.statusCode).toBe(404);
+        expect(res.body.success).toBe(false);
+        expect(res.body.message).toBe(`Handout with id ${nonExistentId} not found`);
+    });
 
-		const survey = await Survey.findById(surveyId);
-		expect(survey).toBeNull();
-	});
+    it("should handle server errors during deletion", async () => {
+        mockHandout.findByIdAndDelete.mockRejectedValue(new Error("Database error"));
 
-	it("should return 404 if survey is not found", async () => {
-		const nonExistentSurveyId = new mongoose.Types.ObjectId();
-		const res = await request(app).delete(
-			`/api/surveys/${nonExistentSurveyId}`
-		);
-		expect(res.statusCode).toBe(404);
-		expect(res.body.message).toBe("Survey not found.");
-	});
+        const res = await request(app)
+            .delete(`/api/handouts/${handoutData1._id}`);
+
+        expect(res.statusCode).toBe(500);
+        expect(res.body.success).toBe(false);
+        expect(res.body.message).toBe("Server Error");
+    });
 });

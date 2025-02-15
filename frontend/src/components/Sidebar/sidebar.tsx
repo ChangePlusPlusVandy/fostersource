@@ -19,7 +19,7 @@ import authService from "../../services/authService";
 // User information
 export const userInfo = {
 	name: "First L.",
-	role: "Foster Parent",
+	role: localStorage.user ? localStorage.user.role : "No role",
 	isLoggedIn: false,
 };
 
@@ -33,7 +33,7 @@ export const items = [
 	{
 		icon: <LayoutDashboard />,
 		description: "Dashboard",
-		href: "#",
+		href: "/dashboard",
 	},
 	{
 		icon: <BookOpen />,
@@ -48,18 +48,18 @@ export const items = [
 	{
 		icon: <Calendar />,
 		description: "Calendar",
-		href: "#",
+		href: "/calendar",
 	},
 	{
 		icon: <MessageCircleQuestion />,
 		description: "FAQs",
 		href: "#",
 	},
-	{ icon: <ShoppingCart />, description: "Cart", href: "#" },
+	{ icon: <ShoppingCart />, description: "Cart", href: "/cart" },
 	{
 		icon: <Phone />,
 		description: "Contact",
-		href: "#",
+		href: "mailto:info@fostersource.org",
 	},
 ];
 
@@ -76,6 +76,7 @@ interface SidebarProps {
 	setIsCollapsed: Dispatch<SetStateAction<boolean>>;
 	isLoggedIn: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+	cartItemCount: number;
 }
 
 // The Sidebar itself
@@ -84,10 +85,11 @@ export function Sidebar({
 	setIsCollapsed,
 	isLoggedIn,
 	setIsLoggedIn,
+	cartItemCount,
 }: SidebarProps) {
 	// User Info
 	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
-	const role = isLoggedIn ? userInfo.role : "Log In";
+	const role = isLoggedIn ? JSON.parse(localStorage.user).role : "Log In";
 	// Automatically collapse sidebar for narrow screens
 	useEffect(() => {
 		const handleResize = () => {
@@ -112,6 +114,7 @@ export function Sidebar({
 				isCollapsed={isCollapsed}
 				isLoggedIn={isLoggedIn}
 				setIsLoggedIn={setIsLoggedIn}
+				cartItemCount={cartItemCount}
 			/>
 		</div>
 	);
@@ -142,7 +145,6 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 					src={
 						"https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png"
 					}
-					// src="assets/cute_ghost.jpeg"
 					alt="Profile"
 					className="profile-pic"
 				/>
@@ -161,6 +163,7 @@ interface SidebarItemsProps {
 	isLoggedIn: boolean;
 	isCollapsed: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+	cartItemCount: number;
 }
 
 // Display and handle sidebar entries
@@ -168,14 +171,15 @@ export function SidebarItems({
 	isCollapsed,
 	isLoggedIn,
 	setIsLoggedIn,
+	cartItemCount,
 }: SidebarItemsProps) {
 	// Helper function for active tab highlighting
-	const handleItemClick = (item: string) => {
-		setActiveItem(item);
-	};
+	// const handleItemClick = (item: string) => {
+	// 	setActiveItem(item);
+	// };
 
 	const handleLogOut = async () => {
-		handleItemClick("logout");
+		// handleItemClick("logout");
 		try {
 			await authService.logout();
 		} catch (err: any) {
@@ -186,16 +190,27 @@ export function SidebarItems({
 		}
 	};
 
-	const [activeItem, setActiveItem] = useState<string>("");
+	const [activeItem, setActiveItem] = useState<string>(
+		window.location.pathname
+	);
 
 	const sidebarItems = items.map(({ icon, description, href }) => {
-		const active = activeItem === description ? "active" : "";
+		const active = activeItem === href ? "active" : "";
 		const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
 		return (
-			<li className={`${active}`} onClick={() => handleItemClick(description)}>
+			<li
+				key={href + description}
+				className={`${active}`}
+				onClick={() => setActiveItem(window.location.pathname)}
+			>
 				<div className={`${iconDescMargin}`}>{icon}</div>
-				<Link to={href}>{!isCollapsed && description}</Link>
+				<Link to={href}>
+					{!isCollapsed && description}{" "}
+					{description === "Cart" && cartItemCount !== 0
+						? `(${cartItemCount})`
+						: ""}
+				</Link>
 			</li>
 		);
 	});

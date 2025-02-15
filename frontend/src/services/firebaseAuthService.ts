@@ -56,7 +56,6 @@ export const register = async (email: string, password: string) => {
 export const signOut = async () => {
 	try {
 		await auth.signOut();
-		console.log("User signed out successfully.");
 	} catch (error: any) {
 		throw new Error("An error occurred while signing out. Please try again.");
 	}
@@ -68,7 +67,6 @@ export const sendPasswordResetEmail = async (email: string) => {
 			url: "http://localhost:3000/reset-password",
 			handleCodeInApp: true,
 		});
-		console.log("Password reset email sent.");
 	} catch (error: any) {
 		const errorCode = error.code;
 		throw new Error(getErrorMessage(errorCode));
@@ -81,7 +79,6 @@ export const confirmPasswordReset = async (
 ) => {
 	try {
 		await confirm(auth, code, newPassword);
-		console.log("Password reset confirmed.");
 	} catch (error: any) {
 		const errorCode = error.code;
 		throw new Error(getErrorMessage(errorCode));

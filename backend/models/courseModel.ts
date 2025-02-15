@@ -10,10 +10,17 @@ export interface ICourse extends Document {
 	isLive: boolean;
 	categories: string[];
 	creditNumber: number;
-	description: string;
+	courseDescription: string;
 	thumbnailPath: string;
 	cost: number;
-	instructor: string;
+	instructorName: string;
+	instructorDescription: string;
+	instructorRole: string;
+	courseType: "webinar" | "course" | "meeting";
+	lengthCourse: number;
+	time: Date;
+	isInPerson: boolean;
+	students: mongoose.Types.ObjectId[]; //for the users
 }
 
 const CourseSchema: Schema = new Schema(
@@ -31,10 +38,26 @@ const CourseSchema: Schema = new Schema(
 		isLive: { type: Boolean, required: true },
 		categories: [{ type: String, required: false }],
 		creditNumber: { type: Number, required: true },
-		description: { type: String, required: true },
+		courseDescription: { type: String, required: true },
 		thumbnailPath: { type: String, required: true },
 		cost: { type: Number, required: true },
-		instructor: { type: String, required: false },
+		instructorDescription: { type: String, required: false },
+		instructorRole: { type: String, required: false },
+		lengthCourse: { type: Number, required: true },
+		time: { type: Date, required: true },
+		instructorName: { type: String, required: true },
+		isInPerson: { type: Boolean, required: true },
+		students: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "User",
+			},
+		],
+		courseType: {
+			type: String,
+			enum: ["webinar", "course", "meeting"],
+			required: true,
+		},
 	},
 	{
 		timestamps: true,

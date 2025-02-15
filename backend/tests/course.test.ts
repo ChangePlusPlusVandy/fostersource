@@ -19,9 +19,14 @@ const courseData1 = {
 	isLive: true,
 	categories: ["Category 1", "Category 2"],
 	creditNumber: 3,
-	description: "This is a description for Course A",
+	courseDescription: "This is a description for Course A",
 	thumbnailPath: "/path/to/thumbnail1.jpg",
 	cost: 12345,
+	instructorDescription: "Bob description",
+	instructorRole: "",
+	lengthCourse: 2,
+	time: new Date("2025-01-31T12:00:00Z"),
+	instructorName: "Bob",
 };
 
 const courseData2 = {
@@ -33,9 +38,14 @@ const courseData2 = {
 	isLive: false,
 	categories: ["Category 3"],
 	creditNumber: 4,
-	description: "This is a description for Course B",
+	courseDescription: "This is a description for Course B",
 	thumbnailPath: "/path/to/thumbnail2.jpg",
 	cost: 0,
+	instructorDescription: "courseB description",
+	instructorRole: "",
+	lengthCourse: 1.5,
+	time: new Date("2025-02-5T12:10:30Z"),
+	instructorName: "courseB name",
 };
 
 const userData = {
@@ -83,6 +93,19 @@ describe("GET /api/courses", () => {
 		});
 		expect(res.body.count).toBe(1);
 	});
+
+	it("should retrieve courses by description", async () => {
+		const res = await request(app)
+			.get("/api/courses")
+			.query({ courseDescription: "This is a description for Course A" });
+		expect(res.statusCode).toBe(200);
+		res.body.data.forEach((course: any) => {
+			expect(course.courseDescription).toBe(
+				"This is a description for Course A"
+			);
+		});
+		expect(res.body.count).toBe(1);
+	});
 });
 
 describe("POST /api/courses", () => {
@@ -103,7 +126,7 @@ describe("POST /api/courses", () => {
 		expect(res.body.data.isLive).toBe(true);
 		expect(res.body.data.categories).toEqual(["Category 1", "Category 2"]);
 		expect(res.body.data.creditNumber).toBe(3);
-		expect(res.body.data.description).toBe(
+		expect(res.body.data.courseDescription).toBe(
 			"This is a description for Course A"
 		);
 		expect(res.body.data.thumbnailPath).toBe("/path/to/thumbnail1.jpg");

@@ -15,6 +15,7 @@ const Login: React.FC = () => {
 
 		try {
 			await authService.login(email, password);
+
 			window.location.href = "/catalog";
 		} catch (err: any) {
 			console.error("Login error:", err);
@@ -22,6 +23,7 @@ const Login: React.FC = () => {
 		} finally {
 			setIsLoading(false);
 		}
+		console.log(localStorage.user);
 	};
 
 	return (

@@ -4,6 +4,7 @@ import {
 	createProgress,
 	updateProgress,
 	deleteProgress,
+	getUserProgresses,
 } from "../controllers/progressController";
 
 const router = express.Router();
@@ -19,5 +20,9 @@ router.put("/:id", updateProgress);
 
 // DELETE progress by ID
 router.delete("/:id", deleteProgress);
+
+// GET progress based on the user
+router.get("/progress/:userId", getUserProgresses);
+
 
 export default router;
