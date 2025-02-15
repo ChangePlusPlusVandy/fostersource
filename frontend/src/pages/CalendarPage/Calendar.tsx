@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
 	format,
 	startOfMonth,
@@ -16,15 +17,15 @@ import {
 	isToday,
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import axios from "axios";
 
-//calendar event to be implemented in database (logic implemented for now)
 interface CalendarEvent {
-	id: string; // unique identifier for each event
-	title: string; // event title
-	date: Date; // date and time of the event
-	type: "webinar" | "course" | "meeting"; // type of event
-	description?: string; // event description (made it optional not sure if it's mandatory to have one)
-	creditHours?: number; // likely used for courses (made it optional not sure if it's mandator to have one)
+	id: string;
+	title: string;
+	date: Date;
+	type: "webinar" | "course" | "meeting";
+	description?: string;
+	creditHours?: number;
 }
 
 const getDaysInInterval = (start: Date, end: Date) => {
@@ -41,6 +42,7 @@ export default function Calendar() {
 	const [currentDate, setCurrentDate] = useState(new Date());
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 	const [view, setView] = useState<"month" | "week" | "day">("month");
+	const [events, setEvents] = useState<CalendarEvent[]>([]);
 	const [tooltip, setTooltip] = useState<{
 		visible: boolean;
 		event?: CalendarEvent;
@@ -53,24 +55,44 @@ export default function Calendar() {
 		y: 0,
 	});
 
-	const dummyEvents: CalendarEvent[] = [
-		//replace with DB call
-		{
-			id: "1",
-			title: "Body Positivity for Children in Care - Live Virtual",
-			date: new Date(2025, 0, 28, 10, 0),
-			type: "webinar",
-			description:
-				"In this session, we will discuss the importance of promoting body acceptance among youth.",
-			creditHours: 2,
-		},
-	];
+	useEffect(() => {
+		const fetchEvents = async () => {
+			try {
+				const response = await axios.get("http://localhost:5001/api/courses");
+				const courseData = response.data;
+
+				const calendarEvents = courseData.map((course: any) => ({
+					id: course._id,
+					title: course.className,
+					date: new Date(course.date),
+					type: course.courseType,
+					description: course.description,
+					creditHours: course.creditNumber,
+				}));
+
+				setEvents(calendarEvents);
+			} catch (error) {
+				console.error("Error fetching events:", error);
+			}
+		};
+
+		fetchEvents();
+	}, []);
 
 	const monthStart = startOfMonth(currentDate);
 	const monthEnd = endOfMonth(currentDate);
 	const calendarStart = startOfWeek(monthStart);
 	const calendarEnd = endOfWeek(monthEnd);
 	const daysInMonth = getDaysInInterval(calendarStart, calendarEnd);
+
+	const getEventsForDate = (date: Date) => {
+		return events.filter((event) => isSameDay(event.date, date));
+	};
+
+	const goToToday = () => {
+		setCurrentDate(new Date());
+		setSelectedDate(new Date());
+	};
 
 	const navigateDate = (direction: "prev" | "next") => {
 		switch (view) {
@@ -98,15 +120,6 @@ export default function Calendar() {
 		}
 	};
 
-	const goToToday = () => {
-		setCurrentDate(new Date());
-		setSelectedDate(new Date());
-	};
-
-	const getEventsForDate = (date: Date) => {
-		return dummyEvents.filter((event) => isSameDay(event.date, date));
-	};
-
 	const handleMouseEnter = (event: CalendarEvent, e: React.MouseEvent) => {
 		setTooltip({
 			visible: true,
@@ -120,13 +133,25 @@ export default function Calendar() {
 		setTooltip({ ...tooltip, visible: false });
 	};
 
+	const bounceAnimation = {
+		initial: { opacity: 0, y: 15 },
+		animate: {
+			opacity: 1,
+			y: 0,
+			transition: { type: "spring", stiffness: 150, damping: 20 },
+		},
+	};
+
 	const renderCalendar = () => {
 		if (view === "month") {
 			return (
-				<div className="w-full overflow-auto">
+				<motion.div
+					{...bounceAnimation}
+					className="w-full h-[calc(100vh-220px)] overflow-auto"
+				>
 					<div
 						className="grid min-w-[800px] w-full"
-						style={{ gridTemplateColumns: "repeat(7, minmax(150px, 1fr))" }}
+						style={{ gridTemplateColumns: "repeat(7, minmax(100px, 1fr))" }}
 					>
 						{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
 							<div key={day} className="text-center font-semibold p-2 border-b">
@@ -141,9 +166,9 @@ export default function Calendar() {
 							return (
 								<div
 									key={day.toString()}
-									className={`min-h-[100px] p-2 border ${
-										isSelected ? "bg-orange-50" : ""
-									} ${!isCurrentMonth ? "text-gray-400" : ""}`}
+									className={`min-h-[100px] p-2 border cursor-pointer transition-colors
+                                        ${isSelected ? "bg-orange-50 hover:bg-orange-50" : "hover:bg-gray-50"}
+                                        ${!isCurrentMonth ? "text-gray-400" : ""}`}
 									onClick={() => setSelectedDate(day)}
 								>
 									<div className="font-medium mb-1 flex items-center">
@@ -177,7 +202,7 @@ export default function Calendar() {
 							);
 						})}
 					</div>
-				</div>
+				</motion.div>
 			);
 		}
 
@@ -191,49 +216,79 @@ export default function Calendar() {
 			);
 
 			return (
-				<div className="w-full overflow-auto">
-					<div className="grid grid-cols-8 gap-1 min-w-full">
-						<div className="border-b p-2 sticky left-0 bg-white"></div>
-						{daysInWeek.map((day) => (
+				<motion.div
+					{...bounceAnimation}
+					className="w-full h-[calc(100vh-220px)] overflow-auto"
+				>
+					<div
+						className="grid border min-w-[800px] w-full"
+						style={{
+							gridTemplateColumns: "100px repeat(7, minmax(100px, 1fr))",
+						}}
+					>
+						<div className="border-r bg-white sticky top-0 z-10 w-[100px] border-b"></div>
+						{daysInWeek.map((day, index) => (
 							<div
 								key={day.toString()}
-								className="text-center font-semibold p-2 border-b min-w-[150px]"
+								className={`border-r p-3 text-center bg-white sticky top-0 z-10 border-b`}
 							>
-								<div>{format(day, "EEE")}</div>
-								<div
-									className={`text-sm inline-flex ${isToday(day) ? "bg-orange-500 text-white rounded-full w-6 h-6 items-center justify-center" : ""}`}
-								>
-									{format(day, "d")}
+								<div className="flex flex-col items-center space-y-1">
+									<span className="font-semibold text-base">
+										{format(day, "EEE")}
+									</span>
+									<div
+										className={`text-lg font-bold inline-flex ${
+											isToday(day)
+												? "bg-orange-500 text-white rounded-full w-8 h-8 items-center justify-center"
+												: ""
+										}`}
+									>
+										{format(day, "d")}
+									</div>
 								</div>
 							</div>
 						))}
 
 						{hours.map((hour) => (
 							<React.Fragment key={hour.toString()}>
-								<div className="border-r p-2 text-sm text-gray-500 sticky left-0 bg-white">
-									{format(hour, "h a")}
+								<div className="border-r border-b bg-white sticky left-0 w-[100px]">
+									<div className="px-3 py-4 text-sm text-gray-500">
+										{format(hour, "h a")}
+									</div>
 								</div>
+
 								{daysInWeek.map((day) => {
-									const currentHourEvents = dummyEvents.filter(
+									const currentDateTime = new Date(day);
+									currentDateTime.setHours(hour.getHours(), 0, 0, 0);
+									const dayEvents = events.filter(
 										(event) =>
 											isSameDay(event.date, day) &&
-											format(event.date, "H") === format(hour, "H")
+											format(event.date, "H") === format(currentDateTime, "H")
 									);
+									const isSelected =
+										selectedDate &&
+										isSameDay(day, selectedDate) &&
+										format(selectedDate, "H") === format(currentDateTime, "H");
 
 									return (
 										<div
 											key={`${day}-${hour}`}
-											className="border p-2 min-h-[60px] min-w-[150px]"
+											className={`border-r border-b min-h-[60px] relative cursor-pointer transition-colors
+                                                ${isSelected ? "bg-orange-50 hover:bg-orange-50" : "hover:bg-gray-50"}`}
+											onClick={() => setSelectedDate(currentDateTime)}
 										>
-											<div className="flex flex-col gap-y-2">
-												{currentHourEvents.map((event) => (
+											<div className="relative p-2">
+												{dayEvents.map((event) => (
 													<div
 														key={event.id}
-														className="bg-orange-500 text-white text-xs p-[6px] rounded cursor-pointer w-full max-w-[95%] overflow-hidden mx-auto"
+														className="bg-orange-500 text-white text-sm p-1.5 rounded mb-1 cursor-pointer hover:bg-orange-600 transition-colors"
 														onMouseEnter={(e) => handleMouseEnter(event, e)}
 														onMouseLeave={handleMouseLeave}
 													>
-														{event.title}
+														<div className="font-bold text-sm">
+															{format(event.date, "h:mm a")}
+														</div>
+														<div className="text-sm mt-0.5">{event.title}</div>
 													</div>
 												))}
 											</div>
@@ -243,7 +298,7 @@ export default function Calendar() {
 							</React.Fragment>
 						))}
 					</div>
-				</div>
+				</motion.div>
 			);
 		}
 
@@ -252,14 +307,17 @@ export default function Calendar() {
 				{ length: 24 },
 				(_, i) => new Date(currentDate.setHours(i, 0, 0, 0))
 			);
-			const dayEvents = dummyEvents.filter((event) =>
+			const dayEvents = events.filter((event) =>
 				isSameDay(event.date, currentDate)
 			);
 
 			return (
-				<div className="w-full overflow-auto">
-					<div className="grid grid-cols-6 border min-w-full">
-						<div className="border-r bg-white sticky left-0 w-32">
+				<motion.div
+					{...bounceAnimation}
+					className="w-full h-[calc(100vh-220px)] overflow-auto"
+				>
+					<div className="grid grid-cols-6 border min-w-[800px] w-full">
+						<div className="border-r bg-white sticky top-0 z-10 w-32">
 							<div className="p-4 text-base">
 								<div className="flex flex-col">
 									<span className="font-bold whitespace-nowrap">
@@ -277,17 +335,23 @@ export default function Calendar() {
 								</div>
 							</div>
 						</div>
-
-						{/* Main content area with fixed width */}
 						<div className="col-span-5 min-w-[600px]">
 							{hours.map((hour) => {
 								const currentHourEvents = dayEvents.filter(
 									(event) => format(event.date, "H") === format(hour, "H")
 								);
+								const isSelected =
+									selectedDate &&
+									format(selectedDate, "H") === format(hour, "H");
 
 								return (
-									<div key={hour.toString()} className="border-b">
-										<div className="flex items-start px-4 py-2">
+									<div
+										key={hour.toString()}
+										className={`border-b min-h-[50px] cursor-pointer transition-colors
+                                            ${isSelected ? "bg-orange-50 hover:bg-orange-50" : "hover:bg-gray-50"}`}
+										onClick={() => setSelectedDate(hour)}
+									>
+										<div className="flex items-start p-1.5">
 											<div className="text-sm text-gray-500 w-16 flex-shrink-0">
 												{format(hour, "h a")}
 											</div>
@@ -295,11 +359,14 @@ export default function Calendar() {
 												{currentHourEvents.map((event) => (
 													<div
 														key={event.id}
-														className="bg-orange-500 text-white text-sm p-2 rounded cursor-pointer"
+														className="bg-orange-500 text-white text-sm p-1.5 rounded cursor-pointer hover:bg-orange-600 transition-colors"
 														onMouseEnter={(e) => handleMouseEnter(event, e)}
 														onMouseLeave={handleMouseLeave}
 													>
-														{event.title}
+														<div className="font-bold">
+															{format(event.date, "h:mm a")}
+														</div>
+														<div className="mt-0.5">{event.title}</div>
 													</div>
 												))}
 											</div>
@@ -309,7 +376,7 @@ export default function Calendar() {
 							})}
 						</div>
 					</div>
-				</div>
+				</motion.div>
 			);
 		}
 
@@ -317,8 +384,8 @@ export default function Calendar() {
 	};
 
 	return (
-		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-12">
-			<div className="bg-white rounded-lg shadow">
+		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-16">
+			<div className="bg-white rounded-lg shadow p-6">
 				<div className="flex items-center justify-between px-6 py-4 border-b">
 					<h2 className="text-2xl font-semibold">
 						{format(currentDate, "MMMM yyyy")}
@@ -377,7 +444,9 @@ export default function Calendar() {
 					</div>
 				</div>
 
-				<div className="px-3 py-4">{renderCalendar()}</div>
+				<motion.div key={view} {...bounceAnimation} className="px-3 py-4">
+					{renderCalendar()}
+				</motion.div>
 
 				{tooltip.visible && tooltip.event && (
 					<div
@@ -410,6 +479,8 @@ export default function Calendar() {
 					</div>
 				)}
 			</div>
+			<br></br>{" "}
+			{/* have to find a better way to do add margin mb-12 isn't working. temp solution for now*/}
 		</div>
 	);
 }

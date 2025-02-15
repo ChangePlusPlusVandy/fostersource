@@ -18,7 +18,7 @@ export const headerItems = [
 	},
 	{
 		description: "Calendar",
-		href: "/calendar",
+		href: "https://fostersource.org/calendar/",
 	},
 	{
 		description: "How to Help",
