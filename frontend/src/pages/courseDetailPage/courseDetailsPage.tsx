@@ -60,6 +60,29 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	const [ratingsPageOpen, setRatingsPageOpen] = useState(false);
 	const [numStarsRatingPage, setNumStarsRatingpage] = useState(0);
+	const [isAdmin, setIsAdmin] = useState(false);
+
+	useEffect(() => {
+		const checkAdminStatus = async () => {
+			try {
+				const response = await apiClient.get("/api/users/is-admin", {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				});
+				setIsAdmin(response.data.isAdmin);
+			} catch (error) {
+				console.error("Failed to check admin status", error);
+			}
+		};
+	
+		checkAdminStatus();
+	}, []);
+
+	const navigateToCourseEdit = () => {
+		navigate(`/courses/edit`); // Change to the desired route
+	};
+	
 
 	useEffect(() => {
 		const handleResize = () => setWindowWidth(window.innerWidth);
@@ -84,6 +107,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	useEffect(() => {
 		fetchCourses();
 	}, []);
+	
 
 	//=============================================================
 
@@ -263,13 +287,15 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 									</div>
 								</div>
 							)}
-							<button
-								onClick={handleClick}
-								style={{ width: "168px", height: "38px" }}
-								className={`w-42 h-9 rounded-md text-white text-xs bg-[#7B4899]`}
-							>
-								Edit Course
+							{isAdmin && (
+								<button
+									onClick={navigateToCourseEdit}
+									style={{ width: "168px", height: "38px" }}
+									className={`w-42 h-9 rounded-md text-white text-xs bg-[#7B4899]`}
+								>
+									Edit Course
 							</button>
+							)}
 						</div>
 					</div>
 					{/* Stars */}
