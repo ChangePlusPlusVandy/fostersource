@@ -195,7 +195,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							<button
 								onClick={handleClick}
 								style={{ width: "168px", height: "38px" }}
-								className={`w-42 h-9 rounded-md text-white text-xs ${
+								className={`h-9 rounded-md text-white text-xs ${
 									isAdded
 										? "bg-gray-400 cursor-not-allowed"
 										: "bg-orange-400 hover:bg-orange-500 cursor-pointer transition-colors duration-300"
@@ -207,7 +207,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 
 							<button
 								onClick={openRatingsPage}
-								className="w-42 h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300 ml-10"
+								className="w-[168px] h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300"
 							>
 								<p>Rate This Course</p>
 							</button>
@@ -255,14 +255,21 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 										</div>
 
 										{/* <button
-                      className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm w-3 h-2"
-                      onClick={() => setRatingsPageOpen(false)}
-                    >
-                      Close
-                    </button> */}
+											className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm w-3 h-2"
+											onClick={() => setRatingsPageOpen(false)}
+											>
+											Close
+										</button> */}
 									</div>
 								</div>
 							)}
+							<button
+								onClick={handleClick}
+								style={{ width: "168px", height: "38px" }}
+								className={`w-42 h-9 rounded-md text-white text-xs bg-[#7B4899]`}
+							>
+								Edit Course
+							</button>
 						</div>
 					</div>
 					{/* Stars */}
