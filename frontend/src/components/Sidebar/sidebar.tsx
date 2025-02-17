@@ -24,7 +24,7 @@ export const userInfo = {
 	role: localStorage.user ? localStorage.user.role : "No role",
 	isLoggedIn: false,
 	isAdmin: localStorage.user
-		? localStorage.user.role === "Admin"
+		? localStorage.user.role === "staff"
 			? true
 			: false
 		: false,
