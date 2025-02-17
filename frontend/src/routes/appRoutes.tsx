@@ -18,6 +18,7 @@ import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 import DiscountPage from "../pages/Admin/DiscountPage/Discount";
+import ProductPage from "../pages/Admin/ProductPage/ProductPage";
 import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
 
@@ -117,6 +118,7 @@ function AppRoutes() {
 							element={<ResetPasswordForm />}
 						/>
 						<Route path="/admin/discounts" element={<DiscountPage />} />
+						<Route path="/admin/products" element={<ProductPage />} />
 						<Route
 							path="/courseDetails"
 							element={<CoursePage setCartItemCount={setCartItemCount} />}
