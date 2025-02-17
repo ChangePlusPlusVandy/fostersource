@@ -101,6 +101,8 @@ export const createCourse = async (
             time,
             instructorName,
 			isInPerson,
+            students, 
+            courseType
         } = req.body;
 
         // Validate required fields
@@ -114,7 +116,8 @@ export const createCourse = async (
             !lengthCourse ||
             !time ||
             !instructorName ||
-			isInPerson === undefined
+			isInPerson === undefined || 
+            !courseType
         ) {
             res.status(400).json({
                 success: false,
@@ -154,7 +157,9 @@ export const createCourse = async (
             lengthCourse,
             time,
             instructorName,
-            isInPerson
+            isInPerson,
+            students, 
+            courseType
         });
 
 
