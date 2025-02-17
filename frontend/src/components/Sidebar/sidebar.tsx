@@ -127,7 +127,7 @@ export function Sidebar({
 			<SidebarItems
 				isCollapsed={isCollapsed}
 				isLoggedIn={isLoggedIn}
-				isAdmin={true}
+				isAdmin={userInfo.isAdmin}
 				setIsLoggedIn={setIsLoggedIn}
 				cartItemCount={cartItemCount}
 			/>
@@ -190,11 +190,6 @@ export function SidebarItems({
 	setIsLoggedIn,
 	cartItemCount,
 }: SidebarItemsProps) {
-	// Helper function for active tab highlighting
-	// const handleItemClick = (item: string) => {
-	// 	setActiveItem(item);
-	// };
-
 	const handleLogOut = async () => {
 		try {
 			await authService.logout();
