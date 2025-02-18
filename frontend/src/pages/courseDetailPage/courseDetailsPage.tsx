@@ -49,6 +49,9 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 		lengthCourse: 2,
 		time: new Date("2025-10-15T00:00:00.000Z"),
 		isInPerson: true,
+		students: [], 
+		regStart: new Date("2025-10-10T00:00:00.000Z"),
+		regEnd: new Date("2025-10-12T00:00:00.000Z")
 	});
 	const [starRating, setStarRating] = useState(-1);
 	const [isAdded, setIsAdded] = useState(false);
