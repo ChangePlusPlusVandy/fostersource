@@ -29,8 +29,7 @@ function AppRoutes() {
 
 	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
 	const [cartItemCount, setCartItemCount] = useState(
-		localStorage.user &&
-		JSON.parse(localStorage.user).cart
+		localStorage.user && JSON.parse(localStorage.user).cart
 			? JSON.parse(localStorage.user).cart.length
 			: 0
 	);
@@ -79,7 +78,7 @@ function AppRoutes() {
 						display: "flex",
 						flex: 1,
 						overflow: "auto",
-						paddingLeft: isCollapsed ? "6rem" : "17rem",
+						marginLeft: isCollapsed ? "6rem" : "17rem",
 					}}
 				>
 					<Routes>
