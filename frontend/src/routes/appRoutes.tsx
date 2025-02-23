@@ -20,6 +20,7 @@ import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 import DiscountPage from "../pages/Admin/DiscountPage/Discount";
 import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
+import ComponentPage from "../pages/Admin/ComponentPage/Component";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -117,6 +118,7 @@ function AppRoutes() {
 							element={<ResetPasswordForm />}
 						/>
 						<Route path="/admin/discounts" element={<DiscountPage />} />
+						<Route path="/admin/components" element = {<ComponentPage workshop={undefined} survey={undefined} certificate={undefined} />}/>
 						<Route
 							path="/courseDetails"
 							element={<CoursePage setCartItemCount={setCartItemCount} />}
