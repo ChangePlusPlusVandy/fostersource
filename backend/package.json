@@ -11,10 +11,11 @@
 	"dependencies": {
 		"backend": "file:",
 		"cors": "^2.8.5",
-		"dotenv": "^16.4.5",
+		"dotenv": "^16.4.7",
 		"express": "^4.21.0",
 		"firebase": "^11.0.1",
 		"firebase-admin": "^12.7.0",
+		"mongodb": "^6.13.0",
 		"mongoose": "^8.7.0",
 		"ts-node": "^10.9.2"
 	},
