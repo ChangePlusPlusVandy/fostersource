@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { JSX, useState } from "react";
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -20,6 +20,7 @@ import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 import DiscountPage from "../pages/Admin/DiscountPage/Discount";
 import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
+import EmailPage from "../pages/Admin/EmailPage/Email";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -117,6 +118,7 @@ function AppRoutes() {
 							element={<ResetPasswordForm />}
 						/>
 						<Route path="/admin/discounts" element={<DiscountPage />} />
+						<Route path="/admin/email" element={<EmailPage />} />
 						<Route
 							path="/courseDetails"
 							element={<CoursePage setCartItemCount={setCartItemCount} />}
