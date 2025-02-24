@@ -6,26 +6,13 @@ import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
 
-// Survey with a type field
-interface Video {
-	type: "Video";
-	_id: string;
-	onDemand: boolean;
-	meetingID: number;
-	date: Date;
-}
-
-// Video with a type field
-interface Survey {
-	type: "Survey";
-	_id: string;
-	questions: string[];
-}
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
 }
+
 const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const { courseId } = useParams<{ courseId: string }>();
+	const navigate = useNavigate();
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
 		_id: "",
 		className: "Introduction to Computer Science",
@@ -49,40 +36,10 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	});
 	const [starRating, setStarRating] = useState(-1);
 	const [isAdded, setIsAdded] = useState(false);
-	const [surveyLength, setSurveyLength] = useState(0);
-	const [creditHours, setCreditHours] = useState(0);
-	const [thumbnailpath, setThumbnailpath] = useState("");
-	const [dateEvent, setDateEvent] = useState(new Date());
-	const navigate = useNavigate();
-	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	const [ratingsPageOpen, setRatingsPageOpen] = useState(false);
 	const [numStarsRatingPage, setNumStarsRatingpage] = useState(0);
 
-	useEffect(() => {
-		const handleResize = () => setWindowWidth(window.innerWidth);
-		window.addEventListener("resize", handleResize);
-		return () => window.removeEventListener("resize", handleResize);
-	}, []);
-
-	const handleBackToCatalog = () => {
-		navigate("/catalog"); // Change to the desired route
-	};
-
 	//================ Working axios request ======================
-
-	const fetchCourses = async () => {
-		try {
-			const response = await apiClient.get("/courses");
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	useEffect(() => {
-		fetchCourses();
-	}, []);
-
-	//=============================================================
 
 	useEffect(() => {
 		async function fetchCourses() {
@@ -97,8 +54,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	}, []);
 
 	useEffect(() => {
-		if (!courseDetailsData) {
-		} else {
+		if (courseDetailsData) {
 			if (courseDetailsData.ratings.length !== 0) {
 				let average = 0;
 				let num = 0;
@@ -113,13 +69,13 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 			} else {
 				setStarRating(-1);
 			}
-			setDateEvent(courseDetailsData.time);
 		}
 	}, [courseDetailsData]);
 
 	if (!courseDetailsData) {
 		return <div>Loading Course Data</div>;
 	}
+
 	const handleClick = () => {
 		setIsAdded(true);
 	};
@@ -134,6 +90,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const submitRatingPage = (value: number) => {
 		setRatingsPageOpen(false);
 		setNumStarsRatingpage(value);
+		// TODO: rating should connect to database?
 		setCourseDetailsData((prevCourse) => {
 			if (!prevCourse) return prevCourse; // Handle null case
 
@@ -151,30 +108,18 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	};
 
 	return (
-		<div className="max-w-stretch w-full min-h-screen m-0 p-0 md:text-lg lg:text-2xl">
+		<div className="w-full min-h-screen m-0 p-0 md:text-lg lg:text-2xl">
 			<div className="mr-4">
 				<button
 					className="w-[154px] h-[38px] bg-[#D9D9D9] rounded-md text-xs"
-					onClick={handleBackToCatalog}
+					onClick={() => navigate("/catalog")}
 				>
 					Back to Catalog
 				</button>
 
-				<div style={{ marginTop: "50px", lineHeight: "48px", display: "flex" }}>
-					<p
-						style={{
-							fontSize: "32px",
-							fontWeight: "bold",
-							margin: "0",
-							lineHeight: "1.2",
-						}}
-					>
-						{courseDetailsData.className}
-					</p>
-					<div
-						className="text-sm md:text-lg lg:text-2xl flex flex-col flex-start items-start gap-2 justify-start"
-						style={{ marginLeft: "150px" }}
-					>
+				<div className="m-0 mt-[50px] flex text-3xl font-bold">
+					{courseDetailsData.className}
+					<div className="text-sm md:text-lg lg:text-2xl flex flex-col flex-start items-start gap-2 justify-start ml-[150px]">
 						<button
 							onClick={handleClick}
 							className={`w-36 h-9 rounded-md text-white text-xs ${
@@ -191,85 +136,57 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							onClick={openRatingsPage}
 							className="min-w-min w-36 h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300"
 						>
-							<p>Rate This Course</p>
+							Rate This Course
 						</button>
 						{/* Pop-Up Modal */}
 						{ratingsPageOpen && (
 							<div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
-								<div className="bg-white p-6 rounded-lg shadow-lg z-40 text-center">
-									<div className="w-full">
-										<div>
-											<button
-												className="flex ml-auto items-center justify-center w-3 h-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm"
-												onClick={() => setRatingsPageOpen(false)}
-											>
-												×
-											</button>
-										</div>
-									</div>
+								<div className="bg-white p-6 rounded-lg shadow-lg z-40 text-center flex flex-col">
+									<button
+										className="flex ml-auto items-center justify-center w-3 h-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm"
+										onClick={() => setRatingsPageOpen(false)}
+									>
+										×
+									</button>
 									<h2 className="text-xl font-bold mb-4">Rate this course</h2>
 									<div>
-										<div className="flex">
-											{[1, 2, 3, 4, 5].map((value, index) => (
-												<button
-													key={index}
-													onClick={() => onClickRating(value)}
-													style={{
-														padding: "5px",
-													}}
-												>
-													<FaStar
-														color={
-															index < numStarsRatingPage ? "#FFD700" : "#a9a9a9"
-														}
-													/>
-												</button>
-											))}
-										</div>
-										<button
-											onClick={() => submitRatingPage(numStarsRatingPage)}
-											className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-30 h-8 text-sm"
-										>
-											Submit
-										</button>
+										{[1, 2, 3, 4, 5].map((value, index) => (
+											<button
+												key={index}
+												className="p-1"
+												onClick={() => onClickRating(value)}
+											>
+												<FaStar
+													color={
+														index < numStarsRatingPage ? "#FFD700" : "#a9a9a9"
+													}
+												/>
+											</button>
+										))}
 									</div>
-
-									{/* <button
-                      className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm w-3 h-2"
-                      onClick={() => setRatingsPageOpen(false)}
-                    >
-                      Close
-                    </button> */}
+									<button
+										className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-30 h-8 text-sm"
+										onClick={() => submitRatingPage(numStarsRatingPage)}
+									>
+										Submit
+									</button>
 								</div>
 							</div>
 						)}
 					</div>
 				</div>
+
 				{/* Stars */}
-				<div style={{ marginTop: "0x" }}>
-					<StarDisplay
-						rating={starRating}
-						courseDetailsData={courseDetailsData}
-						dateEvent={dateEvent}
-					/>
-				</div>
-				<ul style={{ display: "flex", gap: "5px" }}>
-					{courseDetailsData.categories.map((component, index) => (
-						<li key={index}>
-							<ButtonLabel component={component} />
-						</li>
-					))}
-				</ul>
-				{/* Filters */}
-				<div
-					style={{
-						display: "flex",
-						alignItems: "flex-start",
-						gap: "20px",
-						marginTop: "0px",
-					}}
-				>
+				<StarDisplay
+					rating={starRating}
+					courseDetailsData={courseDetailsData}
+				/>
+
+				<CategoryPills categories={courseDetailsData.categories} />
+
+				<div className="flex gap-5 py-3 max-w-7xl bg-pink-200">
 					<div
+						className="bg-blue-200"
 						style={{
 							display: "flex",
 							flexDirection: "column",
@@ -290,7 +207,6 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 								alignItems: "flex-start",
 								justifyContent: "flex-start",
 								padding: "10px",
-								marginTop: "65px",
 							}}
 						>
 							<p
@@ -322,8 +238,6 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							<p
 								style={{
 									textAlign: "left",
-
-									// lineHeight: "1.5",
 									width: "150px",
 								}}
 							>
@@ -331,15 +245,21 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 									style={{
 										fontWeight: 600,
 										fontSize: "12px",
-										// lineHeight: "18px",
 									}}
 								>
 									Speaker
 								</span>
 								<br />
-								<span>
-									<DisplayThumbnail thumbnail={thumbnailpath} />
-								</span>{" "}
+								<div style={{ margin: "20px 0", textAlign: "center" }}>
+									<img
+										src={courseDetailsData.thumbnailPath}
+										alt="No Picture Found"
+										style={{
+											maxWidth: "121px",
+											height: "auto",
+										}}
+									/>
+								</div>
 								<br />
 								<span
 									style={{
@@ -349,18 +269,9 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 									}}
 								>
 									{courseDetailsData.instructorName}
-								</span>{" "}
-								<br />
-								<span>
-									{" "}
-									<ul style={{ display: "flex", gap: "5px" }}>
-										{courseDetailsData.categories.map((component, index) => (
-											<li key={index}>
-												<ButtonLabel component={component} />
-											</li>
-										))}
-									</ul>{" "}
-								</span>{" "}
+								</span>
+
+								<CategoryPills categories={courseDetailsData.categories} />
 								<br />
 								{/*Needs to be complete*/}
 								<span style={{ fontWeight: 500, fontSize: "12px" }}>
@@ -378,99 +289,57 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							</p>
 						</div>
 					</div>
-					<div
-						style={{
-							marginTop: "65px",
-							width: "min-content",
-							height: "578px",
-							backgroundColor: "#FFFFFF",
-							borderRadius: "20px",
-							padding: "10px",
-							paddingLeft: "20px",
-						}}
-					>
-						<p style={{ textAlign: "left" }}>
-							<p>Content</p>
-							<DisplayBar
-								surveyLength={surveyLength}
-								creditHours={creditHours}
-								courseDetailsData={courseDetailsData}
-								dateEvent={dateEvent}
-							/>
-						</p>
+					<div className="p-3 pl-5 rounded-2xl bg-green-200">
+						Content
+						<DisplayBar
+							surveyLength={courseDetailsData.lengthCourse}
+							creditHours={courseDetailsData.creditNumber}
+							time={courseDetailsData.time}
+							lengthCourse={courseDetailsData.lengthCourse}
+						/>
 					</div>
 				</div>
 			</div>
 		</div>
 	);
 };
-const DisplayThumbnail = ({ thumbnail }: { thumbnail: string }) => {
+
+const CategoryPills = ({ categories }: { categories: string[] }) => {
 	return (
-		<div style={{ margin: "20px 0", textAlign: "center" }}>
-			<img
-				src={thumbnail}
-				alt="No Picture Found"
-				style={{
-					maxWidth: "121px",
-					height: "auto",
-				}}
-			/>
-		</div>
+		<ul className="flex gap-1">
+			{categories.map((category, index) => (
+				<li key={index}>
+					<div className="flex rounded-xl bg-[#F79518]">
+						<p className="p-1 px-2 text-white leading-[15px] text-[10px]">
+							{category}
+						</p>
+					</div>
+				</li>
+			))}
+		</ul>
 	);
 };
 
-const ButtonLabel = ({ component }: { component: String }) => {
-	return (
-		<div
-			className="rounded-xl"
-			style={{
-				backgroundColor: "#F79518",
-				display: "flex", // Use flexbox for proper alignment
-				alignItems: "center", // Vertically center the text
-				justifyContent: "center", // Horizontally center the text
-			}}
-		>
-			<p
-				className="p-1 px-2"
-				style={{
-					margin: 0,
-					fontSize: "10px",
-					color: "#FFFFFF",
-					lineHeight: "15px",
-					fontWeight: 500,
-					font: "Poppins",
-				}}
-			>
-				{component}
-			</p>
-		</div>
-	);
-};
-
-{
-	/*Displays the progress bar of webinar, survey, and certificate*/
-}
-
+/* Displays the progress bar of webinar, survey, and certificate */
 const DisplayBar = ({
 	surveyLength,
 	creditHours,
-	courseDetailsData,
-	dateEvent,
+	time,
+	lengthCourse,
 }: {
 	surveyLength: number;
 	creditHours: number;
-	courseDetailsData: Course;
-	dateEvent: Date;
+	time: Date;
+	lengthCourse: number;
 }) => {
 	const [currentPage, setCurrentPage] = useState("Webinar");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
 	const [survey, setSurvey] = useState(false);
 	const [surveyButton, setSurveyButton] = useState(false);
-	const date = courseDetailsData.time;
 
 	useEffect(() => {
-		const webinarEnd = courseDetailsData.time;
+		const webinarEnd = time;
 		webinarEnd.setHours(webinarEnd.getHours() + 2); // 2 hours after the current time
 		const checkTime = () => {
 			const currentTime = new Date();
@@ -507,23 +376,20 @@ const DisplayBar = ({
 		setCertificateColor("#D9D9D9");
 	};
 	const handleSurveyClick = () => {
-		setSurveyColor("#FEC781"); // Turn survey button orange
-		setCertificateColor("#D9D9D9"); // Turn certificate button orange
+		setSurveyColor("#FEC781");
+		setCertificateColor("#D9D9D9");
 		setCurrentPage("Survey");
 	};
 
 	const handleCertificateClick = () => {
-		setSurveyColor("#FEC781"); // Turn survey button orange
-		setCertificateColor("#FEC781"); // Turn certificate button orange
+		setSurveyColor("#FEC781");
+		setCertificateColor("#FEC781");
 		setCurrentPage("Certificate");
 	};
-	const handleCalendarClick = () => {};
-	const handleAccessSurveyClick = () => {};
 
-	{
-		/* Needs to be complete once certificate page is out */
-	}
+	/* TODO: Needs to be complete once certificate page is out */
 	const handleAccessCertificate = () => {};
+
 	return (
 		<div className="w-min">
 			{/* Webinar -> Survey -> Certificate */}
@@ -652,18 +518,18 @@ const DisplayBar = ({
 								}}
 							>
 								{/*Needs to be complete*/}
-								<div>Date {dateEvent.toLocaleDateString()}</div>
+								<div>Date {time.toLocaleDateString()}</div>
 								{/*Needs to be complete*/}
 								<div>
 									Time{" "}
-									{dateEvent.toLocaleTimeString("en-US", {
+									{time.toLocaleTimeString("en-US", {
 										hour: "numeric",
 										minute: "2-digit",
 										hour12: true,
 									})}{" "}
 								</div>
 								{/*Needs to be complete*/}
-								<div>Length {courseDetailsData.lengthCourse}</div>
+								<div>Length {lengthCourse}</div>
 							</p>
 						</div>
 						<div>
@@ -835,17 +701,13 @@ const DisplayBar = ({
 	);
 };
 
-{
-	/*Displays the stars, credit numbers, and live event time*/
-}
+/* Displays the stars, credit numbers, and live event time */
 const StarDisplay = ({
 	rating,
 	courseDetailsData,
-	dateEvent,
 }: {
 	rating: number;
 	courseDetailsData: Course;
-	dateEvent: Date;
 }) => {
 	const [halfFilledStar, setHalfFilledStar] = useState(false);
 	let stars = Array(5).fill(0);
@@ -861,60 +723,31 @@ const StarDisplay = ({
 	}, [rating]);
 
 	return (
-		<div>
-			<div
-				style={{
-					display: "flex",
-					alignItems: "center", // Ensures all items align vertically
-					gap: "10px", // Adds spacing between elements
-				}}
-			>
-				<p style={{ fontSize: "12px", margin: 0, fontWeight: "bold" }}>
-					{rating === -1 ? "No ratings yet" : rating}
-				</p>
-				<ul
-					style={{
-						display: "flex",
-						listStyleType: "none",
-						padding: 0,
-						margin: 0,
-					}}
-				>
-					{stars.map((item, index) => (
-						<li
-							key={index}
-							style={{
-								display: "inline-block",
-								marginRight: "5px",
-							}}
-						>
-							{filledStars > index ? (
-								<FaStar size={10} color="#FFD700" />
-							) : rating - filledStars >= 0.5 &&
-							  Math.ceil(filledStars) === index ? (
-								<FaStarHalfAlt size={10} color="#FFD700" />
-							) : (
-								<FaStar size={10} color="#a9a9a9" />
-							)}
-							{/* <FaStar
-                size={10}
-                color={index < filledStars ? "#FFD700" : "#a9a9a9"}
-              /> */}
-						</li>
-					))}
-				</ul>
-				<p style={{ fontSize: "12px", margin: 0 }}>
-					{courseDetailsData.creditNumber} Credits{" "}
-				</p>
-				<p style={{ fontSize: "12px", margin: 0 }}>
-					Live Web Event {dateEvent.toLocaleDateString()} at{" "}
-					{dateEvent.toLocaleTimeString("en-US", {
-						hour: "numeric",
-						minute: "2-digit",
-						hour12: true,
-					})}
-				</p>
-			</div>
+		<div className="flex gap-[10px] items-center text-[12px]">
+			<p className="font-bold">{rating === -1 ? "No ratings yet" : rating}</p>
+			<ul>
+				{stars.map((_, index) => (
+					<li key={index} className="inline-block mr-1">
+						{filledStars > index ? (
+							<FaStar size={10} color="#FFD700" />
+						) : rating - filledStars >= 0.5 &&
+						  Math.ceil(filledStars) === index ? (
+							<FaStarHalfAlt size={10} color="#FFD700" />
+						) : (
+							<FaStar size={10} color="#a9a9a9" />
+						)}
+					</li>
+				))}
+			</ul>
+			<p>{courseDetailsData.creditNumber} Credits</p>
+			<p>
+				Live Web Event {courseDetailsData.time.toLocaleDateString()} at{" "}
+				{courseDetailsData.time.toLocaleTimeString("en-US", {
+					hour: "numeric",
+					minute: "2-digit",
+					hour12: true,
+				})}
+			</p>
 		</div>
 	);
 };
