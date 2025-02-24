@@ -21,6 +21,7 @@ import DiscountPage from "../pages/Admin/DiscountPage/Discount";
 import ProductPage from "../pages/Admin/ProductPage/ProductPage";
 import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
+import ComponentPage from "../pages/Admin/ComponentPage/Component";
 import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -120,6 +121,7 @@ function AppRoutes() {
 						/>
 						<Route path="/admin" element={<AdminPage />} />
 						<Route path="/admin/discounts" element={<DiscountPage />} />
+						<Route path="/admin/components" element = {<ComponentPage workshop={undefined} survey={undefined} certificate={undefined} />}/>
 						<Route path="/admin/products" element={<ProductPage />} />
 						<Route
 							path="/courseDetails"
