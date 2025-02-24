@@ -1,8 +1,5 @@
-import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
-import {
-	useNavigate,
-	useParams,
-} from "react-router-dom";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 
 import { Course } from "../../shared/types/course";
@@ -42,7 +39,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 		ratings: [],
 		isLive: false,
 		cost: 100,
-		categories: ["Technology"],
+		categories: ["Technology", "Category", "Misc"],
 		thumbnailPath: "",
 		instructorDescription: "PhD at Vandy",
 		instructorRole: "Moderator",
@@ -91,7 +88,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 		async function fetchCourses() {
 			try {
 				const response = await apiClient.get(`/courses/${courseId}`);
-				setCourseDetailsData(response.data.data)
+				setCourseDetailsData(response.data.data);
 			} catch (error) {
 				console.error(error);
 			}
@@ -154,134 +151,116 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	};
 
 	return (
-		<div
-			className="w-full min-h-screen m-0 p-0 md:text-lg lg:text-2xl"
-			style={{ backgroundColor: "#F2F2F2" }}
-		>
-			<div style={{ marginTop: "75px", marginLeft: "250px" }}>
-				<div>
-					<div>
-						<button
-							style={{
-								width: "154px",
-								height: "38px",
-								backgroundColor: "#D9D9D9",
-								borderRadius: "5px",
-								fontSize: "12px",
-							}}
-							onClick={handleBackToCatalog}
-						>
-							{" "}
-							Back to Catalog
-						</button>
-					</div>
-					<div
-						style={{ marginTop: "50px", lineHeight: "48px", display: "flex" }}
-					>
-						<p
-							style={{
-								fontSize: "32px",
-								fontWeight: "bold",
-								margin: "0",
-								lineHeight: "1.2",
-							}}
-						>
-							{courseDetailsData.className}
-						</p>
-						<div
-							className="text-sm md:text-lg lg:text-2xl flex flex-col items-start gap-2"
-							style={{ marginLeft: "150px" }}
-						>
-							<button
-								onClick={handleClick}
-								style={{ width: "168px", height: "38px" }}
-								className={`w-42 h-9 rounded-md text-white text-xs ${
-									isAdded
-										? "bg-gray-400 cursor-not-allowed"
-										: "bg-orange-400 hover:bg-orange-500 cursor-pointer transition-colors duration-300"
-								}`}
-								disabled={isAdded}
-							>
-								{isAdded ? "Added to Cart" : "Add to Cart"}
-							</button>
+		<div className="max-w-stretch w-full min-h-screen m-0 p-0 md:text-lg lg:text-2xl">
+			<div className="mr-4">
+				<button
+					className="w-[154px] h-[38px] bg-[#D9D9D9] rounded-md text-xs"
+					onClick={handleBackToCatalog}
+				>
+					Back to Catalog
+				</button>
 
-							<button
-								onClick={openRatingsPage}
-								className="w-42 h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300 ml-10"
-							>
-								<p>Rate This Course</p>
-							</button>
-							{/* Pop-Up Modal */}
-							{ratingsPageOpen && (
-								<div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
-									<div className="bg-white p-6 rounded-lg shadow-lg z-40 text-center">
-										<div className="w-full">
-											<div>
-												<button
-													className="flex ml-auto items-center justify-center w-3 h-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm"
-													onClick={() => setRatingsPageOpen(false)}
-												>
-													×
-												</button>
-											</div>
-										</div>
-										<h2 className="text-xl font-bold mb-4">Rate this course</h2>
+				<div style={{ marginTop: "50px", lineHeight: "48px", display: "flex" }}>
+					<p
+						style={{
+							fontSize: "32px",
+							fontWeight: "bold",
+							margin: "0",
+							lineHeight: "1.2",
+						}}
+					>
+						{courseDetailsData.className}
+					</p>
+					<div
+						className="text-sm md:text-lg lg:text-2xl flex flex-col flex-start items-start gap-2 justify-start"
+						style={{ marginLeft: "150px" }}
+					>
+						<button
+							onClick={handleClick}
+							className={`w-36 h-9 rounded-md text-white text-xs ${
+								isAdded
+									? "bg-gray-400 cursor-not-allowed"
+									: "bg-orange-400 hover:bg-orange-500 cursor-pointer transition-colors duration-300"
+							}`}
+							disabled={isAdded}
+						>
+							{isAdded ? "Added to Cart" : "Add to Cart"}
+						</button>
+
+						<button
+							onClick={openRatingsPage}
+							className="min-w-min w-36 h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300"
+						>
+							<p>Rate This Course</p>
+						</button>
+						{/* Pop-Up Modal */}
+						{ratingsPageOpen && (
+							<div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
+								<div className="bg-white p-6 rounded-lg shadow-lg z-40 text-center">
+									<div className="w-full">
 										<div>
-											<div className="flex">
-												{[1, 2, 3, 4, 5].map((value, index) => (
-													<button
-														key={index}
-														onClick={() => onClickRating(value)}
-														style={{
-															padding: "5px",
-														}}
-													>
-														<FaStar
-															color={
-																index < numStarsRatingPage
-																	? "#FFD700"
-																	: "#a9a9a9"
-															}
-														/>
-													</button>
-												))}
-											</div>
 											<button
-												onClick={() => submitRatingPage(numStarsRatingPage)}
-												className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-30 h-8 text-sm"
+												className="flex ml-auto items-center justify-center w-3 h-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm"
+												onClick={() => setRatingsPageOpen(false)}
 											>
-												Submit
+												×
 											</button>
 										</div>
+									</div>
+									<h2 className="text-xl font-bold mb-4">Rate this course</h2>
+									<div>
+										<div className="flex">
+											{[1, 2, 3, 4, 5].map((value, index) => (
+												<button
+													key={index}
+													onClick={() => onClickRating(value)}
+													style={{
+														padding: "5px",
+													}}
+												>
+													<FaStar
+														color={
+															index < numStarsRatingPage ? "#FFD700" : "#a9a9a9"
+														}
+													/>
+												</button>
+											))}
+										</div>
+										<button
+											onClick={() => submitRatingPage(numStarsRatingPage)}
+											className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-30 h-8 text-sm"
+										>
+											Submit
+										</button>
+									</div>
 
-										{/* <button
+									{/* <button
                       className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm w-3 h-2"
                       onClick={() => setRatingsPageOpen(false)}
                     >
                       Close
                     </button> */}
-									</div>
 								</div>
-							)}
-						</div>
+							</div>
+						)}
 					</div>
-					{/* Stars */}
-					<div style={{ marginTop: "0x" }}>
-						<StarDisplay
-							rating={starRating}
-							courseDetailsData={courseDetailsData}
-							dateEvent={dateEvent}
-						/>
-					</div>
-					<ul style={{ display: "flex", gap: "5px" }}>
-						{courseDetailsData.categories.map((component, index) => (
-							<li key={index}>
-								<ButtonLabel component={component} />
-							</li>
-						))}
-					</ul>
-					{/* Filters */}
 				</div>
+				{/* Stars */}
+				<div style={{ marginTop: "0x" }}>
+					<StarDisplay
+						rating={starRating}
+						courseDetailsData={courseDetailsData}
+						dateEvent={dateEvent}
+					/>
+				</div>
+				<ul style={{ display: "flex", gap: "5px" }}>
+					{courseDetailsData.categories.map((component, index) => (
+						<li key={index}>
+							<ButtonLabel component={component} />
+						</li>
+					))}
+				</ul>
+				{/* Filters */}
 				<div
 					style={{
 						display: "flex",
@@ -295,13 +274,15 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							display: "flex",
 							flexDirection: "column",
 							gap: "10px",
+							maxWidth: "100%",
+							width: "min-content",
 						}}
 					>
 						{/*Overview Rectangle*/}
 						<div
 							style={{
-								width: "537px",
-								height: "115px",
+								width: "500px",
+								height: "min-content",
 								backgroundColor: "#FFFFFF",
 								borderRadius: "20px",
 								display: "flex",
@@ -330,8 +311,8 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 						{/*Speaker discription rectangle*/}
 						<div
 							style={{
-								width: "537px",
-								height: "451px",
+								width: "500px",
+								height: "min-content",
 								backgroundColor: "#FFFFFF",
 								borderRadius: "20px",
 								padding: "10px",
@@ -341,8 +322,8 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							<p
 								style={{
 									textAlign: "left",
-									margin: "0",
-									lineHeight: "1.5",
+
+									// lineHeight: "1.5",
 									width: "150px",
 								}}
 							>
@@ -350,7 +331,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 									style={{
 										fontWeight: 600,
 										fontSize: "12px",
-										lineHeight: "18px",
+										// lineHeight: "18px",
 									}}
 								>
 									Speaker
@@ -400,7 +381,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 					<div
 						style={{
 							marginTop: "65px",
-							width: "537px",
+							width: "min-content",
 							height: "578px",
 							backgroundColor: "#FFFFFF",
 							borderRadius: "20px",
@@ -441,17 +422,16 @@ const DisplayThumbnail = ({ thumbnail }: { thumbnail: string }) => {
 const ButtonLabel = ({ component }: { component: String }) => {
 	return (
 		<div
+			className="rounded-xl"
 			style={{
-				width: "62px",
-				height: "18px",
 				backgroundColor: "#F79518",
-				borderRadius: "20px",
 				display: "flex", // Use flexbox for proper alignment
 				alignItems: "center", // Vertically center the text
 				justifyContent: "center", // Horizontally center the text
 			}}
 		>
 			<p
+				className="p-1 px-2"
 				style={{
 					margin: 0,
 					fontSize: "10px",
@@ -545,8 +525,9 @@ const DisplayBar = ({
 	}
 	const handleAccessCertificate = () => {};
 	return (
-		<div>
-			<div style={{ display: "flex" }}>
+		<div className="w-min">
+			{/* Webinar -> Survey -> Certificate */}
+			<div className="w-80" style={{ display: "flex" }}>
 				{/*First Shape*/}
 				<button
 					style={{
@@ -554,7 +535,7 @@ const DisplayBar = ({
 						height: "36px",
 						backgroundColor: "#F79518",
 						clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
-						borderRadius: "20px", // Adds roundness
+						borderRadius: "20px",
 						margin: "0 -20px 0 0",
 						padding: "0",
 						textAlign: "center",
