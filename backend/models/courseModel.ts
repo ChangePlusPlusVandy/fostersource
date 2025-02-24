@@ -21,6 +21,8 @@ export interface ICourse extends Document {
 	time: Date;
 	isInPerson: boolean;
 	students: mongoose.Types.ObjectId[]; //for the users
+	regStart: Date; 
+	regEnd: Date;  
 }
 
 const CourseSchema: Schema = new Schema(
@@ -58,6 +60,8 @@ const CourseSchema: Schema = new Schema(
 			enum: ["webinar", "course", "meeting"],
 			required: true,
 		},
+		regStart: { type: Date, required: true }, 
+		regEnd: { type: Date, required: false } 
 	},
 	{
 		timestamps: true,

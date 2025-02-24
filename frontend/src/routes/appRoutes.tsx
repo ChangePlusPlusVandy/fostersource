@@ -18,8 +18,10 @@ import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 import DiscountPage from "../pages/Admin/DiscountPage/Discount";
+import ProductPage from "../pages/Admin/ProductPage/ProductPage";
 import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
+import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -116,7 +118,9 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
+						<Route path="/admin" element={<AdminPage />} />
 						<Route path="/admin/discounts" element={<DiscountPage />} />
+						<Route path="/admin/products" element={<ProductPage />} />
 						<Route
 							path="/courseDetails"
 							element={<CoursePage setCartItemCount={setCartItemCount} />}
