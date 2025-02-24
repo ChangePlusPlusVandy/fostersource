@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X as XIcon } from 'lucide-react';
 
 interface UserType {
   type: string;
@@ -36,14 +36,14 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
     })
   );
 
-  // Define a reusable disabled date input component
   const DisabledDateInput = ({ label, enabled }: { label: string; enabled: boolean }) => (
-    <div className="mt-2 mb-4">
-      <div className="text-sm text-gray-400">{label}</div>
+    <div className="ml-6 mt-1">
+      <div className={`text-sm ${enabled ? 'text-gray-900' : 'text-gray-400'}`}>{label}</div>
       <input 
         type="datetime-local" 
         disabled={!enabled}
-        className={`w-full p-2 border rounded-lg text-sm ${!enabled ? 'bg-gray-100 text-gray-400' : 'bg-white'}`}
+        className={`w-64 p-2 border rounded-lg text-sm ${!enabled ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-900'}`}
+        placeholder="__/__/____ __:__"
       />
     </div>
   );
@@ -52,12 +52,15 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
     <div className="w-full min-h-screen bg-gray-100">
       <div className="max-w-screen-2xl mx-auto px-8 py-6">
         <div className="bg-white border rounded-lg">
-          {/* Header */}
           <div className="bg-[#8757a3] text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
             <h1 className="text-lg font-medium">New Product - Pricing</h1>
             {onClose && (
-              <button onClick={onClose} className="text-white hover:opacity-80">
-                <X className="w-6 h-6" />
+              <button 
+                onClick={onClose} 
+                className="flex items-center justify-center w-8 h-8 rounded-full transition-colors duration-200 hover:bg-white group"
+                aria-label="Close"
+              >
+                <XIcon className="w-6 h-6 text-white group-hover:text-[#8757a3] stroke-2" />
               </button>
             )}
           </div>
@@ -68,23 +71,20 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
             </h2>
 
             <div className="flex gap-8">
-              {/* Left Column - Configuration Options */}
-              <div className="w-1/3 space-y-6">
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Registration Limit</h3>
-                  <select 
-                    value={registrationLimit}
-                    onChange={(e) => setRegistrationLimit(e.target.value)}
-                    className="w-full p-2 border rounded-lg text-sm"
-                  >
-                    <option value="none">none</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                  </select>
-                </div>
+              <div className="w-1/3">
+                <h3 className="text-sm font-medium mb-2">Registration Limit</h3>
+                <select 
+                  value={registrationLimit}
+                  onChange={(e) => setRegistrationLimit(e.target.value)}
+                  className="w-full p-2 border rounded-lg text-sm mb-6"
+                >
+                  <option value="none">none</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                </select>
 
-                <div className="space-y-2">
+                <div className="space-y-2 mb-6">
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
@@ -107,19 +107,27 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                   <DisabledDateInput label="Expiration" enabled={earlyBirdPricing} />
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 mb-6">
                   <div>
                     <h3 className="text-sm font-medium mb-2">Start Sales</h3>
-                    <input type="datetime-local" className="w-full p-2 border rounded-lg text-sm" />
+                    <input 
+                      type="datetime-local" 
+                      className="w-64 p-2 border rounded-lg text-sm" 
+                      placeholder="__/__/____ __:__"
+                    />
                   </div>
 
                   <div>
                     <h3 className="text-sm font-medium mb-2">End Sales</h3>
-                    <input type="datetime-local" className="w-full p-2 border rounded-lg text-sm" />
+                    <input 
+                      type="datetime-local" 
+                      className="w-64 p-2 border rounded-lg text-sm" 
+                      placeholder="__/__/____ __:__"
+                    />
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 mb-6">
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
@@ -153,7 +161,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                   <DisabledDateInput label="Open For Access Date" enabled={delayedOpening} />
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 mb-6">
                   <h3 className="text-sm font-medium">Expire Registrations</h3>
                   <div className="flex gap-2">
                     <input
@@ -192,41 +200,40 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                 </div>
               </div>
 
-              {/* Right Column - Pricing Table */}
               <div className="w-2/3">
-                <h3 className="text-sm font-medium mb-4">Individual Pricing</h3>
-                <div className="border rounded-lg overflow-hidden">
+                <h3 className="text-sm font-medium mb-2">Individual Pricing</h3>
+                <div className="border rounded-lg overflow-hidden border-gray-300">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-gray-50">
-                        <th className="p-3 text-left text-sm">User Type</th>
-                        <th className="p-3 text-center w-24 text-sm">View</th>
-                        <th className="p-3 text-center w-24 text-sm">Register</th>
-                        <th className="p-3 text-center w-32 text-sm">Instant Register</th>
-                        <th className="p-3 text-center w-32 text-sm">Price</th>
-                        <th className="p-3 text-center w-32 text-sm">Early Bird Price</th>
+                      <tr className="bg-gray-100">
+                        <th className="p-3 text-left text-sm font-medium border-b border-gray-300">User Type</th>
+                        <th className="p-3 text-center w-24 text-sm font-medium border-b border-gray-300">View</th>
+                        <th className="p-3 text-center w-24 text-sm font-medium border-b border-gray-300">Register</th>
+                        <th className="p-3 text-center w-32 text-sm font-medium border-b border-gray-300">Instant Register</th>
+                        <th className="p-3 text-center w-32 text-sm font-medium border-b border-gray-300">Price</th>
+                        <th className="p-3 text-center w-32 text-sm font-medium border-b border-gray-300">Early Bird Price</th>
                       </tr>
                     </thead>
                     <tbody>
                       {userTypes.map((user, index) => (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
-                          <td className="p-3 text-sm">{user.type}</td>
-                          <td className="p-3 text-center">
+                        <tr key={index} className={index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}>
+                          <td className="p-3 text-sm border-b border-gray-200">{user.type}</td>
+                          <td className="p-3 text-center border-b border-gray-200">
                             <input type="checkbox" className="w-4 h-4 accent-[#8757a3]" />
                           </td>
-                          <td className="p-3 text-center">
+                          <td className="p-3 text-center border-b border-gray-200">
                             <input type="checkbox" className="w-4 h-4 accent-[#8757a3]" />
                           </td>
-                          <td className="p-3 text-center">
+                          <td className="p-3 text-center border-b border-gray-200">
                             <input type="checkbox" className="w-4 h-4 accent-[#8757a3]" />
                           </td>
-                          <td className="p-3">
+                          <td className="p-3 border-b border-gray-200">
                             <div className="flex items-center justify-center">
                               <span className="mr-1 text-sm">$</span>
                               <input type="text" className="w-20 p-1 border rounded text-sm" />
                             </div>
                           </td>
-                          <td className="p-3">
+                          <td className="p-3 border-b border-gray-200">
                             <div className="flex items-center justify-center">
                               <span className="mr-1 text-sm">$</span>
                               <input type="text" className="w-20 p-1 border rounded text-sm" />
