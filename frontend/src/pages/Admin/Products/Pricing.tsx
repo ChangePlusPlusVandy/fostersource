@@ -36,13 +36,25 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
     })
   );
 
+  // Define a reusable disabled date input component
+  const DisabledDateInput = ({ label, enabled }: { label: string; enabled: boolean }) => (
+    <div className="mt-2 mb-4">
+      <div className="text-sm text-gray-400">{label}</div>
+      <input 
+        type="datetime-local" 
+        disabled={!enabled}
+        className={`w-full p-2 border rounded-lg text-sm ${!enabled ? 'bg-gray-100 text-gray-400' : 'bg-white'}`}
+      />
+    </div>
+  );
+
   return (
     <div className="w-full min-h-screen bg-gray-100">
       <div className="max-w-screen-2xl mx-auto px-8 py-6">
         <div className="bg-white border rounded-lg">
           {/* Header */}
           <div className="bg-[#8757a3] text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
-            <h1 className="text-xl font-medium">New Product - Pricing</h1>
+            <h1 className="text-lg font-medium">New Product - Pricing</h1>
             {onClose && (
               <button onClick={onClose} className="text-white hover:opacity-80">
                 <X className="w-6 h-6" />
@@ -51,7 +63,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
           </div>
 
           <div className="p-6">
-            <h2 className="text-2xl font-bold mb-6">
+            <h2 className="text-xl font-bold mb-6">
               The Inclusive Family Support Model -Live Virtual (01/25/2025)
             </h2>
 
@@ -59,11 +71,11 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
               {/* Left Column - Configuration Options */}
               <div className="w-1/3 space-y-6">
                 <div>
-                  <h3 className="font-medium mb-2">Registration Limit</h3>
+                  <h3 className="text-sm font-medium mb-2">Registration Limit</h3>
                   <select 
                     value={registrationLimit}
                     onChange={(e) => setRegistrationLimit(e.target.value)}
-                    className="w-full p-2 border rounded-lg"
+                    className="w-full p-2 border rounded-lg text-sm"
                   >
                     <option value="none">none</option>
                     <option value="10">10</option>
@@ -73,7 +85,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={privateRegistration}
@@ -83,7 +95,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                     <span>Private Registration</span>
                   </label>
 
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={earlyBirdPricing}
@@ -92,22 +104,23 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                     />
                     <span>Early Bird Pricing</span>
                   </label>
+                  <DisabledDateInput label="Expiration" enabled={earlyBirdPricing} />
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-medium mb-2">Start Sales</h3>
-                    <input type="date" className="w-full p-2 border rounded-lg" />
+                    <h3 className="text-sm font-medium mb-2">Start Sales</h3>
+                    <input type="datetime-local" className="w-full p-2 border rounded-lg text-sm" />
                   </div>
 
                   <div>
-                    <h3 className="font-medium mb-2">End Sales</h3>
-                    <input type="date" className="w-full p-2 border rounded-lg" />
+                    <h3 className="text-sm font-medium mb-2">End Sales</h3>
+                    <input type="datetime-local" className="w-full p-2 border rounded-lg text-sm" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={noEndSales}
@@ -117,7 +130,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                     <span>No End Sales</span>
                   </label>
 
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={autoCloseAccess}
@@ -126,8 +139,9 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                     />
                     <span>Automatically Close Access</span>
                   </label>
+                  <DisabledDateInput label="Close Access After" enabled={autoCloseAccess} />
 
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={delayedOpening}
@@ -136,26 +150,27 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                     />
                     <span>Delayed Product Opening</span>
                   </label>
+                  <DisabledDateInput label="Open For Access Date" enabled={delayedOpening} />
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="font-medium">Expire Registrations</h3>
+                  <h3 className="text-sm font-medium">Expire Registrations</h3>
                   <div className="flex gap-2">
                     <input
                       type="number"
                       value={expirationDays}
                       onChange={(e) => setExpirationDays(e.target.value)}
-                      className="w-16 p-2 border rounded-lg"
+                      className="w-16 p-2 border rounded-lg text-sm"
                       min="0"
                     />
-                    <select className="flex-1 p-2 border rounded-lg">
+                    <select className="flex-1 p-2 border rounded-lg text-sm">
                       <option>Days from Registration</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={emailManagers}
@@ -165,7 +180,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                     <span>Email Managers On Completions</span>
                   </label>
 
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
                       checked={emailRegistrants}
@@ -179,23 +194,23 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 
               {/* Right Column - Pricing Table */}
               <div className="w-2/3">
-                <h3 className="font-medium mb-4">Individual Pricing</h3>
-                <div className="overflow-x-auto">
+                <h3 className="text-sm font-medium mb-4">Individual Pricing</h3>
+                <div className="border rounded-lg overflow-hidden">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50">
-                        <th className="p-3 text-left">User Type</th>
-                        <th className="p-3 text-center w-24">View</th>
-                        <th className="p-3 text-center w-24">Register</th>
-                        <th className="p-3 text-center w-32">Instant Register</th>
-                        <th className="p-3 text-center w-32">Price</th>
-                        <th className="p-3 text-center w-32">Early Bird Price</th>
+                        <th className="p-3 text-left text-sm">User Type</th>
+                        <th className="p-3 text-center w-24 text-sm">View</th>
+                        <th className="p-3 text-center w-24 text-sm">Register</th>
+                        <th className="p-3 text-center w-32 text-sm">Instant Register</th>
+                        <th className="p-3 text-center w-32 text-sm">Price</th>
+                        <th className="p-3 text-center w-32 text-sm">Early Bird Price</th>
                       </tr>
                     </thead>
                     <tbody>
                       {userTypes.map((user, index) => (
                         <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
-                          <td className="p-3">{user.type}</td>
+                          <td className="p-3 text-sm">{user.type}</td>
                           <td className="p-3 text-center">
                             <input type="checkbox" className="w-4 h-4 accent-[#8757a3]" />
                           </td>
@@ -207,14 +222,14 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
                           </td>
                           <td className="p-3">
                             <div className="flex items-center justify-center">
-                              <span className="mr-1">$</span>
-                              <input type="text" className="w-20 p-1 border rounded" />
+                              <span className="mr-1 text-sm">$</span>
+                              <input type="text" className="w-20 p-1 border rounded text-sm" />
                             </div>
                           </td>
                           <td className="p-3">
                             <div className="flex items-center justify-center">
-                              <span className="mr-1">$</span>
-                              <input type="text" className="w-20 p-1 border rounded" />
+                              <span className="mr-1 text-sm">$</span>
+                              <input type="text" className="w-20 p-1 border rounded text-sm" />
                             </div>
                           </td>
                         </tr>
