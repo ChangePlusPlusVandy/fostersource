@@ -4,6 +4,7 @@ import Progress from "../models/progressModel";
 import Payment from "../models/paymentModel";
 import Course from "../models/courseModel";
 import mongoose from "mongoose";
+import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 
 // @desc    Get all users or by filter
 // @route   GET /api/users
@@ -214,4 +215,27 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 	}
 };
 
+// @desc    Check if the user is an admin (staff)
+// @route   GET /api/users/is-admin
+// @access  Private (Requires authentication)
+export const checkAdmin = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized: No user data found" });
+        }
 
+        // Find user based on Firebase UID
+        const user = await User.findOne({ firebaseId: req.user.uid });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Only "staff" users are admins
+        const isAdmin = user.role === "staff";
+
+        return res.status(200).json({ isAdmin });
+    } catch (error) {
+        return res.status(500).json({ message: "Server error", error });
+    }
+};
