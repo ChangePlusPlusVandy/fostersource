@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import Dropdown from "../../../components/dropdown-select";
 import {Video, Calendar, Wifi} from "lucide-react";
 import DisplayBar from "./DisplayBar";
-import { WebinarType } from "../../../shared/types/webinar";
+import { WebinarType } from "../../../shared/types/Webinar";
 
 interface WorkshopProps {
   webinar?: WebinarType
