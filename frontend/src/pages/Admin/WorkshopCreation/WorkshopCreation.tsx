@@ -42,15 +42,9 @@ export default function WorkshopCreation({ workshopName}:WorkshopCreationProps) 
         embeddingLink: ""
     })
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [openModal, setOpenModal] = useState<"New" | "Existing" | null>(null);
 
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
 
     const handleChange = (e:any) => {
         const { name, value } = e.target;
@@ -92,7 +86,7 @@ export default function WorkshopCreation({ workshopName}:WorkshopCreationProps) 
                 </div>
                 <div className="py-5">
                     {formData.type === "webinar" ? (
-                        <WebinarComponent setWebinarData={setWebinarData} webinarData={webinarData}/>
+                        <WebinarComponent setWebinarData={setWebinarData} webinarData={webinarData} openModal={openModal} setOpenModal={setOpenModal}/>
                     ) : formData.type === "in-person" ? (
                         <InPersonComponent  inPersonData={inPersonData} setInPersonData={setInPersonData}/>
                     ) : (
@@ -192,6 +186,16 @@ export default function WorkshopCreation({ workshopName}:WorkshopCreationProps) 
                     <button type="button" className="px-4 py-2 border border-purple-800 text-purple-800 rounded">Exit</button>
                 </div>
             </form>
+
+            {/* First Modal */}
+            <Modal isOpen={openModal === "New"} onClose={() => setOpenModal(null)} title="Create New Webinar">
+                <p>This is the placeholder for adding a new webinar (once we get zoom).</p>
+            </Modal>
+
+            {/* Second Modal */}
+            <Modal isOpen={openModal === "Existing"} onClose={() => setOpenModal(null)} title="Add Existing Webinar">
+                <p>This is placeholder for finding existing webinars.</p>
+            </Modal>
         </div>
     );
 }
