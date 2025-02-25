@@ -16,8 +16,14 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
 		_id: "",
 		className: "Introduction to Computer Science",
-		courseDescription:
-			"Learn the basics of computer science, programming, and problem-solving.",
+		courseDescription: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas vitae nibh nisi. Duis a imperdiet tellus. Mauris quis tortor sit amet nunc consequat dapibus quis nec lorem. Pellentesque vestibulum nulla quis arcu feugiat, ac euismod neque rhoncus. Morbi odio ligula, mattis egestas lacus vitae, pellentesque posuere tortor. Vivamus malesuada rhoncus rhoncus. Aenean sit amet ullamcorper metus. Suspendisse blandit ullamcorper lectus a vestibulum.\n
+
+Nullam efficitur nisl vel nibh cursus vehicula. Etiam erat dolor, euismod quis nibh sit amet, auctor dapibus diam. Fusce mi nisl, volutpat ut lacus ut, pulvinar elementum mauris. Sed ornare tincidunt tortor id molestie. Proin semper dignissim imperdiet. Donec tellus augue, pulvinar ornare ex vel, semper tincidunt lectus. Integer id orci quam. Nulla ac erat vitae nisi aliquet molestie id at elit. Sed scelerisque sodales mi, in eleifend lorem feugiat sed.\n
+
+Maecenas euismod erat rhoncus, viverra odio vitae, pulvinar enim. Duis sollicitudin nibh libero, vitae tristique lacus gravida dignissim. Mauris tempor magna consectetur neque volutpat, sit amet bibendum nisl consectetur. Morbi facilisis eu orci at volutpat. Sed tincidunt laoreet augue, faucibus ornare enim ullamcorper vitae. Ut interdum nibh et eros consectetur venenatis. Nulla pretium nunc est, sit amet mollis ante fringilla eget.\n
+Maecenas euismod erat rhoncus, viverra odio vitae, pulvinar enim. Duis sollicitudin nibh libero, vitae tristique lacus gravida dignissim. Mauris tempor magna consectetur neque volutpat, sit amet bibendum nisl consectetur. Morbi facilisis eu orci at volutpat. Sed tincidunt laoreet augue, faucibus ornare enim ullamcorper vitae. Ut interdum nibh et eros consectetur venenatis. Nulla pretium nunc est, sit amet mollis ante fringilla eget.\n
+
+Sed blandit blandit consequat. Duis ornare at dui in varius. Fusce vel dapibus nunc. Aliquam pellentesque hendrerit vestibulum. Phasellus turpis orci, commodo venenatis lacinia non, ultricies vel lacus. Nullam non euismod lacus, vitae porta magna. Etiam et sodales arcu. Nunc luctus sem et sodales tristique. Sed lorem sem, tristique in laoreet at, pulvinar et mi. Vestibulum libero felis, cursus sit amet egestas sed, luctus id nibh. Duis feugiat dolor metus, vel vulputate libero condimentum quis.`,
 		instructorName: "Dr. Alice Johnson",
 		creditNumber: 3,
 		discussion: "An interactive discussion about computational thinking.",
@@ -40,16 +46,16 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [numStarsRatingPage, setNumStarsRatingpage] = useState(0);
 
 	//================ Working axios request ======================
+	const fetchCourses = async () => {
+		try {
+			const response = await apiClient.get(`/courses/${courseId}`);
+			setCourseDetailsData(response.data.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	useEffect(() => {
-		async function fetchCourses() {
-			try {
-				const response = await apiClient.get(`/courses/${courseId}`);
-				setCourseDetailsData(response.data.data);
-			} catch (error) {
-				console.error(error);
-			}
-		}
 		fetchCourses();
 	}, []);
 
@@ -76,9 +82,6 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 		return <div>Loading Course Data</div>;
 	}
 
-	const handleClick = () => {
-		setIsAdded(true);
-	};
 	const openRatingsPage = () => {
 		setRatingsPageOpen(true);
 	};
@@ -108,8 +111,8 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	};
 
 	return (
-		<div className="w-full min-h-screen m-0 p-0 md:text-lg lg:text-2xl">
-			<div className="mr-4">
+		<div className="w-full h-full m-0 p-0 md:text-lg lg:text-2xl bg-orange-200">
+			<div className="mt-8 mr-4">
 				<button
 					className="w-[154px] h-[38px] bg-[#D9D9D9] rounded-md text-xs"
 					onClick={() => navigate("/catalog")}
@@ -117,11 +120,22 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 					Back to Catalog
 				</button>
 
-				<div className="m-0 mt-[50px] flex text-3xl font-bold">
-					{courseDetailsData.className}
-					<div className="text-sm md:text-lg lg:text-2xl flex flex-col flex-start items-start gap-2 justify-start ml-[150px]">
+				<div className="m-0 my-5 flex text-3xl font-bold">
+					<div className="flex flex-col">
+						<p>{courseDetailsData.className}</p>
+						{/* Stars */}
+						<StarDisplay
+							rating={starRating}
+							courseDetailsData={courseDetailsData}
+						/>
+						<CategoryPills categories={courseDetailsData.categories} />
+					</div>
+
+					<div className="text-sm md:text-lg lg:text-2xl h-auto flex flex-col flex-start items-start gap-2 justify-start ml-36">
 						<button
-							onClick={handleClick}
+							onClick={() => {
+								setIsAdded(true);
+							}}
 							className={`w-36 h-9 rounded-md text-white text-xs ${
 								isAdded
 									? "bg-gray-400 cursor-not-allowed"
@@ -176,81 +190,38 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 					</div>
 				</div>
 
-				{/* Stars */}
-				<StarDisplay
-					rating={starRating}
-					courseDetailsData={courseDetailsData}
-				/>
-
-				<CategoryPills categories={courseDetailsData.categories} />
-
-				<div className="flex gap-5 py-3 max-w-7xl bg-pink-200">
+				<div className="flex gap-5 py-3 max-w-7xl bg-pink-200 w-full pr-3 min-h-full h-full">
 					<div
-						className="bg-blue-200"
+						className="bg-blue-200 min-w-min w-1/2"
 						style={{
 							display: "flex",
 							flexDirection: "column",
 							gap: "10px",
 							maxWidth: "100%",
-							width: "min-content",
 						}}
 					>
 						{/*Overview Rectangle*/}
-						<div
-							style={{
-								width: "500px",
-								height: "min-content",
-								backgroundColor: "#FFFFFF",
-								borderRadius: "20px",
-								display: "flex",
-								flexDirection: "column",
-								alignItems: "flex-start",
-								justifyContent: "flex-start",
-								padding: "10px",
-							}}
-						>
-							<p
-								style={{
-									textAlign: "left",
-									fontSize: "12px",
-									margin: "0",
-									lineHeight: "1.5",
-									fontWeight: 400,
-								}}
-							>
-								<span style={{ fontWeight: 600 }}>Overview</span>
-								<br />
-								{courseDetailsData.discussion}
-							</p>
+						<div className="bg-white rounded-2xl flex flex-col items-start justify-start p-3 text-xs gap-1">
+							<p className="font-semibold">Overview</p>
+							<p>{courseDetailsData.discussion}</p>
 						</div>
 
 						{/*Speaker discription rectangle*/}
-						<div
-							style={{
-								width: "500px",
-								height: "min-content",
-								backgroundColor: "#FFFFFF",
-								borderRadius: "20px",
-								padding: "10px",
-								display: "flex",
-							}}
-						>
-							<p
-								style={{
-									textAlign: "left",
-									width: "150px",
-								}}
-							>
-								<span
+						<div className="bg-white rounded-2xl p-3 flex gap-3 max-h-96">
+							<div className="max-w-36 min-w-32">
+								<div
+									className="justify-start"
 									style={{
 										fontWeight: 600,
 										fontSize: "12px",
 									}}
 								>
 									Speaker
-								</span>
-								<br />
-								<div style={{ margin: "20px 0", textAlign: "center" }}>
+								</div>
+								<div
+									className="bg-slate-400"
+									style={{ margin: "20px 0", textAlign: "center" }}
+								>
 									<img
 										src={courseDetailsData.thumbnailPath}
 										alt="No Picture Found"
@@ -260,36 +231,23 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 										}}
 									/>
 								</div>
-								<br />
-								<span
-									style={{
-										fontSize: "16pz",
-										lineHeight: "24px",
-										fontWeight: 500,
-									}}
-								>
+								<div className="text-base font-medium">
 									{courseDetailsData.instructorName}
-								</span>
+								</div>
 
 								<CategoryPills categories={courseDetailsData.categories} />
-								<br />
+
 								{/*Needs to be complete*/}
-								<span style={{ fontWeight: 500, fontSize: "12px" }}>
+								<p className="text-xs font-medium">
 									{courseDetailsData.instructorDescription}
-								</span>
-							</p>
-							<p
-								style={{
-									fontWeight: 400,
-									fontSize: "12px",
-									lineHeight: "18px",
-								}}
-							>
+								</p>
+							</div>
+							<div className="text-xs overflow-scroll">
 								{courseDetailsData.courseDescription}
-							</p>
+							</div>
 						</div>
 					</div>
-					<div className="p-3 pl-5 rounded-2xl bg-green-200">
+					<div className="p-3 pl-5 rounded-2xl bg-green-200 min-w-min w-1/2">
 						Content
 						<DisplayBar
 							surveyLength={courseDetailsData.lengthCourse}
@@ -391,13 +349,13 @@ const DisplayBar = ({
 	const handleAccessCertificate = () => {};
 
 	return (
-		<div className="w-min">
+		<div className="w-min min-w-min bg-red-800 min-h-min">
 			{/* Webinar -> Survey -> Certificate */}
-			<div className="w-80" style={{ display: "flex" }}>
+			<div className="flex min-w-min">
 				{/*First Shape*/}
 				<button
 					style={{
-						width: "163px",
+						width: "150px",
 						height: "36px",
 						backgroundColor: "#F79518",
 						clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
@@ -426,7 +384,7 @@ const DisplayBar = ({
 				{/*Second Shape*/}
 				<button
 					style={{
-						width: "163px",
+						width: "150px",
 						height: "36px",
 						backgroundColor: surveyColor,
 						clipPath:
@@ -458,8 +416,7 @@ const DisplayBar = ({
 						backgroundColor: certificateColor,
 						clipPath: "polygon(0 0, 85% 0, 85% 100%, 0 100%, 15% 50%)",
 						borderRadius: "0 20px 20px 0",
-						margin: "0",
-						padding: "0",
+
 						border: "none",
 						cursor: "pointer",
 					}}
@@ -469,7 +426,6 @@ const DisplayBar = ({
 						style={{
 							display: "flex",
 							justifyContent: "center",
-							alignItems: "center",
 
 							fontSize: "12px",
 							color: "#FFFFFF",
@@ -723,7 +679,7 @@ const StarDisplay = ({
 	}, [rating]);
 
 	return (
-		<div className="flex gap-[10px] items-center text-[12px]">
+		<div className="flex gap-3 items-center text-xs mt-1 mb-2">
 			<p className="font-bold">{rating === -1 ? "No ratings yet" : rating}</p>
 			<ul>
 				{stars.map((_, index) => (
