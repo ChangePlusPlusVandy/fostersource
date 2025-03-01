@@ -114,24 +114,45 @@ Sed blandit blandit consequat. Duis ornare at dui in varius. Fusce vel dapibus n
 		<div className="w-full h-full m-0 p-0 md:text-lg lg:text-2xl bg-orange-200">
 			<div className="mt-8 mr-4">
 				<button
-					className="w-[154px] h-[38px] bg-[#D9D9D9] rounded-md text-xs"
+					className="w-40 h-9 bg-[#D9D9D9] rounded-md text-xs"
 					onClick={() => navigate("/catalog")}
 				>
 					Back to Catalog
 				</button>
 
-				<div className="m-0 my-5 flex text-3xl font-bold">
-					<div className="flex flex-col">
-						<p>{courseDetailsData.className}</p>
-						{/* Stars */}
-						<StarDisplay
-							rating={starRating}
-							courseDetailsData={courseDetailsData}
-						/>
-						<CategoryPills categories={courseDetailsData.categories} />
+				<div className="m-0 my-5 flex w-full bg-stone-600 gap-20">
+					<div className="flex flex-col text-xs w-auto gap-1 bg-fuchsia-200">
+						<p className="text-3xl font-bold">{courseDetailsData.className}</p>
+
+						{/* Course Details + Rating */}
+						<div className="flex flex-row min-w-fit w-fit gap-4 items-center text-xs mt-1 bg-white content-start">
+							{/* Stars */}
+							<p className="font-bold w-max min-w-max">
+								{starRating === -1 ? (
+									"No ratings yet"
+								) : (
+									<StarDisplay rating={starRating} />
+								)}
+							</p>
+
+							<p className="w-max min-w-max">
+								{courseDetailsData.creditNumber} Credits
+							</p>
+							<p className="w-max min-w-max">
+								Live Web Event {courseDetailsData.time.toLocaleDateString()} at{" "}
+								{courseDetailsData.time.toLocaleTimeString("en-US", {
+									hour: "numeric",
+									minute: "2-digit",
+									hour12: true,
+								})}
+							</p>
+							<div className="w-max min-w-max">
+								<CategoryPills categories={courseDetailsData.categories} />
+							</div>
+						</div>
 					</div>
 
-					<div className="text-sm md:text-lg lg:text-2xl h-auto flex flex-col flex-start items-start gap-2 justify-start ml-36">
+					<div className="text-sm md:text-lg lg:text-2xl h-auto flex flex-col content-end gap-2 w-min bg-blue-400">
 						<button
 							onClick={() => {
 								setIsAdded(true);
@@ -190,9 +211,9 @@ Sed blandit blandit consequat. Duis ornare at dui in varius. Fusce vel dapibus n
 					</div>
 				</div>
 
-				<div className="flex gap-5 py-3 max-w-7xl bg-pink-200 w-full pr-3 min-h-full h-full">
+				<div className="flex gap-5 py-3 max-w-7xl bg-pink-200 w-full pr-3 min-h-full">
 					<div
-						className="bg-blue-200 min-w-min w-1/2"
+						className="bg-blue-200 min-w-min w-5/6"
 						style={{
 							display: "flex",
 							flexDirection: "column",
@@ -208,7 +229,7 @@ Sed blandit blandit consequat. Duis ornare at dui in varius. Fusce vel dapibus n
 
 						{/*Speaker discription rectangle*/}
 						<div className="bg-white rounded-2xl p-3 flex gap-3 max-h-96">
-							<div className="max-w-36 min-w-32">
+							<div className="max-w-36 min-w-32 flex-wrap">
 								<div
 									className="justify-start"
 									style={{
@@ -247,8 +268,8 @@ Sed blandit blandit consequat. Duis ornare at dui in varius. Fusce vel dapibus n
 							</div>
 						</div>
 					</div>
-					<div className="p-3 pl-5 rounded-2xl bg-green-200 min-w-min w-1/2">
-						Content
+					<div className="p-3 px-5 flex flex-col rounded-2xl bg-green-200 min-w-min w-min gap-1">
+						<p className="text-xs font-semibold"> Content </p>
 						<DisplayBar
 							surveyLength={courseDetailsData.lengthCourse}
 							creditHours={courseDetailsData.creditNumber}
@@ -264,7 +285,7 @@ Sed blandit blandit consequat. Duis ornare at dui in varius. Fusce vel dapibus n
 
 const CategoryPills = ({ categories }: { categories: string[] }) => {
 	return (
-		<ul className="flex gap-1">
+		<ul className="flex flex-wrap gap-1">
 			{categories.map((category, index) => (
 				<li key={index}>
 					<div className="flex rounded-xl bg-[#F79518]">
@@ -351,48 +372,28 @@ const DisplayBar = ({
 	return (
 		<div className="w-min min-w-min bg-red-800 min-h-min">
 			{/* Webinar -> Survey -> Certificate */}
-			<div className="flex min-w-min">
+			<div className="flex min-w-min h-9 bg-stone-500">
 				{/*First Shape*/}
 				<button
+					className="bg-[#F79518] rounded-l-full text-center cursor-pointer w-36"
 					style={{
-						width: "150px",
-						height: "36px",
-						backgroundColor: "#F79518",
 						clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
-						borderRadius: "20px",
-						margin: "0 -20px 0 0",
-						padding: "0",
-						textAlign: "center",
-						border: "none",
-						cursor: "pointer",
 					}}
 				>
 					<p
+						className="flex justify-center items-center text-xs text-white font-semibold"
 						onClick={handleWebinarClick}
-						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-							fontSize: "12px",
-							color: "#FFFFFF",
-							fontWeight: 600,
-						}}
 					>
 						Webinar
 					</p>
 				</button>
 				{/*Second Shape*/}
 				<button
+					className="text-center cursor-pointer w-36 -ml-5"
 					style={{
-						width: "150px",
-						height: "36px",
 						backgroundColor: surveyColor,
 						clipPath:
 							"polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
-						margin: "0 -20px 0 0",
-						padding: "0",
-						border: "none",
-						cursor: "pointer",
 					}}
 				>
 					<p
@@ -409,16 +410,12 @@ const DisplayBar = ({
 						Survey
 					</p>
 				</button>
+				{/* Certificate Button */}
 				<button
+					className="text-center cursor-pointer w-36 rounded-r-full -ml-5"
 					style={{
-						width: "150px",
-						height: "36px",
+						clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 15% 50%)",
 						backgroundColor: certificateColor,
-						clipPath: "polygon(0 0, 85% 0, 85% 100%, 0 100%, 15% 50%)",
-						borderRadius: "0 20px 20px 0",
-
-						border: "none",
-						cursor: "pointer",
 					}}
 				>
 					<p
@@ -435,20 +432,6 @@ const DisplayBar = ({
 						Certificate
 					</p>
 				</button>
-				<button
-					onClick={handleCertificateClick}
-					style={{
-						width: "40px",
-						height: "36px",
-						backgroundColor: certificateColor,
-						clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-						borderRadius: "20px",
-						margin: "0 -40px",
-						padding: "0",
-						border: "none",
-						cursor: "pointer",
-					}}
-				></button>
 			</div>
 			<div>
 				{currentPage === "Webinar" && (
@@ -658,13 +641,7 @@ const DisplayBar = ({
 };
 
 /* Displays the stars, credit numbers, and live event time */
-const StarDisplay = ({
-	rating,
-	courseDetailsData,
-}: {
-	rating: number;
-	courseDetailsData: Course;
-}) => {
+const StarDisplay = ({ rating }: { rating: number }) => {
 	const [halfFilledStar, setHalfFilledStar] = useState(false);
 	let stars = Array(5).fill(0);
 	if (rating === -1) {
@@ -679,8 +656,8 @@ const StarDisplay = ({
 	}, [rating]);
 
 	return (
-		<div className="flex gap-3 items-center text-xs mt-1 mb-2">
-			<p className="font-bold">{rating === -1 ? "No ratings yet" : rating}</p>
+		<div className="flex min-w-min gap-3 items-center text-xs mt-1 mb-2">
+			<p>{rating}</p>
 			<ul>
 				{stars.map((_, index) => (
 					<li key={index} className="inline-block mr-1">
@@ -695,15 +672,6 @@ const StarDisplay = ({
 					</li>
 				))}
 			</ul>
-			<p>{courseDetailsData.creditNumber} Credits</p>
-			<p>
-				Live Web Event {courseDetailsData.time.toLocaleDateString()} at{" "}
-				{courseDetailsData.time.toLocaleTimeString("en-US", {
-					hour: "numeric",
-					minute: "2-digit",
-					hour12: true,
-				})}
-			</p>
 		</div>
 	);
 };
