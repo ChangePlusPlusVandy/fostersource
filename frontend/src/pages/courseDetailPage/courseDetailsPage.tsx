@@ -122,7 +122,7 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 	return (
 		<div className="w-full h-full m-0 p-0 md:text-lg lg:text-2xl">
 			<div className="mr-4">
-				<div className="bg-gray-100 sticky top-0">
+				<div className="bg-gray-100 sticky top-0 z-50">
 					<button
 						className="w-40 h-9 bg-[#D9D9D9] rounded-md text-xs mt-8"
 						onClick={() => navigate("/catalog")}
@@ -241,7 +241,7 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 
 						{/* Content overview */}
 						<div className="p-3 flex flex-col rounded-2xl bg-white min-w-min w-full gap-1 h-full">
-							<p className="text-xs font-semibold"> Content(s) </p>
+							<p className="text-sm font-semibold"> Content(s) </p>
 							<DisplayBar
 								surveyLength={courseDetailsData.lengthCourse}
 								creditHours={courseDetailsData.creditNumber}
@@ -252,7 +252,7 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 					</div>
 					{/*Speaker discription rectangle*/}
 					<div className="bg-white rounded-2xl p-3 gap-2 flex h-stretch text-sm w-2/5 flex-col">
-						<div className="font-semibold text-xs">Speaker(s)</div>
+						<div className="font-semibold text-sm">Speaker(s)</div>
 						<div className="flex gap-1">
 							<div className="flex flex-col min-w-24 flex-wrap bg-yellow-300 gap-3">
 								<div className="bg-slate-400 min-h-28">
@@ -318,7 +318,6 @@ const DisplayBar = ({
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
 	const [survey, setSurvey] = useState(false);
-	const [surveyButton, setSurveyButton] = useState(false);
 
 	useEffect(() => {
 		const webinarEnd = time;
@@ -327,7 +326,6 @@ const DisplayBar = ({
 			const currentTime = new Date();
 			if (currentTime.getTime() > webinarEnd.getTime()) {
 				setSurvey(true);
-				setSurveyButton(true);
 			}
 		};
 
@@ -357,7 +355,7 @@ const DisplayBar = ({
 	const handleAccessCertificate = () => {};
 
 	return (
-		<div className="flex min-w-min min-h-min justify-between w-full">
+		<div className="flex min-w-min min-h-min justify-between w-full gap-2">
 			<div className="flex flex-col">
 				{/* Webinar -> Survey -> Certificate */}
 				<div className="flex min-w-min h-9 mb-5">
@@ -367,37 +365,31 @@ const DisplayBar = ({
 						style={{
 							clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
 						}}
+						onClick={() => {
+							setCurrentPage("Webinar");
+							setSurveyColor("#FEC781");
+							setCertificateColor("#FEC781");
+						}}
 					>
-						<p
-							className="flex justify-center items-center text-xs text-white font-semibold"
-							onClick={() => {
-								setCurrentPage("Webinar");
-								setSurveyColor("#FEC781");
-								setCertificateColor("#FEC781");
-							}}
-						>
+						<p className="flex justify-center items-center text-xs text-white font-semibold">
 							Webinar
 						</p>
 					</button>
 					{/* Survey Button */}
 					<button
-						className="text-center cursor-pointer w-48 -ml-6"
+						className="text-center cursor-pointer w-48 -ml-6 text-xs text-white font-semibold"
 						style={{
 							backgroundColor: surveyColor,
 							clipPath:
 								"polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
 						}}
+						onClick={() => {
+							setSurveyColor("#F79518");
+							setCertificateColor("#FEC781");
+							setCurrentPage("Survey");
+						}}
 					>
-						<p
-							className="flex justify-center items-center text-xs text-white font-semibold"
-							onClick={() => {
-								setSurveyColor("#F79518");
-								setCertificateColor("#FEC781");
-								setCurrentPage("Survey");
-							}}
-						>
-							Survey
-						</p>
+						Survey
 					</button>
 					{/* Certificate Button */}
 					<button
