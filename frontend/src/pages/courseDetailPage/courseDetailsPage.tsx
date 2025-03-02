@@ -120,8 +120,8 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 	};
 
 	return (
-		<div className="w-full h-max m-0 p-0 md:text-lg xl:text-2xl bg-blue-300">
-			<div className="mr-4 bg-stone-300 mb-3">
+		<div className="w-full h-max m-0 p-0 md:text-lg xl:text-2xl">
+			<div className="mr-4 mb-3">
 				<div className="bg-gray-100 sticky top-0 z-50">
 					<button
 						className="w-40 h-9 bg-[#D9D9D9] rounded-md text-xs mt-8"
@@ -220,8 +220,8 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 					<hr className="w-full my-4 border-t-4 border-gray-200 pb-1" />
 				</div>
 
-				<div className="flex gap-4 max-w-7xl w-full min-h-full bg-pink-200 flex-col xl:flex-row">
-					<div className="flex flex-col gap-3 bg-green-200 w-stretch">
+				<div className="flex gap-4 max-w-7xl w-full min-h-full flex-col xl:flex-row">
+					<div className="flex flex-col gap-3 w-fit">
 						{/*Overview Rectangle*/}
 						<div className="bg-white rounded-2xl flex flex-col items-start justify-start p-3 text-sm gap-1">
 							<p className="text-md font-semibold">Overview</p>
@@ -246,35 +246,33 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 						</div>
 					</div>
 					{/*Speaker discription rectangle*/}
-					<div className="bg-stone-200">
-						<div className="bg-white rounded-2xl p-3 gap-2 flex h-full text-sm w-full flex-col">
-							<div className="font-semibold text-sm">Speaker(s)</div>
-							<div className="flex gap-1">
-								<div className="flex flex-col min-w-24 flex-wrap bg-yellow-300 gap-3">
-									<div className="bg-slate-400 min-h-28">
-										<img
-											src={courseDetailsData.thumbnailPath}
-											alt={`A profile picture of ${courseDetailsData.instructorName}`}
-										/>
-									</div>
-									<div className="text-base font-medium">
-										{courseDetailsData.instructorName}
-									</div>
-
-									{/*Needs to be complete*/}
-									<div className="text-xs font-medium">
-										{courseDetailsData.instructorRole}
-									</div>
-									<CategoryPills categories={courseDetailsData.categories} />
+					<div className="bg-white rounded-2xl p-3 gap-2 flex h-stretch text-sm w-fit flex-col">
+						<div className="font-semibold text-sm">Speaker(s)</div>
+						<div className="flex gap-2">
+							<div className="flex flex-col min-w-24 flex-wrap gap-3">
+								<div className="bg-stone-100 min-h-28">
+									<img
+										src={courseDetailsData.thumbnailPath}
+										alt={`A profile picture of ${courseDetailsData.instructorName}`}
+									/>
 								</div>
-								<p className="flex flex-col gap-1">
-									{courseDetailsData.instructorDescription
-										.split("\n")
-										.map((line, index) => (
-											<span key={index}>{line}</span>
-										))}
-								</p>
+								<div className="text-base font-medium">
+									{courseDetailsData.instructorName}
+								</div>
+
+								{/*Needs to be complete*/}
+								<div className="text-xs font-medium">
+									{courseDetailsData.instructorRole}
+								</div>
+								<CategoryPills categories={courseDetailsData.categories} />
 							</div>
+							<p className="flex flex-col gap-1">
+								{courseDetailsData.instructorDescription
+									.split("\n")
+									.map((line, index) => (
+										<span key={index}>{line}</span>
+									))}
+							</p>
 						</div>
 					</div>
 				</div>
