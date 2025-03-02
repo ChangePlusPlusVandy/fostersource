@@ -121,7 +121,7 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 
 	return (
 		<div className="w-full h-max m-0 p-0 md:text-lg xl:text-2xl bg-blue-300">
-			<div className="mr-8 bg-stone-300 mb-3">
+			<div className="mr-4 bg-stone-300 mb-3">
 				<div className="bg-gray-100 sticky top-0 z-50">
 					<button
 						className="w-40 h-9 bg-[#D9D9D9] rounded-md text-xs mt-8"
