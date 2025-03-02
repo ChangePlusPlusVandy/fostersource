@@ -120,8 +120,8 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 	};
 
 	return (
-		<div className="w-full h-full m-0 p-0 md:text-lg lg:text-2xl">
-			<div className="mr-4">
+		<div className="w-full h-max m-0 p-0 md:text-lg xl:text-2xl bg-blue-300">
+			<div className="mr-8 bg-stone-300 mb-3">
 				<div className="bg-gray-100 sticky top-0 z-50">
 					<button
 						className="w-40 h-9 bg-[#D9D9D9] rounded-md text-xs mt-8"
@@ -129,7 +129,7 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 					>
 						Back to Catalog
 					</button>
-					<div className="m-0 my-5 flex w-full gap-20">
+					<div className="m-0 my-5 flex w-full gap-2 flex-col xl:flex-row xl:gap-20">
 						<div className="flex flex-col text-xs w-auto gap-1">
 							<p className="text-3xl font-bold">
 								{courseDetailsData.className}
@@ -164,19 +164,14 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 							</div>
 						</div>
 
-						<div className="text-sm md:text-lg lg:text-2xl h-auto flex flex-col content-end gap-2 w-min">
+						<div className="text-sm md:text-lg xl:text-2xl h-auto flex flex-row content-end gap-2 w-min xl:flex-col">
 							<button
 								onClick={() => {
-									setIsAdded(true);
+									setIsAdded(!isAdded);
 								}}
-								className={`w-36 h-9 rounded-md text-white text-xs ${
-									isAdded
-										? "bg-gray-400 cursor-not-allowed"
-										: "bg-orange-400 hover:bg-orange-500 cursor-pointer transition-colors duration-300"
-								}`}
-								disabled={isAdded}
+								className={`w-36 h-9 rounded-md text-white text-xs bg-orange-400 hover:bg-orange-500 cursor-pointer`}
 							>
-								{isAdded ? "Added to Cart" : "Add to Cart"}
+								{isAdded ? "Remove from Cart" : "Add to Cart"}
 							</button>
 
 							<button
@@ -225,8 +220,8 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 					<hr className="w-full my-4 border-t-4 border-gray-200 pb-1" />
 				</div>
 
-				<div className="flex gap-4 max-w-7xl w-full min-h-full bg-pink-200">
-					<div className="flex flex-col gap-3 min-w-min w-5/6 bg-green-200">
+				<div className="flex gap-4 max-w-7xl w-full min-h-full bg-pink-200 flex-col xl:flex-row">
+					<div className="flex flex-col gap-3 bg-green-200 w-stretch">
 						{/*Overview Rectangle*/}
 						<div className="bg-white rounded-2xl flex flex-col items-start justify-start p-3 text-sm gap-1">
 							<p className="text-md font-semibold">Overview</p>
@@ -251,33 +246,35 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 						</div>
 					</div>
 					{/*Speaker discription rectangle*/}
-					<div className="bg-white rounded-2xl p-3 gap-2 flex h-stretch text-sm w-2/5 flex-col">
-						<div className="font-semibold text-sm">Speaker(s)</div>
-						<div className="flex gap-1">
-							<div className="flex flex-col min-w-24 flex-wrap bg-yellow-300 gap-3">
-								<div className="bg-slate-400 min-h-28">
-									<img
-										src={courseDetailsData.thumbnailPath}
-										alt={`A profile picture of ${courseDetailsData.instructorName}`}
-									/>
-								</div>
-								<div className="text-base font-medium">
-									{courseDetailsData.instructorName}
-								</div>
+					<div className="bg-stone-200">
+						<div className="bg-white rounded-2xl p-3 gap-2 flex h-full text-sm w-full flex-col">
+							<div className="font-semibold text-sm">Speaker(s)</div>
+							<div className="flex gap-1">
+								<div className="flex flex-col min-w-24 flex-wrap bg-yellow-300 gap-3">
+									<div className="bg-slate-400 min-h-28">
+										<img
+											src={courseDetailsData.thumbnailPath}
+											alt={`A profile picture of ${courseDetailsData.instructorName}`}
+										/>
+									</div>
+									<div className="text-base font-medium">
+										{courseDetailsData.instructorName}
+									</div>
 
-								{/*Needs to be complete*/}
-								<div className="text-xs font-medium">
-									{courseDetailsData.instructorRole}
+									{/*Needs to be complete*/}
+									<div className="text-xs font-medium">
+										{courseDetailsData.instructorRole}
+									</div>
+									<CategoryPills categories={courseDetailsData.categories} />
 								</div>
-								<CategoryPills categories={courseDetailsData.categories} />
+								<p className="flex flex-col gap-1">
+									{courseDetailsData.instructorDescription
+										.split("\n")
+										.map((line, index) => (
+											<span key={index}>{line}</span>
+										))}
+								</p>
 							</div>
-							<p className="flex flex-col gap-1">
-								{courseDetailsData.instructorDescription
-									.split("\n")
-									.map((line, index) => (
-										<span key={index}>{line}</span>
-									))}
-							</p>
 						</div>
 					</div>
 				</div>
@@ -412,17 +409,35 @@ const DisplayBar = ({
 					</button>
 				</div>
 				{currentPage === "Webinar" && (
-					<div className="text-sm	font-normal flex flex-col gap-1">
-						<div>Date: {time.toLocaleDateString()}</div>
-						<div>
-							Time:{" "}
-							{time.toLocaleTimeString("en-US", {
-								hour: "numeric",
-								minute: "2-digit",
-								hour12: true,
-							})}
+					<div className="flex justify-between">
+						<div className="text-sm	font-normal flex flex-col gap-1">
+							<div>Date: {time.toLocaleDateString()}</div>
+							<div>
+								Time:{" "}
+								{time.toLocaleTimeString("en-US", {
+									hour: "numeric",
+									minute: "2-digit",
+									hour12: true,
+								})}
+							</div>
+							<div>Length: {lengthCourse} hours</div>
 						</div>
-						<div>Length: {lengthCourse} hours</div>
+						<div className="flex flex-col w-max gap-2">
+							{/*Needs to be complete add to calendar button*/}
+							<button className="bg-[#F79518] w-full rounded-md text-center text-white text-xs align-middle px-6 py-3">
+								Add Webinar to Calendar
+							</button>
+							<button
+								onClick={testNetwork}
+								className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3"
+							>
+								Test Network
+							</button>
+							<button className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3">
+								{/*Needs to be complete*/}
+								Handout(s)
+							</button>
+						</div>
 					</div>
 				)}
 				{currentPage === "Survey" && (
@@ -453,29 +468,9 @@ const DisplayBar = ({
 								className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 ${!survey ? "bg-gray-400 cursor-not-allowed" : "bg-[#F79518]"}`}
 								disabled={!survey}
 							>
-								Your Certificate
+								Print Certificate
 							</button>
 						</div>
-					</div>
-				)}
-			</div>
-			<div className="">
-				{currentPage === "Webinar" && (
-					<div className="flex flex-col w-max gap-2">
-						{/*Needs to be complete add to calendar button*/}
-						<button className="bg-[#F79518] w-full rounded-md text-center text-white text-xs align-middle px-6 py-3">
-							Add Webinar to Calendar
-						</button>
-						<button
-							onClick={testNetwork}
-							className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3"
-						>
-							Test Network
-						</button>
-						<button className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3">
-							{/*Needs to be complete*/}
-							Handout(s)
-						</button>
 					</div>
 				)}
 			</div>
