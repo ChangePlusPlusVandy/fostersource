@@ -16,14 +16,17 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
 		_id: "",
 		className: "Introduction to Computer Science",
-		courseDescription: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas vitae nibh nisi. Duis a imperdiet tellus. Mauris quis tortor sit amet nunc consequat dapibus quis nec lorem. Pellentesque vestibulum nulla quis arcu feugiat, ac euismod neque rhoncus. Morbi odio ligula, mattis egestas lacus vitae, pellentesque posuere tortor. Vivamus malesuada rhoncus rhoncus. Aenean sit amet ullamcorper metus. Suspendisse blandit ullamcorper lectus a vestibulum.\n
+		courseDescription: `When it comes to your child's case closing, are you hearing terms or phrases like, "least drastic alternative", APR, RGAP, intervention, etc. and feeling lost in the acronyms and language? Are you facing an APR and worried about ongoing support or post-permanency legal ramifications? Do you find yourself feeling unsure about how to advocate for your rights or desires in a potential APR? Are you wondering if you have to accept an APR? Has your county told you the requirements to qualify for RGAP (post-APR financial assistance)? If you answered yes to any of these questions, join us as attorney, Tim Eirich, helps us make sense of all things APR and RGAP! 
 
-Nullam efficitur nisl vel nibh cursus vehicula. Etiam erat dolor, euismod quis nibh sit amet, auctor dapibus diam. Fusce mi nisl, volutpat ut lacus ut, pulvinar elementum mauris. Sed ornare tincidunt tortor id molestie. Proin semper dignissim imperdiet. Donec tellus augue, pulvinar ornare ex vel, semper tincidunt lectus. Integer id orci quam. Nulla ac erat vitae nisi aliquet molestie id at elit. Sed scelerisque sodales mi, in eleifend lorem feugiat sed.\n
+Hours earned: 2.0
 
-Maecenas euismod erat rhoncus, viverra odio vitae, pulvinar enim. Duis sollicitudin nibh libero, vitae tristique lacus gravida dignissim. Mauris tempor magna consectetur neque volutpat, sit amet bibendum nisl consectetur. Morbi facilisis eu orci at volutpat. Sed tincidunt laoreet augue, faucibus ornare enim ullamcorper vitae. Ut interdum nibh et eros consectetur venenatis. Nulla pretium nunc est, sit amet mollis ante fringilla eget.\n
-Maecenas euismod erat rhoncus, viverra odio vitae, pulvinar enim. Duis sollicitudin nibh libero, vitae tristique lacus gravida dignissim. Mauris tempor magna consectetur neque volutpat, sit amet bibendum nisl consectetur. Morbi facilisis eu orci at volutpat. Sed tincidunt laoreet augue, faucibus ornare enim ullamcorper vitae. Ut interdum nibh et eros consectetur venenatis. Nulla pretium nunc est, sit amet mollis ante fringilla eget.\n
+Feedback from this class:
 
-Sed blandit blandit consequat. Duis ornare at dui in varius. Fusce vel dapibus nunc. Aliquam pellentesque hendrerit vestibulum. Phasellus turpis orci, commodo venenatis lacinia non, ultricies vel lacus. Nullam non euismod lacus, vitae porta magna. Etiam et sodales arcu. Nunc luctus sem et sodales tristique. Sed lorem sem, tristique in laoreet at, pulvinar et mi. Vestibulum libero felis, cursus sit amet egestas sed, luctus id nibh. Duis feugiat dolor metus, vel vulputate libero condimentum quis.`,
+"Incredibly helpful information. This should be required so that all foster parents are informed and not taken advantage of."
+
+"Tim was EXCELLENT and provided insight into complicated legal matters."
+
+"All of Tim's trainings are excellent, and I'm grateful that he partners with Foster Source to equip foster and kinship parents with the knowledge that they need to advocate for themselves and the children in their care."`,
 		instructorName: "Dr. Alice Johnson",
 		creditNumber: 3,
 		discussion: "An interactive discussion about computational thinking.",
@@ -34,7 +37,13 @@ Sed blandit blandit consequat. Duis ornare at dui in varius. Fusce vel dapibus n
 		cost: 100,
 		categories: ["Technology", "Category", "Misc"],
 		thumbnailPath: "",
-		instructorDescription: "PhD at Vandy",
+		instructorDescription: `Sarah has her degree in social work from Metropolitan State University with an emphasis in child and adolescent mental health.
+
+She has worked for Denver Department of Human Services Child Welfare for over 3 years as an ongoing social caseworker and currently holds a senior caseworker position in placement navigation. She has worked as a counselor at a residential treatment program for youth corrections, as a counselor for dual diagnosis adult men at a halfway house, and an independent living specialist for the disabled community/outreach specialist for individuals experiencing homelessness.
+
+Sarah writes:
+
+In my spare time, I spend most of my time with my two teenage daughters. I am a huge advocate for social justice issues which I spend a lot of my time supporting through peaceful protests, education, volunteer work, etc. I love camping, crafting, karaoke, road trip adventures, and dancing in my living room. My favorite place in the entire world is the Mojave Desert.`,
 		instructorRole: "Moderator",
 		lengthCourse: 2,
 		time: new Date("2025-10-15T00:00:00.000Z"),
@@ -111,171 +120,165 @@ Sed blandit blandit consequat. Duis ornare at dui in varius. Fusce vel dapibus n
 	};
 
 	return (
-		<div className="w-full h-full m-0 p-0 md:text-lg lg:text-2xl bg-orange-200">
-			<div className="mt-8 mr-4">
-				<button
-					className="w-40 h-9 bg-[#D9D9D9] rounded-md text-xs"
-					onClick={() => navigate("/catalog")}
-				>
-					Back to Catalog
-				</button>
-
-				<div className="m-0 my-5 flex w-full bg-stone-600 gap-20">
-					<div className="flex flex-col text-xs w-auto gap-1 bg-fuchsia-200">
-						<p className="text-3xl font-bold">{courseDetailsData.className}</p>
-
-						{/* Course Details + Rating */}
-						<div className="flex flex-row min-w-fit w-fit gap-4 items-center text-xs mt-1 bg-white content-start">
-							{/* Stars */}
-							<p className="font-bold w-max min-w-max">
-								{starRating === -1 ? (
-									"No ratings yet"
-								) : (
-									<StarDisplay rating={starRating} />
-								)}
+		<div className="w-full h-full m-0 p-0 md:text-lg lg:text-2xl">
+			<div className="mr-4">
+				<div className="bg-gray-100 sticky top-0">
+					<button
+						className="w-40 h-9 bg-[#D9D9D9] rounded-md text-xs mt-8"
+						onClick={() => navigate("/catalog")}
+					>
+						Back to Catalog
+					</button>
+					<div className="m-0 my-5 flex w-full gap-20">
+						<div className="flex flex-col text-xs w-auto gap-1">
+							<p className="text-3xl font-bold">
+								{courseDetailsData.className}
 							</p>
 
-							<p className="w-max min-w-max">
-								{courseDetailsData.creditNumber} Credits
-							</p>
-							<p className="w-max min-w-max">
-								Live Web Event {courseDetailsData.time.toLocaleDateString()} at{" "}
-								{courseDetailsData.time.toLocaleTimeString("en-US", {
-									hour: "numeric",
-									minute: "2-digit",
-									hour12: true,
-								})}
-							</p>
-							<div className="w-max min-w-max">
-								<CategoryPills categories={courseDetailsData.categories} />
-							</div>
-						</div>
-					</div>
+							{/* Course Details + Rating */}
+							<div className="flex flex-row min-w-fit w-fit gap-4 items-center text-xs mt-1 content-start">
+								{/* Stars */}
+								<p className="font-bold w-max min-w-max">
+									{starRating === -1 ? (
+										"No ratings yet"
+									) : (
+										<StarDisplay rating={starRating} />
+									)}
+								</p>
 
-					<div className="text-sm md:text-lg lg:text-2xl h-auto flex flex-col content-end gap-2 w-min bg-blue-400">
-						<button
-							onClick={() => {
-								setIsAdded(true);
-							}}
-							className={`w-36 h-9 rounded-md text-white text-xs ${
-								isAdded
-									? "bg-gray-400 cursor-not-allowed"
-									: "bg-orange-400 hover:bg-orange-500 cursor-pointer transition-colors duration-300"
-							}`}
-							disabled={isAdded}
-						>
-							{isAdded ? "Added to Cart" : "Add to Cart"}
-						</button>
-
-						<button
-							onClick={openRatingsPage}
-							className="min-w-min w-36 h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300"
-						>
-							Rate This Course
-						</button>
-						{/* Pop-Up Modal */}
-						{ratingsPageOpen && (
-							<div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
-								<div className="bg-white p-6 rounded-lg shadow-lg z-40 text-center flex flex-col">
-									<button
-										className="flex ml-auto items-center justify-center w-3 h-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm"
-										onClick={() => setRatingsPageOpen(false)}
-									>
-										×
-									</button>
-									<h2 className="text-xl font-bold mb-4">Rate this course</h2>
-									<div>
-										{[1, 2, 3, 4, 5].map((value, index) => (
-											<button
-												key={index}
-												className="p-1"
-												onClick={() => onClickRating(value)}
-											>
-												<FaStar
-													color={
-														index < numStarsRatingPage ? "#FFD700" : "#a9a9a9"
-													}
-												/>
-											</button>
-										))}
-									</div>
-									<button
-										className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-30 h-8 text-sm"
-										onClick={() => submitRatingPage(numStarsRatingPage)}
-									>
-										Submit
-									</button>
+								<p className="w-max min-w-max">
+									{courseDetailsData.creditNumber} Credits
+								</p>
+								<p className="w-max min-w-max">
+									Live Web Event {courseDetailsData.time.toLocaleDateString()}{" "}
+									at{" "}
+									{courseDetailsData.time.toLocaleTimeString("en-US", {
+										hour: "numeric",
+										minute: "2-digit",
+										hour12: true,
+									})}
+								</p>
+								<div className="w-max min-w-max">
+									<CategoryPills categories={courseDetailsData.categories} />
 								</div>
 							</div>
-						)}
+						</div>
+
+						<div className="text-sm md:text-lg lg:text-2xl h-auto flex flex-col content-end gap-2 w-min">
+							<button
+								onClick={() => {
+									setIsAdded(true);
+								}}
+								className={`w-36 h-9 rounded-md text-white text-xs ${
+									isAdded
+										? "bg-gray-400 cursor-not-allowed"
+										: "bg-orange-400 hover:bg-orange-500 cursor-pointer transition-colors duration-300"
+								}`}
+								disabled={isAdded}
+							>
+								{isAdded ? "Added to Cart" : "Add to Cart"}
+							</button>
+
+							<button
+								onClick={openRatingsPage}
+								className="min-w-min w-36 h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300"
+							>
+								Rate This Course
+							</button>
+							{/* Pop-Up Modal */}
+							{ratingsPageOpen && (
+								<div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
+									<div className="bg-white p-6 rounded-lg shadow-lg z-40 text-center flex flex-col">
+										<button
+											className="flex ml-auto items-center justify-center w-3 h-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm"
+											onClick={() => setRatingsPageOpen(false)}
+										>
+											×
+										</button>
+										<h2 className="text-xl font-bold mb-4">Rate this course</h2>
+										<div>
+											{[1, 2, 3, 4, 5].map((value, index) => (
+												<button
+													key={index}
+													className="p-1"
+													onClick={() => onClickRating(value)}
+												>
+													<FaStar
+														color={
+															index < numStarsRatingPage ? "#FFD700" : "#a9a9a9"
+														}
+													/>
+												</button>
+											))}
+										</div>
+										<button
+											className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-30 h-8 text-sm"
+											onClick={() => submitRatingPage(numStarsRatingPage)}
+										>
+											Submit
+										</button>
+									</div>
+								</div>
+							)}
+						</div>
 					</div>
+					<hr className="w-full my-4 border-t-4 border-gray-200 pb-1" />
 				</div>
 
-				<div className="flex gap-5 py-3 max-w-7xl bg-pink-200 w-full pr-3 min-h-full">
-					<div
-						className="bg-blue-200 min-w-min w-5/6"
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							gap: "10px",
-							maxWidth: "100%",
-						}}
-					>
+				<div className="flex gap-4 max-w-7xl w-full min-h-full bg-pink-200">
+					<div className="flex flex-col gap-3 min-w-min w-5/6 bg-green-200">
 						{/*Overview Rectangle*/}
-						<div className="bg-white rounded-2xl flex flex-col items-start justify-start p-3 text-xs gap-1">
-							<p className="font-semibold">Overview</p>
-							<p>{courseDetailsData.discussion}</p>
+						<div className="bg-white rounded-2xl flex flex-col items-start justify-start p-3 text-sm gap-1">
+							<p className="text-md font-semibold">Overview</p>
+							<p className="flex flex-col gap-1">
+								{courseDetailsData.courseDescription
+									.split("\n")
+									.map((line, index) => (
+										<span key={index}>{line}</span>
+									))}
+							</p>
 						</div>
 
-						{/*Speaker discription rectangle*/}
-						<div className="bg-white rounded-2xl p-3 flex gap-3 max-h-96">
-							<div className="max-w-36 min-w-32 flex-wrap">
-								<div
-									className="justify-start"
-									style={{
-										fontWeight: 600,
-										fontSize: "12px",
-									}}
-								>
-									Speaker
-								</div>
-								<div
-									className="bg-slate-400"
-									style={{ margin: "20px 0", textAlign: "center" }}
-								>
+						{/* Content overview */}
+						<div className="p-3 flex flex-col rounded-2xl bg-white min-w-min w-full gap-1 h-full">
+							<p className="text-xs font-semibold"> Content(s) </p>
+							<DisplayBar
+								surveyLength={courseDetailsData.lengthCourse}
+								creditHours={courseDetailsData.creditNumber}
+								time={courseDetailsData.time}
+								lengthCourse={courseDetailsData.lengthCourse}
+							/>
+						</div>
+					</div>
+					{/*Speaker discription rectangle*/}
+					<div className="bg-white rounded-2xl p-3 gap-2 flex h-stretch text-sm w-2/5 flex-col">
+						<div className="font-semibold text-xs">Speaker(s)</div>
+						<div className="flex gap-1">
+							<div className="flex flex-col min-w-24 flex-wrap bg-yellow-300 gap-3">
+								<div className="bg-slate-400 min-h-28">
 									<img
 										src={courseDetailsData.thumbnailPath}
-										alt="No Picture Found"
-										style={{
-											maxWidth: "121px",
-											height: "auto",
-										}}
+										alt={`A profile picture of ${courseDetailsData.instructorName}`}
 									/>
 								</div>
 								<div className="text-base font-medium">
 									{courseDetailsData.instructorName}
 								</div>
 
-								<CategoryPills categories={courseDetailsData.categories} />
-
 								{/*Needs to be complete*/}
-								<p className="text-xs font-medium">
-									{courseDetailsData.instructorDescription}
-								</p>
+								<div className="text-xs font-medium">
+									{courseDetailsData.instructorRole}
+								</div>
+								<CategoryPills categories={courseDetailsData.categories} />
 							</div>
-							<div className="text-xs overflow-scroll">
-								{courseDetailsData.courseDescription}
-							</div>
+							<p className="flex flex-col gap-1">
+								{courseDetailsData.instructorDescription
+									.split("\n")
+									.map((line, index) => (
+										<span key={index}>{line}</span>
+									))}
+							</p>
 						</div>
-					</div>
-					<div className="p-3 px-5 flex flex-col rounded-2xl bg-green-200 min-w-min w-min gap-1">
-						<p className="text-xs font-semibold"> Content </p>
-						<DisplayBar
-							surveyLength={courseDetailsData.lengthCourse}
-							creditHours={courseDetailsData.creditNumber}
-							time={courseDetailsData.time}
-							lengthCourse={courseDetailsData.lengthCourse}
-						/>
 					</div>
 				</div>
 			</div>
@@ -349,291 +352,139 @@ const DisplayBar = ({
 			alert("Network is down");
 		}
 	};
-	const handleWebinarClick = () => {
-		setCurrentPage("Webinar");
-		setSurveyColor("#D9D9D9");
-		setCertificateColor("#D9D9D9");
-	};
-	const handleSurveyClick = () => {
-		setSurveyColor("#FEC781");
-		setCertificateColor("#D9D9D9");
-		setCurrentPage("Survey");
-	};
-
-	const handleCertificateClick = () => {
-		setSurveyColor("#FEC781");
-		setCertificateColor("#FEC781");
-		setCurrentPage("Certificate");
-	};
 
 	/* TODO: Needs to be complete once certificate page is out */
 	const handleAccessCertificate = () => {};
 
 	return (
-		<div className="w-min min-w-min bg-red-800 min-h-min">
-			{/* Webinar -> Survey -> Certificate */}
-			<div className="flex min-w-min h-9 bg-stone-500">
-				{/*First Shape*/}
-				<button
-					className="bg-[#F79518] rounded-l-full text-center cursor-pointer w-36"
-					style={{
-						clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
-					}}
-				>
-					<p
-						className="flex justify-center items-center text-xs text-white font-semibold"
-						onClick={handleWebinarClick}
-					>
-						Webinar
-					</p>
-				</button>
-				{/*Second Shape*/}
-				<button
-					className="text-center cursor-pointer w-36 -ml-5"
-					style={{
-						backgroundColor: surveyColor,
-						clipPath:
-							"polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
-					}}
-				>
-					<p
-						onClick={handleSurveyClick}
+		<div className="flex min-w-min min-h-min justify-between w-full">
+			<div className="flex flex-col">
+				{/* Webinar -> Survey -> Certificate */}
+				<div className="flex min-w-min h-9 mb-5">
+					{/* Webinar Button */}
+					<button
+						className="bg-[#F79518] rounded-l-full text-center cursor-pointer w-48"
 						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-							fontSize: "12px",
-							color: "#FFFFFF",
-							fontWeight: 600,
+							clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
 						}}
 					>
-						Survey
-					</p>
-				</button>
-				{/* Certificate Button */}
-				<button
-					className="text-center cursor-pointer w-36 rounded-r-full -ml-5"
-					style={{
-						clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 15% 50%)",
-						backgroundColor: certificateColor,
-					}}
-				>
-					<p
-						onClick={handleCertificateClick}
-						style={{
-							display: "flex",
-							justifyContent: "center",
-
-							fontSize: "12px",
-							color: "#FFFFFF",
-							fontWeight: 600,
-						}}
-					>
-						Certificate
-					</p>
-				</button>
-			</div>
-			<div>
-				{currentPage === "Webinar" && (
-					<p
-						style={{
-							fontSize: "12px",
-							fontWeight: 600,
-							textAlign: "left",
-							margin: "20px 0",
-						}}
-					>
-						Webinar <br />
-						<div>
-							<p
-								style={{
-									fontSize: "12px",
-									fontWeight: 600,
-									textAlign: "left",
-									margin: "10px 0",
-									gap: "3px",
-									display: "flex",
-									flexDirection: "column",
-								}}
-							>
-								{/*Needs to be complete*/}
-								<div>Date {time.toLocaleDateString()}</div>
-								{/*Needs to be complete*/}
-								<div>
-									Time{" "}
-									{time.toLocaleTimeString("en-US", {
-										hour: "numeric",
-										minute: "2-digit",
-										hour12: true,
-									})}{" "}
-								</div>
-								{/*Needs to be complete*/}
-								<div>Length {lengthCourse}</div>
-							</p>
-						</div>
-						<div>
-							{/*Needs to be complete add to calendar button*/}
-							<button
-								style={{
-									width: "168px",
-									height: "38px",
-									backgroundColor: "#F79518",
-									borderRadius: "5px",
-									textAlign: "center",
-									lineHeight: "50px",
-									color: "white",
-									fontSize: "12px",
-									transform: "translateY(10px)",
-									border: "none",
-									marginTop: "20px",
-								}}
-							>
-								{/*Needs to be complete*/}
-								<p style={{ transform: "translateY(-5px)", margin: 0 }}>
-									Add to Calendar
-								</p>
-							</button>
-							<br />
-							<button
-								onClick={testNetwork}
-								style={{
-									width: "168px",
-									height: "38px",
-									backgroundColor: "#F79518",
-									borderRadius: "5px",
-									textAlign: "center",
-									lineHeight: "50px",
-									color: "white",
-									fontSize: "12px",
-									transform: "translateY(10px)",
-									border: "none",
-									marginTop: "10px",
-								}}
-							>
-								<p style={{ transform: "translateY(-5px)", margin: 0 }}>
-									Test Network
-								</p>
-							</button>
-							<br />
-							<button
-								style={{
-									width: "168px",
-									height: "38px",
-									backgroundColor: "#F79518",
-									borderRadius: "5px",
-									textAlign: "center",
-									lineHeight: "50px",
-									color: "white",
-									fontSize: "12px",
-									transform: "translateY(10px)",
-									border: "none",
-									marginTop: "10px",
-								}}
-							>
-								{/*Needs to be complete*/}
-								<p style={{ transform: "translateY(-5px)", margin: 0 }}>
-									Handout
-								</p>
-							</button>
-						</div>
-					</p>
-				)}
-				{currentPage === "Survey" && (
-					<p
-						style={{
-							fontSize: "12px",
-							fontWeight: 600,
-							textAlign: "left",
-							margin: "20px 0",
-						}}
-					>
-						Survey <br />
-						Amount:{" "}
-						<span style={{ fontWeight: 200 }}>{surveyLength} questions</span>
-						<div>
-							{/*Needs to be complete*/}
-
-							<button
-								style={{
-									width: "168px",
-									height: "38px",
-									backgroundColor: survey ? "#F79518" : "#F79518",
-									borderRadius: "5px",
-									textAlign: "center",
-									lineHeight: "50px",
-									color: "white",
-									fontSize: "12px",
-									transform: "translateY(10px)",
-									border: "none",
-									marginTop: "30px",
-									opacity: survey ? 1 : 0.6,
-								}}
-								disabled={!survey}
-							>
-								{/*Needs to be complete*/}
-
-								<p style={{ transform: "translateY(-5px)", margin: 0 }}>
-									{surveyButton ? (
-										<h1>Survey</h1>
-									) : (
-										<h1 className="text-xs mt-1">
-											Cannot access until webinar
-										</h1>
-									)}
-								</p>
-							</button>
-						</div>
-					</p>
-				)}
-				{currentPage === "Certificate" && (
-					<p
-						style={{
-							fontSize: "12px",
-							fontWeight: "bold",
-							textAlign: "left",
-							margin: "20px 0",
-						}}
-					>
-						Certificate
 						<p
-							style={{
-								fontSize: "12px",
-								fontWeight: 600,
-								textAlign: "left",
+							className="flex justify-center items-center text-xs text-white font-semibold"
+							onClick={() => {
+								setCurrentPage("Webinar");
+								setSurveyColor("#FEC781");
+								setCertificateColor("#FEC781");
 							}}
 						>
-							Amount:{" "}
-							<span style={{ fontWeight: 200 }}>{creditHours} questions</span>
+							Webinar
 						</p>
-						<div style={{ textAlign: "left" }}>
-							{/*Needs to be complete*/}
+					</button>
+					{/* Survey Button */}
+					<button
+						className="text-center cursor-pointer w-48 -ml-6"
+						style={{
+							backgroundColor: surveyColor,
+							clipPath:
+								"polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
+						}}
+					>
+						<p
+							className="flex justify-center items-center text-xs text-white font-semibold"
+							onClick={() => {
+								setSurveyColor("#F79518");
+								setCertificateColor("#FEC781");
+								setCurrentPage("Survey");
+							}}
+						>
+							Survey
+						</p>
+					</button>
+					{/* Certificate Button */}
+					<button
+						className="text-center cursor-pointer w-48 rounded-r-full -ml-6"
+						style={{
+							clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 15% 50%)",
+							backgroundColor: certificateColor,
+						}}
+					>
+						<p
+							className="flex justify-center items-center text-xs text-white font-semibold"
+							onClick={() => {
+								setSurveyColor("#F79518");
+								setCertificateColor("#F79518");
+								setCurrentPage("Certificate");
+							}}
+						>
+							Certificate
+						</p>
+					</button>
+				</div>
+				{currentPage === "Webinar" && (
+					<div className="text-sm	font-normal flex flex-col gap-1">
+						<div>Date: {time.toLocaleDateString()}</div>
+						<div>
+							Time:{" "}
+							{time.toLocaleTimeString("en-US", {
+								hour: "numeric",
+								minute: "2-digit",
+								hour12: true,
+							})}
+						</div>
+						<div>Length: {lengthCourse} hours</div>
+					</div>
+				)}
+				{currentPage === "Survey" && (
+					<div className="text-sm font-normal flex flex-col gap-3">
+						Length: {surveyLength} questions
+						<div className="flex flex-col text-xs text-red-600">
+							<p className={survey ? "hidden" : ""}>
+								Complete webinar to access survey
+							</p>
 							<button
-								style={{
-									width: "168px",
-									height: "38px",
-									backgroundColor: "#F79518",
-									borderRadius: "5px",
-									textAlign: "center",
-									lineHeight: "50px",
-									color: "white",
-									fontSize: "12px",
-									border: "none",
-									marginTop: "30px",
-								}}
+								className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 ${!survey ? "bg-gray-400 cursor-not-allowed" : "bg-[#F79518]"}`}
+								disabled={!survey}
 							>
-								{/*Needs to be complete*/}
-								<p
-									style={{
-										transform: "translateY(-7px)",
-										margin: 0,
-										font: "10px",
-									}}
-								>
-									Cannot access until Survey
-								</p>
+								Begin Survey
 							</button>
 						</div>
-					</p>
+					</div>
+				)}
+				{currentPage === "Certificate" && (
+					<div className="text-sm	font-normal flex flex-col gap-3">
+						Once you have completed the course, your certificate will be
+						accessible here.
+						<div className="flex flex-col text-xs text-red-600">
+							<p className={survey ? "hidden" : ""}>
+								Complete webinar to access certificate
+							</p>
+							<button
+								className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 ${!survey ? "bg-gray-400 cursor-not-allowed" : "bg-[#F79518]"}`}
+								disabled={!survey}
+							>
+								Your Certificate
+							</button>
+						</div>
+					</div>
+				)}
+			</div>
+			<div className="">
+				{currentPage === "Webinar" && (
+					<div className="flex flex-col w-max gap-2">
+						{/*Needs to be complete add to calendar button*/}
+						<button className="bg-[#F79518] w-full rounded-md text-center text-white text-xs align-middle px-6 py-3">
+							Add Webinar to Calendar
+						</button>
+						<button
+							onClick={testNetwork}
+							className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3"
+						>
+							Test Network
+						</button>
+						<button className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3">
+							{/*Needs to be complete*/}
+							Handout(s)
+						</button>
+					</div>
 				)}
 			</div>
 		</div>
