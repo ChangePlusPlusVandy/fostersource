@@ -15,6 +15,8 @@ import paymentRoutes from "./routes/paymentRoutes";
 import loginRoutes from "./routes/loginRoutes";
 import certificateRoutes from "./routes/certificateRoutes";
 import handoutRoutes from "./routes/handoutRoutes";
+import speakerRoutes from "./routes/speakerRoutes";
+
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
@@ -72,6 +74,8 @@ app.use("/api/videos", verifyFirebaseAuth, videoRoutes);
 app.use("/api/payments", verifyFirebaseAuth, paymentRoutes);
 app.use("/api/certificates", verifyFirebaseAuth, certificateRoutes);
 app.use("/api/handout", verifyFirebaseAuth, handoutRoutes);
+app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
+
 
 // Error middleware
 app.use(notFound);

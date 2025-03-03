@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import Speaker from "../models/speakerModel";
+import multer from "multer";
+
 
 // @desc    Get all speakers or filter by query parameters
 // @route   GET /api/speakers
@@ -25,50 +27,38 @@ export const getSpeakers = async (
 // @desc    Create a new speaker
 // @route   POST /api/speakers
 // @access  Public
-export const createSpeaker = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
+export const createSpeaker = async (req: Request, res: Response): Promise<void> => {
 	try {
-		const { id, name, title, email, company, bio, disclosures, image } =
-			req.body;
-
-		// Check if speaker exists
-		const existingSpeaker = await Speaker.findOne({ id });
-
-		if (existingSpeaker) {
-			res.status(200).json({
-				speaker: existingSpeaker,
-				message: "Speaker already exists",
-			});
-			return;
-		}
-
-		// Create new speaker
-		const speaker = new Speaker({
-			id,
-			name,
-			title,
-			email,
-			company,
-			bio,
-			disclosures,
-			image,
-		});
-		await speaker.save();
-
-		res.status(201).json({
-			speaker,
-			message: "Speaker created successfully",
-		});
+	  console.log("Request body:", req.body);
+	  console.log("Request file:", req.file);
+  
+	  const { name, title, email, company, bio, disclosures } = req.body;
+	  
+	  // Create new speaker
+	  const speaker = new Speaker({
+		name,
+		title,
+		email,
+		company,
+		bio,
+		disclosures: disclosures || '',
+		image: req.file ? req.file.path : null,
+	  });
+	  
+	  await speaker.save();
+  
+	  res.status(201).json({
+		speaker,
+		message: "Speaker created successfully",
+	  });
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-		} else {
-			res.status(500).json({ message: "An unknown error occurred" });
-		}
+	  if (error instanceof Error) {
+		res.status(500).json({ message: error.message });
+	  } else {
+		res.status(500).json({ message: "An unknown error occurred" });
+	  }
 	}
-};
+  };
 
 // @desc    Update a speaker
 // @route   PUT /api/speakers/:id
