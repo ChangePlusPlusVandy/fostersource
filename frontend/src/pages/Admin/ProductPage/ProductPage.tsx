@@ -4,7 +4,7 @@ import apiClient from "../../../services/apiClient";
 import { Course } from "../../../shared/types/course";
 import { Rating } from '../../../shared/types/rating';
 
-interface Product{
+export interface Product{
   id: number, 
   course: Course, 
   status: string, 
@@ -15,7 +15,7 @@ interface Product{
   selected: boolean
 }
 
-const Pagination = ({ 
+export const Pagination = ({ 
   currentPage = 1,
   totalPages = 1,
   onPageChange = (page: number) => console.log(page)
