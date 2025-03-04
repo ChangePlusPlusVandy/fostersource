@@ -6,19 +6,18 @@ export interface ISpeaker extends Document {
 	email: string;
 	company: string;
 	bio: string;
-	disclosures?: string;
 	image: Object;
 }
 
 const SpeakerSchema: Schema = new Schema(
 	{
-	  name: { type: String, required: true },  // Single string value
+	  name: { type: String, required: true },
 	  title: { type: String, required: true },
 	  email: { type: String, required: true },
 	  company: { type: String, required: true },
 	  bio: { type: String, required: true },
-	  disclosures: { type: String, required: false },
-	  image: { type: Object, required: false },
+	  image: { type: String, required: false }
+
 	},
 	{
 	  timestamps: true,

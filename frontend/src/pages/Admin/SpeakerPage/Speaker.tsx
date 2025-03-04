@@ -155,6 +155,7 @@ export default function SpeakersPage() {
       }
     }
   };
+  
 
   const handleRemoveSpeaker = async (speakerId: string | undefined) => {
     if (!speakerId) return;
@@ -169,39 +170,36 @@ export default function SpeakersPage() {
 
   const handleUpdateSpeaker = async () => {
     if (!currentSpeaker || !currentSpeaker._id) return;
-    
+  
     try {
       const formData = new FormData();
-      
-      // Add all speaker data to formData
+  
       Object.entries(currentSpeaker).forEach(([key, value]) => {
-        if (key !== 'image' && value !== undefined) {
+        if (value) {
           formData.append(key, value.toString());
         }
       });
-      
-      // Add image if selected
+  
       if (imageFile) {
-        formData.append('image', imageFile);
+        formData.append("image", imageFile);
       }
-      
+  
       const response = await apiClient.put(`/speakers/${currentSpeaker._id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { "Content-Type": "multipart/form-data" }
       });
-      
+  
       setSpeakers(speakers.map(s => s._id === currentSpeaker._id ? response.data : s));
-      
       setShowEditModal(false);
       setCurrentSpeaker(null);
       setImageFile(null);
     } catch (err) {
-      console.error('Error updating speaker:', err);
+      console.error("Error updating speaker:", err);
     }
   };
+  
 
   const handleAddSpeaker = async () => {
     try {
-      // Validate required fields first
       if (!newSpeaker.name || !newSpeaker.title || !newSpeaker.email || 
           !newSpeaker.company || !newSpeaker.bio) {
         alert("Please fill out all required fields");
@@ -209,58 +207,27 @@ export default function SpeakersPage() {
       }
   
       const formData = new FormData();
-      
-      console.log("Sending speaker data:", newSpeaker);
-      
-      // Add all new speaker data to formData
-      formData.append('name', newSpeaker.name);
-      formData.append('title', newSpeaker.title);
-      formData.append('email', newSpeaker.email);
-      formData.append('company', newSpeaker.company);
-      formData.append('bio', newSpeaker.bio);
-      
-      if (newSpeaker.disclosures) {
-        formData.append('disclosures', newSpeaker.disclosures);
-      }
-      
-      // Add image if selected
-      if (newImageFile) {
-        formData.append('image', newImageFile);
-      }
-      
-      // Log formData contents
-      console.log("FormData contents:");
-      Array.from(formData.entries()).forEach(entry => {
-        console.log(entry[0], entry[1]);
-      });
-      
-      const response = await apiClient.post('/speakers', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      
-      console.log("Success response:", response.data);
-      setSpeakers([...speakers, response.data.speaker]);
-      
-      setShowAddModal(false);
-      setNewSpeaker({
-        name: '',
-        title: '',
-        email: '',
-        company: '',
-        bio: '',
-        disclosures: ''
-      });
-      setNewImageFile(null);
-    } catch (err: unknown) {
-      console.error('Error adding speaker:', err);
-      
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosError = err as { response?: { data?: any } };
-        if (axiosError.response?.data) {
-          console.error("Server validation error:", axiosError.response.data);
-          alert("Error: " + axiosError.response.data.message);
+  
+      Object.entries(newSpeaker).forEach(([key, value]) => {
+        if (value) {
+          formData.append(key, value.toString());
         }
+      });
+  
+      if (newImageFile) {
+        formData.append("image", newImageFile);
       }
+  
+      const response = await apiClient.post("/speakers", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+  
+      setSpeakers([...speakers, response.data.speaker]);
+      setShowAddModal(false);
+      setNewSpeaker({ name: "", title: "", email: "", company: "", bio: "", disclosures: "" });
+      setNewImageFile(null);
+    } catch (err) {
+      console.error("Error adding speaker:", err);
     }
   };
   
@@ -378,6 +345,7 @@ export default function SpeakersPage() {
               )}
             </div>
           </div>
+
           
           <div className="flex justify-end gap-3">
             <button
@@ -442,16 +410,12 @@ export default function SpeakersPage() {
                   {/* Speaker Image */}
                   <div className="w-48 h-48 flex-shrink-0">
                   <img 
-                    src={speaker.image ? 
-                      (typeof speaker.image === 'string' ? 
-                        `http://localhost:5001/${speaker.image}` : 
-                        URL.createObjectURL(speaker.image)) : 
-                      speakerImage
-                    } 
+                    src={speaker.image ? speaker.image : speakerImage} 
                     alt={speaker.name}
                     className="w-full h-full object-cover rounded-lg"
                     onError={(e) => {
-                      e.currentTarget.src = speakerImage;
+                      console.log("Image failed to load:", e.currentTarget.src);
+                      e.currentTarget.src = speakerImage; // Fallback to default image
                     }}
                   />
                   </div>
