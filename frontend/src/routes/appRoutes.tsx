@@ -21,7 +21,7 @@ import DiscountPage from "../pages/Admin/DiscountPage/Discount";
 // import ProductPage from "../pages/Admin/ProductPage/ProductPage";
 import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
-import Pricing from "../pages/Admin/Products/Pricing"
+import Pricing from "../pages/Admin/Products/Pricing";
 import ComponentPage from "../pages/Admin/ComponentPage/Component";
 import WorkshopCreation from "../pages/Admin/WorkshopCreation/WorkshopCreation";
 // import AdminPage from "../pages/Admin/AdminPage";
@@ -34,8 +34,7 @@ function AppRoutes() {
 
 	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
 	const [cartItemCount, setCartItemCount] = useState(
-		localStorage.user &&
-		JSON.parse(localStorage.user).cart
+		localStorage.user && JSON.parse(localStorage.user).cart
 			? JSON.parse(localStorage.user).cart.length
 			: 0
 	);
