@@ -48,9 +48,9 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 		lengthCourse: 2,
 		time: new Date("2025-10-15T00:00:00.000Z"),
 		isInPerson: true,
-		students: [], 
+		students: [],
 		regStart: new Date("2025-10-10T00:00:00.000Z"),
-		regEnd: new Date("2025-10-12T00:00:00.000Z")
+		regEnd: new Date("2025-10-12T00:00:00.000Z"),
 	});
 	const [starRating, setStarRating] = useState(-1);
 	const [isAdded, setIsAdded] = useState(false);
@@ -71,14 +71,13 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 				console.error("Failed to check admin status", error);
 			}
 		};
-	
+
 		checkAdminStatus();
 	}, []);
 
 	const navigateToCourseEdit = () => {
 		navigate(`/courses/edit`); // Change to the desired route
 	};
-	
 
 	//================ Working axios request ======================
 	const fetchCourses = async () => {
@@ -93,7 +92,6 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 	useEffect(() => {
 		fetchCourses();
 	}, []);
-	
 
 	useEffect(() => {
 		if (courseDetailsData) {
@@ -193,7 +191,9 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 
 						<div className="text-sm md:text-lg xl:text-2xl h-auto flex flex-row content-end gap-2 w-min xl:flex-col">
 							<button
-								onClick={handleClick}
+								onClick={() => {
+									setIsAdded(!isAdded);
+								}}
 								style={{ width: "168px", height: "38px" }}
 								className={`h-9 rounded-md text-white text-xs ${
 									isAdded
@@ -282,7 +282,7 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 									className={`w-42 h-9 rounded-md text-white text-xs bg-[#7B4899]`}
 								>
 									Edit Course
-							</button>
+								</button>
 							)}
 						</div>
 					</div>

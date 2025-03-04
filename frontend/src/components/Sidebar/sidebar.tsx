@@ -244,7 +244,7 @@ export function SidebarItems({
 			{sidebarItems}
 			{isLoggedIn && (
 				<div className="logout">
-					<li className={`${active}`} onClick={() => handleLogOut()}>
+					<li className={`${logoutActive}`} onClick={() => handleLogOut()}>
 						<Link to={logout.href}>
 							<div className={`${iconDescMargin}`}>{logout.icon}</div>
 							{!isCollapsed && logout.description}
