@@ -23,6 +23,7 @@ import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
 import Pricing from "../pages/Admin/Products/Pricing";
 import ComponentPage from "../pages/Admin/ComponentPage/Component";
+import WorkshopCreation from "../pages/Admin/WorkshopCreation/WorkshopCreation";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -122,17 +123,9 @@ function AppRoutes() {
 						{/*<Route path="/admin" element={<AdminPage />} />*/}
 						<Route path="/admin/discounts" element={<DiscountPage />} />
 						<Route path="/admin/products/pricing" element={<Pricing />} />
-						<Route
-							path="/admin/components"
-							element={
-								<ComponentPage
-									workshop={undefined}
-									survey={undefined}
-									certificate={undefined}
-								/>
-							}
-						/>
+						<Route path="/admin/components" element = {<ComponentPage workshop={undefined} survey={undefined} certificate={undefined} />}/>
 						{/*<Route path="/admin/products" element={<ProductPage />} />*/}
+						<Route path="/admin/create-workshop" element={<WorkshopCreation  workshopName={`Workshop | The Inclusive Family Support Model`}/>} />
 						<Route
 							path="/courseDetails"
 							element={<CoursePage setCartItemCount={setCartItemCount} />}
