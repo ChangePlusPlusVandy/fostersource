@@ -62,8 +62,11 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const navigate = useNavigate();
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	const [ratingsPageOpen, setRatingsPageOpen] = useState(false);
-	const [numStarsRatingPage, setNumStarsRatingpage] = useState(0);
+	const [numStarsRatingpage, setNumStarsRatingpage] = useState(0);
 	const [isAdmin, setIsAdmin] = useState(false);
+	const [currentComponent, setCurrentComponent] = useState<string>("");
+	const [canProceed, setCanProceed] = useState<boolean>(false);
+	const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
 		const checkAdminStatus = async () => {
@@ -115,16 +118,17 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	//=============================================================
 
 	useEffect(() => {
-		async function fetchCourses() {
+		const fetchCourseDetails = async () => {
 			try {
 				const response = await apiClient.get(`/courses/${courseId}`);
-				setCourseDetailsData(response.data.data)
+				setCourseDetailsData(response.data.data);
 			} catch (error) {
 				console.error(error);
 			}
-		}
-		fetchCourses();
-	}, []);
+		};
+
+		fetchCourseDetails();
+	}, [courseId]);
 
 	useEffect(() => {
 		if (!courseDetailsData) {
@@ -165,7 +169,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 		setRatingsPageOpen(false);
 		setNumStarsRatingpage(value);
 		setCourseDetailsData((prevCourse) => {
-			if (!prevCourse) return prevCourse; // Handle null case
+			if (!prevCourse) return prevCourse;
 
 			const newRating: Rating = {
 				userId: JSON.parse(localStorage.user),
@@ -174,10 +178,33 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 			};
 
 			return {
-				...prevCourse, // Spread all existing properties
-				ratings: [...prevCourse.ratings, newRating], // Add new rating
+				...prevCourse,
+				ratings: [...prevCourse.ratings, newRating],
 			};
 		});
+	};
+
+	const handleComponentChange = (component: string) => {
+		setCurrentComponent(component);
+		setCanProceed(false);
+
+		if (timer) {
+			clearTimeout(timer);
+		}
+		const lengthInMinutes = courseDetailsData?.lengthCourse * 60; 
+		const newTimer = setTimeout(() => {
+			setCanProceed(true);
+		}, lengthInMinutes * 60000); 
+
+		setTimer(newTimer);
+	};
+
+	const handleNextComponent = () => {
+		if (canProceed) { //lwk dont know what to do now
+			console.log("Navigating to the next component...");
+		} else {
+			alert("You must complete the current component before proceeding.");
+		}
 	};
 
 	return (
@@ -265,7 +292,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 													>
 														<FaStar
 															color={
-																index < numStarsRatingPage
+																index < numStarsRatingpage
 																	? "#FFD700"
 																	: "#a9a9a9"
 															}
@@ -274,7 +301,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 												))}
 											</div>
 											<button
-												onClick={() => submitRatingPage(numStarsRatingPage)}
+												onClick={() => submitRatingPage(numStarsRatingpage)}
 												className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-30 h-8 text-sm"
 											>
 												Submit
