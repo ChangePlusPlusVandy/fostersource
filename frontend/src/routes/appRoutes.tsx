@@ -83,7 +83,7 @@ function AppRoutes() {
 						display: "flex",
 						flex: 1,
 						overflow: "auto",
-						paddingLeft: isCollapsed ? "6rem" : "17rem",
+						marginLeft: isCollapsed ? "6rem" : "17rem",
 					}}
 				>
 					<Routes>
