@@ -1,69 +1,75 @@
 .admin-sidebar {
-	width: 240px;
+	min-width: 70px;
+	width: 70px;
+	padding-left: 0;
+	max-height: min-content;
 	background-color: #ffffff;
+	margin-right: 0.75rem;
+	margin-left: 0.75rem;
+	height: 80vh;
 	box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 	border-radius: 0.7rem;
 	overflow: auto;
 	transition: all 0.2s;
-	height: 44vh;
-	margin: 0 0.75rem;
 }
 
-.admin-sidebar.collapsed {
-	width: 70px;
-}
-
-.admin-profile {
-	display: flex;
+.profile {
+	vertical-align: middle;
+	font: medium;
+	max-width: 75%;
+	margin-top: 1.8rem;
+	margin-left: 1.8rem;
+	margin-right: 1.8rem;
+	margin-bottom: 20px;
 	align-items: center;
-	/* padding: 16px; */
 }
 
-.admin-profile-pic {
-	width: 70px;
-	height: 70px;
+.profile-pic {
+	vertical-align: middle;
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
 }
 
-.admin-profile-text {
-	margin-left: 10px;
-}
-
-.admin-name {
-	font-size: 1.2rem;
-	font-weight: bold;
-}
-
-.admin-role {
-	font-size: 0.8rem;
-	color: gray;
+.admin-login {
+	background-color: #f79518;
+	text-align: center;
+	border-radius: 0.5rem;
 }
 
 .admin-menu {
-	list-style: none;
-	padding: 0;
+	font-weight: 500;
+	list-style-type: none;
 }
 
-.admin-menu-item {
+.admin-menu li {
+	vertical-align: middle;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding-top: 0.7rem;
+	padding-bottom: 0.7rem;
+	padding-left: 1.8rem;
+	padding-right: 1.8rem;
+	position: relative;
+}
+
+.admin-menu a {
+	text-decoration: none;
 	display: flex;
 	align-items: center;
-	padding: 12px 16px;
-	cursor: pointer;
-	position: relative;
-	width: 100%;
 }
 
-.admin-menu-item .admin-icon {
-	font-size: 18px;
-	margin-right: 10px;
+.admin-menu li:hover svg {
+	color: #8757a3;
 }
 
-.admin-menu-item.active {
+.admin-menu li.active {
 	background-color: #7b489933;
-	color: #7b4899;
+	color: black;
 }
 
-.admin-menu-item.active::after {
+.admin-menu li.active::after {
 	content: "";
 	position: absolute;
 	right: 0;
@@ -71,23 +77,56 @@
 	transform: translateY(-50%);
 	width: 3px;
 	height: 65%;
-	background-color: #7b4899;
+	background-color: #8757a3;
 	border-top-left-radius: 5px;
 	border-bottom-left-radius: 5px;
 }
 
-.admin-menu-item:hover {
-	color: #7b4899;
+.admin-menu .logout li:hover a {
+	color: #be0000 !important;
 }
 
-.admin-logout {
-	color: red;
+.admin-menu .logout li:hover svg {
+	color: #be0000 !important;
 }
 
-.admin-logout:hover {
-	background-color: #f7181833;
+.admin-menu .logout li.active {
+	background-color: #f7181833 !important;
+	color: #be0000 !important;
 }
 
-.admin-login {
-	background-color: #7b4899;
+.admin-menu .logout li.active a {
+	color: #be0000 !important;
+}
+
+.admin-menu .logout li.active::after {
+	background-color: #be0000 !important;
+}
+
+body {
+	font-family: "Poppins", sans-serif;
+	font-size: large;
+}
+
+.profile-pic {
+	width: 40px;
+	height: 40px;
+}
+
+.admin-sidebar {
+	min-width: 70px;
+	width: 70px;
+	padding-left: 0;
+}
+
+.admin-menu li {
+	padding-left: 1.5rem;
+}
+
+.profile {
+	padding-left: 0px;
+	padding-right: 0px;
+	margin-left: 0.95rem;
+	margin-right: 0px;
+	max-width: 60%;
 }

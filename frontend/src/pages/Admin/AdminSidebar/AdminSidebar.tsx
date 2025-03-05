@@ -1,25 +1,40 @@
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
-import { Link, useLocation } from "react-router-dom";
-import "./adminSidebar.css"; // Import CSS file
+import { useState, Dispatch, SetStateAction } from "react";
+import { Link } from "react-router-dom";
+import "./adminSidebar.css";
 import {
   Users,
   FileText,
   Settings,
   LogOut,
   Layers,
-  LogIn
+  LogIn, 
+  KeyRound
 } from "lucide-react";
 import authService from "../../../services/authService";
+import { log } from "console";
+import internal from "stream";
 
-// Admin User Information
-export const adminUserInfo = {
-  name: localStorage.user ? JSON.parse(localStorage.user).name : "Admin",
-  role: localStorage.user ? JSON.parse(localStorage.user).role : "Administrator",
-  isLoggedIn: localStorage.user ? true : false,
+// User information
+export const userInfo = {
+	name: "First L.",
+	role: localStorage.user ? localStorage.user.role : "No role",
+	isLoggedIn: false,
+	isAdmin: localStorage.user
+		? localStorage.user.role === "staff"
+			? true
+			: false
+		: false,
 };
 
-// Sidebar menu items for admin
-export const adminItems = [
+// export const userInfo = {
+// 	name: "First L.",
+// 	role: "No role",
+// 	isLoggedIn: false,
+// 	isAdmin: true
+// };
+
+// All sidebar entries
+export const adminSidebarItems = [
   {
     icon: <Layers />,
     description: "Products",
@@ -42,130 +57,159 @@ export const adminItems = [
   },
 ];
 
-// Logout information
-export const adminLogout = {
-  icon: <LogOut />,
-  description: "Logout",
-  href: "#",
+// Admin information for conditional rendering
+// export const admin = {
+// 	icon: <KeyRound />,
+// 	description: "Admin Tools",
+// 	href: "/admin",
+// };
+
+// Logout information for conditional rendering
+export const logout = {
+	icon: <LogOut />,
+	description: "Logout",
+	href: "#",
 };
 
-// Sidebar props interface
+// State of collapsibility, abstracted
 interface AdminSidebarProps {
-  isCollapsed: boolean;
-  setIsCollapsed: Dispatch<SetStateAction<boolean>>;
-  isLoggedIn: boolean;
-  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
+	isLoggedIn: boolean;
+	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 }
 
-// **Admin Sidebar Component**
+// The Sidebar itself
 export function AdminSidebar({
-  isCollapsed,
-  setIsCollapsed,
-  isLoggedIn,
-  setIsLoggedIn,
+	isLoggedIn,
+	setIsLoggedIn,
 }: AdminSidebarProps) {
-  const location = useLocation(); // ✅ Tracks current URL path
+	// User Info
+	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
+	const role = isLoggedIn ? JSON.parse(localStorage.user).role : "Log In";
+  // const name =  "Log In";
+	// const role = "Log In";
+  const isCollapsed = true; 
 
-  useEffect(() => {
-    const handleResize = () => setIsCollapsed(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [setIsCollapsed]);
-
-  return (
-    <div className={`admin-sidebar ${isCollapsed ? "collapsed" : ""}`}>
-      <AdminProfile isCollapsed={isCollapsed} isLoggedIn={isLoggedIn} />
-      <AdminSidebarItems
-        isCollapsed={isCollapsed}
-        isLoggedIn={isLoggedIn}
-        setIsLoggedIn={setIsLoggedIn}
-        currentPath={location.pathname}
-      />
-    </div>
-  );
+	return (
+		<div className="admin-sidebar">
+			<Profile
+				isCollapsed={isCollapsed}
+				isLoggedIn={isLoggedIn}
+				name={name}
+				role={role}
+			/>
+			<AdminSidebarItems
+				isCollapsed={isCollapsed}
+				isLoggedIn={isLoggedIn}
+				isAdmin={userInfo.isAdmin}
+				setIsLoggedIn={setIsLoggedIn}
+			/>
+		</div>
+	);
 }
 
-// **Admin Profile Component**
-interface AdminProfileProps {
-  isCollapsed: boolean;
-  isLoggedIn: boolean;
+interface ProfileProps {
+	isCollapsed: boolean;
+	isLoggedIn: boolean;
+	name?: string;
+	role?: string;
 }
 
-export function AdminProfile({ isCollapsed, isLoggedIn }: AdminProfileProps) {
-  return (
-    <div className="admin-profile flex flex-row items-center w-full p-3">
-      {isLoggedIn ? (
-        <img
-          src="https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png"
-          alt="Admin Profile"
-          className="admin-profile-pic"
-        />
-      ) : (
-        <Link to="/login" className="admin-login-button w-full">
-          <button className="admin-login text-white rounded p-3 flex gap-3 justify-center text-center w-full">
-            <LogIn /> {!isCollapsed && "Login"}
-          </button>
-        </Link>
-      )}
-      {isLoggedIn && !isCollapsed && (
-        <div className="pl-3">
-          <p className="admin-name text-lg font-medium">{adminUserInfo.name}</p>
-          <p className="admin-role text-gray-500 text-sm">{adminUserInfo.role}</p>
-        </div>
-      )}
-    </div>
-  );
+// Display either profile information or log in button
+export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
+	return (
+		<div className="profile flex flex-row items-center w-full">
+			{!isLoggedIn && (
+				<div className="w-full flex justify-center">
+					<Link to={"/login"} className="w-full">
+						<button className="admin-login text-white rounded p-3 flex gap-3 justify-center text-center w-full">
+							<LogIn /> {!isCollapsed && "Login"}
+						</button>
+					</Link>
+				</div>
+			)}
+			{isLoggedIn && (
+				<img
+					src={
+						"https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png"
+					}
+					alt="Profile"
+					className="profile-pic"
+				/>
+			)}
+			{isLoggedIn && !isCollapsed && (
+				<div className="pl-3 align-middle">
+					<p className="text-xl font-medium text-wrap">{name}</p>
+					<p className="text-xs text-gray-600 mt-1">{role}</p>
+				</div>
+			)}
+		</div>
+	);
 }
 
-// **Admin Sidebar Items Component**
 interface AdminSidebarItemsProps {
-  isCollapsed: boolean;
-  isLoggedIn: boolean;
-  setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
-  currentPath: string;
+	isLoggedIn: boolean;
+	isAdmin: boolean;
+	isCollapsed: boolean;
+	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 }
 
-export function AdminSidebarItems({ isCollapsed, isLoggedIn, setIsLoggedIn, currentPath }: AdminSidebarItemsProps) {
-  // ✅ Use `useState` to track the active item based on the current path
-  const [activeItem, setActiveItem] = useState<string>(currentPath);
+// Display and handle sidebar entries
+export function AdminSidebarItems({
+	isCollapsed,
+	isLoggedIn,
+	isAdmin,
+	setIsLoggedIn,
+}: AdminSidebarItemsProps) {
+	const handleLogOut = async () => {
+		try {
+			await authService.logout();
+		} catch (err: any) {
+			console.error("Login error:", err);
+		} finally {
+			setIsLoggedIn(authService.isAuthenticated());
+			window.location.href = "/login";
+		}
+	};
 
-  // ✅ Ensure the active item updates when the route changes
-  useEffect(() => {
-    setActiveItem(currentPath);
-  }, [currentPath]);
+	const [activeItem, setActiveItem] = useState<string>(
+		window.location.pathname
+	);
 
-  const handleLogOut = async () => {
-    try {
-      await authService.logout();
-    } catch (err) {
-      console.error("Logout error:", err);
-    } finally {
-      setIsLoggedIn(false);
-      window.location.href = "/login";
-    }
-  };
+	const sidebarItems = adminSidebarItems.map(({ icon, description, href }) => {
+		const active = activeItem === href ? "active" : "";
+		const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
-  const sidebarItems = adminItems.map(({ icon, description, href }) => {
-    const isActive = activeItem === href;
-    return (
-      <li key={href} className={`admin-menu-item ${isActive ? "active" : ""}`} onClick={() => setActiveItem(href)}>
-        <div className="admin-icon mr-4">{icon}</div>
-        {!isCollapsed && <Link to={href} className="admin-menu-text">{description}</Link>}
-      </li>
-    );
-  });
+		return (
 
-  return (
-    <ul className="admin-menu mb-4">
-      {sidebarItems}
-      {isLoggedIn && (
-        <div className="admin-logout">
-          <li className="admin-menu-item" onClick={() => handleLogOut()}>
-            <div className="admin-icon mr-4">{adminLogout.icon}</div>
-            {!isCollapsed && <Link to={adminLogout.href} className="admin-menu-text">{adminLogout.description}</Link>}
+        <li
+            key={href + description}
+            className={`${active}`}
+            onClick={() => {setActiveItem(window.location.pathname); 
+                window.location.href = href;
+            }}
+          >
+            <div className={`${iconDescMargin}`}>{icon}</div>
+          
           </li>
-        </div>
-      )}
-    </ul>
-  );
+
+		);
+	});
+
+	const logoutActive = activeItem === logout.href ? "active" : "";
+	const iconDescMargin = !isCollapsed ? "mr-4" : "";
+
+	return (
+		<ul className="admin-menu mb-4">
+			{sidebarItems}
+			{isLoggedIn && (
+				<div className="logout">
+					<li className={`${logoutActive}`} onClick={() => handleLogOut()}>
+						<div className={`${iconDescMargin}`}>{logout.icon}</div>
+						<Link to={logout.href}>{!isCollapsed && logout.description}</Link>
+					</li>
+				</div>
+			)}
+		</ul>
+	);
 }
+
