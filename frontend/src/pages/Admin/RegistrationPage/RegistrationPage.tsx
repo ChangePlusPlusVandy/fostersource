@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Expand, Search } from "lucide-react";
+import { Expand } from "lucide-react";
 import { Pagination } from "../ProductPage/ProductPage";
 import apiClient from "../../../services/apiClient";
 import { Payment } from "../../../shared/types/payment";
