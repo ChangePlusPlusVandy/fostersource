@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Expand, Search } from "lucide-react";
+import { Expand } from "lucide-react";
 import { Pagination } from "../ProductPage/ProductPage";
 import apiClient from "../../../services/apiClient";
 import { Payment } from "../../../shared/types/payment";
-import { Checkbox } from "../ComponentPage/WorkshopCard";
 import SearchDropdown from "../ComponentPage/DropDownSearch";
 import { Course } from "../../../shared/types/course";
 
@@ -90,10 +89,22 @@ export default function RegistrationPage() {
         URL.revokeObjectURL(url);
     }
 
+    const removeQuery = (index: number) => {
+        setSearchQuery(searchQuery => searchQuery.filter((_, i) => i !== index)); 
+    }
+
     useEffect(() => {
         fetchSearchOptions(); 
         fetchRegistrations(); 
     }, []); 
+
+    const totalPages: number = Math.ceil(displayedRegistrations.length / itemsPerPage);
+
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+          setCurrentPage(page);
+        }
+    };
 
     return (
         <div className="w-full min-h-screen bg-gray-100">  
@@ -106,7 +117,17 @@ export default function RegistrationPage() {
                         <Expand className="w-6 border rounded-lg p-1 cursor-pointer"></Expand>
                     </div>
 
-                    <SearchDropdown options={searchOptions} selected={searchQuery} />
+                    <SearchDropdown options={searchOptions} selected={searchQuery} setSelected={setSearchQuery} />
+
+                    {searchQuery.length > 0 && (
+                        <div className="flex space-x-2">
+                            {searchQuery.map((courseName, idx) => (
+                                <div key={idx} className="" onClick={() => removeQuery(idx)}>
+                                    {courseName}
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     <div className="flex justify-between text-xs items-center">
                         <div className="flex space-x-4">
@@ -167,9 +188,14 @@ export default function RegistrationPage() {
                             ))}
                         </tbody>
                     </table>
-                    { 
-                        //TODO: add stuff here 
-                        }
+                    
+                    <div className="flex justify-end mt-6">
+                        <Pagination 
+                        currentPage={currentPage}
+                        totalPages={totalPages || 1}
+                        onPageChange={handlePageChange}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
