@@ -20,11 +20,12 @@ export default function SearchDropdown({ options, selected, setSelected }: Searc
         option.toLowerCase().includes(value.toLowerCase())
       )
     );
-    setShowDropdown(value.length > 0);
   };
 
   const handleSelect = (option: string) => {
-    setSelected(options => [...options, option]); 
+    if (!selected.includes(option)) {
+      setSelected(prevSelected => [...prevSelected, option]); 
+    }
     setSearch(option);
     setShowDropdown(false);
   };
@@ -37,7 +38,7 @@ export default function SearchDropdown({ options, selected, setSelected }: Searc
           value={search}
           onChange={handleSearch}
           onFocus={() => setShowDropdown(true)}
-          onBlur={() => setShowDropdown(false)}
+          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
           placeholder="Search courses..."
           className="w-full border p-2 rounded"
         />

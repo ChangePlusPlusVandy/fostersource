@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Expand } from "lucide-react";
+import { Expand, Search } from "lucide-react";
 import { Pagination } from "../ProductPage/ProductPage";
 import apiClient from "../../../services/apiClient";
 import { Payment } from "../../../shared/types/payment";
@@ -18,8 +18,8 @@ interface Registration {
 export default function RegistrationPage() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [itemsPerPage, setItemsPerPage] = useState(15);
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
     const [regType, setRegType] = useState("In-Person");
     const regTypes = ["In-Person", "Online"]; 
     const [excludeZero, setExcludeZero] = useState(false); 
@@ -28,7 +28,7 @@ export default function RegistrationPage() {
     const [searchQuery, setSearchQuery] = useState<string[]>([]); 
     const [registrations, setRegistrations] = useState<Registration[]>([]); 
     const displayedRegistrations = registrations
-        .filter(registration => registration.date >= startDate && registration.date <= endDate)
+        .filter(registration => registration.date >= new Date(startDate) && registration.date <= new Date(endDate))
         .filter(registration => searchOptions.includes(registration.title.toLowerCase()))
         .filter(registration => excludeZero ? registration.paid > 0 : true)
         .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage); 
@@ -37,10 +37,10 @@ export default function RegistrationPage() {
 
     const fetchSearchOptions = async () => {
         try {
-            const response = await apiClient.get("courses"); 
+            const response = await apiClient.get("/courses"); 
 
-            const courseTitles: string[] = response.data.map((course: Course) => course.className.toLowerCase());
-
+            const courseTitles: string[] = response.data.data.map((course: Course) => course.className.toLowerCase());
+            
             setSearchOptions(courseTitles);
         } catch (error) {
             console.error(error); 
@@ -49,7 +49,7 @@ export default function RegistrationPage() {
 
     const fetchRegistrations = async () => {
         try {
-            const response = await apiClient.get("payments"); 
+            const response = await apiClient.get("/payments"); 
 
             const receivedPayments: Registration[] = response.data.map((payment: Payment) => ({
                 // title: payment.title, 
@@ -96,7 +96,7 @@ export default function RegistrationPage() {
     useEffect(() => {
         fetchSearchOptions(); 
         fetchRegistrations(); 
-    }, []); 
+    }, [searchQuery]); 
 
     const totalPages: number = Math.ceil(displayedRegistrations.length / itemsPerPage);
 
@@ -117,28 +117,33 @@ export default function RegistrationPage() {
                         <Expand className="w-6 border rounded-lg p-1 cursor-pointer"></Expand>
                     </div>
 
-                    <SearchDropdown options={searchOptions} selected={searchQuery} setSelected={setSearchQuery} />
+                    <SearchDropdown options={searchOptions} selected={searchQuery} setSelected={setSearchQuery} ></SearchDropdown>
 
-                    {searchQuery.length > 0 && (
-                        <div className="flex space-x-2">
-                            {searchQuery.map((courseName, idx) => (
-                                <div key={idx} className="" onClick={() => removeQuery(idx)}>
-                                    {courseName}
+                    <div className="w-full overflow-x-auto whitespace-nowrap scrollbar-hide">
+                        <div className="flex space-x-2 py-2 text-xs">
+                            {searchQuery.map((title, index) => (
+                                <div
+                                    key={index}
+                                    className="text-white px-2 py-2 rounded-2xl flex items-center"
+                                    style={{backgroundColor: "#7B4899"}}
+                                >
+                                    {title}
+                                    <button className="ml-2 text-white" onClick={() => removeQuery(index)}>✕</button>
                                 </div>
                             ))}
                         </div>
-                    )}
+                    </div>
 
-                    <div className="flex justify-between text-xs items-center">
+                    <div className="flex justify-between text-xs items-center mt-5">
                         <div className="flex space-x-4">
                             <div className="space-x-2">
                                 <label className="font-bold">Start Date</label>
-                                <input type="date" value={startDate.toDateString()} onChange={(e) => setStartDate(new Date(e.target.value))}
+                                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
                                     className="border rounded-md p-2"/>
                             </div>
                             <div className="space-x-2">
                                 <label className="font-bold">End Date</label>
-                                <input type="date" value={endDate.toDateString()} onChange={(e) => setEndDate(new Date(e.target.value))} 
+                                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} 
                                     className="border rounded-md p-2"/>
                             </div>
                             <div className="space-x-2">
