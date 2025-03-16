@@ -3,10 +3,11 @@ import React, { useState } from "react";
 
 interface SearchDropdownProps {
 	options: string[];
-  selected: string[]; 
+  selected: string[];
+  setSelected: React.Dispatch<React.SetStateAction<string[]>>; 
 }
 
-export default function SearchDropdown({ options, selected }: SearchDropdownProps) {
+export default function SearchDropdown({ options, selected, setSelected }: SearchDropdownProps) {
   const [search, setSearch] = useState("");
   const [filteredOptions, setFilteredOptions] = useState(options);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -23,7 +24,7 @@ export default function SearchDropdown({ options, selected }: SearchDropdownProp
   };
 
   const handleSelect = (option: string) => {
-    selected.push(option); 
+    setSelected(options => [...options, option]); 
     setSearch(option);
     setShowDropdown(false);
   };
@@ -36,17 +37,24 @@ export default function SearchDropdown({ options, selected }: SearchDropdownProp
           value={search}
           onChange={handleSearch}
           onFocus={() => setShowDropdown(true)}
-          placeholder="Search..."
+          onBlur={() => setShowDropdown(false)}
+          placeholder="Search courses..."
           className="w-full border p-2 rounded"
         />
         {showDropdown && (
-          <ul className="absolute w-full bg-white border rounded mt-1 max-h-40 overflow-auto">
+          <ul 
+            
+            className="absolute w-full bg-white border rounded max-h-40 overflow-auto"
+          >
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
                 <li
                   key={option}
                   onClick={() => handleSelect(option)}
-                  className="p-2 cursor-pointer hover:bg-gray-200"
+                  className="p-2 cursor-pointer hover:text-white"
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#9C75B4")}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
+                  style={{}}
                 >
                   {option}
                 </li>
