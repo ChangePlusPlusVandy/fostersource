@@ -1,5 +1,5 @@
 import { Search } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface SearchDropdownProps {
 	options: string[];
@@ -12,14 +12,21 @@ export default function SearchDropdown({ options, selected, setSelected }: Searc
   const [filteredOptions, setFilteredOptions] = useState(options);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  useEffect(() => {
+    setFilteredOptions(
+      search ? options.filter(option => option.toLowerCase().includes(search.toLowerCase())) : options
+    );
+  }, [options, search]);
+
+
   const handleSearch = (e: any) => {
     const value = e.target.value;
     setSearch(value);
-    setFilteredOptions(
-      options.filter((option) =>
-        option.toLowerCase().includes(value.toLowerCase())
-      )
-    );
+    // setFilteredOptions(
+    //   options.filter((option) =>
+    //     option.toLowerCase().includes(value.toLowerCase())
+    //   )
+    // );
   };
 
   const handleSelect = (option: string) => {
