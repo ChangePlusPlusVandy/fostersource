@@ -1,13 +1,13 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface IEmailTemplate extends Document {
+export interface IEmail extends Document {
   title: string;
   body: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-const emailTemplateSchema: Schema = new Schema(
+const emailSchema: Schema = new Schema(
   {
     title: { type: String, required: true },
     body: { type: String, required: true },
@@ -17,6 +17,6 @@ const emailTemplateSchema: Schema = new Schema(
   }
 );
 
-const EmailTemplate: Model<IEmailTemplate> = mongoose.model<IEmailTemplate>("EmailTemplate", emailTemplateSchema);
+const Email: Model<IEmail> = mongoose.model<IEmail>("Email", emailSchema);
 
-export default EmailTemplate;
+export default Email;
