@@ -5,12 +5,15 @@ import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
+import SurveyModal from "./SurveyModal";
 
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
 }
 
 const CoursePage = ({ setCartItemCount }: CatalogProps) => {
+	const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+
 	const { courseId } = useParams<{ courseId: string }>();
 	const navigate = useNavigate();
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
@@ -311,6 +314,8 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 								creditHours={courseDetailsData.creditNumber}
 								time={courseDetailsData.time}
 								lengthCourse={courseDetailsData.lengthCourse}
+								isSurveyModalOpen={isSurveyModalOpen}
+								setIsSurveyModalOpen={setIsSurveyModalOpen}
 							/>
 						</div>
 					</div>
@@ -372,16 +377,20 @@ const DisplayBar = ({
 	creditHours,
 	time,
 	lengthCourse,
+	isSurveyModalOpen,
+	setIsSurveyModalOpen
 }: {
 	surveyLength: number;
 	creditHours: number;
 	time: Date;
 	lengthCourse: number;
+	isSurveyModalOpen: boolean;
+	setIsSurveyModalOpen: any;
 }) => {
 	const [currentPage, setCurrentPage] = useState("Webinar");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
-	const [survey, setSurvey] = useState(false);
+	const [survey, setSurvey] = useState(true);
 
 	useEffect(() => {
 		const webinarEnd = time;
@@ -510,16 +519,18 @@ const DisplayBar = ({
 				{currentPage === "Survey" && (
 					<div className="text-sm font-normal flex flex-col gap-3">
 						Length: {surveyLength} questions
-						<div className="flex flex-col text-xs text-red-600">
-							<p className={survey ? "hidden" : ""}>
+						<div className="flex flex-col text-xs">
+							<p className={survey ? "hidden text-red-600" : "text-red-600"}>
 								Complete webinar to access survey
 							</p>
 							<button
 								className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 ${!survey ? "bg-gray-400 cursor-not-allowed" : "bg-[#F79518]"}`}
 								disabled={!survey}
+								onClick={() => setIsSurveyModalOpen(true)}
 							>
 								Begin Survey
 							</button>
+							<SurveyModal isOpen={isSurveyModalOpen} onClose={() => setIsSurveyModalOpen(false)} surveyId={"67d79d830a42d191ebb55049"}></SurveyModal>
 						</div>
 					</div>
 				)}
