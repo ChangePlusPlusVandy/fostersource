@@ -1,7 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
-
 import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
@@ -11,44 +10,12 @@ interface CatalogProps {
 }
 
 const CoursePage = ({ setCartItemCount }: CatalogProps) => {
-	const { courseId } = useParams<{ courseId: string }>();
 	const navigate = useNavigate();
-	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
-		_id: "",
-		className: "Introduction to Computer Science",
-		courseDescription: `When it comes to your child's case closing, are you hearing terms or phrases like, "least drastic alternative", APR, RGAP, intervention, etc. and feeling lost in the acronyms and language? Are you facing an APR and worried about ongoing support or post-permanency legal ramifications? Do you find yourself feeling unsure about how to advocate for your rights or desires in a potential APR? Are you wondering if you have to accept an APR? Has your county told you the requirements to qualify for RGAP (post-APR financial assistance)? If you answered yes to any of these questions, join us as attorney, Tim Eirich, helps us make sense of all things APR and RGAP! 
+	const [courseId, setCourseId] = useState<string>();
+	const location = useLocation();
+	const queryParams = new URLSearchParams(location.search);
 
-Hours earned: 2.0
-
-Feedback from this class:
-
-"Incredibly helpful information. This should be required so that all foster parents are informed and not taken advantage of."
-
-"Tim was EXCELLENT and provided insight into complicated legal matters."
-
-"All of Tim's trainings are excellent, and I'm grateful that he partners with Foster Source to equip foster and kinship parents with the knowledge that they need to advocate for themselves and the children in their care."`,
-		instructorName: "Dr. Alice Johnson",
-		creditNumber: 3,
-		discussion: "An interactive discussion about computational thinking.",
-		components: ["Lectures", "Labs", "Quizzes"],
-		handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-		ratings: [],
-		isLive: false,
-		cost: 100,
-		categories: ["Technology", "Category", "Misc"],
-		thumbnailPath: "",
-		instructorDescription: `Sarah has her degree in social work from Metropolitan State University with an emphasis in child and adolescent mental health.
-
-She has worked for Denver Department of Human Services Child Welfare for over 3 years as an ongoing social caseworker and currently holds a senior caseworker position in placement navigation. She has worked as a counselor at a residential treatment program for youth corrections, as a counselor for dual diagnosis adult men at a halfway house, and an independent living specialist for the disabled community/outreach specialist for individuals experiencing homelessness.
-
-Sarah writes:
-
-In my spare time, I spend most of my time with my two teenage daughters. I am a huge advocate for social justice issues which I spend a lot of my time supporting through peaceful protests, education, volunteer work, etc. I love camping, crafting, karaoke, road trip adventures, and dancing in my living room. My favorite place in the entire world is the Mojave Desert.`,
-		instructorRole: "Moderator",
-		lengthCourse: 2,
-		time: new Date("2025-10-15T00:00:00.000Z"),
-		isInPerson: true,
-	});
+	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>();
 	const [starRating, setStarRating] = useState(-1);
 	const [isAdded, setIsAdded] = useState(false);
 	const [ratingsPageOpen, setRatingsPageOpen] = useState(false);
@@ -56,8 +23,10 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 
 	//================ Working axios request ======================
 	const fetchCourses = async () => {
+		if (!courseId) return;
 		try {
 			const response = await apiClient.get(`/courses/${courseId}`);
+			console.log(response.data.data);
 			setCourseDetailsData(response.data.data);
 		} catch (error) {
 			console.error(error);
@@ -65,8 +34,13 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 	};
 
 	useEffect(() => {
+		const id = queryParams.get("courseId");
+		setCourseId(id || "");
+	}, [location.search]);
+
+	useEffect(() => {
 		fetchCourses();
-	}, []);
+	}, [courseId]);
 
 	useEffect(() => {
 		if (courseDetailsData) {
@@ -150,13 +124,16 @@ In my spare time, I spend most of my time with my two teenage daughters. I am a 
 									{courseDetailsData.creditNumber} Credits
 								</p>
 								<p className="w-max min-w-max">
-									Live Web Event {courseDetailsData.time.toLocaleDateString()}{" "}
-									at{" "}
-									{courseDetailsData.time.toLocaleTimeString("en-US", {
-										hour: "numeric",
-										minute: "2-digit",
-										hour12: true,
-									})}
+									Live Web Event{" "}
+									{new Date(courseDetailsData.time).toLocaleDateString()} at{" "}
+									{new Date(courseDetailsData.time).toLocaleTimeString(
+										"en-US",
+										{
+											hour: "numeric",
+											minute: "2-digit",
+											hour12: true,
+										}
+									)}
 								</p>
 								<div className="w-max min-w-max">
 									<CategoryPills categories={courseDetailsData.categories} />
@@ -315,7 +292,7 @@ const DisplayBar = ({
 	const [survey, setSurvey] = useState(false);
 
 	useEffect(() => {
-		const webinarEnd = time;
+		const webinarEnd = new Date(time);
 		webinarEnd.setHours(webinarEnd.getHours() + 2); // 2 hours after the current time
 		const checkTime = () => {
 			const currentTime = new Date();
@@ -409,10 +386,10 @@ const DisplayBar = ({
 				{currentPage === "Webinar" && (
 					<div className="flex justify-between">
 						<div className="text-sm	font-normal flex flex-col gap-1">
-							<div>Date: {time.toLocaleDateString()}</div>
+							<div>Date: {new Date(time).toLocaleDateString()}</div>
 							<div>
 								Time:{" "}
-								{time.toLocaleTimeString("en-US", {
+								{new Date(time).toLocaleTimeString("en-US", {
 									hour: "numeric",
 									minute: "2-digit",
 									hour12: true,
