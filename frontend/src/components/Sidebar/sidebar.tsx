@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./sidebar.css";
 import {
 	House,
+	KeyRound,
 	LayoutDashboard,
 	BookOpen,
 	Mic,
@@ -15,12 +16,20 @@ import {
 } from "lucide-react";
 
 import authService from "../../services/authService";
+import { log } from "console";
+import { User } from "../../shared/types/user";
+import apiClient from "../../services/apiClient";
 
 // User information
 export const userInfo = {
 	name: "First L.",
 	role: localStorage.user ? localStorage.user.role : "No role",
 	isLoggedIn: false,
+	isAdmin: localStorage.user
+		? localStorage.user.role === "staff"
+			? true
+			: false
+		: false,
 };
 
 // All sidebar entries
@@ -62,6 +71,13 @@ export const items = [
 		href: "mailto:info@fostersource.org",
 	},
 ];
+
+// Admin information for conditional rendering
+export const admin = {
+	icon: <KeyRound />,
+	description: "Admin Tools",
+	href: "/admin",
+};
 
 // Logout information for conditional rendering
 export const logout = {
@@ -173,13 +189,22 @@ export function SidebarItems({
 	setIsLoggedIn,
 	cartItemCount,
 }: SidebarItemsProps) {
-	// Helper function for active tab highlighting
-	// const handleItemClick = (item: string) => {
-	// 	setActiveItem(item);
-	// };
+	const [isAdmin, setIsAdmin] = useState(false);
+
+	const checkAdmin = async () => {
+		try {
+			const response = await apiClient.get("/users/is-admin");
+			setIsAdmin(response.data.isAdmin);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	useEffect(() => {
+		checkAdmin();
+	}, []);
 
 	const handleLogOut = async () => {
-		// handleItemClick("logout");
 		try {
 			await authService.logout();
 		} catch (err: any) {
@@ -204,8 +229,8 @@ export function SidebarItems({
 				className={`${active}`}
 				onClick={() => setActiveItem(window.location.pathname)}
 			>
-				<div className={`${iconDescMargin}`}>{icon}</div>
 				<Link to={href}>
+					<div className={`${iconDescMargin}`}>{icon}</div>
 					{!isCollapsed && description}{" "}
 					{description === "Cart" && cartItemCount !== 0
 						? `(${cartItemCount})`
@@ -215,17 +240,29 @@ export function SidebarItems({
 		);
 	});
 
-	const active = activeItem === logout.description ? "active" : "";
+	const adminActive = activeItem === admin.href ? "active" : "";
+	const logoutActive = activeItem === logout.href ? "active" : "";
 	const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
 	return (
 		<ul className="menu mb-4">
+			{isAdmin && (
+				<li
+					className={`${adminActive}`}
+					onClick={() => setActiveItem(window.location.pathname)}
+				>
+					<div className={`${iconDescMargin}`}>{admin.icon}</div>
+					<Link to={admin.href}>{!isCollapsed && admin.description}</Link>
+				</li>
+			)}
 			{sidebarItems}
 			{isLoggedIn && (
 				<div className="logout">
-					<li className={`${active}`} onClick={() => handleLogOut()}>
-						<div className={`${iconDescMargin}`}>{logout.icon}</div>
-						<Link to={logout.href}>{!isCollapsed && logout.description}</Link>
+					<li className={`${logoutActive}`} onClick={() => handleLogOut()}>
+						<Link to={logout.href}>
+							<div className={`${iconDescMargin}`}>{logout.icon}</div>
+							{!isCollapsed && logout.description}
+						</Link>
 					</li>
 				</div>
 			)}
