@@ -18,11 +18,15 @@ import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 import DiscountPage from "../pages/Admin/DiscountPage/Discount";
+import SpeakerPage from "../pages/Admin/SpeakerPage/Speaker"
+import ProductPage from "../pages/Admin/ProductPage/ProductPage";
 import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
-import Pricing from "../pages/Admin/Products/Pricing"
+import Pricing from "../pages/Admin/Products/Pricing";
 import ComponentPage from "../pages/Admin/ComponentPage/Component";
 import SurveyPage from "../pages/Admin/SurveyPage/Survey";
+import WorkshopCreation from "../pages/Admin/WorkshopCreation/WorkshopCreation";
+// import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -32,8 +36,7 @@ function AppRoutes() {
 
 	const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
 	const [cartItemCount, setCartItemCount] = useState(
-		localStorage.user &&
-		JSON.parse(localStorage.user).cart
+		localStorage.user && JSON.parse(localStorage.user).cart
 			? JSON.parse(localStorage.user).cart.length
 			: 0
 	);
@@ -82,7 +85,7 @@ function AppRoutes() {
 						display: "flex",
 						flex: 1,
 						overflow: "auto",
-						paddingLeft: isCollapsed ? "6rem" : "17rem",
+						marginLeft: isCollapsed ? "6rem" : "17rem",
 					}}
 				>
 					<Routes>
@@ -119,16 +122,19 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
-						{/* <Route path="/admin" element={<AdminPage />} /> */}
+						{/*<Route path="/admin" element={<AdminPage />} />*/}
 						<Route path="/admin/discounts" element={<DiscountPage />} />
+						<Route path="/admin/speakers" element={<SpeakerPage />} />
 						<Route path="/admin/products/pricing" element={<Pricing />} />
 						<Route path="/admin/components" element = {<ComponentPage workshop={undefined} survey={undefined} certificate={undefined} />}/>
-						{/* <Route path="/admin/products" element={<ProductPage />} /> */}
 						<Route path="/admin/components/survey" element={<SurveyPage />} />
+						<Route path="/admin/products" element={<ProductPage />} />
+						<Route path="/admin/create-workshop" element={<WorkshopCreation  workshopName={`Workshop | The Inclusive Family Support Model`}/>} />
 						<Route
 							path="/courseDetails"
 							element={<CoursePage setCartItemCount={setCartItemCount} />}
 						/>
+						
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (

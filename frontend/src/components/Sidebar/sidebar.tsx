@@ -17,6 +17,8 @@ import {
 
 import authService from "../../services/authService";
 import { log } from "console";
+import { User } from "../../shared/types/user";
+import apiClient from "../../services/apiClient";
 
 // User information
 export const userInfo = {
@@ -127,7 +129,6 @@ export function Sidebar({
 			<SidebarItems
 				isCollapsed={isCollapsed}
 				isLoggedIn={isLoggedIn}
-				isAdmin={userInfo.isAdmin}
 				setIsLoggedIn={setIsLoggedIn}
 				cartItemCount={cartItemCount}
 			/>
@@ -176,7 +177,6 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 
 interface SidebarItemsProps {
 	isLoggedIn: boolean;
-	isAdmin: boolean;
 	isCollapsed: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 	cartItemCount: number;
@@ -186,10 +186,24 @@ interface SidebarItemsProps {
 export function SidebarItems({
 	isCollapsed,
 	isLoggedIn,
-	isAdmin,
 	setIsLoggedIn,
 	cartItemCount,
 }: SidebarItemsProps) {
+	const [isAdmin, setIsAdmin] = useState(false);
+
+	const checkAdmin = async () => {
+		try {
+			const response = await apiClient.get("/users/is-admin");
+			setIsAdmin(response.data.isAdmin);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	useEffect(() => {
+		checkAdmin();
+	}, []);
+
 	const handleLogOut = async () => {
 		try {
 			await authService.logout();
@@ -215,8 +229,8 @@ export function SidebarItems({
 				className={`${active}`}
 				onClick={() => setActiveItem(window.location.pathname)}
 			>
-				<div className={`${iconDescMargin}`}>{icon}</div>
 				<Link to={href}>
+					<div className={`${iconDescMargin}`}>{icon}</div>
 					{!isCollapsed && description}{" "}
 					{description === "Cart" && cartItemCount !== 0
 						? `(${cartItemCount})`
@@ -245,8 +259,10 @@ export function SidebarItems({
 			{isLoggedIn && (
 				<div className="logout">
 					<li className={`${logoutActive}`} onClick={() => handleLogOut()}>
-						<div className={`${iconDescMargin}`}>{logout.icon}</div>
-						<Link to={logout.href}>{!isCollapsed && logout.description}</Link>
+						<Link to={logout.href}>
+							<div className={`${iconDescMargin}`}>{logout.icon}</div>
+							{!isCollapsed && logout.description}
+						</Link>
 					</li>
 				</div>
 			)}

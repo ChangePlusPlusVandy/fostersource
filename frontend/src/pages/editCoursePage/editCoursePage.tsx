@@ -48,12 +48,12 @@ const EditCourse = () => {
         }
     };
     return (
-        <div className="bg-white w-[96%] h-[96%] p-6 rounded-xl shadow-lg" >
+       
             <div className="flex flex-col p-4">
                 <p className="text-xl font-bold -mt-2">
-                    New Product
+                    Details
                 </p>
-                <div className="ml-10 mt-3">
+                <div className="ml-10 mt-2">
                     <div className="flex flex-row justify-between">
                         <p className="text-xs">
                             Title
@@ -155,7 +155,7 @@ const EditCourse = () => {
                     <div className="-mt-[420px] flex flex-col flex-grow text-sm">
                         <input
                             type="text"
-                            className="w-[68%] h-8 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
+                            className="w-[60%] h-8 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
                             placeholder="Title of the class"
                             value={inputTitleValue}
                             onChange={(e) => setInputTitleValue(e.target.value)}
@@ -167,7 +167,7 @@ const EditCourse = () => {
                         </p>
                         <div className="text-xs">
                             <textarea
-                                className="w-[68%] h-11 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
+                                className="w-[60%] h-11 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
                                 placeholder="Enter text here..."
                                 value={inputSummaryValue}
                                 onChange={(e) => setSummaryValue(e.target.value)}
@@ -179,22 +179,22 @@ const EditCourse = () => {
                             Description
                         </p>
                         <textarea
-                            className="w-[68%] h-28 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
+                            className="w-[60%] h-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
                             placeholder="Summary of the class"
                             value={inputDescriptionValue}
                             onChange={(e) => setDescriptionValue(e.target.value)}
                         />
                     </div>
-                    <div className="mt-3">
+                    <div className="mt-2">
                         <div className="flex flex-row items-start space-x-2">
                             <p className="text-sm leading-none">
                                 Short Product Url
                             </p>
                             <p className="text-gray-400 text-xs leading-none">(optional) </p>
                         </div>
-                        <div className="text-sm mt-3">
+                        <div className="text-sm mt-2">
                             <textarea
-                                className="w-[68%] h-8 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
+                                className="w-[60%] h-8 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
                                 placeholder=""
                                 value={inputShortUrlProduct}
                                 onChange={(e) => setInputShortUrlProduct(e.target.value)}
@@ -203,12 +203,12 @@ const EditCourse = () => {
                     </div>
 
                     <div className="flex flex-row">
-                        <div className="mt-3 ml-20 gap-1 flex flex-col text-sm">
+                        <div className="mt-2 gap-1 flex flex-col text-sm">
                             Credits
                             <div className="">
                                 <input
                                     type="number"
-                                    className="h-8 w-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-center"
+                                    className="h-6 w-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-center"
                                     min="0"
                                     max="10"
                                     defaultValue="0"
@@ -217,13 +217,13 @@ const EditCourse = () => {
                             </div>
                         </div>
                         <div className="mt-3 flex flex-col text-sm">
-                            <p className="ml-52">
+                            <p className="ml-12">
                                 Tags
                             </p>
                             <div className="flex flex-row">
                                 <button
                                     onClick={() => setWebinar(!webinar)}
-                                    className={`w-16 h-4 ml-52 rounded-lg ${webinar ? "bg-orange-400" : "bg-gray-200"}`}>
+                                    className={`w-16 h-4 ml-12 rounded-lg ${webinar ? "bg-orange-400" : "bg-gray-200"}`}>
                                     <p className={`text-xs ${webinar ? "text-black?" : "text-gray-600"}`}>
                                         Webinar
                                     </p>
@@ -251,7 +251,7 @@ const EditCourse = () => {
                             </p>
                             <input
                                 type="datetime-local"
-                                className="text-sm w-48 h-8 border rounded-lg focus:ring-2 focus:ring-blue-500 text-center ml-20"
+                                className="text-sm w-48 h-6 border rounded-lg focus:ring-2 focus:ring-blue-500 text-center ml-20"
                                 min="0"
                                 max="10"
                                 onChange={(e) => setDate(new Date(e.target.value))}
@@ -261,7 +261,7 @@ const EditCourse = () => {
                     </div>
 
                     <div className="flex flex-row">
-                        <div className="mt-3 ml-20 gap-1 flex flex-col text-sm">
+                        <div className="mt-3 gap-1 flex flex-col text-sm">
                             Categories
                             <select className="w-52 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                                 <option value="1">None Selected</option>
@@ -269,7 +269,7 @@ const EditCourse = () => {
                                 <option value="3">Option 3</option>
                             </select>
                         </div>
-                        <div className="mt-3 ml-20 gap-1 flex flex-col text-sm">
+                        <div className="mt-3 ml-12 gap-1 flex flex-col text-sm">
                             Product Types
                             <select className="w-52 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                                 <option value="1">None Selected</option>
@@ -277,7 +277,7 @@ const EditCourse = () => {
                                 <option value="3">Option 3</option>
                             </select>
                         </div>
-                        <div className="mt-4 ml-20 gap-1 flex flex-col text-sm">
+                        <div className="mt-4 ml-12 gap-1 flex flex-col text-sm">
                             <div className="flex flex-row">
                                 <p className="text-sm leading-none">
                                     Ribbon
@@ -346,7 +346,7 @@ const EditCourse = () => {
                     </div>
                 </div>
             </div>
-        </div>
+
     )
 }
 
