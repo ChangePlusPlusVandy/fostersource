@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { JSX, useState } from "react";
 import {
 	BrowserRouter as Router,
 	Routes,
@@ -24,6 +24,7 @@ import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
 import Pricing from "../pages/Admin/Products/Pricing";
 import ComponentPage from "../pages/Admin/ComponentPage/Component";
+import SurveyPage from "../pages/Admin/SurveyPage/Survey";
 import WorkshopCreation from "../pages/Admin/WorkshopCreation/WorkshopCreation";
 // import AdminPage from "../pages/Admin/AdminPage";
 
@@ -126,6 +127,7 @@ function AppRoutes() {
 						<Route path="/admin/speakers" element={<SpeakerPage />} />
 						<Route path="/admin/products/pricing" element={<Pricing />} />
 						<Route path="/admin/components" element = {<ComponentPage workshop={undefined} survey={undefined} certificate={undefined} />}/>
+						<Route path="/admin/components/survey" element={<SurveyPage />} />
 						<Route path="/admin/products" element={<ProductPage />} />
 						<Route path="/admin/create-workshop" element={<WorkshopCreation  workshopName={`Workshop | The Inclusive Family Support Model`}/>} />
 						<Route
