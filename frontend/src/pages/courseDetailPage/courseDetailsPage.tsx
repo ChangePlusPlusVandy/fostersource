@@ -20,6 +20,28 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [isAdded, setIsAdded] = useState(false);
 	const [ratingsPageOpen, setRatingsPageOpen] = useState(false);
 	const [numStarsRatingPage, setNumStarsRatingpage] = useState(0);
+	const [isAdmin, setIsAdmin] = useState(false);
+
+	useEffect(() => {
+		const checkAdminStatus = async () => {
+			try {
+				const response = await apiClient.get("/api/users/is-admin", {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem("token")}`,
+					},
+				});
+				setIsAdmin(response.data.isAdmin);
+			} catch (error) {
+				console.error("Failed to check admin status", error);
+			}
+		};
+
+		checkAdminStatus();
+	}, []);
+
+	const navigateToCourseEdit = () => {
+		navigate(`/courses/edit`); // Change to the desired route
+	};
 
 	//================ Working axios request ======================
 	const fetchCourses = async () => {
@@ -146,14 +168,20 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 								onClick={() => {
 									setIsAdded(!isAdded);
 								}}
-								className={`w-36 h-9 rounded-md text-white text-xs bg-orange-400 hover:bg-orange-500 cursor-pointer`}
+								style={{ width: "168px", height: "38px" }}
+								className={`h-9 rounded-md text-white text-xs ${
+									isAdded
+										? "bg-gray-400 cursor-not-allowed"
+										: "bg-orange-400 hover:bg-orange-500 cursor-pointer transition-colors duration-300"
+								}`}
+								disabled={isAdded}
 							>
 								{isAdded ? "Remove from Cart" : "Add to Cart"}
 							</button>
 
 							<button
 								onClick={openRatingsPage}
-								className="min-w-min w-36 h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300"
+								className="w-[168px] h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300"
 							>
 								Rate This Course
 							</button>
@@ -183,14 +211,52 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 												</button>
 											))}
 										</div>
-										<button
-											className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-30 h-8 text-sm"
-											onClick={() => submitRatingPage(numStarsRatingPage)}
-										>
-											Submit
-										</button>
+										<h2 className="text-xl font-bold mb-4">Rate this course</h2>
+										<div>
+											<div className="flex">
+												{[1, 2, 3, 4, 5].map((value, index) => (
+													<button
+														key={index}
+														onClick={() => onClickRating(value)}
+														style={{
+															padding: "5px",
+														}}
+													>
+														<FaStar
+															color={
+																index < numStarsRatingPage
+																	? "#FFD700"
+																	: "#a9a9a9"
+															}
+														/>
+													</button>
+												))}
+											</div>
+											<button
+												onClick={() => submitRatingPage(numStarsRatingPage)}
+												className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-30 h-8 text-sm"
+											>
+												Submit
+											</button>
+										</div>
+
+										{/* <button
+											className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-sm w-3 h-2"
+											onClick={() => setRatingsPageOpen(false)}
+											>
+											Close
+										</button> */}
 									</div>
 								</div>
+							)}
+							{isAdmin && (
+								<button
+									onClick={navigateToCourseEdit}
+									style={{ width: "168px", height: "38px" }}
+									className={`w-42 h-9 rounded-md text-white text-xs bg-[#7B4899]`}
+								>
+									Edit Course
+								</button>
 							)}
 						</div>
 					</div>

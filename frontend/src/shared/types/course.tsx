@@ -1,4 +1,5 @@
 import {Rating} from "./rating";
+import { User } from "./user";
 
 export type Course = {
 	handouts: string[];
@@ -19,4 +20,7 @@ export type Course = {
 	lengthCourse: number;
 	time: Date;
 	isInPerson: Boolean;
+	students: String[]; 
+	regStart: Date; 
+	regEnd: Date; 
 };

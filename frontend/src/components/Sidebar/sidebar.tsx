@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./sidebar.css";
 import {
 	House,
+	KeyRound,
 	LayoutDashboard,
 	BookOpen,
 	Mic,
@@ -15,12 +16,18 @@ import {
 } from "lucide-react";
 
 import authService from "../../services/authService";
+import { log } from "console";
 
 // User information
 export const userInfo = {
 	name: "First L.",
 	role: localStorage.user ? localStorage.user.role : "No role",
 	isLoggedIn: false,
+	isAdmin: localStorage.user
+		? localStorage.user.role === "staff"
+			? true
+			: false
+		: false,
 };
 
 // All sidebar entries
@@ -62,6 +69,13 @@ export const items = [
 		href: "mailto:info@fostersource.org",
 	},
 ];
+
+// Admin information for conditional rendering
+export const admin = {
+	icon: <KeyRound />,
+	description: "Admin Tools",
+	href: "/admin",
+};
 
 // Logout information for conditional rendering
 export const logout = {
@@ -113,6 +127,7 @@ export function Sidebar({
 			<SidebarItems
 				isCollapsed={isCollapsed}
 				isLoggedIn={isLoggedIn}
+				isAdmin={userInfo.isAdmin}
 				setIsLoggedIn={setIsLoggedIn}
 				cartItemCount={cartItemCount}
 			/>
@@ -161,6 +176,7 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 
 interface SidebarItemsProps {
 	isLoggedIn: boolean;
+	isAdmin: boolean;
 	isCollapsed: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 	cartItemCount: number;
@@ -170,16 +186,11 @@ interface SidebarItemsProps {
 export function SidebarItems({
 	isCollapsed,
 	isLoggedIn,
+	isAdmin,
 	setIsLoggedIn,
 	cartItemCount,
 }: SidebarItemsProps) {
-	// Helper function for active tab highlighting
-	// const handleItemClick = (item: string) => {
-	// 	setActiveItem(item);
-	// };
-
 	const handleLogOut = async () => {
-		// handleItemClick("logout");
 		try {
 			await authService.logout();
 		} catch (err: any) {
@@ -215,15 +226,25 @@ export function SidebarItems({
 		);
 	});
 
-	const active = activeItem === logout.description ? "active" : "";
+	const adminActive = activeItem === admin.href ? "active" : "";
+	const logoutActive = activeItem === logout.href ? "active" : "";
 	const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
 	return (
 		<ul className="menu mb-4">
+			{isAdmin && (
+				<li
+					className={`${adminActive}`}
+					onClick={() => setActiveItem(window.location.pathname)}
+				>
+					<div className={`${iconDescMargin}`}>{admin.icon}</div>
+					<Link to={admin.href}>{!isCollapsed && admin.description}</Link>
+				</li>
+			)}
 			{sidebarItems}
 			{isLoggedIn && (
 				<div className="logout">
-					<li className={`${active}`} onClick={() => handleLogOut()}>
+					<li className={`${logoutActive}`} onClick={() => handleLogOut()}>
 						<Link to={logout.href}>
 							<div className={`${iconDescMargin}`}>{logout.icon}</div>
 							{!isCollapsed && logout.description}
