@@ -249,10 +249,13 @@ export function SidebarItems({
 			{isAdmin && (
 				<li
 					className={`${adminActive}`}
-					onClick={() => setActiveItem(window.location.pathname)}
+					onClick={() => {
+						setActiveItem(window.location.pathname);
+						window.location.href = admin.href;
+					}}
 				>
 					<div className={`${iconDescMargin}`}>{admin.icon}</div>
-					<Link to={admin.href}>{!isCollapsed && admin.description}</Link>
+					<Link to={""}>{!isCollapsed && admin.description}</Link>
 				</li>
 			)}
 			{sidebarItems}

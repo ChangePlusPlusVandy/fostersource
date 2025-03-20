@@ -2,13 +2,13 @@ import { useState, Dispatch, SetStateAction } from "react";
 import { Link } from "react-router-dom";
 import "./adminSidebar.css";
 import {
-  Users,
-  FileText,
-  Settings,
-  LogOut,
-  Layers,
-  LogIn, 
-  KeyRound
+	Users,
+	FileText,
+	Settings,
+	LogOut,
+	Layers,
+	LogIn,
+	KeyRound,
 } from "lucide-react";
 import authService from "../../../services/authService";
 import { log } from "console";
@@ -35,34 +35,34 @@ export const userInfo = {
 
 // All sidebar entries
 export const adminSidebarItems = [
-  {
-    icon: <Layers />,
-    description: "Products",
-    href: "/admin/products",
-  },
-  {
-    icon: <Users />,
-    description: "Users",
-    href: "/admin/users",
-  },
-  {
-    icon: <FileText />,
-    description: "Content",
-    href: "/admin/content",
-  },
-  {
-    icon: <Settings />,
-    description: "Settings",
-    href: "/admin/settings",
-  },
+	{
+		icon: <Layers />,
+		description: "Products",
+		href: "/admin/products",
+	},
+	{
+		icon: <Users />,
+		description: "Users",
+		href: "/admin/users",
+	},
+	{
+		icon: <FileText />,
+		description: "Content",
+		href: "/admin/content",
+	},
+	{
+		icon: <Settings />,
+		description: "Settings",
+		href: "/admin/settings",
+	},
 ];
 
-// Admin information for conditional rendering
-// export const admin = {
-// 	icon: <KeyRound />,
-// 	description: "Admin Tools",
-// 	href: "/admin",
-// };
+//Admin information for conditional rendering
+export const admin = {
+	icon: <KeyRound />,
+	description: "Admin Tools",
+	href: "/admin",
+};
 
 // Logout information for conditional rendering
 export const logout = {
@@ -78,16 +78,13 @@ interface AdminSidebarProps {
 }
 
 // The Sidebar itself
-export function AdminSidebar({
-	isLoggedIn,
-	setIsLoggedIn,
-}: AdminSidebarProps) {
+export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 	// User Info
 	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
 	const role = isLoggedIn ? JSON.parse(localStorage.user).role : "Log In";
-  // const name =  "Log In";
+	// const name =  "Log In";
 	// const role = "Log In";
-  const isCollapsed = true; 
+	const isCollapsed = true;
 
 	return (
 		<div className="admin-sidebar">
@@ -180,18 +177,17 @@ export function AdminSidebarItems({
 		const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
 		return (
-
-        <li
-            key={href + description}
-            className={`${active}`}
-            onClick={() => {setActiveItem(window.location.pathname); 
-                window.location.href = href;
-            }}
-          >
-            <div className={`${iconDescMargin}`}>{icon}</div>
-          
-          </li>
-
+			<li
+				key={href + description}
+				className={`${active}`}
+				onClick={() => {
+					setActiveItem(window.location.pathname);
+				}}
+			>
+				<Link to={href}>
+					<div className={`${iconDescMargin}`}>{icon}</div>
+				</Link>
+			</li>
 		);
 	});
 
@@ -212,4 +208,3 @@ export function AdminSidebarItems({
 		</ul>
 	);
 }
-
