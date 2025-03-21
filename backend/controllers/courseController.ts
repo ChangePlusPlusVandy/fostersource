@@ -104,7 +104,8 @@ export const createCourse = async (
             students, 
             courseType, 
             regStart, 
-            regEnd
+            regEnd,
+            productType
         } = req.body;
 
         // Validate required fields
@@ -164,7 +165,8 @@ export const createCourse = async (
             students, 
             courseType, 
             regStart, 
-            regEnd
+            regEnd,
+            productType
         });
 
 

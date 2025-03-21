@@ -18,12 +18,14 @@ import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
 import authService from "../services/authService";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 import DiscountPage from "../pages/Admin/DiscountPage/Discount";
-import ProductPage from "../pages/Admin/ProductPage/ProductPage";
+//import ProductPage from "../pages/Admin/ProductPage/ProductPage";
 import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
 import Pricing from "../pages/Admin/Products/Pricing"
 import ComponentPage from "../pages/Admin/ComponentPage/Component";
-import AdminPage from "../pages/Admin/AdminPage";
+//import AdminPage from "../pages/Admin/AdminPage";
+import HandoutsPage from "../pages/Admin/HandoutsPage/handoutsPage"
+import EditCourse from "../pages/editCoursePage/editCoursePage";
 
 function AppRoutes() {
 	const [isHeaderBarOpen, setIsHeaderBarOpen] = useState(false);
@@ -120,11 +122,14 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
-						<Route path="/admin" element={<AdminPage />} />
+						
 						<Route path="/admin/discounts" element={<DiscountPage />} />
+						<Route path = "/admin/editCourse/:id" element = {<EditCourse />} />
 						<Route path="/admin/products/pricing" element={<Pricing />} />
 						<Route path="/admin/components" element = {<ComponentPage workshop={undefined} survey={undefined} certificate={undefined} />}/>
-						<Route path="/admin/products" element={<ProductPage />} />
+						
+						<Route path="/admin/handouts/:id" element = {<HandoutsPage />} />
+						
 						<Route
 							path="/courseDetails"
 							element={<CoursePage setCartItemCount={setCartItemCount} />}
