@@ -22,6 +22,7 @@ export const dummyCourses = [
 		lengthCourse: 10, // Example: duration in weeks
 		time: new Date("2025-03-01T10:00:00Z"), // Example date
 		isInPerson: false,
+		type: 'webinar' as const,
 	},
 	{
 		className: "Advanced Mathematics",
@@ -43,6 +44,7 @@ export const dummyCourses = [
 		lengthCourse: 12, // Example duration
 		time: new Date("2025-04-10T15:00:00Z"), // Example date
 		isInPerson: true,
+		type: 'inPerson' as const,
 	},
 	{
 		className: "Introduction to Philosophy",
@@ -69,5 +71,6 @@ export const dummyCourses = [
 		lengthCourse: 8, // Example duration
 		time: new Date("2025-02-20T12:00:00Z"), // Example date
 		isInPerson: false,
+		type: 'webinar' as const,
 	},
 ];

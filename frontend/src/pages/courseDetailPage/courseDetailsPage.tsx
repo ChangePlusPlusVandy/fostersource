@@ -4,10 +4,13 @@ import {
 	useParams,
 } from "react-router-dom";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { MapPin } from 'lucide-react';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
+import { dummyCourses } from "../../shared/DummyCourses";
 
 // Survey with a type field
 interface Video {
@@ -24,9 +27,43 @@ interface Survey {
 	_id: string;
 	questions: string[];
 }
+
+interface BaseSession {
+	type: 'webinar' | 'inPerson' | 'onDemand';
+}
+
+interface WebinarSession extends BaseSession {
+	type: 'webinar';
+	meetingID: string;
+	date: Date;
+	time: string;
+	length: number;
+}
+
+interface InPersonSession extends BaseSession {
+	type: 'inPerson';
+	location: string;
+	date: Date;
+	time: string;
+	length: number;
+}
+
+interface OnDemandSession extends BaseSession {
+	type: 'onDemand';
+	videoUrl: string;
+	length: number;
+}
+
+type SessionType = WebinarSession | InPersonSession | OnDemandSession;
+
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
 }
+
+interface MapProps {
+	location: string;
+}
+
 const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const { courseId } = useParams<{ courseId: string }>();
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>({
@@ -51,7 +88,9 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 		isInPerson: true,
 		students: [], 
 		regStart: new Date("2025-10-10T00:00:00.000Z"),
-		regEnd: new Date("2025-10-12T00:00:00.000Z")
+		regEnd: new Date("2025-10-12T00:00:00.000Z"),
+		type: 'inPerson',
+		location: "123 Main St, Nashville, TN 37203"
 	});
 	const [starRating, setStarRating] = useState(-1);
 	const [isAdded, setIsAdded] = useState(false);
@@ -120,14 +159,28 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	useEffect(() => {
 		const fetchCourseDetails = async () => {
 			try {
-				const response = await apiClient.get(`/courses/${courseId}`);
-				setCourseDetailsData(response.data.data);
+				const response = await apiClient.get(`/api/courses/${courseId}`);
+				const courseData = response.data.data;
+				
+				setCourseDetailsData({
+					...courseData,
+					_id: courseId || "",
+					type: courseData.type,
+					location: courseData.type === 'inPerson' ? courseData.location : undefined,
+					videoUrl: courseData.type === 'onDemand' ? courseData.videoUrl : undefined,
+					meetingID: courseData.type === 'webinar' ? courseData.meetingID : undefined,
+					students: courseData.students || [],
+					regStart: new Date(courseData.regStart),
+					regEnd: new Date(courseData.regEnd)
+				});
 			} catch (error) {
-				console.error(error);
+				console.error("Error fetching course details:", error);
 			}
-		};
+		}
 
-		fetchCourseDetails();
+		if (courseId) {
+			fetchCourseDetails();
+		}
 	}, [courseId]);
 
 	useEffect(() => {
@@ -188,22 +241,53 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 		setCurrentComponent(component);
 		setCanProceed(false);
 
+		// Clear any existing timer
 		if (timer) {
 			clearTimeout(timer);
 		}
-		const lengthInMinutes = courseDetailsData?.lengthCourse * 60; 
+
+		// Use the course's lengthCourse field from the schema
+		const lengthInMilliseconds = courseDetailsData.lengthCourse * 60 * 60 * 1000;
+		
+		// Set a new timer based on course length
 		const newTimer = setTimeout(() => {
 			setCanProceed(true);
-		}, lengthInMinutes * 60000); 
+		}, lengthInMilliseconds);
 
 		setTimer(newTimer);
 	};
 
 	const handleNextComponent = () => {
-		if (canProceed) { //lwk dont know what to do now
-			console.log("Navigating to the next component...");
-		} else {
-			alert("You must complete the current component before proceeding.");
+		if (canProceed) {
+			// Clear the timer when proceeding
+			if (timer) {
+				clearTimeout(timer);
+				setTimer(null);
+			}
+			setCanProceed(false);
+			
+			// Navigate based on current component
+			switch (currentComponent) {
+				case "Webinar":
+					setCurrentComponent("Survey");
+					break;
+				case "Survey":
+					setCurrentComponent("Certificate");
+					break;
+				case "Certificate":
+					// Handle completion
+					console.log("Course completed");
+					break;
+				default:
+					console.log("Invalid component");
+			}
+			} else {
+			// Calculate remaining time in minutes
+			const remainingTime = Math.ceil(
+				(courseDetailsData.lengthCourse * 60 * 60 * 1000 - 
+				(Date.now() - (timer ? Date.now() : 0))) / 1000 / 60
+			);
+			alert(`Please wait ${remainingTime} minutes before proceeding to the next section.`);
 		}
 	};
 
@@ -545,7 +629,7 @@ const DisplayBar = ({
 	courseDetailsData: Course;
 	dateEvent: Date;
 }) => {
-	const [currentPage, setCurrentPage] = useState("Webinar");
+	const [currentPage, setCurrentPage] = useState<"Webinar" | "Survey" | "Certificate">("Webinar");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
 	const [survey, setSurvey] = useState(false);
@@ -607,6 +691,102 @@ const DisplayBar = ({
 		/* Needs to be complete once certificate page is out */
 	}
 	const handleAccessCertificate = () => {};
+
+	const renderSessionContent = () => {
+		if (!courseDetailsData) return null;
+
+		// Log the type to verify it's being read correctly
+		console.log("Course type:", courseDetailsData.type);
+
+		switch (courseDetailsData.type) {
+			case 'webinar':
+				return (
+					<div>
+						<p className="text-sm font-semibold mb-4">Online Webinar</p>
+						<div className="space-y-2">
+							<div>Date: {dateEvent.toLocaleDateString()}</div>
+							<div>Time: {dateEvent.toLocaleTimeString()}</div>
+							<div>Length: {courseDetailsData.lengthCourse} hours</div>
+							<button className="w-full bg-[#F79518] text-white py-2 px-4 rounded mt-4">
+								Add to Calendar
+							</button>
+							<button 
+								onClick={testNetwork}
+								className="w-full bg-[#F79518] text-white py-2 px-4 rounded mt-2"
+							>
+								Test Network
+							</button>
+						</div>
+					</div>
+				);
+
+			case 'inPerson':
+				return (
+					<div className="space-y-4">
+						<p className="text-sm font-semibold">In-Person Meeting</p>
+						<div className="space-y-2">
+							<div className="flex items-center gap-2">
+								<MapPin className="w-4 h-4 text-gray-600" />
+								<span>{courseDetailsData.location}</span>
+							</div>
+							<div>Date: {dateEvent.toLocaleDateString()}</div>
+							<div>Time: {dateEvent.toLocaleTimeString()}</div>
+							<div>Length: {courseDetailsData.lengthCourse} hours</div>
+							
+							{/* Google Maps component */}
+							{courseDetailsData.location && (
+								<>
+									<div className="mt-4 rounded-lg overflow-hidden border border-gray-200">
+										<LocationMap location={courseDetailsData.location} />
+									</div>
+									<button 
+										onClick={() => {
+											if (courseDetailsData.location) {
+												window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(courseDetailsData.location)}`, '_blank');
+											}
+										}}
+										className="w-full bg-[#F79518] text-white py-2 px-4 rounded mt-4 flex items-center justify-center gap-2"
+									>
+										<MapPin className="w-4 h-4" />
+										Open in Google Maps
+									</button>
+								</>
+							)}
+
+							<button className="w-full bg-[#F79518] text-white py-2 px-4 rounded mt-2">
+								Add to Calendar
+							</button>
+						</div>
+					</div>
+				);
+
+			case 'onDemand':
+				return (
+					<div>
+						<p className="text-sm font-semibold mb-4">On-Demand Video</p>
+						<div className="space-y-2">
+							<div>Length: {courseDetailsData.lengthCourse} hours</div>
+							<div className="aspect-video bg-gray-100 rounded mt-4">
+								<video 
+									controls 
+									className="w-full h-full"
+									src={courseDetailsData.videoUrl}
+								>
+									Your browser does not support the video tag.
+								</video>
+							</div>
+							<button className="w-full bg-[#F79518] text-white py-2 px-4 rounded mt-4">
+								Download Video
+							</button>
+						</div>
+					</div>
+				);
+
+			default:
+				return <div>Invalid session type</div>;
+		}
+	};
+
 	return (
 		<div>
 			<div style={{ display: "flex" }}>
@@ -711,110 +891,7 @@ const DisplayBar = ({
 				></button>
 			</div>
 			<div>
-				{currentPage === "Webinar" && (
-					<p
-						style={{
-							fontSize: "12px",
-							fontWeight: 600,
-							textAlign: "left",
-							margin: "20px 0",
-						}}
-					>
-						Webinar <br />
-						<div>
-							<p
-								style={{
-									fontSize: "12px",
-									fontWeight: 600,
-									textAlign: "left",
-									margin: "10px 0",
-									gap: "3px",
-									display: "flex",
-									flexDirection: "column",
-								}}
-							>
-								{/*Needs to be complete*/}
-								<div>Date {dateEvent.toLocaleDateString()}</div>
-								{/*Needs to be complete*/}
-								<div>
-									Time{" "}
-									{dateEvent.toLocaleTimeString("en-US", {
-										hour: "numeric",
-										minute: "2-digit",
-										hour12: true,
-									})}{" "}
-								</div>
-								{/*Needs to be complete*/}
-								<div>Length {courseDetailsData.lengthCourse}</div>
-							</p>
-						</div>
-						<div>
-							{/*Needs to be complete add to calendar button*/}
-							<button
-								style={{
-									width: "168px",
-									height: "38px",
-									backgroundColor: "#F79518",
-									borderRadius: "5px",
-									textAlign: "center",
-									lineHeight: "50px",
-									color: "white",
-									fontSize: "12px",
-									transform: "translateY(10px)",
-									border: "none",
-									marginTop: "20px",
-								}}
-							>
-								{/*Needs to be complete*/}
-								<p style={{ transform: "translateY(-5px)", margin: 0 }}>
-									Add to Calendar
-								</p>
-							</button>
-							<br />
-							<button
-								onClick={testNetwork}
-								style={{
-									width: "168px",
-									height: "38px",
-									backgroundColor: "#F79518",
-									borderRadius: "5px",
-									textAlign: "center",
-									lineHeight: "50px",
-									color: "white",
-									fontSize: "12px",
-									transform: "translateY(10px)",
-									border: "none",
-									marginTop: "10px",
-								}}
-							>
-								<p style={{ transform: "translateY(-5px)", margin: 0 }}>
-									Test Network
-								</p>
-							</button>
-							<br />
-							<button
-								style={{
-									width: "168px",
-									height: "38px",
-									backgroundColor: "#F79518",
-									borderRadius: "5px",
-									textAlign: "center",
-									lineHeight: "50px",
-									color: "white",
-									fontSize: "12px",
-									transform: "translateY(10px)",
-									border: "none",
-									marginTop: "10px",
-								}}
-							>
-								{/*Needs to be complete*/}
-								<p style={{ transform: "translateY(-5px)", margin: 0 }}>
-									Handout
-								</p>
-							</button>
-						</div>
-					</p>
-				)}
+				{currentPage === "Webinar" && renderSessionContent()}
 				{currentPage === "Survey" && (
 					<p
 						style={{
@@ -998,6 +1075,41 @@ const StarDisplay = ({
 				</p>
 			</div>
 		</div>
+	);
+};
+
+const LocationMap = ({ location }: MapProps) => {
+	const [coordinates, setCoordinates] = useState<{lat: number, lng: number} | null>(null);
+	
+	useEffect(() => {
+		// Geocode the address to get coordinates
+		const geocoder = new google.maps.Geocoder();
+		geocoder.geocode({ address: location }, (results, status) => {
+			if (status === 'OK' && results?.[0]?.geometry?.location) {
+				const { lat, lng } = results[0].geometry.location;
+				setCoordinates({ lat: lat(), lng: lng() });
+			}
+		});
+	}, [location]);
+
+	const mapContainerStyle = {
+		width: '100%',
+		height: '250px',
+	};
+
+	if (!coordinates) return <div>Loading map...</div>;
+
+	return (
+		// need to setup billing account so havent made api key yet
+		<LoadScript googleMapsApiKey={process.env.GOOGLE_MAPS_API_KEY!}> 
+			<GoogleMap
+				mapContainerStyle={mapContainerStyle}
+				center={coordinates}
+				zoom={15}
+			>
+				<Marker position={coordinates} />
+			</GoogleMap>
+		</LoadScript>
 	);
 };
 

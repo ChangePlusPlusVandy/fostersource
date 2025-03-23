@@ -19,6 +19,10 @@ export type Course = {
 	instructorRole: string;
 	lengthCourse: number;
 	time: Date;
+	type: 'webinar' | 'inPerson' | 'onDemand';
+	location?: string;
+	videoUrl?: string;
+	meetingID?: string;
 	isInPerson: Boolean;
 	students: String[]; 
 	regStart: Date; 
