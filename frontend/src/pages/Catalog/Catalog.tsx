@@ -5,7 +5,10 @@ import CatalogCourseComponent from "./CatalogCourseComponent";
 import CatalogSearchBar from "./CatalogSearchBar";
 import { dummyCourses } from "../../shared/DummyCourses";
 import apiClient from "../../services/apiClient";
-import {addToCart, insertCoursesIndividually} from "../../services/registrationServices";
+import {
+	addToCart,
+	insertCoursesIndividually,
+} from "../../services/registrationServices";
 
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
@@ -28,6 +31,7 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 				const response = await apiClient.get("/courses");
 				setCourses(response.data.data);
 				setFilteredCourses(response.data.data);
+				console.log(response.data.data);
 			} catch (error) {
 				console.error(error);
 			}
@@ -122,7 +126,7 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 
 	async function registerAll() {
 		await insertCoursesIndividually().then(() => {
-			console.log("Inserted!")
+			console.log("Inserted!");
 		});
 	}
 
@@ -141,7 +145,11 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 				<div className="flex flex-col gap-6">
 					{filteredCourses.length > 0 ? (
 						filteredCourses.map((course, index) => (
-							<CatalogCourseComponent key={index} course={course} setCartItemCount={setCartItemCount} />
+							<CatalogCourseComponent
+								key={index}
+								course={course}
+								setCartItemCount={setCartItemCount}
+							/>
 						))
 					) : (
 						<p className="text-gray-600 text-center">No courses found.</p>
