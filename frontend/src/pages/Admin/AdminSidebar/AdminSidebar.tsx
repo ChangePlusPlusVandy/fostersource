@@ -9,10 +9,11 @@ import {
 	Layers,
 	LogIn,
 	KeyRound,
+	HomeIcon,
 } from "lucide-react";
 import authService from "../../../services/authService";
-import { log } from "console";
-import internal from "stream";
+// import { log } from "console";
+// import internal from "stream";
 
 // User information
 export const userInfo = {
@@ -35,6 +36,11 @@ export const userInfo = {
 
 // All sidebar entries
 export const adminSidebarItems = [
+	// {
+	// 	icon: <Home />,
+	// 	description: "Home",
+	// 	href: "/",
+	// },
 	{
 		icon: <Layers />,
 		description: "Products",
@@ -109,6 +115,21 @@ interface ProfileProps {
 	isLoggedIn: boolean;
 	name?: string;
 	role?: string;
+}
+
+export function HomeSidebar() {
+	return (
+		<li
+			key={"/"}
+			onClick={() => {
+				window.location.pathname = "/";
+			}}
+		>
+			<div className={"Home"}>
+				<HomeIcon />
+			</div>
+		</li>
+	);
 }
 
 // Display either profile information or log in button
@@ -196,6 +217,7 @@ export function AdminSidebarItems({
 
 	return (
 		<ul className="admin-menu mb-4">
+			<HomeSidebar />
 			{sidebarItems}
 			{isLoggedIn && (
 				<div className="logout">

@@ -189,20 +189,22 @@ export function SidebarItems({
 	setIsLoggedIn,
 	cartItemCount,
 }: SidebarItemsProps) {
-	const [isAdmin, setIsAdmin] = useState(false);
+	const [isAdmin, setIsAdmin] = useState(
+		localStorage.user && JSON.parse(localStorage.user).role === "staff"
+	);
 
-	const checkAdmin = async () => {
-		try {
-			const response = await apiClient.get("/users/is-admin");
-			setIsAdmin(response.data.isAdmin);
-		} catch (error) {
-			console.error(error);
-		}
-	};
+	// const checkAdmin = async () => {
+	// 	try {
+	// 		const response = await apiClient.get("/users/is-admin");
+	// 		setIsAdmin(response.data.isAdmin);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// };
 
-	useEffect(() => {
-		checkAdmin();
-	}, []);
+	// useEffect(() => {
+	// 	checkAdmin();
+	// }, []);
 
 	const handleLogOut = async () => {
 		try {
