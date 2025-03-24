@@ -14,6 +14,7 @@ import apiClient from "../../../services/apiClient";
 import { Course } from "../../../shared/types/course";
 import { Rating } from "../../../shared/types/rating";
 import { Link } from "react-router-dom";
+import AdminCoursePreview from "../../../components/AdminCoursePreview/AdminCoursePreview";
 
 export interface Product {
 	id: number;
@@ -175,6 +176,7 @@ export default function ProductPage() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [products, setProducts] = useState<Product[]>([]);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [productLoading, setProductLoading] = useState(false);
 
 	const elemColors: Record<string, string> = {
 		Ongoing: "#30CD5A",
@@ -217,8 +219,8 @@ export default function ProductPage() {
 
 	const fetchProducts = async () => {
 		try {
+			setProductLoading(true);
 			const response = await apiClient.get("/courses");
-			console.log(response);
 
 			const receivedCourses: Product[] = response.data.data.map(
 				(course: Course) => ({
@@ -251,6 +253,7 @@ export default function ProductPage() {
 			}
 
 			setProducts(receivedCourses);
+			setProductLoading(false);
 		} catch (error) {
 			console.error(error);
 		}
@@ -374,124 +377,19 @@ export default function ProductPage() {
 						</button>
 					</div>
 
-					{displayedProducts.length === 0 ? (
+					{productLoading ? (
+						<p>Loading...</p>
+					) : displayedProducts.length === 0 ? (
 						<div className="text-center text-gray-500">No courses found.</div>
 					) : (
 						<>
 							<div className="space-y-2 text-sm">
 								{displayedProducts.map((product) => (
-									<div
+									<AdminCoursePreview
 										key={product.id}
-										className={`flex items-center justify-between w-full pr-3 rounded-lg border relative`}
-										style={{
-											backgroundColor: product.selected ? "#f5f0f7" : "white",
-										}}
-									>
-										<div
-											className="absolute left-0 top-0 rounded-l-lg w-1 h-full"
-											style={{ backgroundColor: elemColors[product.status] }}
-										></div>
-
-										<div className="flex items-center space-x-6 flex-1 py-3 ml-3">
-											<input
-												type="checkbox"
-												checked={product.selected}
-												onChange={() => toggleSelection(product.id)}
-												className="w-5 h-5"
-												style={{ accentColor: "#8757a3" }}
-											/>
-											<div className="flex items-center gap-2">
-												<span className="font-medium">
-													{product.course.className}
-												</span>
-											</div>
-										</div>
-
-										<div className="flex items-center justify-end space-x-6 flex-1 py-3">
-											<span className="text-gray-500">{product.avgRating}</span>
-											<div className="flex">
-												{Array.from(
-													{ length: Math.floor(product.avgRating) },
-													() => (
-														<Star className="w-4"></Star>
-													)
-												)}
-												{Array.from(
-													{ length: 5 - Math.floor(product.avgRating) },
-													() => (
-														<Star className="w-4"></Star>
-													)
-												)}
-											</div>
-
-											<span className="text-gray-500 w-16">
-												{product.course.creditNumber} credits
-											</span>
-											<Calendar className="w-12"></Calendar>
-											<span className="text-gray-500 w-24">
-												{product.course.isLive ? "Live" : "Virtual"} Event{" "}
-												{product.startTime.getMonth()}/
-												{product.startTime.getDate()}/
-												{product.startTime.getFullYear()} at{" "}
-												{product.startTime.getHours()}:
-												{product.startTime
-													.getMinutes()
-													.toString()
-													.padStart(2, "0")}{" "}
-												{product.timeZone}
-											</span>
-
-											<div className="flex flex-col space-y-2 w-36">
-												<div className="flex flex-row justify-between">
-													<div
-														className="flex rounded-lg border text-white px-1 group relative"
-														style={{ backgroundColor: "#9C75B4" }}
-													>
-														<PictureInPicture2></PictureInPicture2>
-														<List></List>
-														<ShieldCheck></ShieldCheck>
-														<div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden w-24 p-2 text-xs text-white bg-gray-800 rounded-lg shadow-lg group-hover:block">
-															{"Includes: Webinar, Survey, Certificate"}
-														</div>
-													</div>
-													<div
-														className="text-white rounded-lg px-1 items-center justify-center flex"
-														style={{ backgroundColor: "#9C75B4" }}
-													>
-														$0-$25
-													</div>
-												</div>
-												<div className="flex flex-row justify-between">
-													<div
-														className="text-white rounded-lg px-1"
-														style={{ backgroundColor: "#9C75B4" }}
-													>
-														Live
-													</div>
-													<div
-														className="text-white rounded-lg px-1"
-														style={{ backgroundColor: "#9C75B4" }}
-													>
-														{product.course.students.length} registered
-													</div>
-												</div>
-											</div>
-
-											<div className="flex gap-4">
-												<Link to={`/admin/product/edit?courseId=${product.id}`}>
-													<Edit2 className="w-4 h-4 text-gray-400" />
-												</Link>
-												<button
-													onClick={() =>
-														// TODO: handle delete Product
-														console.log("hi")
-													}
-												>
-													<Trash2 className="w-4 h-4 text-gray-400" />
-												</button>
-											</div>
-										</div>
-									</div>
+										product={product}
+										toggleSelection={toggleSelection}
+									/>
 								))}
 							</div>
 

@@ -23,15 +23,17 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 	const [selectedCredits, setSelectedCredits] = useState<string>("All");
 	const [selectedFormat, setSelectedFormat] = useState<string>("All");
 	const [selectedCost, setSelectedCost] = useState<string>("All");
+	const [loading, setLoading] = useState(false);
 
 	// Read query parameters from the URL and apply filters
 	useEffect(() => {
 		async function fetchData() {
 			try {
+				setLoading(true);
 				const response = await apiClient.get("/courses");
 				setCourses(response.data.data);
 				setFilteredCourses(response.data.data);
-				console.log(response.data.data);
+				setLoading(false);
 			} catch (error) {
 				console.error(error);
 			}
@@ -143,7 +145,9 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 
 			<div className="container mx-auto">
 				<div className="flex flex-col gap-6">
-					{filteredCourses.length > 0 ? (
+					{loading ? (
+						<p>Loading...</p>
+					) : filteredCourses.length > 0 ? (
 						filteredCourses.map((course, index) => (
 							<CatalogCourseComponent
 								key={index}
