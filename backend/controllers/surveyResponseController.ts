@@ -57,10 +57,10 @@ export const createSurveyResponse = async (
 		// answers are a list of QuestionResponse IDs and QuestionResponse objects must be created first before calling this endpoint
 		const { userId, dateCompleted, answers } = req.body;
 
-		if (!userId || !dateCompleted || !answers || answers.length === 0) {
+		if (!userId || !answers || answers.length === 0) {
 			res.status(400).json({
 				success: false,
-				message: "Please provide userId, dateCompleted, and answers.",
+				message: "Please provide userId, and answers.",
 			});
 			return;
 		}

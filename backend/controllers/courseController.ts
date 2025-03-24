@@ -13,12 +13,10 @@ export const getCourses = async (
     try {
         const filters = req.query;
 
-
         // Populate ratings and components fields as needed
         const courseResponses = await Course.find(filters)
             .populate(["ratings", "components"])
             .exec();
-
 
         res.status(200).json({
             success: true,
