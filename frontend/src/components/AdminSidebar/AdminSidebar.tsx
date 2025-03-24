@@ -11,7 +11,7 @@ import {
 	KeyRound,
 	HomeIcon,
 } from "lucide-react";
-import authService from "../../../services/authService";
+import authService from "../../services/authService";
 // import { log } from "console";
 // import internal from "stream";
 

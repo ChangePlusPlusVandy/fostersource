@@ -23,14 +23,16 @@ import SpeakerPage from "../pages/Admin/SpeakerPage/Speaker";
 import ProductPage from "../pages/Admin/ProductPage/ProductPage";
 import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
-import Pricing from "../pages/Admin/Products/Pricing";
+import Pricing from "../pages/Admin/Pricing/Pricing";
 import ComponentPage from "../pages/Admin/ComponentPage/Component";
 import WorkshopCreation from "../pages/Admin/WorkshopCreation/WorkshopCreation";
 import RegistrationPage from "../pages/Admin/RegistrationPage/RegistrationPage";
 import AdminPage from "../pages/Admin/AdminPage";
 import EmailPage from "../pages/Admin/EmailPage/EmailPage";
 import apiClient from "../services/apiClient";
-import { AdminSidebar } from "../pages/Admin/AdminSidebar/AdminSidebar";
+import { AdminSidebar } from "../components/AdminSidebar/AdminSidebar";
+import EditCourse from "../pages/Admin/EditCoursePage/editCoursePage";
+import EditSideBar from "../components/EditCourseSidebar/editCoursePageSideBar";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -102,16 +104,25 @@ function AppRoutes() {
 				}}
 				className="bg-gray-100"
 			>
-				<GlobalBlackBar />
-				<div style={{ width: "100%" }}>
-					<HeaderBar isOpen={isHeaderBarOpen} setIsOpen={setIsHeaderBarOpen} />
-				</div>
+				{isAdminRoute ? (
+					<></>
+				) : (
+					<div>
+						<GlobalBlackBar />
+						<div style={{ width: "100%" }}>
+							<HeaderBar
+								isOpen={isHeaderBarOpen}
+								setIsOpen={setIsHeaderBarOpen}
+							/>
+						</div>
+					</div>
+				)}
 				<div
 					style={{
 						position: "absolute",
 						display: "flex",
 						alignItems: "center",
-						top: "25%",
+						top: isAdminRoute ? "1rem" : "25%",
 					}}
 				>
 					{isAdminRoute ? (
@@ -128,6 +139,11 @@ function AppRoutes() {
 							cartItemCount={cartItemCount}
 						/>
 					)}
+					{/* {window.location.href.indexOf("/admin/product/") > -1 ? (
+						<EditSideBar />
+					) : (
+						<></>
+					)} */}
 				</div>
 				<div
 					style={{
@@ -200,26 +216,6 @@ function AppRoutes() {
 							}
 						/>
 						<Route
-							path="/admin/products/pricing"
-							element={
-								<AdminRoute>
-									<Pricing />
-								</AdminRoute>
-							}
-						/>
-						<Route
-							path="/admin/components"
-							element={
-								<AdminRoute>
-									<ComponentPage
-										workshop={undefined}
-										survey={undefined}
-										certificate={undefined}
-									/>
-								</AdminRoute>
-							}
-						/>
-						<Route
 							path="admin/email"
 							element={
 								<AdminRoute>
@@ -244,15 +240,36 @@ function AppRoutes() {
 							}
 						/>
 						<Route
-							path="/admin/create-workshop"
+							path="/admin/product/edit"
 							element={
 								<AdminRoute>
+									<EditSideBar />
+								</AdminRoute>
+							}
+						>
+							<Route index element={<Navigate to="details" replace />} />
+							<Route path="details" element={<EditCourse />} />
+							<Route path="pricing" element={<Pricing />} />
+							<Route
+								path="components"
+								element={
+									<ComponentPage
+										workshop={undefined}
+										survey={undefined}
+										certificate={undefined}
+									/>
+								}
+							/>
+							<Route
+								path="workshop"
+								element={
 									<WorkshopCreation
 										workshopName={`Workshop | The Inclusive Family Support Model`}
 									/>
-								</AdminRoute>
-							}
-						/>
+								}
+							/>
+							<Route path="speakers" element={<SpeakerPage />} />
+						</Route>
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (

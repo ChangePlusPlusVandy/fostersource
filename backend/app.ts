@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
-import path from 'path';
+import path from "path";
 
 // Import route files
 import userRoutes from "./routes/userRoutes";
@@ -18,14 +18,16 @@ import certificateRoutes from "./routes/certificateRoutes";
 import handoutRoutes from "./routes/handoutRoutes";
 import speakerRoutes from "./routes/speakerRoutes";
 
-
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
 import { verifyFirebaseAuth } from "./middlewares/authMiddleware";
+import upload from "./middlewares/uploadMiddleware";
+import { uploadImage } from "./controllers/uploadController";
+import uploadRoutes from "./routes/uploadRoutes";
 
 const app: Application = express();
 
-app.use("/uploads", express.static(path.join(__dirname, "./uploads"))); 
+app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
 
 // CORS configuration - must be before any routes
 app.use(
@@ -78,7 +80,7 @@ app.use("/api/payments", verifyFirebaseAuth, paymentRoutes);
 app.use("/api/certificates", verifyFirebaseAuth, certificateRoutes);
 app.use("/api/handout", verifyFirebaseAuth, handoutRoutes);
 app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
-
+app.use("/api/upload", verifyFirebaseAuth, uploadRoutes);
 
 // Error middleware
 app.use(notFound);
