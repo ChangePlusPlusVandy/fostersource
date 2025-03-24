@@ -90,9 +90,6 @@ export default function SurveyModal({ isOpen, onClose, surveyId }:SurveyModalPro
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white rounded-lg shadow-lg w-11/12 max-w-4xl h-5/6 p-8 relative flex flex-col">
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl">
-                    ✖
-                </button>
                 <h2 className="text-2xl font-bold mb-6 text-center">Survey</h2>
                 <div className="flex-1 overflow-auto">
                     {surveyQuestions.length > 0 ? (

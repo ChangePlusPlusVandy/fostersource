@@ -316,7 +316,6 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 						<div className="p-3 flex flex-col rounded-2xl bg-white min-w-min w-full gap-1 h-full">
 							<p className="text-sm font-semibold"> Content(s) </p>
 							<DisplayBar
-								surveyLength={courseDetailsData.lengthCourse}
 								creditHours={courseDetailsData.creditNumber}
 								time={courseDetailsData.time}
 								lengthCourse={courseDetailsData.lengthCourse}
@@ -379,14 +378,12 @@ const CategoryPills = ({ categories }: { categories: string[] }) => {
 
 /* Displays the progress bar of webinar, survey, and certificate */
 const DisplayBar = ({
-	surveyLength,
 	creditHours,
 	time,
 	lengthCourse,
 	isSurveyModalOpen,
 	setIsSurveyModalOpen
 }: {
-	surveyLength: number;
 	creditHours: number;
 	time: Date;
 	lengthCourse: number;
@@ -396,7 +393,7 @@ const DisplayBar = ({
 	const [currentPage, setCurrentPage] = useState("Webinar");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
-	const [survey, setSurvey] = useState(true);
+	const [survey, setSurvey] = useState(false);
 
 	useEffect(() => {
 		const webinarEnd = time;
@@ -524,7 +521,6 @@ const DisplayBar = ({
 				)}
 				{currentPage === "Survey" && (
 					<div className="text-sm font-normal flex flex-col gap-3">
-						Length: {surveyLength} questions
 						<div className="flex flex-col text-xs">
 							<p className={survey ? "hidden text-red-600" : "text-red-600"}>
 								Complete webinar to access survey
