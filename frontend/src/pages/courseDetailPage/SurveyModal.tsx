@@ -17,7 +17,7 @@ export default function SurveyModal({ isOpen, onClose, surveyId }:SurveyModalPro
         const populateQuestions = async () => {
             let tempQuestions: any[] = []
             try {
-                const questionIds = (await apiClient.get("surveys?_id=67d79d830a42d191ebb55049")).data[0].questions
+                const questionIds = (await apiClient.get("surveys")).data[0].questions
                 for(let id of questionIds){
                     let question = (await apiClient.get(`questions?_id=${id}`)).data[0]
                     let exists = false
@@ -66,19 +66,23 @@ export default function SurveyModal({ isOpen, onClose, surveyId }:SurveyModalPro
         if (questionNumber < surveyQuestions.length - 1) {
             setQuestionNumber(questionNumber + 1);
         } else {
+            let responseIds = []
             for(let id of Object.keys(responses)){
-                console.log(responses[`${id}`])
+                const response = await apiClient.post("questionResponses", {
+                    userId: JSON.parse(localStorage.user)._id,
+                    questionId: id,
+                    answer: (responses[`${id}`]).toString(),
+                })
+                responseIds.push(response.data._id)
             }
-            // console.log({
-            //     userId: JSON.parse(localStorage.getItem("user")!)._id,
-            //     answer: JSON.stringify(responses),
-            //     dateCompleted: new Date()
-            // })
-            // await apiClient.post("surveyResponses", {
-            //     userId: JSON.parse(localStorage.user._id),
-            //     answer: JSON.stringify(responses),
-            //     dateCompleted: new Date()
-            // })
+            const response = await apiClient.post("surveyResponses", {
+                userId: JSON.parse(localStorage.user)._id,
+                answers: responseIds,
+            })
+
+            let surveyResponseId = response.data._id
+            // Beloved EM please add the updating the course to append the survey response once the other changes from Kevin is added for this.
+
             onClose();
         }
     }
