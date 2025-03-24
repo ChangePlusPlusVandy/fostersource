@@ -3,6 +3,8 @@ import WebinarComponent from "./Webinar";
 import InPersonComponent from "./InPerson";
 import OnDemandComponent from "./OnDemand";
 import Modal from "./Modal";
+import MeetingComponent from "./Meeting";
+import apiClient from "../../../services/apiClient";
 
 
 interface WorkshopCreationProps {
@@ -12,7 +14,7 @@ export default function WorkshopCreation({ workshopName}:WorkshopCreationProps) 
     const [formData, setFormData] = useState({
         title: "",
         summary: "",
-        type: "webinar",
+        type: "meeting",
         audioInstructions: "",
         markAttendance: false,
         requireAttendance: false,
@@ -21,6 +23,16 @@ export default function WorkshopCreation({ workshopName}:WorkshopCreationProps) 
         hideAfter: false,
         minTime: 0,
     });
+
+    const [meetingData, setMeetingData] = useState({
+        serviceType: "",
+        meetingID: "string",
+        startTime: new Date(),
+        duration: 0,
+        authParticipants: false,
+        autoRecord: false,
+        enablePractice: false,
+    })
 
     const [webinarData, setWebinarData] = useState({
         serviceType: "",
@@ -42,7 +54,7 @@ export default function WorkshopCreation({ workshopName}:WorkshopCreationProps) 
         embeddingLink: ""
     })
 
-    const [openModal, setOpenModal] = useState<"New" | "Existing" | null>(null);
+    const [openModal, setOpenModal] = useState<"NewWebinar" | "ExistingWebinar" | "ExistingMeeting"| "NewMeeting" | null>(null);
 
 
 
@@ -74,7 +86,10 @@ export default function WorkshopCreation({ workshopName}:WorkshopCreationProps) 
                     <label className="text-sm font-medium block">Type</label>
                     <div className="mt-2 flex gap-4">
                         <label className="flex items-center gap-2">
-                            <input type="radio" name="type" value="webinar" checked={formData.type === "webinar"} onChange={handleChange} required /> Webinar
+                            <input type="radio" name="type" value="meeting" checked={formData.type === "meeting"} onChange={handleChange} required /> Meeting
+                        </label>
+                        <label className="flex items-center gap-2">
+                            <input type="radio" name="type" value="webinar"  onChange={handleChange} required /> Webinar
                         </label>
                         <label className="flex items-center gap-2">
                             <input type="radio" name="type" value="in-person" onChange={handleChange} /> In-Person
@@ -89,9 +104,11 @@ export default function WorkshopCreation({ workshopName}:WorkshopCreationProps) 
                         <WebinarComponent setWebinarData={setWebinarData} webinarData={webinarData} openModal={openModal} setOpenModal={setOpenModal}/>
                     ) : formData.type === "in-person" ? (
                         <InPersonComponent  inPersonData={inPersonData} setInPersonData={setInPersonData}/>
-                    ) : (
+                    ) : formData.type === "on-demand" ?(
                         <OnDemandComponent  onDemandData={onDemandData} setOnDemandData={setOnDemandData}/>
-                    )}
+                    ) : (
+                        <MeetingComponent setMeetingData={setMeetingData} meetingData={meetingData} openModal={openModal} setOpenModal={setOpenModal}/>
+                        )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-6 py-5">
@@ -188,14 +205,33 @@ export default function WorkshopCreation({ workshopName}:WorkshopCreationProps) 
             </form>
 
             {/* First Modal */}
-            <Modal isOpen={openModal === "New"} onClose={() => setOpenModal(null)} title="Create New Webinar">
+            <Modal isOpen={openModal === "NewMeeting"} onClose={() => setOpenModal(null)} title="Create New Meeting">
+                <button type="button" className="px-4 py-2 bg-purple-800 text-white rounded" onClick={() => apiClient.post("/zoom/new-meeting", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                })}>Create New Webinar</button>
+
+                <p>This is the placeholder for adding a new meeting (once we get zoom).</p>
+            </Modal>
+
+            {/* Second Modal */}
+            <Modal isOpen={openModal === "ExistingMeeting"} onClose={() => setOpenModal(null)} title="Add Existing Meeting">
+                <p>This is placeholder for finding existing meetings.</p>
+            </Modal>
+
+
+            {/* First Modal */}
+            <Modal isOpen={openModal === "NewWebinar"} onClose={() => setOpenModal(null)} title="Create New Webinar">
+
                 <p>This is the placeholder for adding a new webinar (once we get zoom).</p>
             </Modal>
 
             {/* Second Modal */}
-            <Modal isOpen={openModal === "Existing"} onClose={() => setOpenModal(null)} title="Add Existing Webinar">
+            <Modal isOpen={openModal === "ExistingWebinar"} onClose={() => setOpenModal(null)} title="Add Existing Webinar">
                 <p>This is placeholder for finding existing webinars.</p>
             </Modal>
+
         </div>
     );
 }
