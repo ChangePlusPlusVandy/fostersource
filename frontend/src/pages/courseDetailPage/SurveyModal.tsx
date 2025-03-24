@@ -66,11 +66,14 @@ export default function SurveyModal({ isOpen, onClose, surveyId }:SurveyModalPro
         if (questionNumber < surveyQuestions.length - 1) {
             setQuestionNumber(questionNumber + 1);
         } else {
-            console.log({
-                userId: JSON.parse(localStorage.getItem("user")!)._id,
-                answer: JSON.stringify(responses),
-                dateCompleted: new Date()
-            })
+            for(let id of Object.keys(responses)){
+                console.log(responses[`${id}`])
+            }
+            // console.log({
+            //     userId: JSON.parse(localStorage.getItem("user")!)._id,
+            //     answer: JSON.stringify(responses),
+            //     dateCompleted: new Date()
+            // })
             // await apiClient.post("surveyResponses", {
             //     userId: JSON.parse(localStorage.user._id),
             //     answer: JSON.stringify(responses),
