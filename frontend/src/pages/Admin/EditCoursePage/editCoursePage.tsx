@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import adminApiClient from "../../../services/adminApiClient";
+import apiClient from "../../../services/apiClient";
 const EditCourse = () => {
 	const [inputTitleValue, setInputTitleValue] = useState<string>("");
 	const [inputSummaryValue, setSummaryValue] = useState<string>("");
@@ -12,38 +14,87 @@ const EditCourse = () => {
 
 	const [file, setFile] = useState<File | null>(null);
 	const [filePreview, setFilePreview] = useState<string | null>(null);
+	const [bannerImage, setBannerImage] = useState<File | null>(null);
 
-	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFileChange = async (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
 		if (event.target.files && event.target.files[0]) {
 			const selectedFile = event.target.files[0];
 			setFile(selectedFile);
 			setFilePreview(URL.createObjectURL(selectedFile));
+
+			const uploadedUrl = await uploadImageToCloudinary(selectedFile);
+
+			if (uploadedUrl) {
+				console.log("Catalog image uploaded to:", uploadedUrl);
+				// Store uploadedUrl somewhere (e.g., in state or send to backend on submit)
+			}
 		}
 	};
 
-	const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-		event.preventDefault();
-		event.stopPropagation();
-		if (event.dataTransfer.files && event.dataTransfer.files[0]) {
-			setFile(event.dataTransfer.files[0]);
-		}
-	};
-
-	const [bannerImage, setBannerImage] = useState<File | null>(null);
-
-	const handleBannerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleBannerChange = async (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
 		if (event.target.files && event.target.files[0]) {
-			setBannerImage(event.target.files[0]);
+			const selectedFile = event.target.files[0];
+			setBannerImage(selectedFile);
+
+			const uploadedUrl = await uploadImageToCloudinary(selectedFile);
+			if (uploadedUrl) {
+				console.log("Banner image uploaded to:", uploadedUrl);
+				// Store uploadedUrl somewhere
+			}
 		}
 	};
 
-	const handleBannerDrop = (event: React.DragEvent<HTMLDivElement>) => {
+	const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
 		event.preventDefault();
-		event.stopPropagation();
 		if (event.dataTransfer.files && event.dataTransfer.files[0]) {
-			setBannerImage(event.dataTransfer.files[0]);
+			const droppedFile = event.dataTransfer.files[0];
+			setFile(droppedFile);
+			setFilePreview(URL.createObjectURL(droppedFile));
+
+			const uploadedUrl = await uploadImageToCloudinary(droppedFile);
+			if (uploadedUrl) {
+				console.log("Catalog image uploaded to:", uploadedUrl);
+			}
 		}
 	};
+
+	const handleBannerDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+		event.preventDefault();
+		if (event.dataTransfer.files && event.dataTransfer.files[0]) {
+			const droppedFile = event.dataTransfer.files[0];
+			setBannerImage(droppedFile);
+
+			const uploadedUrl = await uploadImageToCloudinary(droppedFile);
+			if (uploadedUrl) {
+				console.log("Banner image uploaded to:", uploadedUrl);
+			}
+		}
+	};
+
+	const uploadImageToCloudinary = async (
+		file: File
+	): Promise<string | null> => {
+		const formData = new FormData();
+		formData.append("image", file);
+
+		try {
+			const res = await adminApiClient.post("/upload/image", formData);
+
+			// Adjust according to your API response structure
+			return res.data.imageUrl || null;
+		} catch (error: any) {
+			console.error(
+				"Error uploading image:",
+				error?.response?.data || error.message
+			);
+			return null;
+		}
+	};
+
 	return (
 		<div className="flex flex-col p-8 bg-white">
 			<p className="text-2xl">Details</p>

@@ -1,8 +1,10 @@
 // utils/cloudinaryStorage.ts
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import { v2 as cloudinary } from "cloudinary";
+import cloudinary from "./cloudinary";
 import { Request } from "express";
 import { Options } from "multer-storage-cloudinary";
+
+console.log("cloundaryStorage");
 
 // Explicit type to override the broken one
 interface CustomParams {
@@ -17,7 +19,7 @@ const storage = new CloudinaryStorage({
 		file: Express.Multer.File
 	): Promise<CustomParams> => {
 		return {
-			folder: "your-folder-name",
+			folder: "assets",
 			allowed_formats: ["jpg", "jpeg", "png", "webp"],
 		};
 	},

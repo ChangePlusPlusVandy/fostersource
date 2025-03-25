@@ -8,8 +8,6 @@ export const uploadImage = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		console.log("Uploaded file:", req.file);
-
 		if (!req.file) {
 			res.status(400).json({ message: "No file uploaded" });
 			return;
@@ -17,6 +15,8 @@ export const uploadImage = async (
 
 		// @ts-ignore: Cloudinary adds 'path' property to the file object
 		const imageUrl = req.file.path;
+
+		console.log(imageUrl);
 
 		res.status(200).json({
 			imageUrl,

@@ -1,6 +1,8 @@
-import express, { Application } from "express";
+import express, { Request, Response, NextFunction, Application } from "express";
 import cors from "cors";
 import path from "path";
+import multer from "multer";
+import cloudinary from "./config/cloudinary";
 
 // Import route files
 import userRoutes from "./routes/userRoutes";
@@ -21,9 +23,11 @@ import speakerRoutes from "./routes/speakerRoutes";
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
 import { verifyFirebaseAuth } from "./middlewares/authMiddleware";
-import upload from "./middlewares/uploadMiddleware";
+import upload from "./middlewares/upload";
 import { uploadImage } from "./controllers/uploadController";
 import uploadRoutes from "./routes/uploadRoutes";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app: Application = express();
 
@@ -83,6 +87,15 @@ app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
 app.use("/api/upload", verifyFirebaseAuth, uploadRoutes);
 
 // Error middleware
+app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
+	if (err instanceof multer.MulterError) {
+		console.error("❌ Multer error:", err.message);
+		res.status(400).json({ message: err.message });
+		return;
+	}
+	console.error("❌ Unknown error:", err);
+	res.status(500).json({ message: "Internal server error" });
+});
 app.use(notFound);
 app.use(errorHandler);
 
