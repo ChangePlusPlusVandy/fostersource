@@ -215,8 +215,8 @@ export function SidebarItems({
 				className={`${active}`}
 				onClick={() => setActiveItem(window.location.pathname)}
 			>
-				<div className={`${iconDescMargin}`}>{icon}</div>
 				<Link to={href}>
+					<div className={`${iconDescMargin}`}>{icon}</div>
 					{!isCollapsed && description}{" "}
 					{description === "Cart" && cartItemCount !== 0
 						? `(${cartItemCount})`
@@ -245,8 +245,10 @@ export function SidebarItems({
 			{isLoggedIn && (
 				<div className="logout">
 					<li className={`${logoutActive}`} onClick={() => handleLogOut()}>
-						<div className={`${iconDescMargin}`}>{logout.icon}</div>
-						<Link to={logout.href}>{!isCollapsed && logout.description}</Link>
+						<Link to={logout.href}>
+							<div className={`${iconDescMargin}`}>{logout.icon}</div>
+							{!isCollapsed && logout.description}
+						</Link>
 					</li>
 				</div>
 			)}

@@ -1,32 +1,49 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { List, Trash2, X } from 'lucide-react';
+import apiClient from "../../../services/apiClient";
 
 const Survey = () => {
-    const [title, setTitle] = useState('');
-    const [summary, setSummary] = useState('');
     const [questions, setQuestions] = useState([
         {
+            _id: '',
             question: '',
-            answerType: 'Text Input',
-            options: [''],
+            explanation: '',
+            isMCQ: false,
+            answers: [''],
+            isRequired: false,
+            isEdited: false,
         },
     ]);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [surveyId, setSurveyId] = useState<string | null>(null);
 
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTitle(e.target.value);
-        setHasUnsavedChanges(true);
-    };
+    useEffect(() => {
+        const fetchSurvey = async () => {
+            try {
+                const response = await apiClient.get("http://localhost:5001/api/surveys"); // Fetch the existing survey
+                const surveyData = response.data;
 
-    const handleSummaryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setSummary(e.target.value);
-        setHasUnsavedChanges(true);
-    };
+                if (surveyData) {
+                    setSurveyId(surveyData._id);
+                    setQuestions(surveyData.questions);
+                }
+            } catch (error) {
+                console.error('Error fetching survey:', error);
+                setErrorMessage('Error loading survey data.');
+            }
+        };
+
+        fetchSurvey();
+    }, []);
 
     const handleQuestionChange = (index: number, value: string) => {
         const updatedQuestions = [...questions];
         updatedQuestions[index].question = value;
+        updatedQuestions[index].isEdited = true;
         setQuestions(updatedQuestions);
         setHasUnsavedChanges(true);
     };
@@ -35,9 +52,13 @@ const Survey = () => {
         setQuestions([
             ...questions,
             {
+                _id: '',
                 question: '',
-                answerType: 'Text Input',
-                options: [''],
+                explanation: '',
+                isMCQ: false,
+                answers: [''],
+                isRequired: true,
+                isEdited: true,
             },
         ]);
         setHasUnsavedChanges(true);
@@ -49,12 +70,27 @@ const Survey = () => {
         setHasUnsavedChanges(true);
     };
 
-    const handleAnswerTypeChange = (index: number, value: string) => {
+    const handleExplanationChange = (index: number, value: string) => {
         const updatedQuestions = [...questions];
-        updatedQuestions[index].answerType = value;
-        // Reset options (for Multiple Choice or Multi-select)
-        if (value !== 'Text Input') {
-            updatedQuestions[index].options = [''];
+        updatedQuestions[index].explanation = value;
+        updatedQuestions[index].isEdited = true;
+        setQuestions(updatedQuestions);
+        setHasUnsavedChanges(true);
+    };
+
+    const handleRequiredChange = (index: number, value: boolean) => {
+        const updatedQuestions = [...questions];
+        updatedQuestions[index].isRequired = value;
+        setQuestions(updatedQuestions);
+        setHasUnsavedChanges(true);
+    };
+
+    const handleAnswerTypeChange = (index: number, value: boolean) => {
+        const updatedQuestions = [...questions];
+        updatedQuestions[index].isMCQ = value;
+        // Reset options (for Multiple Choice)
+        if (value) {
+            updatedQuestions[index].answers = [''];
         }
         setQuestions(updatedQuestions);
         setHasUnsavedChanges(true);
@@ -62,21 +98,21 @@ const Survey = () => {
 
     const handleOptionChange = (qIndex: number, oIndex: number, value: string) => {
         const updatedQuestions = [...questions];
-        updatedQuestions[qIndex].options[oIndex] = value;
+        updatedQuestions[qIndex].answers[oIndex] = value;
         setQuestions(updatedQuestions);
         setHasUnsavedChanges(true);
     };
 
     const addOption = (qIndex: number) => {
         const updatedQuestions = [...questions];
-        updatedQuestions[qIndex].options.push('');
+        updatedQuestions[qIndex].answers.push('');
         setQuestions(updatedQuestions);
         setHasUnsavedChanges(true);
     };
 
     const deleteOption = (qIndex: number, oIndex: number) => {
         const updatedQuestions = [...questions];
-        updatedQuestions[qIndex].options.splice(oIndex, 1);
+        updatedQuestions[qIndex].answers.splice(oIndex, 1);
         setQuestions(updatedQuestions);
         setHasUnsavedChanges(true);
     };
@@ -102,10 +138,65 @@ const Survey = () => {
     };
 
     const handleLeave = () => {
-        // Implement exit logic here (e.g., redirecting the user or closing the form)
+        // TODO: Implement exit logic here (e.g., redirecting the user or closing the form)
         setIsModalOpen(false);
         // Console log that the user is leaving
         // console.log("User left the page.");
+    };
+
+    const handleSaveSurvey = async () => {
+        setLoading(true);
+        setErrorMessage(null);
+        try {
+            if (questions.length === 0) {
+                setErrorMessage("At least one question is required.");
+                setLoading(false);
+                return;
+            }
+
+            // First, create the questions
+            const createdQuestions = await Promise.all(
+                questions.map(async (q) => {
+                    if (q.isEdited) {
+                        // If question is edited, create a new question
+                        const response = await apiClient.post("http://localhost:5001/api/questions", {
+                            question: q.question,
+                            explanation: q.explanation,
+                            isMCQ: q.isMCQ,
+                            answers: q.answers || [],
+                            isRequired: q.isRequired,
+                        });
+                        return response.data._id; // Return the new question's ID
+                    } else {
+                        // If question is not edited, return the existing question ID
+                        return q._id; // Assume _id exists if it's an existing question
+                    }
+                })
+            );
+
+            // Create survey data to send to backend
+            const surveyData = {
+                questions: createdQuestions,
+            };
+
+            if (surveyId) {
+                // If surveyId exists, update the existing survey
+                const response = await apiClient.put(`http://localhost:5001/api/surveys/${surveyId}`, surveyData);
+                alert('Survey saved successfully!');
+                setHasUnsavedChanges(false);
+                setSurveyId(response.data._id);
+            } else {
+                // Create a new survey if there is no surveyId
+                //response = await apiClient.post("http://localhost:5001/api/surveys", surveyData);
+                console.error('No surveyId');
+            }            
+        } catch (err) {
+            // Handle errors from the backend
+            console.error('Error saving survey:', err);
+            setErrorMessage('Error saving survey. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -116,36 +207,12 @@ const Survey = () => {
                     <h1 className="text-2xl font-semibold text-gray-800">Survey</h1>
                 </div>
 
-                {/* Title */}
-                <div>
-                    <label htmlFor="title" className="block font-semibold text-lg">Title</label>
-                    <input
-                        type="text"
-                        id="title"
-                        value={title}
-                        onChange={handleTitleChange}
-                        placeholder="Enter survey title"
-                        className="w-full mt-2 p-3 border rounded-md"
-                    />
-                </div>
-
-                {/* Summary */}
-                <div>
-                    <label htmlFor="summary" className="block font-semibold text-lg">Summary</label>
-                    <textarea
-                        id="summary"
-                        value={summary}
-                        onChange={handleSummaryChange}
-                        placeholder="Enter survey summary"
-                        rows={4}
-                        className="w-full mt-2 p-3 border rounded-md"
-                    />
-                </div>
-
                 {/* Questions */}
                 <div>
                     {questions.map((question, index) => (
-                        <div key={index} className="space-y-4 mt-16">
+                        <div key={index} className="space-y-4 mt-12">
+                            
+
                             {/* Question */}
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
@@ -171,29 +238,40 @@ const Survey = () => {
                                 />
                             </div>
 
+                            {/* Explanation Text */}
+                            <div>
+                                <label htmlFor={`explanation-${index}`} className="block font-semibold">Explanation Text</label>
+                                <textarea
+                                    id={`explanation-${index}`}
+                                    value={question.explanation}
+                                    onChange={(e) => handleExplanationChange(index, e.target.value)}
+                                    placeholder="Enter optional explanation that will appear above the question."
+                                    className="w-3/4 mt-2 p-3 border rounded-md"
+                                />
+                            </div>
+
                             {/* Answer Type */}
                             <div>
                                 <label htmlFor={`answer-type-${index}`} className="block font-semibold">Answer Type</label>
                                 <select
                                     id={`answer-type-${index}`}
-                                    value={question.answerType}
-                                    onChange={(e) => handleAnswerTypeChange(index, e.target.value)}
+                                    value={question.isMCQ ? "true" : "false"}
+                                    onChange={(e) => handleAnswerTypeChange(index, e.target.value === "true")}
                                     className="w-3/4 mt-2 p-3 border rounded-md"
                                 >
-                                    <option value="Text Input">Text Input</option>
-                                    <option value="Multiple Choice">Multiple Choice</option>
-                                    <option value="Multi-select">Multi-select</option>
+                                    <option value="false">Text Input</option>
+                                    <option value="true">Multiple Choice</option>
                                 </select>
                             </div>
 
-                            {/* Options (for Multiple Choice or Multi-select) */}
-                            {(question.answerType === 'Multiple Choice' || question.answerType === 'Multi-select') && (
+                            {/* Options (for Multiple Choice) */}
+                            {(question.isMCQ) && (
                                 <div className="mt-4 space-y-3 pl-16">
-                                    {question.options.map((option, oIndex) => (
+                                    {question.answers.map((answer, oIndex) => (
                                         <div key={oIndex} className="flex items-center space-x-3">
                                             <input
                                                 type="text"
-                                                value={option}
+                                                value={answer}
                                                 onChange={(e) => handleOptionChange(index, oIndex, e.target.value)}
                                                 placeholder={`Option ${oIndex + 1}`}
                                                 className="w-3/4 p-3 border rounded-md"
@@ -215,6 +293,17 @@ const Survey = () => {
                                     </button>
                                 </div>
                             )}
+
+                            {/* Required Checkbox */}
+                            <div className="mt-2 flex items-center">
+                                <input
+                                    type="checkbox"
+                                    checked={question.isRequired}
+                                    onChange={(e) => handleRequiredChange(index, e.target.checked)}
+                                    className="mr-2"
+                                />
+                                <label className="text-sm">Required</label>
+                            </div>
                         </div>
                     ))}
 
@@ -227,14 +316,20 @@ const Survey = () => {
                     </button>
 
                     <div className="flex flex-col items-end mt-4 space-y-2">
-                        {/* Save and Exit Button */}
+                        {/* Error Message Display */}
+                        {errorMessage && (
+                            <div className="text-red-600 mt-4">
+                                {errorMessage}
+                            </div>
+                        )}
+
+                        {/* Save Button */}
                         <button
-                            onClick={() => {
-                                // Add save logic here
-                            }}
+                            onClick={handleSaveSurvey}
                             className="w-[200px] bg-[#8757A3] text-white py-2 px-4 rounded-md hover:bg-[#6d4a92] focus:ring-2 focus:ring-[#8757A3]"
+                            disabled={loading}
                         >
-                            Save and Exit
+                            {loading ? "Saving..." : "Save"}
                         </button>
 
                         {/* Exit Button */}

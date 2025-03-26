@@ -1,140 +1,130 @@
 import { Request, Response } from "express";
 import Survey, { ISurvey } from "../models/surveyModel";
 
-// @desc    Get all surveys or filter by query parameters
+// @desc    Get the single survey
 // @route   GET /api/surveys
 // @access  Public
-export const getSurveys = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
-	try {
-		const { id, question } = req.query;
-		const query: { [key: string]: any } = {};
+export const getSurvey = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Use `findOneAndUpdate` to find the survey and create one if it doesn't exist
+    const survey = await Survey.findOneAndUpdate(
+      {},  // Find the first document (survey)
+      { $setOnInsert: { questions: [] } },  // If no document is found, insert a new one with empty questions
+      { new: true, upsert: true }  // Return the updated/new document, and if not found, create it
+    ).populate({
+      path: "questions",
+      model: "Question",
+    });
 
-		if (id) query.id = String(id);
-		if (question) query.question = String(question);
-
-		const surveys = await Survey.find(query).populate({
-			path: "question",
-			model: "Question",
-		});
-
-		res.status(200).json(surveys);
-	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-		} else {
-			res.status(500).json({ message: "An unknown error occurred" });
-		}
-	}
+    res.status(200).json(survey);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
+  }
 };
 
-// @desc    Create a new survey
+// @desc    Create a new survey (only if it doesn't already exist)
 // @route   POST /api/surveys
 // @access  Public
-export const createSurvey = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
-	try {
-		const { id, question } = req.body; // Changed from req.query to req.body
+// export const createSurvey = async (req: Request, res: Response): Promise<void> => {
+//   try {
+//     // Check if a survey already exists
+//     const existingSurvey = await Survey.findOne();
 
-		// Check if survey exists
-		const existingSurvey = await Survey.findOne({ id });
+//     if (existingSurvey) {
+//       res.status(200).json({
+//         survey: existingSurvey,
+//         message: "Survey already exists. You can update it instead.",
+//       });
+//       return;
+//     }
 
-		if (existingSurvey) {
-			res.status(200).json({
-				survey: existingSurvey,
-				message: "Survey already exists",
-			});
-			return;
-		}
+//     const { questions } = req.body;
 
-		// Create new survey
-		const survey = new Survey({
-			id,
-			question,
-		});
-		await survey.save();
+//     if (!questions) {
+//       res.status(400).json({ message: "Questions are required" });
+//       return;
+//     }
 
-		res.status(201).json({
-			survey,
-			message: "Survey created successfully",
-		});
-	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-		} else {
-			res.status(500).json({ message: "An unknown error occurred" });
-		}
-	}
+//     // Create a new survey
+//     const survey = new Survey({
+//       questions,
+//     });
+//     await survey.save();
+
+//     res.status(201).json({
+//       survey,
+//       message: "Survey created successfully",
+//     });
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       res.status(500).json({ message: error.message });
+//     } else {
+//       res.status(500).json({ message: "An unknown error occurred" });
+//     }
+//   }
+// };
+
+// @desc    Update the existing survey
+// @route   PUT /api/surveys
+// @access  Public
+export const updateSurvey = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { questions } = req.body;
+
+    // Find the single existing survey (since there is only one survey)
+    const survey = await Survey.findOne();
+
+    if (!survey) {
+      res.status(404).json({ message: "Survey not found" });
+      return;
+    }
+
+    // Update the survey with new questions
+    survey.questions = questions;
+    await survey.save();
+
+    res.status(200).json(survey);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
+  }
 };
 
-// @desc    Update a survey
-// @route   PUT /api/surveys/:id
+// @desc    Delete the survey
+// @route   DELETE /api/surveys
 // @access  Public
-export const updateSurvey = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
-	try {
-		const { id: surveyId } = req.params;
-		const updates = req.body;
+export const deleteSurvey = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Since there is only one survey, no need to look for it by ID
+    const survey = await Survey.findOne();
 
-		const updatedSurvey = await Survey.findByIdAndUpdate(
-			surveyId,
-			updates,
-			{ new: true } // Returns the updated document
-		);
+    if (!survey) {
+      res.status(404).json({
+        success: false,
+        message: "Survey not found",
+      });
+      return;
+    }
 
-		if (!updatedSurvey) {
-			res.status(404).json({ message: "Survey not found" });
-			return;
-		}
+    // Delete the survey
+    await Survey.deleteOne({ _id: survey._id });
 
-		res.status(200).json(updatedSurvey);
-	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-		} else {
-			res.status(500).json({ message: "An unknown error occurred" });
-		}
-	}
-};
-
-// @desc    Delete a survey
-// @route   DELETE /api/surveys/:id
-// @access  Public
-export const deleteSurvey = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
-	try {
-		const { id } = req.params;
-
-		// Check if survey exists
-		const survey = await Survey.findById(id);
-		if (!survey) {
-			res.status(404).json({
-				success: false,
-				message: "Survey not found.",
-			});
-			return;
-		}
-
-		// Delete the survey
-		await Survey.deleteOne({ _id: id });
-
-		res.status(200).json({
-			success: true,
-			message: "Survey deleted successfully.",
-		});
-	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-		} else {
-			res.status(500).json({ message: "An unknown error occurred" });
-		}
-	}
+    res.status(200).json({
+      success: true,
+      message: "Survey deleted successfully",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "An unknown error occurred" });
+    }
+  }
 };
