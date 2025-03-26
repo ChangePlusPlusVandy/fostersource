@@ -1,24 +1,19 @@
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 import { Link } from "react-router-dom";
-import "./sidebar.css";
+import "./adminSidebar.css";
 import {
-	House,
-	KeyRound,
-	LayoutDashboard,
-	BookOpen,
-	Mic,
-	Calendar,
-	MessageCircleQuestion,
-	ShoppingCart,
-	Phone,
+	Users,
+	FileText,
+	Settings,
 	LogOut,
+	Layers,
 	LogIn,
+	KeyRound,
+	HomeIcon,
 } from "lucide-react";
-
 import authService from "../../services/authService";
-import { log } from "console";
-import { User } from "../../shared/types/user";
-import apiClient from "../../services/apiClient";
+// import { log } from "console";
+// import internal from "stream";
 
 // User information
 export const userInfo = {
@@ -32,47 +27,43 @@ export const userInfo = {
 		: false,
 };
 
+// export const userInfo = {
+// 	name: "First L.",
+// 	role: "No role",
+// 	isLoggedIn: false,
+// 	isAdmin: true
+// };
+
 // All sidebar entries
-export const items = [
+export const adminSidebarItems = [
+	// {
+	// 	icon: <Home />,
+	// 	description: "Home",
+	// 	href: "/",
+	// },
 	{
-		icon: <House />,
-		description: "Home",
-		href: "/",
+		icon: <Layers />,
+		description: "Products",
+		href: "/admin/products",
 	},
 	{
-		icon: <LayoutDashboard />,
-		description: "Dashboard",
-		href: "/dashboard",
+		icon: <Users />,
+		description: "Users",
+		href: "/admin/users",
 	},
 	{
-		icon: <BookOpen />,
-		description: "Catalog",
-		href: "/catalog",
+		icon: <FileText />,
+		description: "Content",
+		href: "/admin/content",
 	},
 	{
-		icon: <Mic />,
-		description: "Podcasts",
-		href: "#",
-	},
-	{
-		icon: <Calendar />,
-		description: "Calendar",
-		href: "/calendar",
-	},
-	{
-		icon: <MessageCircleQuestion />,
-		description: "FAQs",
-		href: "#",
-	},
-	{ icon: <ShoppingCart />, description: "Cart", href: "/cart" },
-	{
-		icon: <Phone />,
-		description: "Contact",
-		href: "mailto:info@fostersource.org",
+		icon: <Settings />,
+		description: "Settings",
+		href: "/admin/settings",
 	},
 ];
 
-// Admin information for conditional rendering
+//Admin information for conditional rendering
 export const admin = {
 	icon: <KeyRound />,
 	description: "Admin Tools",
@@ -87,50 +78,33 @@ export const logout = {
 };
 
 // State of collapsibility, abstracted
-interface SidebarProps {
-	isCollapsed: boolean;
-	setIsCollapsed: Dispatch<SetStateAction<boolean>>;
+interface AdminSidebarProps {
 	isLoggedIn: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
-	cartItemCount: number;
 }
 
 // The Sidebar itself
-export function Sidebar({
-	isCollapsed,
-	setIsCollapsed,
-	isLoggedIn,
-	setIsLoggedIn,
-	cartItemCount,
-}: SidebarProps) {
+export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 	// User Info
 	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
 	const role = isLoggedIn ? JSON.parse(localStorage.user).role : "Log In";
-	// Automatically collapse sidebar for narrow screens
-	useEffect(() => {
-		const handleResize = () => {
-			setIsCollapsed(window.innerWidth < 768);
-		};
-
-		window.addEventListener("resize", handleResize);
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, []);
+	// const name =  "Log In";
+	// const role = "Log In";
+	const isCollapsed = true;
 
 	return (
-		<div className="sidebar">
+		<div className="admin-sidebar">
 			<Profile
 				isCollapsed={isCollapsed}
 				isLoggedIn={isLoggedIn}
 				name={name}
 				role={role}
 			/>
-			<SidebarItems
+			<AdminSidebarItems
 				isCollapsed={isCollapsed}
 				isLoggedIn={isLoggedIn}
+				isAdmin={userInfo.isAdmin}
 				setIsLoggedIn={setIsLoggedIn}
-				cartItemCount={cartItemCount}
 			/>
 		</div>
 	);
@@ -143,6 +117,21 @@ interface ProfileProps {
 	role?: string;
 }
 
+export function HomeSidebar() {
+	return (
+		<li
+			key={"/"}
+			onClick={() => {
+				window.location.pathname = "/";
+			}}
+		>
+			<div className={"Home"}>
+				<HomeIcon />
+			</div>
+		</li>
+	);
+}
+
 // Display either profile information or log in button
 export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 	return (
@@ -150,7 +139,7 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 			{!isLoggedIn && (
 				<div className="w-full flex justify-center">
 					<Link to={"/login"} className="w-full">
-						<button className="login text-white rounded p-3 flex gap-3 justify-center text-center w-full">
+						<button className="admin-login text-white rounded p-3 flex gap-3 justify-center text-center w-full">
 							<LogIn /> {!isCollapsed && "Login"}
 						</button>
 					</Link>
@@ -175,37 +164,20 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 	);
 }
 
-interface SidebarItemsProps {
+interface AdminSidebarItemsProps {
 	isLoggedIn: boolean;
+	isAdmin: boolean;
 	isCollapsed: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
-	cartItemCount: number;
 }
 
 // Display and handle sidebar entries
-export function SidebarItems({
+export function AdminSidebarItems({
 	isCollapsed,
 	isLoggedIn,
+	isAdmin,
 	setIsLoggedIn,
-	cartItemCount,
-}: SidebarItemsProps) {
-	const [isAdmin, setIsAdmin] = useState(
-		localStorage.user && JSON.parse(localStorage.user).role === "staff"
-	);
-
-	// const checkAdmin = async () => {
-	// 	try {
-	// 		const response = await apiClient.get("/users/is-admin");
-	// 		setIsAdmin(response.data.isAdmin);
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 	}
-	// };
-
-	// useEffect(() => {
-	// 	checkAdmin();
-	// }, []);
-
+}: AdminSidebarItemsProps) {
 	const handleLogOut = async () => {
 		try {
 			await authService.logout();
@@ -221,7 +193,7 @@ export function SidebarItems({
 		window.location.pathname
 	);
 
-	const sidebarItems = items.map(({ icon, description, href }) => {
+	const sidebarItems = adminSidebarItems.map(({ icon, description, href }) => {
 		const active = activeItem === href ? "active" : "";
 		const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
@@ -229,45 +201,29 @@ export function SidebarItems({
 			<li
 				key={href + description}
 				className={`${active}`}
-				onClick={() => setActiveItem(window.location.pathname)}
+				onClick={() => {
+					setActiveItem(window.location.pathname);
+				}}
 			>
 				<Link to={href}>
 					<div className={`${iconDescMargin}`}>{icon}</div>
-					{!isCollapsed && description}{" "}
-					{description === "Cart" && cartItemCount !== 0
-						? `(${cartItemCount})`
-						: ""}
 				</Link>
 			</li>
 		);
 	});
 
-	const adminActive = activeItem === admin.href ? "active" : "";
 	const logoutActive = activeItem === logout.href ? "active" : "";
 	const iconDescMargin = !isCollapsed ? "mr-4" : "";
 
 	return (
-		<ul className="menu mb-4">
-			{isAdmin && (
-				<li
-					className={`${adminActive}`}
-					onClick={() => {
-						setActiveItem(window.location.pathname);
-						window.location.href = admin.href;
-					}}
-				>
-					<div className={`${iconDescMargin}`}>{admin.icon}</div>
-					<Link to={""}>{!isCollapsed && admin.description}</Link>
-				</li>
-			)}
+		<ul className="admin-menu mb-4">
+			<HomeSidebar />
 			{sidebarItems}
 			{isLoggedIn && (
 				<div className="logout">
 					<li className={`${logoutActive}`} onClick={() => handleLogOut()}>
-						<Link to={logout.href}>
-							<div className={`${iconDescMargin}`}>{logout.icon}</div>
-							{!isCollapsed && logout.description}
-						</Link>
+						<div className={`${iconDescMargin}`}>{logout.icon}</div>
+						<Link to={logout.href}>{!isCollapsed && logout.description}</Link>
 					</li>
 				</div>
 			)}
