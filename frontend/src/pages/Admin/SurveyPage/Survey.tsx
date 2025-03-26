@@ -166,7 +166,7 @@ const Survey = () => {
                             answers: q.answers || [],
                             isRequired: q.isRequired,
                         });
-                        return response.data._id; // Return the new question's ID
+                        return response.data._id; // Return new question's ID
                     } else {
                         // If question is not edited, return the existing question ID
                         return q._id; // Assume _id exists if it's an existing question
