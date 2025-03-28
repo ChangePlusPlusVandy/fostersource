@@ -58,12 +58,12 @@ export const createPayment = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		const { userId, date, amount, memo } = req.body;
+		const { userId, date, amount, memo, courses, transactionId } = req.body;
 
-		if (!userId || !date || !amount || !memo) {
+		if (!userId || !date || !amount || !memo || courses.length === 0 || !transactionId) {
 			res.status(400).json({
 				success: false,
-				message: "Please provide userId, date, amount, and memo.",
+				message: "Please provide userId, date, amount, memo, courses, and transaction ID.",
 			});
 			return;
 		}
@@ -73,6 +73,8 @@ export const createPayment = async (
 			date,
 			amount,
 			memo,
+			courses,
+			transactionId
 		});
 
 		const savedPayment = await newPayment.save();
@@ -96,7 +98,7 @@ export const updatePayment = async (
 ): Promise<void> => {
 	try {
 		const { id } = req.params;
-		const { userId, date, amount, memo } = req.body;
+		const { userId, date, amount, memo, courses, transactionId } = req.body;
 
 		const payment = await Payment.findById(id);
 
@@ -112,6 +114,8 @@ export const updatePayment = async (
 		if (date) payment.date = new Date(date);
 		if (amount) payment.amount = amount;
 		if (memo) payment.memo = memo;
+		if (courses) payment.courses = courses; 
+		if (transactionId) payment.transactionId = transactionId; 
 
 		const updatedPayment = await payment.save();
 
