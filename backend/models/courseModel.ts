@@ -1,8 +1,14 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { IRating } from "./ratingModel";
+import { IHandout } from "./handoutModel";
+
+// export interface IHandout {
+// 	title: string;
+// 	file: string;
+// }
 
 export interface ICourse extends Document {
-	handouts: string[];
+	handouts: IHandout[];
 	ratings: IRating[];
 	className: string;
 	discussion: string;
@@ -21,13 +27,27 @@ export interface ICourse extends Document {
 	time: Date;
 	isInPerson: boolean;
 	students: mongoose.Types.ObjectId[]; //for the users
-	regStart: Date; 
-	regEnd: Date;  
+	regStart: Date;
+	regEnd: Date;
+	productType: string[];
 }
+
+// const HandoutSchema = new Schema(
+//     {
+//         title: { type: String, required: true },
+//         file: { type: String, required: true }
+//     },
+//     { _id: false }
+// );
 
 const CourseSchema: Schema = new Schema(
 	{
-		handouts: [{ type: String, required: false }],
+		handouts: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Handout",
+			},
+		],
 		ratings: [
 			{
 				type: Schema.Types.ObjectId,
@@ -41,7 +61,7 @@ const CourseSchema: Schema = new Schema(
 		categories: [{ type: String, required: false }],
 		creditNumber: { type: Number, required: true },
 		courseDescription: { type: String, required: true },
-		thumbnailPath: { type: String, required: true },
+		thumbnailPath: { type: String, required: false },
 		cost: { type: Number, required: true },
 		instructorDescription: { type: String, required: false },
 		instructorRole: { type: String, required: false },
@@ -60,8 +80,9 @@ const CourseSchema: Schema = new Schema(
 			enum: ["webinar", "course", "meeting"],
 			required: true,
 		},
-		regStart: { type: Date, required: true }, 
-		regEnd: { type: Date, required: false } 
+		regStart: { type: Date, required: true },
+		regEnd: { type: Date, required: false },
+		productType: [{ type: String, required: false }],
 	},
 	{
 		timestamps: true,

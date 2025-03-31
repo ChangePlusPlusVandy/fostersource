@@ -3,6 +3,7 @@ import Dropdown from "../../../components/dropdown-select";
 import { Video, Calendar, Wifi } from "lucide-react";
 import DisplayBar from "./DisplayBar";
 import { WebinarType } from "../../../shared/types/Webinar";
+import { Link } from "react-router-dom";
 
 interface WorkshopProps {
 	webinar?: WebinarType;
@@ -179,14 +180,12 @@ export default function WorkshopCard({
 					</div>
 				</div>
 
-				<button
-					className="bg-[#8757A3] text-white py-2 px-4 rounded w-full mt-4 transition transform active:scale-95 hover:scale-105"
-					onClick={() => {
-						console.log("clicked");
-					}}
+				<Link
+					to={"/admin/product/edit/workshop"}
+					className="bg-[#8757A3] inline-block text-center text-white py-2 px-4 rounded w-full mt-4 transition transform active:scale-95 hover:scale-105"
 				>
 					Edit Component
-				</button>
+				</Link>
 
 				<div className="flex justify-center mt-2">
 					<button className="text-purple-600 underline transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95">

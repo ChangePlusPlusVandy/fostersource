@@ -5,15 +5,15 @@ import { IQuestion } from "./questionModel";
 export interface ISurvey extends Document {
 	// Define fields here:
 	id: string;
-	question: IQuestion[];
+	question: mongoose.Types.ObjectId[];
+	courseId: mongoose.Types.ObjectId;
 }
 
 // Define the schema with placeholders for fields (others will fill this in)
 const surveySchema: Schema = new Schema(
 	{
 		// Define fields here:
-		id: { type: String, required: true },
-		question: [
+		questions: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "Question",
