@@ -51,13 +51,43 @@ export default function RegistrationPage() {
         try {
             const response = await apiClient.get("/payments"); 
 
-            const receivedPayments: Registration[] = response.data.map((payment: Payment) => ({
-                // title: payment.title, 
-                user: payment.userId,
-                // email: payment.email,
-                date: payment.date,
-                // transactionId: payment._id,
-            }))
+            const receivedPayments: Registration[] = []; 
+            const courseTitles = new Map<string, string>(); 
+            const userEmails = new Map<string, string>(); 
+
+            for (const payment of response.data) {
+                let userEmail: string; 
+
+                if (userEmails.has(payment.userId)) {
+                    userEmail = userEmails.get(payment.userId)!; 
+                } else {
+                    const userResp = await apiClient.get(`/users/${payment.userId}`); 
+                    userEmail = userResp.data.email; 
+                    userEmails.set(payment.userId, userEmail); 
+                }
+
+                for (const courseId of payment.courses) {
+                    let courseTitle: string; 
+
+                    if (courseTitles.has(courseId)) {
+                        courseTitle = courseTitles.get(courseId)!; 
+                    } else {
+                        const courseResp = await apiClient.get(`/courses/${courseId}`); 
+                        courseTitle = courseResp.data.className; 
+                        courseTitles.set(courseId, courseTitle); 
+                    }
+
+                    receivedPayments.push({
+                        title: courseTitle, 
+                        user: payment.userId, 
+                        email: userEmail, 
+                        date: payment.date, 
+                        transactionId: payment.transactionId,
+                        paid: payment.amount,
+                    })
+                }
+            }
+
 
             setRegistrations(receivedPayments); 
         } catch (error) {
