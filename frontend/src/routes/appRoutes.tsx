@@ -33,6 +33,7 @@ import apiClient from "../services/apiClient";
 import { AdminSidebar } from "../components/AdminSidebar/AdminSidebar";
 import EditCourse from "../pages/Admin/EditCoursePage/editCoursePage";
 import EditSideBar from "../components/EditCourseSidebar/editCoursePageSideBar";
+import Registrants from "../pages/Admin/NewProductPage/Registrants";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -220,6 +221,14 @@ function AppRoutes() {
 							element={
 								<AdminRoute>
 									<EmailPage />
+								</AdminRoute>
+							}
+						/>
+						<Route
+							path="admin/new-product/registrants"
+							element={
+								<AdminRoute>
+									<Registrants />
 								</AdminRoute>
 							}
 						/>
