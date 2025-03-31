@@ -9,25 +9,25 @@ export const getCourses = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
-	try {
-		const filters = req.query;
+    try {
+        const filters = req.query;
 
-		// Populate ratings and components fields as needed
-		const courseResponses = await Course.find(filters)
-			.populate(["ratings", "components"])
-			.exec();
+        // Populate ratings and components fields as needed
+        const courseResponses = await Course.find(filters)
+            .populate(["ratings", "components"])
+            .exec();
 
-		res.status(200).json({
-			success: true,
-			count: courseResponses.length,
-			data: courseResponses,
-		});
-	} catch (error) {
-		res.status(500).json({
-			success: false,
-			message: "Internal service error.",
-		});
-	}
+        res.status(200).json({
+            success: true,
+            count: courseResponses.length,
+            data: courseResponses,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Internal service error.",
+        });
+    }
 };
 
 // @desc    Get a specific course by a valid id
