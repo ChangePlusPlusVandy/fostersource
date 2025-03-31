@@ -1,7 +1,7 @@
 import request from "supertest";
 import app from "../app";
 import mongoose from "mongoose";
-import Email from "../models/emailModel";
+import Email from "../models/emailTemplateModel";
 
 const emailData1 = {
     title: "Welcome Email",
