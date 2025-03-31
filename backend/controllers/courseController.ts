@@ -102,6 +102,7 @@ export const createCourse = async (
 			courseType,
 			regStart,
 			regEnd,
+			productType,
 		} = req.body;
 
 		// Validate required fields
@@ -160,6 +161,7 @@ export const createCourse = async (
 			courseType,
 			regStart,
 			regEnd,
+			productType,
 		});
 
 		const savedCourseResponse = await newCourseResponse.save();
