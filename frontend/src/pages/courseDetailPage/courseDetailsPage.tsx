@@ -1,7 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
-
 import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
@@ -89,6 +88,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 
 	//================ Working axios request ======================
 	const fetchCourses = async () => {
+		if (!courseId) return;
 		try {
 			const response = await apiClient.get(`courses/${courseId}`);
 			response.data.data.time = new Date(response.data.data.time)
@@ -99,8 +99,13 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	};
 
 	useEffect(() => {
+		const id = queryParams.get("courseId");
+		setCourseId(id || "");
+	}, [location.search]);
+
+	useEffect(() => {
 		fetchCourses();
-	}, []);
+	}, [courseId]);
 
 	useEffect(() => {
 		if (courseDetailsData) {
@@ -184,13 +189,16 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 									{courseDetailsData.creditNumber} Credits
 								</p>
 								<p className="w-max min-w-max">
-									Live Web Event {courseDetailsData.time.toLocaleDateString()}{" "}
-									at{" "}
-									{courseDetailsData.time.toLocaleTimeString("en-US", {
-										hour: "numeric",
-										minute: "2-digit",
-										hour12: true,
-									})}
+									Live Web Event{" "}
+									{new Date(courseDetailsData.time).toLocaleDateString()} at{" "}
+									{new Date(courseDetailsData.time).toLocaleTimeString(
+										"en-US",
+										{
+											hour: "numeric",
+											minute: "2-digit",
+											hour12: true,
+										}
+									)}
 								</p>
 								<div className="w-max min-w-max">
 									<CategoryPills categories={courseDetailsData.categories} />
@@ -396,7 +404,7 @@ const DisplayBar = ({
 	const [survey, setSurvey] = useState(false);
 
 	useEffect(() => {
-		const webinarEnd = time;
+		const webinarEnd = new Date(time);
 		webinarEnd.setHours(webinarEnd.getHours() + 2); // 2 hours after the current time
 		const checkTime = () => {
 			const currentTime = new Date();
@@ -490,10 +498,10 @@ const DisplayBar = ({
 				{currentPage === "Webinar" && (
 					<div className="flex justify-between">
 						<div className="text-sm	font-normal flex flex-col gap-1">
-							<div>Date: {time.toLocaleDateString()}</div>
+							<div>Date: {new Date(time).toLocaleDateString()}</div>
 							<div>
 								Time:{" "}
-								{time.toLocaleTimeString("en-US", {
+								{new Date(time).toLocaleTimeString("en-US", {
 									hour: "numeric",
 									minute: "2-digit",
 									hour12: true,

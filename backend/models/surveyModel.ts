@@ -13,8 +13,7 @@ export interface ISurvey extends Document {
 const surveySchema: Schema = new Schema(
 	{
 		// Define fields here:
-		id: { type: String, required: true },
-		question: [
+		questions: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: "Question",
