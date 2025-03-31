@@ -84,7 +84,7 @@ export const updateSurvey = async (req: Request, res: Response): Promise<void> =
     }
 
     // Update the survey with new questions
-    survey.questions = questions;
+    survey.question = questions;
     await survey.save();
 
     res.status(200).json(survey);
