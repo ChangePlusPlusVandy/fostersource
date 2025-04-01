@@ -23,6 +23,7 @@ export interface ICourse extends Document {
 	students: mongoose.Types.ObjectId[]; //for the users
 	regStart: Date; 
 	regEnd: Date;  
+	managers: mongoose.Types.ObjectId[];
 }
 
 const CourseSchema: Schema = new Schema(
@@ -61,7 +62,13 @@ const CourseSchema: Schema = new Schema(
 			required: true,
 		},
 		regStart: { type: Date, required: true }, 
-		regEnd: { type: Date, required: false } 
+		regEnd: { type: Date, required: false } ,
+		managers: [
+			{
+			  type: Schema.Types.ObjectId,
+			  ref: "User",
+			},
+		],
 	},
 	{
 		timestamps: true,

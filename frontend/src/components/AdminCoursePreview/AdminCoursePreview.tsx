@@ -127,7 +127,7 @@ function AdminCoursePreview({
 				</div>
 
 				<div className="flex gap-4">
-					<Link to={`/admin/product/edit?courseId=${product.id}`}>
+					<Link to={`/admin/product/edit/${product.course._id}`}>
 						<Edit2 className="w-4 h-4 text-gray-400" />
 					</Link>
 					<button

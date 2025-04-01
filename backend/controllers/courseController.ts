@@ -43,7 +43,7 @@ export const getCourseById = async (
 		if (id) {
 			// Find course by ID and populate related fields
 			const course = await Course.findById(id)
-				.populate(["ratings", "components"])
+				.populate(["ratings", "components",  "managers"])
 				.exec();
 
 			if (!course) {
