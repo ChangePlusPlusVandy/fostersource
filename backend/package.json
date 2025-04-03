@@ -9,6 +9,7 @@
 		"format:check": "prettier --check ."
 	},
 	"dependencies": {
+		"@sendgrid/mail": "^8.1.4",
 		"backend": "file:",
 		"cloudinary": "^1.41.3",
 		"cors": "^2.8.5",
