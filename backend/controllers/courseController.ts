@@ -90,6 +90,7 @@ export const createCourse = async (
             discussion,
             components,
             isLive,
+            categoriesAvalible,
             categories,
             creditNumber,
             courseDescription,

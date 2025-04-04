@@ -15,10 +15,11 @@ import paymentRoutes from "./routes/paymentRoutes";
 import loginRoutes from "./routes/loginRoutes";
 import certificateRoutes from "./routes/certificateRoutes";
 import handoutRoutes from "./routes/handoutRoutes";
+import courseCategoriesRoutes from "./routes/courseCategoriesRoutes"
 
 // Import middleware
-import { notFound, errorHandler } from "./middlewares/errorMiddleware";
-import { verifyFirebaseAuth } from "./middlewares/authMiddleware";
+//import { notFound, errorHandler } from "./middlewares/errorMiddleware";
+//import { verifyFirebaseAuth } from "./middlewares/authMiddleware";
 
 const app: Application = express();
 
@@ -59,23 +60,24 @@ app.use(express.json());
 app.options("*", cors());
 
 // Use routes
-app.use("/api/login", loginRoutes);
-app.use("/api/users", verifyFirebaseAuth, userRoutes);
-app.use("/api/ratings", verifyFirebaseAuth, ratingRoutes);
-app.use("/api/surveys", verifyFirebaseAuth, surveyRoutes);
-app.use("/api/surveyResponses", verifyFirebaseAuth, surveyResponseRoutes);
-app.use("/api/questions", verifyFirebaseAuth, questionRoutes);
-app.use("/api/questionResponses", verifyFirebaseAuth, questionResponseRoutes);
-app.use("/api/progress", verifyFirebaseAuth, progressRoutes);
-app.use("/api/courses", verifyFirebaseAuth, courseRoutes);
-app.use("/api/videos", verifyFirebaseAuth, videoRoutes);
-app.use("/api/payments", verifyFirebaseAuth, paymentRoutes);
-app.use("/api/certificates", verifyFirebaseAuth, certificateRoutes);
-app.use("/api/handout", verifyFirebaseAuth, handoutRoutes);
+// app.use("/api/login", loginRoutes);
+// app.use("/api/users", verifyFirebaseAuth, userRoutes);
+// app.use("/api/ratings", verifyFirebaseAuth, ratingRoutes);
+// app.use("/api/surveys", verifyFirebaseAuth, surveyRoutes);
+// app.use("/api/surveyResponses", verifyFirebaseAuth, surveyResponseRoutes);
+// app.use("/api/questions", verifyFirebaseAuth, questionRoutes);
+// app.use("/api/questionResponses", verifyFirebaseAuth, questionResponseRoutes);
+// app.use("/api/progress", verifyFirebaseAuth, progressRoutes);
+app.use("/api/courses", courseRoutes);
+// app.use("/api/videos", verifyFirebaseAuth, videoRoutes);
+// app.use("/api/payments", verifyFirebaseAuth, paymentRoutes);
+// app.use("/api/certificates", verifyFirebaseAuth, certificateRoutes);
+app.use("/api/handout", handoutRoutes);
+app.use("/api/settings/selectedCategories", courseCategoriesRoutes);
 
 // Error middleware
-app.use(notFound);
-app.use(errorHandler);
+// app.use(notFound);
+// app.use(errorHandler);
 
 module.exports = app;
 
