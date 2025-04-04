@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
@@ -88,7 +88,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	};
 
 	//================ Working axios request ======================
-	const fetchCourses = async () => {
+	const fetchCourse = async () => {
 		if (!courseId) return;
 		try {
 			const response = await apiClient.get(`courses/${courseId}`);
@@ -105,7 +105,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	// }, [location.search]);
 
 	useEffect(() => {
-		fetchCourses();
+		fetchCourse();
 	}, [courseId]);
 
 	useEffect(() => {
