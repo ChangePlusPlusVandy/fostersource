@@ -35,8 +35,8 @@ class AuthService {
 		if (user) {
 			this.authState.user = user;
 			this.authState.isAuthenticated = true;
-			if(user.cart !== ""){
-				user.cart = JSON.parse(user.cart)
+			if (user.cart !== "") {
+				user.cart = JSON.parse(user.cart);
 			}
 			localStorage.setItem("user", JSON.stringify(user));
 			apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;

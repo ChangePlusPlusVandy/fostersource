@@ -9,37 +9,36 @@ import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
 	try {
 		const { search, userType, page = 1, limit = 10 } = req.query;
-		
+
 		let query: any = {};
-		
 
 		if (search) {
 			query.$or = [
-				{ name: { $regex: search, $options: 'i' } },
-				{ email: { $regex: search, $options: 'i' } }
+				{ name: { $regex: search, $options: "i" } },
+				{ email: { $regex: search, $options: "i" } },
 			];
 		}
-		
-		if (userType && userType !== 'All') {
+
+		if (userType && userType !== "All") {
 			query.userType = userType;
 		}
 
 		const skip = (Number(page) - 1) * Number(limit);
-		
+
 		const users = await User.find(query)
 			.skip(skip)
 			.limit(Number(limit))
-			.select('name email userType company');
-			
+			.select("name email userType company");
+
 		const total = await User.countDocuments(query);
 
 		res.json({
 			users,
 			total,
-			pages: Math.ceil(total / Number(limit))
+			pages: Math.ceil(total / Number(limit)),
 		});
 	} catch (error) {
-		res.status(500).json({ message: 'Error fetching users', error });
+		res.status(500).json({ message: "Error fetching users", error });
 	}
 };
 
@@ -100,7 +99,10 @@ export const getOrCreateUser = async (
 	}
 };
 
-export const updateUser = async (req: Request, res: Response): Promise<void> => {
+export const updateUser = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	try {
 		const { id } = req.params;
 		const updates = req.body;
@@ -117,11 +119,14 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 
 		res.status(200).json(updatedUser);
 	} catch (error) {
-		res.status(500).json({ message: 'Error updating user', error });
+		res.status(500).json({ message: "Error updating user", error });
 	}
 };
 
-export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+export const deleteUser = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	try {
 		const { id } = req.params;
 
@@ -204,8 +209,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 			message: "User registered to courses successfully.",
 			progress: progressResults,
 		});
-
 	} catch (error) {
+		console.error(error);
 		res.status(500).json({
 			success: false,
 			message: "Internal server error.",
@@ -214,33 +219,35 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const checkAdmin = async (req: AuthenticatedRequest, res: Response) => {
-    try {
-        if (!req.user) {
-            return res.status(401).json({ message: "Unauthorized: No user data found" });
-        }
+	try {
+		if (!req.user) {
+			return res
+				.status(401)
+				.json({ message: "Unauthorized: No user data found" });
+		}
 
-        const user = await User.findOne({ firebaseId: req.user.uid });
+		const user = await User.findOne({ firebaseId: req.user.uid });
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        const isAdmin = user.role === "staff";
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		const isAdmin = user.role === "staff";
 
-        return res.status(200).json({ isAdmin });
-    } catch (error) {
-        return res.status(500).json({ message: "Server error", error });
-    }
+		return res.status(200).json({ isAdmin });
+	} catch (error) {
+		return res.status(500).json({ message: "Server error", error });
+	}
 };
 
 export const getUserById = async (req: Request, res: Response) => {
 	try {
 		const user = await User.findById(req.params.id);
 		if (!user) {
-			return res.status(404).json({ message: 'User not found' });
+			return res.status(404).json({ message: "User not found" });
 		}
 		res.json(user);
 	} catch (error) {
-		res.status(500).json({ message: 'Error fetching user', error });
+		res.status(500).json({ message: "Error fetching user", error });
 	}
 };
 
@@ -251,11 +258,11 @@ export const createUser = async (req: Request, res: Response) => {
 			name,
 			email,
 			userType,
-			company
+			company,
 		});
 		await user.save();
 		res.status(201).json(user);
 	} catch (error) {
-		res.status(500).json({ message: 'Error creating user', error });
+		res.status(500).json({ message: "Error creating user", error });
 	}
 };

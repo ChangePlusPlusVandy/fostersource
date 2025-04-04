@@ -7,8 +7,8 @@ export interface IPayment extends Document {
 	date: Date;
 	amount: number;
 	memo: string;
-	courses: ICourse[]; 
-	transactionId: string; 
+	courses: mongoose.Types.ObjectId[];
+	transactionId: string;
 }
 
 const paymentSchema: Schema = new Schema(
@@ -23,9 +23,10 @@ const paymentSchema: Schema = new Schema(
 		memo: { type: String, required: true },
 		courses: [
 			{
-				type: Schema.Types.ObjectId, 
-				ref: "Course"
-			}
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Course",
+				required: true,
+			},
 		],
 		transactionId: { type: String, required: true },
 	},
