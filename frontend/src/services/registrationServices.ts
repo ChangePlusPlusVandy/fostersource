@@ -1,6 +1,6 @@
 import { Course } from "../shared/types/course";
 import apiClient from "./apiClient";
-import {dummyCourses} from "../shared/DummyCourses";
+import { dummyCourses } from "../shared/DummyCourses";
 
 export async function addToCart(course: Course) {
 	let user = localStorage.getItem("user")
@@ -18,7 +18,7 @@ export async function addToCart(course: Course) {
 		cost: course.cost,
 		creditNumber: course.creditNumber,
 		instructor: course.instructorName,
-		_id: course._id
+		_id: course._id,
 	};
 	const isCourseInCart = user.cart.some(
 		(cartItem: any) => cartItem._id === cartCourseInfo._id
@@ -59,61 +59,63 @@ export async function removeFromCart(course: {
 		const response = await apiClient.put(`/users/${user._id}`, {
 			cart: JSON.stringify(user.cart),
 		});
-		if(response.status === 200){
+		if (response.status === 200) {
 			localStorage.setItem("user", JSON.stringify(user));
-		}	} catch (error) {
+		}
+	} catch (error) {
 		console.error(error);
 	}
 	window.location.reload();
 }
 
-export async function registerFromCart(){
+export async function registerFromCart() {
 	let user = localStorage.user ? JSON.parse(localStorage.user) : null;
 
-	if(user === null){
+	if (user === null) {
 		return;
 	}
 
 	let classes = [];
 	const cart = user.cart;
-	for(let course of cart){
-		classes.push(course._id)
+	for (let course of cart) {
+		classes.push(course._id);
 	}
 
 	try {
+		console.log("making request");
 		const response = await apiClient.post(`/users/register`, {
 			userId: user._id,
 			courseIds: classes,
 		});
 
-		if(response.status === 201){
-			user.cart = []
+		console.log("first call:", response.status);
+
+		if (response.status === 201) {
+			user.cart = [];
 			try {
 				const response = await apiClient.put(`/users/${user._id}`, {
 					cart: "[]",
 				});
-				if(response.status === 200){
+				console.log("second call:", response.status);
+				if (response.status === 200) {
 					localStorage.setItem("user", JSON.stringify(user));
-					window.location.reload()
+					window.location.reload();
 					window.location.href = "/dashboard";
 				}
-
 			} catch (error) {
 				console.error(error);
 			}
-
 		}
-
 	} catch (error) {
 		console.error(
 			"Error registering user for courses:",
 			// @ts-ignore
-		error.response?.data || error.message
+			error.response?.data || error.message
 		);
 	}
 }
 
-export async function insertCoursesIndividually(){
+export async function insertCoursesIndividually() {
 	try {
 		for (const course of dummyCourses) {
 			const response = await apiClient.post("/courses", course);
@@ -121,8 +123,11 @@ export async function insertCoursesIndividually(){
 		}
 		console.log("All courses inserted successfully!");
 	} catch (error) {
-		// @ts-ignore
-		console.error("Error inserting courses:", error.response?.data || error.message);
+		//@ts-ignore
+		console.error(
+			"Error inserting courses:",
+			//@ts-ignore
+			error.response?.data || error.message
+		);
 	}
-};
-
+}

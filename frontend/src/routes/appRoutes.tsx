@@ -35,6 +35,7 @@ import { AdminSidebar } from "../components/AdminSidebar/AdminSidebar";
 import EditCourse from "../pages/Admin/EditCoursePage/editCoursePage";
 import EditSideBar from "../components/EditCourseSidebar/editCoursePageSideBar";
 import SurveySummary from "../pages/Admin/SurveySummaryPage/SurveySummary";
+import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -196,6 +197,7 @@ function AppRoutes() {
 						{/*<Route path="/admin" element={<AdminPage />} />*/}
 						<Route path="/admin/discounts" element={<DiscountPage />} />
 						<Route path="/admin/speakers" element={<SpeakerPage />} />
+						<Route path="/admin/users" element={<UserManagementPage />} />
 						<Route path="/admin/products/pricing" element={<Pricing />} />
 						<Route
 							path="/admin/components"
