@@ -5,11 +5,13 @@ import apiClient from "../../../services/apiClient";
 import { Course } from "../../../shared/types/course";
 import { SurveyType } from "../../../shared/types/survey";
 import { Pagination } from "../ProductPage/ProductPage";
+import DetailedSurveyResponse from "./DetailedSurveyResponse";
 
 interface SurveyElem {
   courseTitle: string; 
   numResponses: number; 
   responses: string[]; 
+  questionIds: string[]; 
 }
 
 export default function SurveySummary() {
@@ -17,9 +19,11 @@ export default function SurveySummary() {
   const [searchQuery, setSearchQuery] = useState<string[]>([]); 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [modalOpen, setModalOpen] = useState(false); 
 
   const [surveys, setSurveys] = useState<SurveyElem[]>([]); 
   const displayedSurveys = surveys.filter(survey => searchQuery.includes(survey.courseTitle.toLowerCase())); 
+  const [modalSurveyIds, setModalSurveyIds] = useState<string[]>([]); 
 
   const fetchSearchOptions = async () => {
     try {
@@ -38,9 +42,9 @@ export default function SurveySummary() {
       const response = await apiClient.get("/"); 
       
       const receivedSurveys: SurveyElem[] = response.data.map((survey: SurveyType) => ({
-        courseTitle: survey.title,
-        numResponses: survey.responses.length, 
-        responses: survey.responses, 
+        // courseTitle: survey.title,
+        // numResponses: survey.responses.length, 
+        // responses: survey.responses, 
       }))
     } catch (error) {
       console.error(error); 
@@ -55,6 +59,12 @@ export default function SurveySummary() {
       setCurrentPage(page);
     }
   };
+
+  const handleModalOpen = (surveyIdx: number) => {
+    const selectedSurvey = displayedSurveys[surveyIdx]; 
+    setModalSurveyIds(selectedSurvey.questionIds); 
+    setModalOpen(true); 
+  }
 
   useEffect(() => {
     fetchSearchOptions(); 
@@ -84,15 +94,19 @@ export default function SurveySummary() {
             <tbody>
                 {displayedSurveys.map((survey, rowIdx) => (
                     <tr key={rowIdx} className={rowIdx % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                        <td className="border border-gray-200 text-left">{survey.courseTitle}</td>
-                        <td className="border border-gray-200 text-left">{survey.numResponses}</td>
-                        <td className="border border-gray-200 text-left">
-                          <Search className="w-6 border rounded-lg p-1 cursor-pointer"></Search>
+                        <td className="border border-gray-200 text-left w-9/12">{survey.courseTitle}</td>
+                        <td className="border border-gray-200 text-left w-2/12">{survey.numResponses}</td>
+                        <td className="border border-gray-200 text-left w-1/12">
+                          <Search className="w-6 border rounded-lg p-1 cursor-pointer" onClick={() => handleModalOpen(rowIdx)}></Search>
                         </td>
                     </tr>
                 ))}
             </tbody>
           </table>
+
+          {modalOpen && (
+            <DetailedSurveyResponse surveyQuestionIDs={modalSurveyIds} toggleModal={setModalOpen}></DetailedSurveyResponse>
+          )}
           
           <div className="flex justify-end mt-6">
               <Pagination 
