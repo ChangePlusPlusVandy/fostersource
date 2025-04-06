@@ -35,6 +35,7 @@ import { AdminSidebar } from "../components/AdminSidebar/AdminSidebar";
 import EditCourse from "../pages/Admin/EditCoursePage/editCoursePage";
 import EditSideBar from "../components/EditCourseSidebar/editCoursePageSideBar";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
+import ProductProgressReport from "../pages/Admin/ProductSummaryPage/ProductProgressReport";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -248,6 +249,14 @@ function AppRoutes() {
 								<AdminRoute>
 									<EmailPage />
 								</AdminRoute>
+							}
+						/>
+						<Route
+							path="admin/product-progress-report"
+							element={
+								
+									<ProductProgressReport />
+								
 							}
 						/>
 						<Route

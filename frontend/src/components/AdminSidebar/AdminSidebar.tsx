@@ -53,8 +53,8 @@ export const adminSidebarItems = [
 	},
 	{
 		icon: <FileText />,
-		description: "Content",
-		href: "/admin/content",
+		description: "Progress Report",
+		href: "/admin/product-progress-report",
 	},
 	{
 		icon: <Settings />,

@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export type Progress = {
 	user: string; //the id
 	course: string; //the id
