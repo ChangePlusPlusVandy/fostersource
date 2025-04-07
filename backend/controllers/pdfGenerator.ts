@@ -29,16 +29,16 @@ export const generateCertificate = async (
     const backgroundPath = `./uploads/${certificateType}Certificate.png`;
     doc.image(backgroundPath, 0, 0, { width: doc.page.width, height: doc.page.height }); 
 
-    doc.fontSize(20).fillColor('black'); 
-
     if (certificateType === "completion") {
-      doc.text(participantName, 160, 280, { width: 520, height: 40, align: 'center' }); 
-      doc.text(courseInfo, 110, 360, { width: 640, height: 40, align: 'center' });
-      doc.text(completionDate, 330, 405, { width: 180, height: 30, align: 'center' }); 
+      doc.font('Helvetica-Bold').fillColor('#071860');
+      doc.fontSize(22).text(participantName, 160, 275, { width: 520, height: 40, align: 'center' }); 
+      doc.fontSize(22).text(courseInfo, 110, 355, { width: 640, height: 40, align: 'center' });
+      doc.fontSize(16).text(completionDate, 330, 405, { width: 180, height: 30, align: 'center' }); 
     } else {
-      doc.text(participantName, 160, 225, { width: 520, height: 40, align: 'center' }); 
-      doc.text(courseInfo, 100, 315, { width: 640, height: 40, align: 'center' });
-      doc.text(completionDate, 90, 415, { width: 160, height: 40, align: 'center' }); 
+      doc.font('Times-Bold').fillColor('black');
+      doc.fontSize(20).text(participantName, 160, 225, { width: 520, height: 40, align: 'center' }); 
+      doc.fontSize(16).text(courseInfo, 100, 317.5, { width: 640, height: 40, align: 'center' });
+      doc.fontSize(16).text(completionDate, 90, 415, { width: 160, height: 40, align: 'center' }); 
     }
 
     doc.end(); 
