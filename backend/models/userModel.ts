@@ -26,6 +26,7 @@ export interface IUser extends Document {
 	certification: string;
 	company: string;
 	phone: string;
+	language: "English" | "Spanish";
 	progress: IProgress;
 	payments: IPayment;
 	cart: string;
@@ -61,6 +62,7 @@ const userSchema: Schema = new Schema(
 		certification: { type: String, required: true },
 		company: { type: String, required: true },
 		phone: { type: String, required: true },
+		language: { type: String, enum: ["English", "Spanish"], default: "English" },
 		progress: [
 			{
 				type: Schema.Types.ObjectId,

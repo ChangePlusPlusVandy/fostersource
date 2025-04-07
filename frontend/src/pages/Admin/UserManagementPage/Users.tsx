@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiEye, FiTrash2, FiMic } from 'react-icons/fi';
-import { US_STATES, COUNTRIES, TIMEZONES } from './locationData';
+import { US_STATES, COUNTRIES } from './locationData';
 import { Pagination } from '../../../components/Pagination/Pagination';
 import apiClient from '../../../services/apiClient';
 
@@ -22,8 +22,7 @@ interface User {
     country?: string;
     phoneNumber?: string;
     phone?: string;
-    timezone?: string;
-    language: 'English' | 'Espanol';
+    language: 'English' | 'Spanish';
     selected?: boolean;
 }
 
@@ -39,8 +38,7 @@ interface UserForm {
     country: string;
     phoneNumber: string;
     userType: string;
-    timezone: string;
-    language: 'English' | 'Espanol';
+    language: 'English' | 'Spanish';
 }
 
 interface SpeakerProduct {
@@ -96,7 +94,6 @@ const UserManagementPage: React.FC = () => {
         country: '',
         phoneNumber: '',
         userType: '',
-        timezone: '',
         language: 'English'
     });
     const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -141,6 +138,7 @@ const UserManagementPage: React.FC = () => {
                 zipPostalCode: user.zip || '',
                 country: user.country || '',
                 phoneNumber: user.phone || '',
+                language: user.language || 'English',
                 selected: false
             }));
             
@@ -163,7 +161,7 @@ const UserManagementPage: React.FC = () => {
         }));
     };
 
-    const handleLanguageChange = (language: 'English' | 'Espanol') => {
+    const handleLanguageChange = (language: 'English' | 'Spanish') => {
         setUserForm(prev => ({
             ...prev,
             language
@@ -212,7 +210,8 @@ const UserManagementPage: React.FC = () => {
                         stateProvinceRegion: userForm.stateProvinceRegion,
                         zipPostalCode: userForm.zipPostalCode,
                         country: userForm.country,
-                        phoneNumber: userForm.phoneNumber
+                        phoneNumber: userForm.phoneNumber,
+                        language: userForm.language
                     } : user)
                 );
             } else {
@@ -239,6 +238,7 @@ const UserManagementPage: React.FC = () => {
                     zipPostalCode: userForm.zipPostalCode,
                     country: userForm.country,
                     phoneNumber: userForm.phoneNumber,
+                    language: userForm.language,
                     selected: false
                 };
                 
@@ -269,7 +269,6 @@ const UserManagementPage: React.FC = () => {
             country: '',
             phoneNumber: '',
             userType: '',
-            timezone: '',
             language: 'English'
         });
     };
@@ -287,7 +286,6 @@ const UserManagementPage: React.FC = () => {
             country: user.country || '',
             phoneNumber: user.phoneNumber || '',
             userType: user.userType,
-            timezone: user.timezone || '',
             language: user.language || 'English'
         });
         setEditingUserId(user._id || null);
@@ -454,6 +452,7 @@ const UserManagementPage: React.FC = () => {
                                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Email</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">User Type</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Company</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Language</th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">Actions</th>
                             </tr>
                         </thead>
@@ -482,6 +481,12 @@ const UserManagementPage: React.FC = () => {
                                         <td className="px-6 py-4 text-sm text-gray-900">{user.email}</td>
                                         <td className="px-6 py-4 text-sm text-gray-900">{user.userType}</td>
                                         <td className="px-6 py-4 text-sm text-gray-900">{user.company}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-900">
+                                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                ${user.language === 'English' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                                {user.language}
+                                            </span>
+                                        </td>
                                         <td className="px-6 py-4 text-sm">
                                             <div className="flex gap-3">
                                                 <Tooltip text="Edit">
@@ -648,7 +653,7 @@ const UserManagementPage: React.FC = () => {
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border rounded-md"
                                     >
-                                        <option value="">Choose a State</option>
+                                        <option value="" className="text-sm text-gray-400">Choose a State</option>
                                         {US_STATES.map(state => (
                                             <option key={state.value} value={state.value}>
                                                 {state.label}
@@ -681,7 +686,7 @@ const UserManagementPage: React.FC = () => {
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border rounded-md"
                                     >
-                                        <option value="">Choose a Country</option>
+                                        <option value="" className="text-sm text-gray-400">Choose a Country</option>
                                         {COUNTRIES.map(country => (
                                             <option key={country.value} value={country.value}>
                                                 {country.label}
@@ -704,70 +709,65 @@ const UserManagementPage: React.FC = () => {
                                 />
                             </div>
 
-                            <div className="mb-4">
-                                <label className="block text-sm text-gray-500 mb-1">User Type</label>
-                                <select
-                                    name="userType"
-                                    value={userForm.userType}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                    required
-                                >
-                                    <option value="">Choose a User Type</option>
-                                    {USER_TYPES.map(type => (
-                                        <option key={type} value={type}>{type}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="block text-sm text-gray-500 mb-1">
-                                    Timezone <span>(optional)</span>
-                                </label>
-                                <select
-                                    name="timezone"
-                                    value={userForm.timezone}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                >
-                                    <option value="">Choose a Timezone</option>
-                                    {TIMEZONES.map(timezone => (
-                                        <option key={timezone.value} value={timezone.value}>
-                                            {timezone.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="mb-6">
-                                <label className="block text-sm text-gray-500 mb-2">Language:</label>
-                                <div className="flex gap-4">
-                                    <label className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            checked={userForm.language === 'English'}
-                                            onChange={() => handleLanguageChange('English')}
-                                            className="mr-2"
-                                        />
-                                        English
-                                    </label>
-                                    <label className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            checked={userForm.language === 'Espanol'}
-                                            onChange={() => handleLanguageChange('Espanol')}
-                                            className="mr-2"
-                                        />
-                                        Español
-                                    </label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label className="block text-sm font-semibold mb-1">User Type</label>
+                                    <select
+                                        name="userType"
+                                        value={userForm.userType}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border rounded-md"
+                                        required
+                                    >
+                                        <option value="" className="text-sm text-gray-400">Choose a User Type</option>
+                                        {USER_TYPES.map(type => (
+                                            <option key={type} value={type}>{type}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-semibold mb-1">Language:</label>
+                                    <div className="relative">
+                                        <div className="flex rounded-full border border-gray-300 p-1 bg-white">
+                                            <button
+                                                type="button"
+                                                className={`flex-1 py-2 px-4 rounded-full text-center ${
+                                                    userForm.language === 'English' 
+                                                    ? 'bg-purple-200 text-purple-800 font-medium shadow-sm' 
+                                                    : 'text-gray-700'
+                                                }`}
+                                                onClick={() => handleLanguageChange('English')}
+                                            >
+                                                English
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`flex-1 py-2 px-4 rounded-full text-center ${
+                                                    userForm.language === 'Spanish' 
+                                                    ? 'bg-purple-200 text-purple-800 font-medium shadow-sm' 
+                                                    : 'text-gray-700'
+                                                }`}
+                                                onClick={() => handleLanguageChange('Spanish')}
+                                            >
+                                                Spanish
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="flex justify-end">
+                            <div className="flex justify-end gap-4 mt-6">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsUserModalOpen(false)}
+                                    className="px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
                                 <button
                                     type="submit"
                                     className="px-4 py-2 bg-[#7b499a] text-white rounded-md hover:bg-[#6a3e85] transition-colors"
-                                    
                                 >
                                     {editingUserId ? 'Update User' : 'Create User'}
                                 </button>
