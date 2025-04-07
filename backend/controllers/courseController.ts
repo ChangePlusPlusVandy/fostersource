@@ -20,30 +20,25 @@ export const getCourses = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  try {
-    const filters = req.query;
-    console.log("[getCourses] Filters:", filters);
+    try {
+        const filters = req.query;
 
-    // Populate ratings and components fields as needed
-    const courseResponses = await Course.find(filters)
-      .populate(["ratings", "components"])
-      .exec();
+        // Populate ratings and components fields as needed
+        const courseResponses = await Course.find(filters)
+            .populate(["ratings", "components"])
+            .exec();
 
-    console.log("[getCourses] Found courses:", courseResponses.length);
-    res.status(200).json({
-      success: true,
-      count: courseResponses.length,
-      data: courseResponses,
-    });
-  } catch (err: unknown) {
-    const error = err as ErrorWithDetails;
-    console.error("[getCourses] Error:", error);
-    console.error("[getCourses] Stack:", error.stack || "No stack trace available");
-    res.status(500).json({
-      success: false,
-      message: "Internal service error.",
-    });
-  }
+        res.status(200).json({
+            success: true,
+            count: courseResponses.length,
+            data: courseResponses,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Internal service error.",
+        });
+    }
 };
 
 // @desc    Get a specific course by a valid id
@@ -104,32 +99,31 @@ export const createCourse = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  try {
-    const {
-      handouts,
-      ratings,
-      className,
-      discussion,
-      components,
-      isLive,
-      categories,
-      creditNumber,
-      courseDescription,
-      thumbnailPath,
-      cost,
-      instructorDescription,
-      instructorRole,
-      lengthCourse,
-      time,
-      instructorName,
-      isInPerson,
-      students,
-      courseType,
-      regStart,
-      regEnd,
-    } = req.body;
-
-    console.log("[createCourse] Attempting to create course:", className);
+	try {
+		const {
+			handouts,
+			ratings,
+			className,
+			discussion,
+			components,
+			isLive,
+			categories,
+			creditNumber,
+			courseDescription,
+			thumbnailPath,
+			cost,
+			instructorDescription,
+			instructorRole,
+			lengthCourse,
+			time,
+			instructorName,
+			isInPerson,
+			students,
+			courseType,
+			regStart,
+			regEnd,
+			productType,
+		} = req.body;
 
     // Validate required fields
     if (
@@ -166,30 +160,31 @@ export const createCourse = async (
       return;
     }
 
-    // Create a new course instance
-    const newCourseResponse = new Course({
-      handouts,
-      ratings,
-      className,
-      discussion,
-      components,
-      isLive,
-      categories,
-      creditNumber,
-      courseDescription,
-      thumbnailPath,
-      cost,
-      instructorDescription,
-      instructorRole,
-      lengthCourse,
-      time,
-      instructorName,
-      isInPerson,
-      students,
-      courseType,
-      regStart,
-      regEnd,
-    });
+		// Create a new course instance
+		const newCourseResponse = new Course({
+			handouts,
+			ratings,
+			className,
+			discussion,
+			components,
+			isLive,
+			categories,
+			creditNumber,
+			courseDescription,
+			thumbnailPath,
+			cost,
+			instructorDescription,
+			instructorRole,
+			lengthCourse,
+			time,
+			instructorName,
+			isInPerson,
+			students,
+			courseType,
+			regStart,
+			regEnd,
+			productType,
+		});
 
     const savedCourseResponse = await newCourseResponse.save();
     console.log("[createCourse] Course created successfully:", savedCourseResponse._id);

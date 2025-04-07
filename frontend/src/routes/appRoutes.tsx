@@ -25,6 +25,7 @@ import Dashboard from "../pages/Dashboard/dashboard";
 import Cart from "../pages/CartPage/cart";
 import Pricing from "../pages/Admin/Pricing/Pricing";
 import ComponentPage from "../pages/Admin/ComponentPage/Component";
+import SurveyPage from "../pages/Admin/SurveyPage/Survey";
 import WorkshopCreation from "../pages/Admin/WorkshopCreation/WorkshopCreation";
 import RegistrationPage from "../pages/Admin/RegistrationPage/RegistrationPage";
 import AdminPage from "../pages/Admin/AdminPage";
@@ -34,6 +35,7 @@ import { AdminSidebar } from "../components/AdminSidebar/AdminSidebar";
 import EditCourse from "../pages/Admin/EditCoursePage/editCoursePage";
 import EditSideBar from "../components/EditCourseSidebar/editCoursePageSideBar";
 import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
+import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -191,6 +193,31 @@ function AppRoutes() {
 						<Route
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
+						/>
+						{/*<Route path="/admin" element={<AdminPage />} />*/}
+						<Route path="/admin/discounts" element={<DiscountPage />} />
+						<Route path="/admin/speakers" element={<SpeakerPage />} />
+						<Route path="/admin/users" element={<UserManagementPage />} />
+						<Route path="/admin/products/pricing" element={<Pricing />} />
+						<Route
+							path="/admin/components"
+							element={
+								<ComponentPage
+									workshop={undefined}
+									survey={undefined}
+									certificate={undefined}
+								/>
+							}
+						/>
+						<Route path="/admin/components/survey" element={<SurveyPage />} />
+						<Route path="/admin/products" element={<ProductPage />} />
+						<Route
+							path="/admin/create-workshop"
+							element={
+								<WorkshopCreation
+									workshopName={`Workshop | The Inclusive Family Support Model`}
+								/>
+							}
 						/>
 						<Route
 							path="/admin"
