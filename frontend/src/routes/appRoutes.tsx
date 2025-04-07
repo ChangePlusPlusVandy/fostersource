@@ -123,14 +123,16 @@ function AppRoutes() {
 						position: "absolute",
 						display: "flex",
 						alignItems: "center",
-						top: isAdminRoute ? "1rem" : "25%",
+						top: isAdminRoute ? "0" : "25%",
 					}}
 				>
 					{isAdminRoute ? (
-						<AdminSidebar
-							isLoggedIn={isLoggedIn}
-							setIsLoggedIn={setIsLoggedIn}
-						/>
+						<div className="h-screen flex items-center">
+							<AdminSidebar
+								isLoggedIn={isLoggedIn}
+								setIsLoggedIn={setIsLoggedIn}
+							/>
+						</div>
 					) : (
 						<Sidebar
 							isCollapsed={isCollapsed}
@@ -151,7 +153,7 @@ function AppRoutes() {
 						display: "flex",
 						flex: 1,
 						overflow: "auto",
-						marginLeft: isCollapsed || isAdminRoute ? "6rem" : "17rem",
+						marginLeft: isCollapsed ? "6rem" : "17rem",
 					}}
 				>
 					<Routes>
