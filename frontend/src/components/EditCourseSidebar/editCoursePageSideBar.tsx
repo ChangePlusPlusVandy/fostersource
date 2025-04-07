@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, ReactNode } from "react";
 import { useLocation, useNavigate, Outlet, NavLink } from "react-router-dom";
 
 import "./editCoursePageSideBar.css";
+import { useParams } from "react-router-dom";
 
 interface SideBarProps {
 	children?: ReactNode;
@@ -18,56 +19,57 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 	const isRegistrantsPageRoute = location.pathname === "/";
 	const isParticipationPageRoute = location.pathname === "/";
 	const isEmailPageRoute = location.pathname === "/";
+	const { id: courseId } = useParams();
 
 	const navigate = useNavigate();
 
 	const sidebarItems = [
 		{
 			name: "Details",
-			path: "/admin/product/edit/details",
+			path: `/admin/product/edit/${courseId}/details`,
 			highlightLeftOffset: "51.4px",
 		},
 		{
 			name: "Pricing",
-			path: "/admin/product/edit/pricing",
+			path: `/admin/product/edit/${courseId}/pricing`,
 			highlightLeftOffset: "51.4px",
 		},
 		{
 			name: "Components",
-			path: "/admin/product/edit/components",
+			path: `/admin/product/edit/${courseId}/components`,
 			highlightLeftOffset: "13.6px",
 		},
 		{
 			name: "Speakers",
-			path: "/admin/product/edit/speakers",
+			path: `/admin/product/edit/${courseId}/speakers`,
 			highlightLeftOffset: "37px",
 		},
 		{
 			name: "Handouts",
-			path: "/admin/product/edit/handouts",
+			path: `/admin/product/edit/${courseId}/handouts`,
 			highlightLeftOffset: "34px",
 		},
 		{
 			name: "Managers",
-			path: "/admin/product/edit/managers",
+			path: `/admin/product/edit/${courseId}/managers`,
 			highlightLeftOffset: "31.5px",
 		},
 		{
 			name: "Registrants",
-			path: "/admin/product/edit/registrants",
+			path: `/admin/product/edit/${courseId}/registrants`,
 			highlightLeftOffset: "24.5px",
 		},
 		{
 			name: "Participation",
-			path: "/admin/product/edit/participation",
+			path: `/admin/product/edit/${courseId}/participation`,
 			highlightLeftOffset: "16px",
 		},
 		{
 			name: "Email",
-			path: "/admin/product/edit/email",
+			path: `/admin/product/edit/${courseId}/email`,
 			highlightLeftOffset: "59.5px",
 		},
-	];
+	];	
 
 	const handleDetailsClick = () => {
 		navigate("/admin/product/edit/details");

@@ -34,6 +34,7 @@ import apiClient from "../services/apiClient";
 import { AdminSidebar } from "../components/AdminSidebar/AdminSidebar";
 import EditCourse from "../pages/Admin/EditCoursePage/editCoursePage";
 import EditSideBar from "../components/EditCourseSidebar/editCoursePageSideBar";
+import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
 // import AdminPage from "../pages/Admin/AdminPage";
 
@@ -267,35 +268,36 @@ function AppRoutes() {
 							}
 						/>
 						<Route
-							path="/admin/product/edit"
+							path="/admin/product/edit/:id"
 							element={
 								<AdminRoute>
-									<EditSideBar />
+								<EditSideBar />
 								</AdminRoute>
 							}
-						>
+							>
 							<Route index element={<Navigate to="details" replace />} />
 							<Route path="details" element={<EditCourse />} />
 							<Route path="pricing" element={<Pricing />} />
 							<Route
 								path="components"
 								element={
-									<ComponentPage
-										workshop={undefined}
-										survey={undefined}
-										certificate={undefined}
-									/>
+								<ComponentPage
+									workshop={undefined}
+									survey={undefined}
+									certificate={undefined}
+								/>
 								}
 							/>
 							<Route
 								path="workshop"
 								element={
-									<WorkshopCreation
-										workshopName={`Workshop | The Inclusive Family Support Model`}
-									/>
+								<WorkshopCreation
+									workshopName={`Workshop | The Inclusive Family Support Model`}
+								/>
 								}
 							/>
 							<Route path="speakers" element={<SpeakerPage />} />
+							<Route path="managers" element={<CourseManagerPage />} />
 						</Route>
 					</Routes>
 				</div>
