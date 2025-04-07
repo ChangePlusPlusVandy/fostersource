@@ -20,6 +20,7 @@ import certificateRoutes from "./routes/certificateRoutes";
 import handoutRoutes from "./routes/handoutRoutes";
 import emailRoutes from './routes/emailRoutes';
 import speakerRoutes from "./routes/speakerRoutes";
+import pdfRoutes from "./routes/pdfRoutes"; 
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
@@ -87,6 +88,7 @@ app.use("/api/handout", verifyFirebaseAuth, handoutRoutes);
 app.use('/api/emails', verifyFirebaseAuth, emailRoutes);
 app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
 app.use("/api/upload", verifyFirebaseAuth, uploadRoutes);
+app.use("/api/certificatePDFs", pdfRoutes); 
 
 // Error middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
