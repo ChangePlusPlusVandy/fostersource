@@ -25,6 +25,7 @@ export interface IUser extends Document {
 	zip: string;
 	certification: string;
 	phone: string;
+	language: "English" | "Spanish";
 	progress: IProgress;
 	payments: IPayment;
 	cart: string;
@@ -59,6 +60,7 @@ const userSchema: Schema = new Schema(
 		zip: { type: String, required: true },
 		certification: { type: String, required: true },
 		phone: { type: String, required: true },
+		language: { type: String, enum: ["English", "Spanish"], default: "English" },
 		progress: [
 			{
 				type: Schema.Types.ObjectId,
