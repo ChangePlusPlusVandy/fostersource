@@ -3,7 +3,6 @@ import { auth } from "./firebaseConfig";
 
 const apiClient = axios.create({
 	baseURL: "http://localhost:5001/api",
-	headers: { "Content-Type": "application/json" },
 });
 
 async function getFirebaseToken(): Promise<string | null> {
@@ -26,6 +25,11 @@ apiClient.interceptors.request.use(async (config) => {
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`;
 	}
+
+	if (config.data instanceof FormData) {
+		config.headers["Content-Type"] = "multipart/form-data";
+	}
+
 	return config;
 });
 

@@ -4,6 +4,8 @@ import {
 	createPayment,
 	updatePayment,
 	deletePayment,
+	createPaypalOrder,
+	capturePaypalOrder,
 } from "../controllers/paymentController";
 
 const router = express.Router();
@@ -19,5 +21,8 @@ router.put("/:id", updatePayment);
 
 // DELETE payment by ID
 router.delete("/:id", deletePayment);
+
+router.post("/create-paypal-order", createPaypalOrder);
+router.post("/capture-paypal-order", capturePaypalOrder);
 
 export default router;

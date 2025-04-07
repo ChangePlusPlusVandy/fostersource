@@ -3,6 +3,8 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
+		"@paypal/react-paypal-js": "^8.8.2",
+		"@react-google-maps/api": "^2.20.6",
 		"@testing-library/jest-dom": "^5.17.0",
 		"@testing-library/react": "^13.4.0",
 		"@testing-library/user-event": "^13.5.0",
@@ -11,7 +13,7 @@
 		"@types/node": "^16.18.113",
 		"@types/react": "^18.3.11",
 		"@types/react-dom": "^18.3.1",
-		"axios": "^1.7.7",
+		"axios": "^1.8.3",
 		"date-fns": "^4.1.0",
 		"firebase": "^11.0.1",
 		"framer-motion": "^12.4.1",
