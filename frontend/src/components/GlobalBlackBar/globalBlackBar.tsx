@@ -23,7 +23,7 @@ const GlobalBlackBar = () => {
 			if (googleElement) {
 				(googleElement as HTMLElement).click();
 			} else {
-				console.log('Google translate element not found, trying to initialize');
+				console.log('bruh');
 				if (window.googleTranslateElementInit) {
 					window.googleTranslateElementInit();
 					setTimeout(() => {
@@ -117,7 +117,7 @@ const GlobalBlackBar = () => {
 						className="translate-label"
 						style={{ cursor: 'pointer', color: 'white' }}
 					>
-						Translate
+						Traducir
 					</span>
 					<GoogleTranslate />
 				</div>

@@ -13,7 +13,7 @@ const GoogleTranslate: React.FC = () => {
             const script = document.createElement('script');
             script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
             script.async = true;
-            script.onerror = () => console.error('Failed to load Google Translate script');
+            script.onerror = () => console.error('bruh');
             document.body.appendChild(script);
         };
 
@@ -55,7 +55,7 @@ const GoogleTranslate: React.FC = () => {
                     }
                 }, 1000);
             } catch (error) {
-                console.error('Error initializing Google Translate:', error);
+                console.error('bruh:', error);
             }
         };
 
