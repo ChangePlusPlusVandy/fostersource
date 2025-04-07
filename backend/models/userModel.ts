@@ -24,6 +24,7 @@ export interface IUser extends Document {
 	state: string;
 	zip: string;
 	certification: string;
+	company: string;
 	phone: string;
 	progress: IProgress;
 	payments: IPayment;
@@ -58,6 +59,7 @@ const userSchema: Schema = new Schema(
 		state: { type: String, required: true },
 		zip: { type: String, required: true },
 		certification: { type: String, required: true },
+		company: { type: String, required: true },
 		phone: { type: String, required: true },
 		progress: [
 			{
