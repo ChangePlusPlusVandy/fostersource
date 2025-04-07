@@ -5,7 +5,7 @@ import {
   createEmail,
   updateEmail,
   deleteEmail,
-} from "../controllers/emailController";
+} from "../controllers/emailTemplateController";
 
 const router = express.Router();
 
