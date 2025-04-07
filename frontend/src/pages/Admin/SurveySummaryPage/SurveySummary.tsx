@@ -3,14 +3,12 @@ import React, { useState, useEffect} from "react";
 import SearchDropdown from "../ComponentPage/DropDownSearch";
 import apiClient from "../../../services/apiClient";
 import { Course } from "../../../shared/types/course";
-import { SurveyType } from "../../../shared/types/survey";
 import { Pagination } from "../ProductPage/ProductPage";
 import DetailedSurveyResponse from "./DetailedSurveyResponse";
 
 interface SurveyElem {
   courseTitle: string; 
-  numResponses: number; 
-  responses: string[]; 
+  numResponses: number;
   questionIds: string[]; 
 }
 
@@ -22,7 +20,7 @@ export default function SurveySummary() {
   const [modalOpen, setModalOpen] = useState(false); 
 
   const [surveys, setSurveys] = useState<SurveyElem[]>([]); 
-  const displayedSurveys = surveys.filter(survey => searchQuery.includes(survey.courseTitle.toLowerCase())); 
+  const displayedSurveys = surveys.filter(survey => (searchQuery.length === 0 || searchQuery.includes(survey.courseTitle.toLowerCase()))); 
   const [modalSurveyIds, setModalSurveyIds] = useState<string[]>([]); 
 
   const fetchSearchOptions = async () => {
@@ -39,13 +37,25 @@ export default function SurveySummary() {
 
   const fetchSurveys = async () => {
     try {
-      const response = await apiClient.get("/"); 
+      const response = await apiClient.get("/surveys"); 
+      const survey = response.data; 
+
+      const receivedSurveys: SurveyElem[] = []; 
       
-      const receivedSurveys: SurveyElem[] = response.data.map((survey: SurveyType) => ({
-        // courseTitle: survey.title,
-        // numResponses: survey.responses.length, 
-        // responses: survey.responses, 
-      }))
+      const courseResponse = await apiClient.get(`/courses/${survey.courseId}`); 
+      const courseTitle = courseResponse.data.className; 
+
+      const surveyId = survey.surveyId; 
+      const surveyResponses = await apiClient.get(`/surveyResponses/${surveyId}`); 
+      
+      const surveyData: SurveyElem = {
+        courseTitle: courseTitle,
+        numResponses: surveyResponses.data.length, 
+        questionIds: survey.questionIds,
+      }
+      receivedSurveys.push(surveyData); 
+      
+      setSurveys(receivedSurveys); 
     } catch (error) {
       console.error(error); 
     }
@@ -68,10 +78,15 @@ export default function SurveySummary() {
 
   useEffect(() => {
     fetchSearchOptions(); 
-  }); 
+    fetchSurveys(); 
+  }, []); 
 
   return (
     <div className="w-full min-h-screen bg-gray-100">
+      {modalOpen && (
+        <DetailedSurveyResponse surveyQuestionIDs={modalSurveyIds} toggleModal={setModalOpen}></DetailedSurveyResponse>
+      )}
+      
       <div className="max-w-screen-2xl mx-auto px-8 py-6 space-y-4">
         <div className="bg-white border rounded-lg p-6">
           <div className="flex justify-between">
@@ -82,7 +97,7 @@ export default function SurveySummary() {
           </div>
 
           <SearchDropdown options={searchOptions} selected={searchQuery} setSelected={setSearchQuery} ></SearchDropdown>
-        
+          
           <table className="w-full border border-gray-300 rounded-md border-separate border-spacing-0 text-sm mt-5">
             <thead className="bg-gray-100 rounded-md">
               <tr>
@@ -94,19 +109,15 @@ export default function SurveySummary() {
             <tbody>
                 {displayedSurveys.map((survey, rowIdx) => (
                     <tr key={rowIdx} className={rowIdx % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                        <td className="border border-gray-200 text-left w-9/12">{survey.courseTitle}</td>
-                        <td className="border border-gray-200 text-left w-2/12">{survey.numResponses}</td>
-                        <td className="border border-gray-200 text-left w-1/12">
+                        <td className="border border-gray-200 text-left w-9/12 pl-3">{survey.courseTitle}</td>
+                        <td className="border border-gray-200 text-left w-2/12 text-center">{survey.numResponses}</td>
+                        <td className="border border-gray-200 text-left w-1/12 justify-items-center">
                           <Search className="w-6 border rounded-lg p-1 cursor-pointer" onClick={() => handleModalOpen(rowIdx)}></Search>
                         </td>
                     </tr>
                 ))}
             </tbody>
           </table>
-
-          {modalOpen && (
-            <DetailedSurveyResponse surveyQuestionIDs={modalSurveyIds} toggleModal={setModalOpen}></DetailedSurveyResponse>
-          )}
           
           <div className="flex justify-end mt-6">
               <Pagination 
