@@ -24,13 +24,8 @@ export default function WorkshopCreation({
 	});
 
 	const [webinarData, setWebinarData] = useState({
-		serviceType: "",
-		meetingID: "string",
-		startTime: new Date(),
-		duration: 0,
-		authParticipants: false,
-		autoRecord: false,
-		enablePractice: false,
+		meetingID: "",
+		meetingPassword: ""
 	});
 
 	const [inPersonData, setInPersonData] = useState({
@@ -42,8 +37,6 @@ export default function WorkshopCreation({
 	const [onDemandData, setOnDemandData] = useState({
 		embeddingLink: "",
 	});
-
-	const [openModal, setOpenModal] = useState<"New" | "Existing" | null>(null);
 
 	const handleChange = (e: any) => {
 		const { name, value } = e.target;
@@ -121,8 +114,6 @@ export default function WorkshopCreation({
 						<WebinarComponent
 							setWebinarData={setWebinarData}
 							webinarData={webinarData}
-							openModal={openModal}
-							setOpenModal={setOpenModal}
 						/>
 					) : formData.type === "in-person" ? (
 						<InPersonComponent
@@ -276,26 +267,6 @@ export default function WorkshopCreation({
 					</button>
 				</div>
 			</form>
-
-			{/* First Modal */}
-			<Modal
-				isOpen={openModal === "New"}
-				onClose={() => setOpenModal(null)}
-				title="Create New Webinar"
-			>
-				<p>
-					This is the placeholder for adding a new webinar (once we get zoom).
-				</p>
-			</Modal>
-
-			{/* Second Modal */}
-			<Modal
-				isOpen={openModal === "Existing"}
-				onClose={() => setOpenModal(null)}
-				title="Add Existing Webinar"
-			>
-				<p>This is placeholder for finding existing webinars.</p>
-			</Modal>
 		</div>
 	);
 }
