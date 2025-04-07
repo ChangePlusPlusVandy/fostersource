@@ -38,6 +38,7 @@ import Registrants from "../pages/Admin/NewProductPage/Registrants";
 import SurveySummary from "../pages/Admin/SurveySummaryPage/SurveySummary";
 import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
+import UserTypesPage from "../pages/Admin/UserTypesPage/UserTypesPage";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -202,6 +203,7 @@ function AppRoutes() {
 						<Route path="/admin/discounts" element={<DiscountPage />} />
 						<Route path="/admin/speakers" element={<SpeakerPage />} />
 						<Route path="/admin/users" element={<UserManagementPage />} />
+						<Route path="/admin/user-types" element={<UserTypesPage />} />
 						<Route path="/admin/products/pricing" element={<Pricing />} />
 						<Route
 							path="/admin/components"
