@@ -182,7 +182,7 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 			/>
 			{/* Separate Settings and Logout */}
 			<div className="admin-footer-items">
-				<ul className="admin-menu flex flex-col items-center gap-2">
+				<ul className="admin-menu flex flex-col items-center gap-2 p-4">
 					{/* Settings Item */}
 					<div className="w-full">
 						<li
