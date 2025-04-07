@@ -34,6 +34,7 @@ import apiClient from "../services/apiClient";
 import { AdminSidebar } from "../components/AdminSidebar/AdminSidebar";
 import EditCourse from "../pages/Admin/EditCoursePage/editCoursePage";
 import EditSideBar from "../components/EditCourseSidebar/editCoursePageSideBar";
+import SurveySummary from "../pages/Admin/SurveySummaryPage/SurveySummary";
 import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
 // import AdminPage from "../pages/Admin/AdminPage";
@@ -265,6 +266,12 @@ function AppRoutes() {
 								<AdminRoute>
 									<ProductPage />
 								</AdminRoute>
+							}
+						/>
+						<Route
+							path="/admin/survey/responses"
+							element={
+								<SurveySummary></SurveySummary>
 							}
 						/>
 						<Route
