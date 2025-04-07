@@ -227,7 +227,7 @@ function AppRoutes() {
 							}
 						/>
 						<Route
-							path="admin/new-product/registrants"
+							path="admin/registrants"
 							element={
 								<AdminRoute>
 									<Registrants />

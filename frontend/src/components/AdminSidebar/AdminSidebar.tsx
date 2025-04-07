@@ -75,11 +75,11 @@ export const adminSidebarItems: SidebarItem[] = [
 				href: "/admin/products",
 			},
 			{ icon: <Disc3 />, description: "Discounts", href: "/admin/discounts" },
-			{ icon: <Mail />, description: "Emails", href: "/admin/emails" },
+			{ icon: <Mail />, description: "Emails", href: "/admin/email" },
 			{
 				icon: <ClipboardList />,
-				description: "Templates",
-				href: "/admin/templates",
+				description: "Registrants",
+				href: "/admin/registrants",
 			},
 		],
 	},
@@ -106,7 +106,7 @@ export const adminSidebarItems: SidebarItem[] = [
 			{
 				icon: <FilePlus2 />,
 				description: "Registration",
-				href: "/admin/reports/registration",
+				href: "/admin/content",
 			},
 			{
 				icon: <Type />,
@@ -245,7 +245,7 @@ interface ProfileProps {
 // Display either profile information or log in button
 export function Profile({ isLoggedIn, name, role }: ProfileProps) {
 	return (
-		<div className="profile flex flex-row items-center w-full">
+		<div className="align-middle m-7 flex flex-row items-center w-full">
 			{!isLoggedIn && (
 				<div className="w-full flex justify-center">
 					<Link to={"/login"} className="w-full">
