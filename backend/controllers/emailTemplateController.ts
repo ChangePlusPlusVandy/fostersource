@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Email from "../models/emailModel";
+import EmailTemplate from "../models/emailTemplateModel";
 
 // @desc    Get all emails
 // @route   GET /api/emails
@@ -13,7 +13,7 @@ export const getEmails = async (req: Request, res: Response): Promise<void> => {
       filters.title = { $regex: title, $options: 'i' };
     }
 
-    const emails = await Email.find(filters);
+    const emails = await EmailTemplate.find(filters);
 
     res.status(200).json({
       success: true,
@@ -43,7 +43,7 @@ export const getEmailById = async (req: Request, res: Response): Promise<void> =
   try {
     const { id } = req.params;
     
-    const email = await Email.findById(id);
+    const email = await EmailTemplate.findById(id);
     
     if (!email) {
       res.status(404).json({
@@ -88,7 +88,7 @@ export const createEmail = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    const newEmail = new Email({
+    const newEmail = new EmailTemplate({
       title,
       body,
     });
@@ -123,7 +123,7 @@ export const updateEmail = async (req: Request, res: Response): Promise<void> =>
     const { id } = req.params;
     const { title, body } = req.body;
 
-    const updatedEmail = await Email.findByIdAndUpdate(
+    const updatedEmail = await EmailTemplate.findByIdAndUpdate(
       id,
       { title, body },
       { new: true, runValidators: true }
@@ -164,7 +164,7 @@ export const deleteEmail = async (req: Request, res: Response): Promise<void> =>
   try {
     const { id } = req.params;
 
-    const deletedEmail = await Email.findByIdAndDelete(id);
+    const deletedEmail = await EmailTemplate.findByIdAndDelete(id);
     if (!deletedEmail) {
       res.status(404).json({
         success: false,
