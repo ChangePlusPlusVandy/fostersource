@@ -94,7 +94,7 @@ export default function Registrants() {
 		fetchRegistrantData();
 	}, [courseId]); // Re-fetch if courseId changes
 
-	// --- Event Handlers (handleDelete, handleSearch remain the same) ---
+	// --- Event Handlers ---
 	const handleDelete = (registrantId: string) => {
 		console.log("Attempting to delete registrant:", registrantId);
 		// TODO: Implement API call to delete the user *or* registration? Clarify requirement.
@@ -102,16 +102,20 @@ export default function Registrants() {
 	};
 
 	const handleSearch = () => {
-		console.log("Searching for:", searchTerm);
-		// TODO: Implement search logic (client or server-side)
-		alert("Search functionality not fully implemented.");
+		// The actual filtering is reactive and handled by the derived `filteredRegistrants`
+		// variable below, based on the `searchTerm` state.
+		// This function is primarily useful if you were triggering a server-side search.
+		// For client-side, it doesn't need to do much besides potentially logging.
+		console.log(
+			"Search triggered for (client-side filtering applied):",
+			searchTerm
+		);
 	};
 
 	// --- Filtering for Search (Client-side example) ---
-	const filteredRegistrants = registrants.filter(
-		(r) =>
-			r.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			r.email.toLowerCase().includes(searchTerm.toLowerCase())
+	// Filter based on the `searchTerm` state, comparing against `fullName` case-insensitively.
+	const filteredRegistrants = registrants.filter((r) =>
+		r.fullName.toLowerCase().includes(searchTerm.toLowerCase())
 	);
 
 	if (isLoading) {
@@ -136,25 +140,29 @@ export default function Registrants() {
 				{/* Header Bar */}
 				<div className="flex flex-row items-center justify-between w-full bg-[#a881c2] text-white h-12 rounded-t-lg p-3 text-sm font-medium">
 					<span className="text-white text-lg font-semibold truncate px-2">
-						{courseTitle} - Registrants
+						{courseTitle}
 					</span>
+					<div className="flex flex-row items-center gap-2 border border-solid px-2 p-1 rounded-md">
+						✕
+					</div>
 				</div>
 
 				{/* Content Area */}
 				<div className="flex flex-col w-full p-6 gap-4">
+					<h1 className="text-2xl font-semibold text-gray-800">Registrants</h1>
 					{/* Search and Download Bar */}
 					<div className="flex items-center w-full gap-4 flex-wrap">
 						<div className="flex-grow flex focus-within:ring-2 focus-within:ring-[#a881c2] focus-within:ring-offset-1 rounded-md min-w-[300px]">
 							<input
 								type="text"
-								placeholder="Search by name or email..."
+								placeholder="Search by full name..." // Updated placeholder slightly
 								value={searchTerm}
-								onChange={(e) => setSearchTerm(e.target.value)}
+								onChange={(e) => setSearchTerm(e.target.value)} // Updates state, triggering re-filter
 								onKeyDown={(e) => e.key === "Enter" && handleSearch()}
 								className="peer p-2 border border-gray-300 rounded-l-md flex-grow focus:outline-none text-sm"
 							/>
 							<button
-								onClick={handleSearch}
+								onClick={handleSearch} // Calls the updated handleSearch
 								className="peer-focus:bg-[#7b4899] px-4 py-2 bg-[#a881c2] text-white rounded-r-md hover:bg-[#936aa9] transition-colors duration-200 text-sm font-medium"
 							>
 								Search
