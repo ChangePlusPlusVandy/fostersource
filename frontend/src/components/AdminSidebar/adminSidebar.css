@@ -1,5 +1,6 @@
 .admin-sidebar {
-	width: 250px;
+	width: 80px;
+	transition: width 0.3s ease-in-out;
 	padding-left: 0;
 	max-height: max-content;
 	background-color: #ffffff;
@@ -122,9 +123,4 @@ body {
 
 .admin-footer-items .admin-menu {
 	flex-grow: 0;
-}
-
-.admin-footer-items li:last-child:hover svg,
-.admin-footer-items li:last-child:hover span {
-	color: #be0000 !important;
 }

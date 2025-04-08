@@ -37,13 +37,6 @@ export const userInfo = {
 		: false,
 };
 
-// export const userInfo = {
-// 	name: "First L.",
-// 	role: "No role",
-// 	isLoggedIn: false,
-// 	isAdmin: true
-// };
-
 // All sidebar entries - Updated structure
 // Define types for better structure
 type SubItem = {
@@ -60,11 +53,6 @@ type SidebarItem = {
 };
 
 export const adminSidebarItems: SidebarItem[] = [
-	// {
-	// 	icon: <Home />,
-	// 	description: "Home",
-	// 	href: "/",
-	// },
 	{
 		icon: <Layers />,
 		description: "Products",
@@ -148,8 +136,7 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 	// User Info
 	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
 	const role = isLoggedIn ? JSON.parse(localStorage.user).role : "Log In";
-	// const name =  "Log In";
-	// const role = "Log In";
+
 	// State for tracking the active item (can be parent or sub-item href)
 	const [activeItem, setActiveItem] = useState<string>(
 		window.location.pathname
@@ -170,7 +157,7 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 
 	return (
 		// Removed dynamic 'expanded' class
-		<div className="admin-sidebar">
+		<div className="admin-sidebar hover:w-64 z-10 group">
 			<Profile isLoggedIn={isLoggedIn} name={name} role={role} />
 			<AdminSidebarItems
 				isLoggedIn={isLoggedIn}
@@ -187,7 +174,7 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 					<div className="w-full">
 						<li
 							key={"/admin/settings"}
-							className={`${activeItem === "/admin/settings" ? "active" : ""} w-full rounded-md p-2`}
+							className={`${activeItem === "/admin/settings" ? "active" : ""} w-full rounded-md p-2 hover:text-[#7b4899]`}
 							onClick={() => {
 								setActiveItem("/admin/settings");
 								window.location.href = "/admin/settings"; // Simple navigation for example
@@ -195,12 +182,12 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 						>
 							<Link
 								to="/admin/settings"
-								className="flex justify-center w-full rounded-md"
+								className="flex justify-center w-full rounded-md gap-4"
 							>
-								<div className={`mr-4`}>
+								<div>
 									<Settings />
 								</div>
-								<span>Settings</span>
+								<span className="hidden group-hover:block">Settings</span>
 							</Link>
 						</li>
 					</div>
@@ -209,6 +196,7 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 					{isLoggedIn && (
 						<li
 							key={"logout"}
+							className="w-full px-2"
 							onClick={async () => {
 								try {
 									await authService.logout();
@@ -220,13 +208,16 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 								}
 							}}
 						>
-							<div className="flex items-center w-full cursor-pointer">
+							<div
+								tabIndex={0}
+								className="flex justify-center w-full cursor-pointer gap-4 rounded-md hover:text-[#be0000]"
+							>
 								{/* Always apply margin */}
-								<div className={`mr-4`}>
+								<div>
 									<LogOut />
 								</div>
 								{/* Always show text */}
-								<span>Logout</span>
+								<span className="hidden group-hover:block">Logout</span>
 							</div>
 						</li>
 					)}
@@ -289,8 +280,6 @@ interface AdminSidebarItemsProps {
 
 // Display and handle sidebar entries - Updated Logic
 export function AdminSidebarItems({
-	isLoggedIn,
-	setIsLoggedIn,
 	activeItem,
 	setActiveItem,
 	expandedItem,
@@ -311,22 +300,26 @@ export function AdminSidebarItems({
 	};
 
 	return (
-		<ul className="admin-menu flex flex-col flex-grow gap-5 p-7">
+		<ul className="admin-menu flex flex-col flex-grow gap-5 p-6">
 			<li
 				key={"/"}
 				onClick={() => {
 					window.location.pathname = "/"; // Or use Link/navigate
 				}}
 			>
-				<Link to="/" className="flex items-center w-full hover:text-[#7b4899]">
+				<Link
+					to="/"
+					className="flex justify-center w-full gap-4 hover:text-[#7b4899] group-hover:justify-start"
+				>
 					{/* Always apply margin */}
-					<div className={`mr-4`}>
+					<div className="">
 						<HomeIcon />
 					</div>
 					{/* Always show text */}
-					<span>Home</span>
+					<span className="hidden group-hover:block">Home</span>
 				</Link>
 			</li>
+
 			{adminSidebarItems.map((item) => {
 				const isParentActive =
 					expandedItem === item.description ||
@@ -337,24 +330,29 @@ export function AdminSidebarItems({
 					<li
 						key={item.description}
 						// Add class if item itself is active or if it's the expanded parent
-						className={`${isParentActive && !item.subItems ? "active" : ""} ${isExpanded ? "parent-expanded" : ""}`}
+						className={`${isParentActive && !item.subItems ? "active" : ""} ${isExpanded ? "parent-expanded" : ""} justify-center`}
 					>
+						<hr className="border-t border-purple-200 border-2 rounded-full mb-4" />
+
 						<div
-							className="flex items-center w-full justify-between cursor-pointer"
+							className="flex justify-center items-center w-full cursor-pointer group-hover:justify-between"
 							onClick={() => handleItemClick(item)}
 						>
-							<div className="flex items-center hover:text-[#7b4899]">
-								{/* Always apply margin */}
-								<div className={`mr-4`}>{item.icon}</div>
+							<div className="peer flex items-center hover:text-[#7b4899] gap-4">
+								{item.icon}
 								{/* Always show text */}
-								<span>{item.description}</span>
+								<div className="hidden group-hover:block">
+									{item.description}
+								</div>
 							</div>
-							{item.subItems &&
-								(isExpanded ? (
-									<ChevronDown size={24} />
-								) : (
-									<ChevronRight size={24} />
-								))}
+							<div className="hidden group-hover:block peer-hover:text-[#7b4899]">
+								{item.subItems &&
+									(isExpanded ? (
+										<ChevronDown size={24} />
+									) : (
+										<ChevronRight size={24} />
+									))}
+							</div>
 						</div>
 
 						{/* Render Sub-menu if item has subItems, and is expanded */}
@@ -377,7 +375,9 @@ export function AdminSidebarItems({
 											>
 												<div className="mr-1">{subItem.icon}</div>{" "}
 												{/* Icon for sub-item */}
-												<span>{subItem.description}</span>
+												<span className="hidden group-hover:block">
+													{subItem.description}
+												</span>
 											</Link>
 										</li>
 									);
@@ -387,7 +387,6 @@ export function AdminSidebarItems({
 					</li>
 				);
 			})}
-			{/* Removed Settings/Logout from here */}
 		</ul>
 	);
 }
