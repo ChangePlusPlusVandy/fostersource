@@ -72,9 +72,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
           </div> */}
 
 			<div className="p-6">
-				<h2 className="text-xl font-bold mb-6">
-					The Inclusive Family Support Model -Live Virtual (01/25/2025)
-				</h2>
+				<h2 className="text-xl font-bold mb-6"></h2>
 
 				<div className="flex gap-8">
 					<div className="w-1/3">

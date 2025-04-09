@@ -1,106 +1,111 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import React, {
+	useEffect,
+	useState,
+	useCallback,
+	useRef,
+	createContext,
+	useContext,
+} from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { AxiosError } from "axios";
-import Select, { MultiValue } from "react-select";
 import adminApiClient from "../../../services/adminApiClient";
 import apiClient from "../../../services/apiClient";
 
+import {
+	components as selectComponents,
+	OptionProps,
+	GroupBase,
+	Props as SelectProps,
+} from "react-select";
+import ReactSelect from "react-select";
+import SaveCourseButton from "../../../components/SaveCourseButtons";
+import { useCourseEditStore } from "../../../store/useCourseEditStore";
+
+export const SetOptionsContext = createContext<React.Dispatch<
+	React.SetStateAction<OptionType[]>
+> | null>(null);
+export const useSetOptions = () => useContext(SetOptionsContext);
+
+interface CustomSelectProps
+	extends SelectProps<OptionType, true, GroupBase<OptionType>> {
+	setOptions?: React.Dispatch<React.SetStateAction<OptionType[]>>;
+}
+
+const CustomSelect = ({ setOptions, ...props }: CustomSelectProps) => {
+	return <ReactSelect {...props} />;
+};
+
 type OptionType = {
+	id: string;
 	value: string;
 	label: string;
 };
 
 const EditCourse = () => {
-	const [inputTitleValue, setInputTitleValue] = useState<string>("");
-	const [inputSummaryValue, setSummaryValue] = useState<string>("");
-	const [inputDescriptionValue, setDescriptionValue] = useState<string>("");
-	const [inputShortUrlProduct, setInputShortUrlProduct] = useState<string>("");
-	const [webinar, setWebinar] = useState<boolean>(false);
-	const [survey, setSurvey] = useState<boolean>(false);
-	const [certificate, setCertificate] = useState<boolean>(false);
-	const [credit, setCredit] = useState<number>(0);
-	const [date, setDate] = useState<Date>(new Date());
+	const {
+		className,
+		discussion,
+		courseDescription,
+		creditNumber,
+		time,
+		regStart,
+		courseType,
+		cost,
+		categories,
+		productType,
+		isLive,
+		isInPerson,
+		components,
+		thumbnailPath,
+		shortUrl,
+		setField,
+		setAllFields,
+	} = useCourseEditStore();
 
 	const [file, setFile] = useState<File | null>(null);
-	const [filePreview, setFilePreview] = useState<string | null>(null);
-	const [components, setComponents] = useState<string[]>([]);
-	const location = useLocation();
-	const { id } = useParams();
-	const [regStart, setRegStart] = useState<Date>(new Date());
-	const [courseType, setCourseType] = useState<string>(" ");
-	const [price, setPrice] = useState<number>(0);
-	const [selectedValues, setSelectedValues] = useState<string[]>([]);
-	const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-	const [selectedProductTypes, setSelectedProductTypes] = useState<string[]>(
-		[]
-	);
-	const [isLive, setIsLive] = useState<boolean>(false);
-	const [isInPerson, setIsInPerson] = useState<boolean>(false);
-	const options = [
-		{ value: "None Selected", label: "None Selected" },
-		{ value: "Biological Families", label: "Biological Families" },
-		{
-			value: "Diversity, Equity, Inclusion",
-			label: "Diversity, Equity, Inclusion",
-		},
-		{ value: "Formación En Español", label: "Formación En Español" },
-		{ value: "Foster Parent Connections", label: "Foster Parent Connections" },
-		{
-			value: "Brighton Foster Parent Connections",
-			label: "    Brighton Foster Parent Connections",
-		},
-		{
-			value: "LGBTQ Foster Parent Connections",
-			label: "    LGBTQ Foster Parent Connections",
-		},
-		{
-			value: "Longmont Foster Parent Connections",
-			label: "    Longmont Foster Parent Connections",
-		},
-		{
-			value: "Indian Child Welfare Act (ICWA)",
-			label: "Indian Child Welfare Act (ICWA)",
-		},
-		{ value: "Kinship Education", label: "Kinship Education" },
-		{ value: "Mental Health", label: "Mental Health" },
-		{ value: "Panels", label: "Panels" },
-		{ value: "Appeals Panels", label: "    Appeals Panels" },
-		{
-			value: "Elected Officials Panels",
-			label: "    Elected Officials Panels",
-		},
-		{
-			value: "Foster Care Alumni Panels",
-			label: "  Foster Care Alumni Panels",
-		},
-		{ value: "Human Services Panel", label: "    Human Services Panel" },
-		{ value: "Judicial Panels", label: "    Judicial Panels" },
-		{ value: "Podcast", label: "Podcast" },
-		{
-			value: "PodReactive Attachment Disorder (RAD)cast",
-			label: "Reactive Attachment Disorder (RAD)",
-		},
-		{ value: "Sex Education", label: "Sex Education" },
-		{ value: "Special Education", label: "Special Education" },
-		{ value: "Therapies", label: "Therapies" },
-		{ value: "EMDR", label: "    EMDR" },
-		{ value: "Equine", label: "    Equine" },
-		{ value: "PCIT", label: "    PCIT" },
-		{
-			value: "Speech/Play/Talk/Occupational/Behavioral",
-			label: "    Speech/Play/Talk/Occupational/Behavioral",
-		},
-		{ value: "Trauma", label: "Trauma" },
-	];
-	const productTypes = [
-		{ value: "In-Person Training", label: "In-Person Training" },
-		{ value: "On Demand - Englisn", label: "On Demand - Englisn" },
-		{
-			value: "Video Por Encargo - Español",
-			label: "Video Por Encargo - Español",
-		},
-		{ value: "Virtual Training - Live", label: "Virtual Training - Live" },
-	];
+
+	type Category = { _id: string; category: string };
+
+	const [optionValues, setOptionValues] = useState<Category[]>([]);
+	const [options, setOptions] = useState<OptionType[]>([]);
+	const [modalOpen, setModalopen] = useState<boolean>(false);
+	const [enteredCategory, setEnteredCategory] = useState<string>("");
+	const [oldOptions, setOldOptions] = useState<OptionType[]>([]);
+	const [undoEdit, setUndoEdit] = useState<boolean>(false);
+
+	const getOptions = async () => {
+		try {
+			const response = await apiClient.get("/courseCategories");
+			const mapped = response.data.data.map((cat: any) => ({
+				id: cat._id,
+				value: cat.category,
+				label: cat.category,
+			}));
+			setOptions(mapped);
+			setOldOptions(mapped);
+		} catch (e) {
+			console.error("Failed to fetch selected categories:", e);
+		}
+	};
+
+	const mapToOptions = (categories: { _id: string; category: string }[]) => {
+		const mapped: OptionType[] = categories.map((item) => ({
+			id: item._id,
+			value: item.category,
+			label: item.category,
+		}));
+		setOptions(mapped);
+		setOldOptions(mapped);
+	};
+
+	useEffect(() => {
+		mapToOptions(optionValues);
+	}, [optionValues]);
+
+	useEffect(() => {
+		getOptions();
+	}, []);
+
 	const [bannerImage, setBannerImage] = useState<File | null>(null);
 
 	const handleFileChange = async (
@@ -109,13 +114,13 @@ const EditCourse = () => {
 		if (event.target.files && event.target.files[0]) {
 			const selectedFile = event.target.files[0];
 			setFile(selectedFile);
-			setFilePreview(URL.createObjectURL(selectedFile));
+			// setFilePreview(URL.createObjectURL(selectedFile));
 
 			const uploadedUrl = await uploadImageToCloudinary(selectedFile);
 
 			if (uploadedUrl) {
 				console.log("Catalog image uploaded to:", uploadedUrl);
-				// Store uploadedUrl somewhere (e.g., in state or send to backend on submit)
+				setField("thumbnailPath", uploadedUrl);
 			}
 		}
 	};
@@ -140,7 +145,6 @@ const EditCourse = () => {
 		if (event.dataTransfer.files && event.dataTransfer.files[0]) {
 			const droppedFile = event.dataTransfer.files[0];
 			setFile(droppedFile);
-			setFilePreview(URL.createObjectURL(droppedFile));
 
 			const uploadedUrl = await uploadImageToCloudinary(droppedFile);
 			if (uploadedUrl) {
@@ -182,176 +186,204 @@ const EditCourse = () => {
 		}
 	};
 
-	const handleTagsClick = () => {
-		let newComponents = [...components];
-		console.log("Webinar value is " + webinar);
-		if (webinar && !newComponents.includes("Webinar")) {
-			newComponents.push("Webinar");
-		}
-		if (survey && !newComponents.includes("Survey")) {
-			newComponents.push("Survey");
-		}
-		if (certificate && !newComponents.includes("Certificate")) {
-			newComponents.push("Certificate");
-		}
-		if (!webinar) {
-			newComponents = newComponents.filter((value) => value !== "Webinar");
-		}
-		if (!survey) {
-			newComponents = newComponents.filter((value) => value !== "Survey");
-		}
-		if (!certificate) {
-			newComponents = newComponents.filter((value) => value !== "Certificate");
-		}
-		setComponents(newComponents);
-	};
+	// const [coursesRecieved, setCoursesRecieved] = useState<boolean>(false);
+	// const getCourse = useCallback(async () => {
+	// 	try {
+	// 		const response = await apiClient.get(`/courses/${id}`);
+	// 		const course = response.data.data;
+	// 		setInputTitleValue(course.className);
+	// 		setSummaryValue(course.discussion);
+	// 		setDescriptionValue(course.courseDescription);
+	// 		setComponents(course.components);
+	// 		setDate(course.time);
+	// 		setCredit(course.creditNumber);
+	// 		setRegStart(course.regStart);
+	// 		setCourseType(course.courseType);
+	// 		setPrice(course.cost);
+	// 		setSelectedOptions(
+	// 			course.categories.map((cat: string) => ({ value: cat, label: cat }))
+	// 		);
+	// 		setSelectedProductTypes(course.productType);
+	// 		setIsInPerson(course.isInPerson);
+	// 		setIsLive(course.isLive);
+	// 		setFilePreview(course.thumbnailPath);
+	// 		console.log("thumbnail path:", course.thumbnailPath);
+	// 		setCoursesRecieved(true);
+	// 	} catch (e: unknown) {
+	// 		const err = e as AxiosError;
+	// 		if (err.response && err.response.status === 404) {
+	// 			console.log("Course does NOT exist.");
+	// 			return false;
+	// 		}
+	// 		console.log("Error:", e);
+	// 	}
+	// }, [id]);
 
-	useEffect(() => {
-		handleTagsClick();
-	}, [webinar, survey, certificate]);
+	// useEffect(() => {
+	// 	getCourse();
+	// }, [getCourse]);
 
-	const [coursesRecieved, setCoursesRecieved] = useState<boolean>(false);
-	const getCourse = useCallback(async () => {
+	// const checkInPersonIsLive = () => {
+	// 	if (selectedProductTypes.length > 0) {
+	// 		setIsLive(selectedProductTypes.includes("Virtual Training - Live"));
+	// 		setIsInPerson(selectedProductTypes.includes("In-Person Training"));
+	// 	} else {
+	// 		setIsLive(false);
+	// 		setIsInPerson(false);
+	// 	}
+	// };
+
+	// useEffect(() => {
+	// 	checkInPersonIsLive();
+	// }, [selectedProductTypes]);
+
+	// const updateCourse = async () => {
+	// 	if (!id) {
+	// 		console.error("No course ID found");
+	// 		return;
+	// 	}
+	// 	try {
+	// 		const selectedValues = selectedOptionsRef.current.map(
+	// 			(option) => option.value
+	// 		);
+	// 		const response = await apiClient.put(`/courses/${id}`, {
+	// 			className: inputTitleRef.current,
+	// 			discussion: inputSummaryValueRef.current,
+	// 			components: componentsRef.current,
+	// 			creditNumber: creditNumberRef.current,
+	// 			courseDescription: inputDescriptionValueRef.current,
+	// 			time: dateRef.current,
+	// 			thumbnailPath: filePreview,
+	// 			regStart: regStartRef.current,
+	// 			courseType: courseTypeRef.current,
+	// 			categories: selectedValues,
+	// 			productType: selectedProductRef.current,
+	// 			isInPerson: isInPersonRef.current,
+	// 			isLive: isLiveRef.current,
+	// 		});
+	// 		console.log(response);
+	// 	} catch (e) {
+	// 		console.log("update Course error " + e);
+	// 	}
+	// };
+
+	// const inputTitleRef = useRef(inputTitleValue);
+	// const inputSummaryValueRef = useRef(inputSummaryValue);
+	// const componentsRef = useRef(components);
+	// const creditNumberRef = useRef(credit);
+	// const inputDescriptionValueRef = useRef(inputDescriptionValue);
+	// const dateRef = useRef(date);
+	// const regStartRef = useRef(regStart);
+	// const courseTypeRef = useRef(courseType);
+	// const selectedOptionsRef = useRef(selectedOptions);
+	// const selectedProductRef = useRef(selectedProductTypes);
+	// const isLiveRef = useRef(isLive);
+	// const isInPersonRef = useRef(isInPerson);
+	// const optionsRef = useRef(options);
+	// const thumbnailPathRef = useRef(filePreview);
+
+	// // Sync the ref with the latest inputTitleValue:
+	// useEffect(() => {
+	// 	inputTitleRef.current = inputTitleValue;
+	// 	inputSummaryValueRef.current = inputSummaryValue;
+	// 	componentsRef.current = components;
+	// 	creditNumberRef.current = credit;
+	// 	inputDescriptionValueRef.current = inputDescriptionValue;
+	// 	dateRef.current = date;
+	// 	regStartRef.current = regStart;
+	// 	courseTypeRef.current = courseType;
+	// 	selectedOptionsRef.current = selectedOptions;
+	// 	selectedProductRef.current = selectedProductTypes;
+	// 	isLiveRef.current = isLive;
+	// 	isInPersonRef.current = isInPerson;
+	// 	optionsRef.current = options;
+	// 	thumbnailPathRef.current = filePreview;
+	// }, [
+	// 	inputTitleValue,
+	// 	inputSummaryValue,
+	// 	components,
+	// 	credit,
+	// 	inputDescriptionValue,
+	// 	date,
+	// 	regStart,
+	// 	courseType,
+	// 	selectedOptions,
+	// 	selectedProductTypes,
+	// 	isLive,
+	// 	isInPerson,
+	// 	options,
+	// 	filePreview,
+	// ]);
+
+	// useEffect(() => {
+	// 	return () => {
+	// 		if (coursesRecieved && inputTitleRef.current != "") {
+	// 			updateCourse();
+	// 		}
+	// 	};
+	// }, [coursesRecieved]);
+
+	// const updateOptionsLocally = async (category: string) => {
+	// 	setOldOptions(options);
+	// 	setOptions((options) => [...options, { value: category, label: category }]);
+	// };
+
+	const addOption = async (category: string) => {
 		try {
-			const response = await apiClient.get(`/courses/${id}`);
-			const course = response.data.data;
-			setInputTitleValue(course.className);
-			setSummaryValue(course.discussion);
-			setDescriptionValue(course.courseDescription);
-			setComponents(course.components);
-			setDate(course.time);
-			setCredit(course.creditNumber);
-			setRegStart(course.regStart);
-			setCourseType(course.courseType);
-			setPrice(course.cost);
-			setSelectedOptions(course.categories);
-			setSelectedProductTypes(course.productType);
-			setIsInPerson(course.isInPerson);
-			setIsLive(course.isLive);
-			// TODO: Set file paths once that's completed
-			setCoursesRecieved(true);
-		} catch (e: unknown) {
-			const err = e as AxiosError;
-			if (err.response && err.response.status === 404) {
-				console.log("Course does NOT exist.");
-				return false;
-			}
-			console.log("Error:", e);
-		}
-	}, [id]);
-
-	useEffect(() => {
-		getCourse();
-	}, [getCourse]);
-
-	const checkInPersonIsLive = () => {
-		if (selectedProductTypes.length > 0) {
-			setIsLive(selectedProductTypes.includes("Virtual Training - Live"));
-			setIsInPerson(selectedProductTypes.includes("In-Person Training"));
-		} else {
-			setIsLive(false);
-			setIsInPerson(false);
-		}
-	};
-	console.log("isLive", isLive);
-	console.log("isInPerson", isInPerson);
-	useEffect(() => {
-		if (components && components.length > 0) {
-			for (let i = 0; i < components.length; i++) {
-				if (components[i] === "Webinar") {
-					setWebinar(true);
-				} else if (components[i] === "Survey") {
-					console.log("Here");
-					setSurvey(true);
-				} else if (components[i] === "Certificate") {
-					setCertificate(true);
-				}
-			}
-		}
-		checkInPersonIsLive();
-	}, [coursesRecieved]);
-
-	useEffect(() => {
-		checkInPersonIsLive();
-	}, [selectedProductTypes]);
-
-	const updateCourse = async () => {
-		if (!id) {
-			console.error("No course ID found");
-			return;
-		}
-		try {
-			console.log(componentsRef);
-			const response = await apiClient.put(`/courses/${id}`, {
-				className: inputTitleRef.current,
-				discussion: inputSummaryValueRef.current,
-				components: componentsRef.current,
-				creditNumber: creditNumberRef.current,
-				courseDescription: inputDescriptionValueRef.current,
-				time: dateRef.current,
-				// thumbnailPath: file,
-				regStart: regStartRef.current,
-				courseType: courseTypeRef.current,
-				categories: selectedOptionsRef.current,
-				productType: selectedProductRef.current,
-				isInPerson: isInPersonRef.current,
-				isLive: isLiveRef.current,
+			const response = await apiClient.post("/courseCategories", {
+				category,
 			});
-			console.log(response);
+			setOptions((options) => [
+				...options,
+				{ id: response.data._id, value: category, label: category },
+			]);
 		} catch (e) {
-			console.log("update Course error " + e);
+			console.log("Error updating categories");
 		}
 	};
 
-	const inputTitleRef = useRef(inputTitleValue);
-	const inputSummaryValueRef = useRef(inputSummaryValue);
-	const componentsRef = useRef(components);
-	const creditNumberRef = useRef(credit);
-	const inputDescriptionValueRef = useRef(inputDescriptionValue);
-	const dateRef = useRef(date);
-	const regStartRef = useRef(regStart);
-	const courseTypeRef = useRef(courseType);
-	const selectedOptionsRef = useRef(selectedOptions);
-	const selectedProductRef = useRef(selectedProductTypes);
-	const isLiveRef = useRef(isLive);
-	const isInPersonRef = useRef(isInPerson);
+	const CustomOption = (props: OptionProps<OptionType, true>) => {
+		const { data, innerRef, innerProps } = props;
+		const setOptions = useSetOptions();
 
-	// Sync the ref with the latest inputTitleValue:
-	useEffect(() => {
-		inputTitleRef.current = inputTitleValue;
-		inputSummaryValueRef.current = inputSummaryValue;
-		componentsRef.current = components;
-		creditNumberRef.current = credit;
-		inputDescriptionValueRef.current = inputDescriptionValue;
-		dateRef.current = date;
-		regStartRef.current = regStart;
-		courseTypeRef.current = courseType;
-		selectedOptionsRef.current = selectedOptions;
-		selectedProductRef.current = selectedProductTypes;
-		isLiveRef.current = isLive;
-		isInPersonRef.current = isInPerson;
-	}, [
-		inputTitleValue,
-		inputSummaryValue,
-		components,
-		credit,
-		inputDescriptionValue,
-		date,
-		regStart,
-		courseType,
-		selectedOptions,
-		selectedProductTypes,
-		isLive,
-		isInPerson,
-	]);
+		const handleDelete = async (e: React.MouseEvent) => {
+			e.stopPropagation();
+			if (!setOptions) return;
 
-	useEffect(() => {
-		return () => {
-			if (coursesRecieved && inputTitleRef.current != "") {
-				updateCourse();
+			try {
+				await apiClient.delete(`/courseCategories/${data.id}`);
+				const updatedOptions = (
+					props.selectProps.options as OptionType[]
+				).filter((opt) => opt.id !== data.id);
+				setOptions(updatedOptions);
+			} catch (err) {
+				console.error("Failed to delete category", err);
 			}
 		};
-	}, [coursesRecieved]);
+
+		return (
+			<div
+				ref={innerRef}
+				{...innerProps}
+				className="flex justify-between items-center px-3 py-2 hover:bg-gray-100"
+			>
+				<span>{data.label}</span>
+				<button
+					onClick={(e) => {
+						handleDelete(e);
+						setUndoEdit(true);
+					}}
+					className="text-red-500 text-xs hover:text-red-700"
+				>
+					❌
+				</button>
+			</div>
+		);
+	};
+
+	// useEffect(() => {
+	// 	addOption();
+	// }, [options]);
 
 	return (
 		<div className="flex flex-col p-8 bg-white">
@@ -405,7 +437,6 @@ const EditCourse = () => {
 										className="ml-auto text-right"
 										onClick={() => {
 											setFile(null);
-											setFilePreview(null);
 										}}
 									>
 										🗑️
@@ -473,8 +504,8 @@ const EditCourse = () => {
 								type="text"
 								className="h-8 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
 								placeholder="Title of the class"
-								value={inputTitleValue}
-								onChange={(e) => setInputTitleValue(e.target.value)}
+								value={className}
+								onChange={(e) => setField("className", e.target.value)}
 							/>
 						</div>
 						<div className="mt-3">
@@ -483,8 +514,8 @@ const EditCourse = () => {
 								<textarea
 									className="w-full h-11 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
 									placeholder="Enter text here..."
-									value={inputSummaryValue}
-									onChange={(e) => setSummaryValue(e.target.value)}
+									value={discussion}
+									onChange={(e) => setField("discussion", e.target.value)}
 								/>
 							</div>
 						</div>
@@ -493,8 +524,8 @@ const EditCourse = () => {
 							<textarea
 								className="w-full h-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
 								placeholder="Summary of the class"
-								value={inputDescriptionValue}
-								onChange={(e) => setDescriptionValue(e.target.value)}
+								value={courseDescription}
+								onChange={(e) => setField("courseDescription", e.target.value)}
 							/>
 						</div>
 						<div className="mt-2">
@@ -508,8 +539,8 @@ const EditCourse = () => {
 								<textarea
 									className="w-full h-8 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
 									placeholder=""
-									value={inputShortUrlProduct}
-									onChange={(e) => setInputShortUrlProduct(e.target.value)}
+									value={shortUrl}
+									onChange={(e) => setField("shortUrl", e.target.value)}
 								/>
 							</div>
 						</div>
@@ -523,169 +554,164 @@ const EditCourse = () => {
 										className="h-6 w-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-center"
 										min="0"
 										max="10"
-										value={credit}
-										onChange={(e) => setCredit(Number(e.target.value))}
+										value={creditNumber}
+										onChange={(e) =>
+											setField("creditNumber", Number(e.target.value))
+										}
 									/>
 								</div>
 							</div>
-							<div className="mt-3 flex flex-col text-sm">
-								<p className="ml-12">Tags</p>
-								<div className="flex flex-row">
-									<button
-										onClick={() => {
-											setWebinar(!webinar);
-											handleTagsClick();
-										}}
-										className={`w-16 h-4 ml-12 rounded-lg ${webinar ? "bg-orange-400" : "bg-gray-200"}`}
-									>
-										<p
-											className={`text-xs ${webinar ? "text-black?" : "text-gray-600"}`}
-										>
-											Webinar
-										</p>
-									</button>
-									<button
-										onClick={() => {
-											setSurvey(!survey);
-											handleTagsClick();
-										}}
-										className={`w-14 h-4 ml-2 rounded-lg ${survey ? "bg-orange-400" : "bg-gray-200"}`}
-									>
-										<p
-											className={`text-xs ${survey ? "text-black?" : "text-gray-600"}`}
-										>
-											Survey
-										</p>
-									</button>
-									<button
-										onClick={() => {
-											setCertificate(!certificate);
-											handleTagsClick();
-										}}
-										className={`w-20 h-4 ml-2 rounded-lg ${certificate ? "bg-orange-400" : "bg-gray-200"}`}
-									>
-										<p
-											className={`text-xs ${certificate ? "text-black?" : "text-gray-600"}`}
-										>
-											Certificate
-										</p>
-									</button>
-								</div>
-							</div>
-							<div className="flex flex-col mt-3">
-								<p className="ml-20 text-sm">Live Event</p>
-								<input
-									type="datetime-local"
-									className="text-sm w-48 h-6 border rounded-lg focus:ring-2 focus:ring-blue-500 text-center ml-20"
-									value={
-										date
-											? new Date(date)
-													.toLocaleString("sv-SE", { hour12: false })
-													.replace(" ", "T")
-													.slice(0, 16)
-											: ""
-									}
-									onChange={(e) => setDate(new Date(e.target.value))}
-								/>
-							</div>
 						</div>
 
-						<div className="flex flex-row">
-							<div className="mt-3 gap-1 flex flex-col text-sm">
-								Categories
-								<Select
+						<div className="mt-3 ml-20 gap-1 flex flex-col text-sm ">
+							Categories
+							<SetOptionsContext.Provider value={setOptions}>
+								<CustomSelect
+									className="w-[250px]"
 									options={options}
 									isMulti
-									className="basic-multi-select w-96"
-									classNamePrefix="select"
-									value={options.filter((option) =>
-										selectedOptions.includes(option.value)
+									value={options.filter((opt) =>
+										categories.includes(opt.value)
 									)}
-									onChange={(selected) =>
-										setSelectedOptions(selected.map((opt) => opt.value))
-									}
+									onChange={(selected) => {
+										const selectedValues = (selected as OptionType[]).map(
+											(opt) => opt.value
+										);
+										setField("categories", selectedValues);
+									}}
+									components={{ Option: CustomOption }}
 								/>
-							</div>
-							<div className="mt-3 ml-12 gap-1 flex flex-col text-sm">
-								Product Types
-								<Select
-									options={productTypes}
-									isMulti
-									className="basic-multi-select w-80"
-									classNamePrefix="select"
-									value={productTypes.filter((productTypes) =>
-										selectedProductTypes.includes(productTypes.value)
-									)}
-									onChange={(selected) =>
-										setSelectedProductTypes(selected.map((opt) => opt.value))
-									}
-								/>
-							</div>
+							</SetOptionsContext.Provider>
+						</div>
+
+						<div className="mt-9 ml-5">
+							<button
+								className="w-32 h-10 text-purple-400"
+								onClick={() => setModalopen(!modalOpen)}
+							>
+								<p className="text-xs font-medium text-purple-400">
+									Add Category
+								</p>
+							</button>
 						</div>
 					</div>
-				</div>
-
-				<div>
-					<p className="text-sm mt-4">User Preview</p>
-					<div className="w-full h-72 border border-black rounded-md p-5">
-						<div className="p-4 w-full h-full border rounded-md shadow-md">
-							<div className="flex flex-col ">
-								<p className="text-lg">{inputTitleValue}</p>
-							</div>
-							<div className="flex flex-row">
-								<p className="text-xs whitespace-nowrap">No Rating</p>
-								<p className="text-xs ml-5">{credit}</p>
-								<p className="text-xs ml-5 whitespace-nowrap">
-									{date &&
-										(() => {
-											const dateObj = new Date(date);
-											return (
-												<>
-													{dateObj.toDateString()} at{" "}
-													{dateObj.toLocaleTimeString("en-US", {
-														hour: "2-digit",
-														minute: "2-digit",
-													})}
-													(
-													{dateObj
-														.toLocaleTimeString("en-US", {
-															timeZoneName: "short",
-														})
-														.split(" ")
-														.pop()}
-													)
-												</>
-											);
-										})()}
-								</p>
-								<div className="relative w-full h-[300px]">
-									{filePreview && (
-										<div className="absolute right-0 top-0">
-											<img
-												src={filePreview}
-												alt="Preview"
-												className="w-[397px] h-[250px] object-cover rounded-lg border border-gray-300 shadow-lg -mt-[44px]"
-											/>
-										</div>
-									)}
+					{modalOpen && (
+						<div
+							className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+							onClick={() => setModalopen(false)}
+						>
+							<div
+								className="md:w-[389px] md:h-[199px] w-[300px] h-[140px] flex bg-white overflow-auto border rounded-md p-5 md:p-6"
+								onClick={(e) => e.stopPropagation()}
+							>
+								<div className="flex flex-col w-full">
+									<div className="flex flex-row">
+										<p className="font-medium md:text-2xl text-lg">
+											Add Category Type
+										</p>
+										<button
+											className="flex ml-auto w-7 h-7 border border-gray-500 items-center justify-center rounded-sm"
+											onClick={(e) => setModalopen(false)}
+										>
+											<p className="text-3xl font-thin">×</p>
+										</button>
+									</div>
+									<p className="mt-2 md:mt-3 text-xs md:text-sm">Name</p>
+									<input
+										className="border w-full"
+										type="text"
+										value={enteredCategory}
+										onChange={(e) => setEnteredCategory(e.target.value)}
+									/>
+									<div className="flex flex-row ml-auto">
+										<button
+											className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border border-gray-400 bg-gray-white rounded-md mt-5 mr-3"
+											onClick={() => {
+												setModalopen(false);
+												setEnteredCategory("");
+											}}
+										>
+											<p className="text-gray-400 text-sm">Cancel</p>
+										</button>
+										<button
+											className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border bg-purple-500 rounded-md  mt-5"
+											onClick={() => {
+												setModalopen(false);
+												setEnteredCategory("");
+												addOption(enteredCategory);
+											}}
+										>
+											<p className="text-white text-sm">Create Type</p>
+										</button>
+									</div>
 								</div>
 							</div>
-							<div className="-mt-56">
-								<p className="text-xs max-w-[513px]">{inputSummaryValue}</p>
+						</div>
+					)}
+				</div>
+			</div>
+
+			<div>
+				<p className="text-sm mt-4">User Preview</p>
+				<div className="w-full h-72 border border-black rounded-md p-5">
+					<div className="p-4 w-full h-full border rounded-md shadow-md">
+						<div className="flex flex-col ">
+							<p className="text-lg">{className}</p>
+						</div>
+						<div className="flex flex-row">
+							<p className="text-xs whitespace-nowrap">No Rating</p>
+							<p className="text-xs ml-5">{creditNumber}</p>
+							{/* <p className="text-xs ml-5 whitespace-nowrap">
+								{date &&
+									(() => {
+										const dateObj = new Date(date);
+										return (
+											<>
+												{dateObj.toDateString()} at{" "}
+												{dateObj.toLocaleTimeString("en-US", {
+													hour: "2-digit",
+													minute: "2-digit",
+												})}
+												(
+												{dateObj
+													.toLocaleTimeString("en-US", {
+														timeZoneName: "short",
+													})
+													.split(" ")
+													.pop()}
+												)
+											</>
+										);
+									})()}
+							</p> */}
+							<div className="relative w-full h-[300px]">
+								{thumbnailPath && (
+									<div className="absolute right-0 top-0">
+										<img
+											src={thumbnailPath}
+											alt="Preview"
+											className="w-[397px] h-[250px] object-cover rounded-lg border border-gray-300 shadow-lg -mt-[44px]"
+										/>
+									</div>
+								)}
 							</div>
-							<div className="mt-16 flex flex-row">
-								<button className="w-40 h-9 bg-orange-400 rounded-lg">
-									Register{" "}
-									{price == 0 ? <span>(Free) </span> : <span>({price}) </span>}
-								</button>
-								<button className="ml-5 w-40 h-9 border border-orange-400 rounded-lg bg-white">
-									<p className="text-orange-400 text-xs">Learn More</p>
-								</button>
-							</div>
+						</div>
+						<div className="-mt-56">
+							<p className="text-xs max-w-[513px]">{discussion}</p>
+						</div>
+						<div className="mt-16 flex flex-row">
+							<button className="w-40 h-9 bg-orange-400 rounded-lg">
+								Register{" "}
+								{/* {price == 0 ? <span>(Free) </span> : <span>({price}) </span>} */}
+							</button>
+							<button className="ml-5 w-40 h-9 border border-orange-400 rounded-lg bg-white">
+								<p className="text-orange-400 text-xs">Learn More</p>
+							</button>
 						</div>
 					</div>
 				</div>
 			</div>
+			<SaveCourseButton prevLink="" nextLink={"pricing"} />
 		</div>
 	);
 };

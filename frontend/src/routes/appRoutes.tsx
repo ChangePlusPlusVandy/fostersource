@@ -281,37 +281,59 @@ function AppRoutes() {
 						/>
 						<Route
 							path="/admin/survey/responses"
-							element={
-								<SurveySummary></SurveySummary>
-							}
+							element={<SurveySummary></SurveySummary>}
 						/>
 						<Route
 							path="/admin/product/edit/:id"
 							element={
 								<AdminRoute>
-								<EditSideBar />
+									<EditSideBar />
 								</AdminRoute>
 							}
-							>
+						>
 							<Route index element={<Navigate to="details" replace />} />
 							<Route path="details" element={<EditCourse />} />
 							<Route path="pricing" element={<Pricing />} />
 							<Route
 								path="components"
 								element={
-								<ComponentPage
-									workshop={undefined}
-									survey={undefined}
-									certificate={undefined}
-								/>
+									<ComponentPage
+										workshop={undefined}
+										survey={undefined}
+										certificate={undefined}
+									/>
 								}
 							/>
 							<Route
 								path="workshop"
 								element={
-								<WorkshopCreation
-									workshopName={`Workshop | The Inclusive Family Support Model`}
-								/>
+									<WorkshopCreation
+										workshopName={`Workshop | The Inclusive Family Support Model`}
+									/>
+								}
+							/>
+							<Route path="speakers" element={<SpeakerPage />} />
+							<Route path="managers" element={<CourseManagerPage />} />
+						</Route>
+						<Route
+							path="/admin/product/create"
+							element={
+								<AdminRoute>
+									<EditSideBar />
+								</AdminRoute>
+							}
+						>
+							<Route index element={<Navigate to="details" replace />} />
+							<Route path="details" element={<EditCourse />} />
+							<Route path="pricing" element={<Pricing />} />
+							<Route
+								path="components"
+								element={
+									<ComponentPage
+										workshop={undefined}
+										survey={undefined}
+										certificate={undefined}
+									/>
 								}
 							/>
 							<Route path="speakers" element={<SpeakerPage />} />

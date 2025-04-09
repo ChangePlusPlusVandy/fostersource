@@ -31,6 +31,7 @@ export interface ICourse extends Document {
 	regStart: Date;
 	regEnd: Date;
 	productType: string[];
+	shortUrl: string;
 }
 
 // const HandoutSchema = new Schema(
@@ -83,13 +84,14 @@ const CourseSchema: Schema = new Schema(
 		},
 		managers: [
 			{
-			  type: Schema.Types.ObjectId,
-			  ref: "User",
+				type: Schema.Types.ObjectId,
+				ref: "User",
 			},
 		],
 		regStart: { type: Date, required: true },
 		regEnd: { type: Date, required: false },
 		productType: [{ type: String, required: false }],
+		shortUrl: { type: String, required: false },
 	},
 	{
 		timestamps: true,
