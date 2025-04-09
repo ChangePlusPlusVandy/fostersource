@@ -32,6 +32,7 @@ export interface ICourse extends Document {
 	regEnd: Date;
 	productType: string[];
 	shortUrl: string;
+	draft: boolean;
 }
 
 // const HandoutSchema = new Schema(
@@ -59,18 +60,18 @@ const CourseSchema: Schema = new Schema(
 		className: { type: String, required: true },
 		discussion: { type: String, required: false },
 		components: [{ type: Schema.Types.Mixed, required: false }],
-		isLive: { type: Boolean, required: true },
+		isLive: { type: Boolean, required: false },
 		categories: [{ type: String, required: false }],
-		creditNumber: { type: Number, required: true },
-		courseDescription: { type: String, required: true },
+		creditNumber: { type: Number, required: false },
+		courseDescription: { type: String, required: false },
 		thumbnailPath: { type: String, required: false },
-		cost: { type: Number, required: true },
+		cost: { type: Number, required: false },
 		instructorDescription: { type: String, required: false },
 		instructorRole: { type: String, required: false },
-		lengthCourse: { type: Number, required: true },
-		time: { type: Date, required: true },
-		instructorName: { type: String, required: true },
-		isInPerson: { type: Boolean, required: true },
+		lengthCourse: { type: Number, required: false },
+		time: { type: Date, required: false },
+		instructorName: { type: String, required: false },
+		isInPerson: { type: Boolean, required: false },
 		students: [
 			{
 				type: Schema.Types.ObjectId,
@@ -88,10 +89,11 @@ const CourseSchema: Schema = new Schema(
 				ref: "User",
 			},
 		],
-		regStart: { type: Date, required: true },
+		regStart: { type: Date, required: false },
 		regEnd: { type: Date, required: false },
 		productType: [{ type: String, required: false }],
 		shortUrl: { type: String, required: false },
+		draft: { type: Boolean, required: true, default: true },
 	},
 	{
 		timestamps: true,

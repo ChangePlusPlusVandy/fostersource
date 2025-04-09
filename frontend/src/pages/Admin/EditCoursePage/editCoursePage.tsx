@@ -1,13 +1,4 @@
-import React, {
-	useEffect,
-	useState,
-	useCallback,
-	useRef,
-	createContext,
-	useContext,
-} from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { AxiosError } from "axios";
+import React, { useEffect, useState, createContext, useContext } from "react";
 import adminApiClient from "../../../services/adminApiClient";
 import apiClient from "../../../services/apiClient";
 
@@ -186,148 +177,6 @@ const EditCourse = () => {
 		}
 	};
 
-	// const [coursesRecieved, setCoursesRecieved] = useState<boolean>(false);
-	// const getCourse = useCallback(async () => {
-	// 	try {
-	// 		const response = await apiClient.get(`/courses/${id}`);
-	// 		const course = response.data.data;
-	// 		setInputTitleValue(course.className);
-	// 		setSummaryValue(course.discussion);
-	// 		setDescriptionValue(course.courseDescription);
-	// 		setComponents(course.components);
-	// 		setDate(course.time);
-	// 		setCredit(course.creditNumber);
-	// 		setRegStart(course.regStart);
-	// 		setCourseType(course.courseType);
-	// 		setPrice(course.cost);
-	// 		setSelectedOptions(
-	// 			course.categories.map((cat: string) => ({ value: cat, label: cat }))
-	// 		);
-	// 		setSelectedProductTypes(course.productType);
-	// 		setIsInPerson(course.isInPerson);
-	// 		setIsLive(course.isLive);
-	// 		setFilePreview(course.thumbnailPath);
-	// 		console.log("thumbnail path:", course.thumbnailPath);
-	// 		setCoursesRecieved(true);
-	// 	} catch (e: unknown) {
-	// 		const err = e as AxiosError;
-	// 		if (err.response && err.response.status === 404) {
-	// 			console.log("Course does NOT exist.");
-	// 			return false;
-	// 		}
-	// 		console.log("Error:", e);
-	// 	}
-	// }, [id]);
-
-	// useEffect(() => {
-	// 	getCourse();
-	// }, [getCourse]);
-
-	// const checkInPersonIsLive = () => {
-	// 	if (selectedProductTypes.length > 0) {
-	// 		setIsLive(selectedProductTypes.includes("Virtual Training - Live"));
-	// 		setIsInPerson(selectedProductTypes.includes("In-Person Training"));
-	// 	} else {
-	// 		setIsLive(false);
-	// 		setIsInPerson(false);
-	// 	}
-	// };
-
-	// useEffect(() => {
-	// 	checkInPersonIsLive();
-	// }, [selectedProductTypes]);
-
-	// const updateCourse = async () => {
-	// 	if (!id) {
-	// 		console.error("No course ID found");
-	// 		return;
-	// 	}
-	// 	try {
-	// 		const selectedValues = selectedOptionsRef.current.map(
-	// 			(option) => option.value
-	// 		);
-	// 		const response = await apiClient.put(`/courses/${id}`, {
-	// 			className: inputTitleRef.current,
-	// 			discussion: inputSummaryValueRef.current,
-	// 			components: componentsRef.current,
-	// 			creditNumber: creditNumberRef.current,
-	// 			courseDescription: inputDescriptionValueRef.current,
-	// 			time: dateRef.current,
-	// 			thumbnailPath: filePreview,
-	// 			regStart: regStartRef.current,
-	// 			courseType: courseTypeRef.current,
-	// 			categories: selectedValues,
-	// 			productType: selectedProductRef.current,
-	// 			isInPerson: isInPersonRef.current,
-	// 			isLive: isLiveRef.current,
-	// 		});
-	// 		console.log(response);
-	// 	} catch (e) {
-	// 		console.log("update Course error " + e);
-	// 	}
-	// };
-
-	// const inputTitleRef = useRef(inputTitleValue);
-	// const inputSummaryValueRef = useRef(inputSummaryValue);
-	// const componentsRef = useRef(components);
-	// const creditNumberRef = useRef(credit);
-	// const inputDescriptionValueRef = useRef(inputDescriptionValue);
-	// const dateRef = useRef(date);
-	// const regStartRef = useRef(regStart);
-	// const courseTypeRef = useRef(courseType);
-	// const selectedOptionsRef = useRef(selectedOptions);
-	// const selectedProductRef = useRef(selectedProductTypes);
-	// const isLiveRef = useRef(isLive);
-	// const isInPersonRef = useRef(isInPerson);
-	// const optionsRef = useRef(options);
-	// const thumbnailPathRef = useRef(filePreview);
-
-	// // Sync the ref with the latest inputTitleValue:
-	// useEffect(() => {
-	// 	inputTitleRef.current = inputTitleValue;
-	// 	inputSummaryValueRef.current = inputSummaryValue;
-	// 	componentsRef.current = components;
-	// 	creditNumberRef.current = credit;
-	// 	inputDescriptionValueRef.current = inputDescriptionValue;
-	// 	dateRef.current = date;
-	// 	regStartRef.current = regStart;
-	// 	courseTypeRef.current = courseType;
-	// 	selectedOptionsRef.current = selectedOptions;
-	// 	selectedProductRef.current = selectedProductTypes;
-	// 	isLiveRef.current = isLive;
-	// 	isInPersonRef.current = isInPerson;
-	// 	optionsRef.current = options;
-	// 	thumbnailPathRef.current = filePreview;
-	// }, [
-	// 	inputTitleValue,
-	// 	inputSummaryValue,
-	// 	components,
-	// 	credit,
-	// 	inputDescriptionValue,
-	// 	date,
-	// 	regStart,
-	// 	courseType,
-	// 	selectedOptions,
-	// 	selectedProductTypes,
-	// 	isLive,
-	// 	isInPerson,
-	// 	options,
-	// 	filePreview,
-	// ]);
-
-	// useEffect(() => {
-	// 	return () => {
-	// 		if (coursesRecieved && inputTitleRef.current != "") {
-	// 			updateCourse();
-	// 		}
-	// 	};
-	// }, [coursesRecieved]);
-
-	// const updateOptionsLocally = async (category: string) => {
-	// 	setOldOptions(options);
-	// 	setOptions((options) => [...options, { value: category, label: category }]);
-	// };
-
 	const addOption = async (category: string) => {
 		try {
 			const response = await apiClient.post("/courseCategories", {
@@ -380,10 +229,6 @@ const EditCourse = () => {
 			</div>
 		);
 	};
-
-	// useEffect(() => {
-	// 	addOption();
-	// }, [options]);
 
 	return (
 		<div className="flex flex-col p-8 bg-white">
@@ -697,7 +542,7 @@ const EditCourse = () => {
 							</div>
 						</div>
 						<div className="-mt-56">
-							<p className="text-xs max-w-[513px]">{discussion}</p>
+							<p className="text-xs max-w-[513px]">{courseDescription}</p>
 						</div>
 						<div className="mt-16 flex flex-row">
 							<button className="w-40 h-9 bg-orange-400 rounded-lg">

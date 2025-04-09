@@ -216,14 +216,6 @@ function AppRoutes() {
 						<Route path="/admin/components/survey" element={<SurveyPage />} />
 						<Route path="/admin/products" element={<ProductPage />} />
 						<Route
-							path="/admin/create-workshop"
-							element={
-								<WorkshopCreation
-									workshopName={`Workshop | The Inclusive Family Support Model`}
-								/>
-							}
-						/>
-						<Route
 							path="/admin"
 							element={
 								<AdminRoute>
@@ -304,14 +296,7 @@ function AppRoutes() {
 									/>
 								}
 							/>
-							<Route
-								path="workshop"
-								element={
-									<WorkshopCreation
-										workshopName={`Workshop | The Inclusive Family Support Model`}
-									/>
-								}
-							/>
+							<Route path="workshop" element={<WorkshopCreation />} />
 							<Route path="speakers" element={<SpeakerPage />} />
 							<Route path="managers" element={<CourseManagerPage />} />
 						</Route>
@@ -336,6 +321,7 @@ function AppRoutes() {
 									/>
 								}
 							/>
+							<Route path="workshop" element={<WorkshopCreation />} />
 							<Route path="speakers" element={<SpeakerPage />} />
 							<Route path="managers" element={<CourseManagerPage />} />
 						</Route>

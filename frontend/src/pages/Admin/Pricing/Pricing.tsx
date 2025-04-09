@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { X as XIcon } from "lucide-react";
+import SaveCourseButton from "../../../components/SaveCourseButtons";
 
 interface UserType {
 	type: string;
@@ -292,6 +293,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 					</div>
 				</div>
 			</div>
+			<SaveCourseButton prevLink="details" nextLink="components" />
 		</div>
 	);
 };

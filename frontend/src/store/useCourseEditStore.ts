@@ -28,6 +28,7 @@ interface CourseEditState {
 	regEnd?: Date;
 	productType: string[];
 	shortUrl?: string;
+	draft: boolean;
 
 	// Methods
 	setField: <K extends keyof CourseEditState>(
@@ -67,6 +68,7 @@ const initialState: Omit<
 	regEnd: undefined,
 	productType: [],
 	shortUrl: undefined,
+	draft: true,
 };
 
 export const useCourseEditStore = create<CourseEditState>()((set) => ({

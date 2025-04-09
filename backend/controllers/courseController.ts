@@ -122,31 +122,33 @@ export const createCourse = async (
 			regEnd,
 			productType,
 			shortUrl,
+			draft,
 		} = req.body;
 
 		// Validate required fields
-		if (
-			!className ||
-			isLive === undefined ||
-			creditNumber === undefined ||
-			!courseDescription ||
-			!thumbnailPath ||
-			cost === undefined ||
-			!lengthCourse ||
-			!time ||
-			!instructorName ||
-			isInPerson === undefined ||
-			!courseType ||
-			!regEnd
-		) {
-			// console.log("[createCourse] Validation failed. Missing required fields");
-			res.status(400).json({
-				success: false,
-				message:
-					"Please provide className, isLive, creditNumber, thumbnailPath, cost, lengthCourse, time, instructorName, isInPerson, courseType, and regStart",
-			});
-			return;
-		}
+		if (!draft)
+			if (
+				!className ||
+				isLive === undefined ||
+				creditNumber === undefined ||
+				!courseDescription ||
+				!thumbnailPath ||
+				cost === undefined ||
+				!lengthCourse ||
+				!time ||
+				!instructorName ||
+				isInPerson === undefined ||
+				!courseType ||
+				!regEnd
+			) {
+				// console.log("[createCourse] Validation failed. Missing required fields");
+				res.status(400).json({
+					success: false,
+					message:
+						"Please provide className, isLive, creditNumber, thumbnailPath, cost, lengthCourse, time, instructorName, isInPerson, courseType, and regStart",
+				});
+				return;
+			}
 
 		// Check for existing course
 		let existingCourse = await Course.findOne({ className });
@@ -184,6 +186,7 @@ export const createCourse = async (
 			regEnd,
 			productType,
 			shortUrl,
+			draft,
 		});
 
 		const savedCourseResponse = await newCourseResponse.save();

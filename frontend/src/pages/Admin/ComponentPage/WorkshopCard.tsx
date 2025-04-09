@@ -3,7 +3,12 @@ import Dropdown from "../../../components/dropdown-select";
 import { Video, Calendar, Wifi } from "lucide-react";
 import DisplayBar from "./DisplayBar";
 import { WebinarType } from "../../../shared/types/Webinar";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
+import {
+	useCourseEditStore,
+	getCleanCourseData,
+} from "../../../store/useCourseEditStore";
+import apiClient from "../../../services/apiClient";
 
 interface WorkshopProps {
 	webinar?: WebinarType;
@@ -123,6 +128,25 @@ export default function WorkshopCard({
 		},
 	];
 
+	const navigate = useNavigate();
+	const course = getCleanCourseData();
+	const setAllFields = useCourseEditStore((state) => state.setAllFields);
+
+	const handleEditClick = async () => {
+		if (!course._id) {
+			try {
+				const res = await apiClient.post("/courses", course); // or course with defaults
+				const createdCourse = res.data.data;
+				setAllFields({ ...createdCourse });
+				navigate(`/admin/product/edit/${createdCourse._id}/workshop`);
+			} catch (e) {
+				console.error("Failed to create course before editing", e);
+			}
+		} else {
+			navigate(`/admin/product/edit/${course._id}/workshop`);
+		}
+	};
+
 	return (
 		<div className="border rounded-lg shadow p-4 bg-white w-full last:mr-6 h-[98%] pb-2">
 			<div>
@@ -180,12 +204,12 @@ export default function WorkshopCard({
 					</div>
 				</div>
 
-				<Link
-					to={"/admin/product/edit/workshop"}
+				<button
+					onClick={handleEditClick}
 					className="bg-[#8757A3] inline-block text-center text-white py-2 px-4 rounded w-full mt-4 transition transform active:scale-95 hover:scale-105"
 				>
 					Edit Component
-				</Link>
+				</button>
 
 				<div className="flex justify-center mt-2">
 					<button className="text-purple-600 underline transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95">
