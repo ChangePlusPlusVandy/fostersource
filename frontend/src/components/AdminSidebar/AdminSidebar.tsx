@@ -236,7 +236,7 @@ interface ProfileProps {
 // Display either profile information or log in button
 export function Profile({ isLoggedIn, name, role }: ProfileProps) {
 	return (
-		<div className="align-middle m-7 flex flex-row items-center w-full">
+		<div className="align-middle my-7 flex justify-center w-max mx-auto group-hover:justify-start group-hover:mx-6">
 			{!isLoggedIn && (
 				<div className="w-full flex justify-center">
 					<Link to={"/login"} className="w-full">
@@ -258,7 +258,7 @@ export function Profile({ isLoggedIn, name, role }: ProfileProps) {
 			)}
 			{/* Always render name/role based on isLoggedIn */}
 			{isLoggedIn && (
-				<div className="pl-3 align-middle profile-info">
+				<div className="hidden group-hover:block pl-3 align-middle profile-info">
 					<p className="text-xl font-medium text-wrap whitespace-nowrap">
 						{name}
 					</p>
@@ -312,7 +312,7 @@ export function AdminSidebarItems({
 					className="flex justify-center w-full gap-4 hover:text-[#7b4899] group-hover:justify-start"
 				>
 					{/* Always apply margin */}
-					<div className="">
+					<div>
 						<HomeIcon />
 					</div>
 					{/* Always show text */}
@@ -327,64 +327,66 @@ export function AdminSidebarItems({
 				const isExpanded = expandedItem === item.description;
 
 				return (
-					<li
-						key={item.description}
-						// Add class if item itself is active or if it's the expanded parent
-						className={`${isParentActive && !item.subItems ? "active" : ""} ${isExpanded ? "parent-expanded" : ""} justify-center`}
-					>
+					<div>
 						<hr className="border-t border-purple-200 border-2 rounded-full mb-4" />
-
-						<div
-							className="flex justify-center items-center w-full cursor-pointer group-hover:justify-between"
-							onClick={() => handleItemClick(item)}
+						<li
+							key={item.description}
+							tabIndex={0}
+							// Add class if item itself is active or if it's the expanded parent
+							className={`${isParentActive && !item.subItems ? "active" : ""} ${isExpanded ? "parent-expanded" : ""} justify-center`}
 						>
-							<div className="peer flex items-center hover:text-[#7b4899] gap-4">
-								{item.icon}
-								{/* Always show text */}
-								<div className="hidden group-hover:block">
-									{item.description}
+							<div
+								className="flex justify-center items-center w-full cursor-pointer group-hover:justify-between"
+								onClick={() => handleItemClick(item)}
+							>
+								<div className="peer flex items-center hover:text-[#7b4899] gap-4">
+									{item.icon}
+									{/* Always show text */}
+									<div className="hidden group-hover:block">
+										{item.description}
+									</div>
+								</div>
+								<div className="hidden group-hover:block peer-hover:text-[#7b4899]">
+									{item.subItems &&
+										(isExpanded ? (
+											<ChevronDown size={24} />
+										) : (
+											<ChevronRight size={24} />
+										))}
 								</div>
 							</div>
-							<div className="hidden group-hover:block peer-hover:text-[#7b4899]">
-								{item.subItems &&
-									(isExpanded ? (
-										<ChevronDown size={24} />
-									) : (
-										<ChevronRight size={24} />
-									))}
-							</div>
-						</div>
 
-						{/* Render Sub-menu if item has subItems, and is expanded */}
-						{item.subItems && isExpanded && (
-							<ul className="admin-submenu">
-								{item.subItems.map((subItem) => {
-									const isSubActive = activeItem === subItem.href;
-									return (
-										<li
-											key={subItem.href}
-											className={`${isSubActive ? "active" : ""} hover:text-[#7b4899]`}
-											onClick={(e) => {
-												e.stopPropagation(); // Prevent parent li click
-												handleItemClick(subItem);
-											}}
-										>
-											<Link
-												to={subItem.href}
-												className="flex items-center w-full"
+							{/* Render Sub-menu if item has subItems, and is expanded */}
+							{item.subItems && isExpanded && (
+								<ul className="admin-submenu">
+									{item.subItems.map((subItem) => {
+										const isSubActive = activeItem === subItem.href;
+										return (
+											<li
+												key={subItem.href}
+												className={`${isSubActive ? "active" : ""} hover:text-[#7b4899]`}
+												onClick={(e) => {
+													e.stopPropagation(); // Prevent parent li click
+													handleItemClick(subItem);
+												}}
 											>
-												<div className="mr-1">{subItem.icon}</div>{" "}
-												{/* Icon for sub-item */}
-												<span className="hidden group-hover:block">
-													{subItem.description}
-												</span>
-											</Link>
-										</li>
-									);
-								})}
-							</ul>
-						)}
-					</li>
+												<Link
+													to={subItem.href}
+													className="flex items-center w-full"
+												>
+													<div className="mr-1">{subItem.icon}</div>{" "}
+													{/* Icon for sub-item */}
+													<span className="hidden group-hover:block">
+														{subItem.description}
+													</span>
+												</Link>
+											</li>
+										);
+									})}
+								</ul>
+							)}
+						</li>
+					</div>
 				);
 			})}
 		</ul>
