@@ -166,23 +166,29 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 					<div className="w-full">
 						<li
 							key={"/admin/settings"}
-							className={`${activeItem === "/admin/settings" ? "active" : ""} w-full rounded-md p-2 hover:text-[#7b4899]`}
+							className={`${activeItem === "/admin/settings" ? "active" : ""} w-full rounded-md hover:text-[#7b4899] ${focusedItem === "Settings" ? "!text-[#7b4899]" : ""}`}
 							onClick={() => {
 								setActiveItem("/admin/settings");
 								window.location.href = "/admin/settings";
 							}}
 							onFocus={() => {
-								setFocusedItem("/admin/settings");
+								setFocusedItem("Settings");
 								setIsFocused(true);
 							}}
 							onBlur={() => {
 								setFocusedItem(null);
 								setIsFocused(false);
 							}}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.preventDefault();
+									window.location.href = "/admin/settings";
+								}
+							}}
 						>
 							<Link
 								to="/admin/settings"
-								className="flex justify-center w-full rounded-md gap-4"
+								className="flex justify-center w-full rounded-lg gap-4 py-1 px-2"
 							>
 								<div>
 									<Settings />
@@ -200,16 +206,15 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 					{isLoggedIn && (
 						<li
 							key={"logout"}
-							className="w-full px-2"
+							className="w-full"
 							onFocus={() => {
-								setFocusedItem("/admin/logout");
+								setFocusedItem("Logout");
 								setIsFocused(true);
 							}}
 							onBlur={() => {
 								setFocusedItem(null);
 								setIsFocused(false);
 							}}
-							tabIndex={0}
 							onClick={async () => {
 								try {
 									await authService.logout();
@@ -222,7 +227,8 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 							}}
 						>
 							<div
-								className={`flex justify-center w-full cursor-pointer gap-4 rounded-md hover:text-[#be0000] ${isFocused ? "!text-[#be0000]" : ""}`}
+								className={`flex justify-center w-full cursor-pointer gap-4 rounded-md hover:text-[#be0000] ${focusedItem === "Logout" ? "!text-[#be0000]" : ""} py-1 px-2`}
+								tabIndex={0}
 							>
 								{/* Always apply margin */}
 								<div>
