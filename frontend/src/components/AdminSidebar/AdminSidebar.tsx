@@ -403,6 +403,7 @@ export function AdminSidebarItems({
 												onClick={(e) => {
 													e.stopPropagation(); // Prevent parent li click
 													handleItemClick(subItem);
+													setIsFocused(false);
 												}}
 												onKeyDown={(e) => {
 													if (e.key === "Enter" || e.key === " ") {
