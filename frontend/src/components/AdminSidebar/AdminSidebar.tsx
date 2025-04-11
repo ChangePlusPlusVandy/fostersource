@@ -316,7 +316,9 @@ export function AdminSidebarItems({
 }: AdminSidebarItemsProps) {
 	const handleItemClick = (item: SidebarItem | SubItem) => {
 		// If it's a parent item with subItems, toggle expansion
-		if ("subItems" in item && item.subItems) {
+		if (item.description === "Home") {
+			window.location.href = "/";
+		} else if ("subItems" in item && item.subItems) {
 			setExpandedItem(
 				expandedItem === item.description ? null : item.description
 			);
