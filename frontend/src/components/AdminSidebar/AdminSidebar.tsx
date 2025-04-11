@@ -352,6 +352,15 @@ export function AdminSidebarItems({
 								setFocusedItem(null);
 								setIsFocused(false);
 							}}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.preventDefault();
+									handleItemClick(item);
+									if (item.href) {
+										window.location.href = item.href;
+									}
+								}
+							}}
 							// Add class if item itself is active or if it's the expanded parent
 							className={`${isParentActive && !item.subItems ? "active" : ""} ${isExpanded ? "parent-expanded" : ""} justify-center`}
 						>
