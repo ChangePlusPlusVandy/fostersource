@@ -1,14 +1,12 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./adminSidebar.css";
 import {
 	Users,
-	FileText,
 	Settings,
 	LogOut,
 	Layers,
 	LogIn,
-	KeyRound,
 	HomeIcon,
 	ChevronDown,
 	ChevronRight,
@@ -22,20 +20,6 @@ import {
 	Flag,
 } from "lucide-react";
 import authService from "../../services/authService";
-// import { log } from "console";
-// import internal from "stream";
-
-// User information
-export const userInfo = {
-	name: "First L.",
-	role: localStorage.user ? localStorage.user.role : "No role",
-	isLoggedIn: false,
-	isAdmin: localStorage.user
-		? localStorage.user.role === "staff"
-			? true
-			: false
-		: false,
-};
 
 // All sidebar entries - Updated structure
 // Define types for better structure
@@ -48,11 +32,16 @@ type SubItem = {
 type SidebarItem = {
 	icon: JSX.Element;
 	description: string;
-	href?: string; // Optional for parent items
+	href?: string;
 	subItems?: SubItem[];
 };
 
-export const adminSidebarItems: SidebarItem[] = [
+export const mainItems: SidebarItem[] = [
+	{
+		icon: <HomeIcon />,
+		description: "Home",
+		href: "/",
+	},
 	{
 		icon: <Layers />,
 		description: "Products",
@@ -108,22 +97,7 @@ export const adminSidebarItems: SidebarItem[] = [
 			},
 		],
 	},
-	// Note: Settings and Logout are handled separately below the main list usually
 ];
-
-//Admin information for conditional rendering
-export const admin = {
-	icon: <KeyRound />,
-	description: "Admin Tools",
-	href: "/admin",
-};
-
-// Logout information for conditional rendering
-export const logout = {
-	icon: <LogOut />,
-	description: "Logout",
-	href: "#",
-};
 
 // State of collapsibility, abstracted
 interface AdminSidebarProps {
@@ -141,13 +115,17 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 	const [activeItem, setActiveItem] = useState<string>(
 		window.location.pathname
 	);
+
 	// State to track which parent item is expanded
 	const [expandedItem, setExpandedItem] = useState<string | null>(null);
+	const [isFocused, setIsFocused] = useState(false);
+	const [focusedItem, setFocusedItem] = useState<string | null>(null);
 
 	// Determine if the current active item belongs to an expanded parent
-	const parentOfActive = adminSidebarItems.find((item) =>
+	const parentOfActive = mainItems.find((item) =>
 		item.subItems?.some((sub) => sub.href === activeItem)
 	);
+
 	// Initialize expandedItem if an active sub-item is found on load
 	useState(() => {
 		if (parentOfActive) {
@@ -155,10 +133,21 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 		}
 	});
 
+	useEffect(() => {
+		console.log("isFocused", isFocused);
+		console.log("focusedItem", focusedItem);
+	}, [isFocused, focusedItem]);
+
 	return (
-		// Removed dynamic 'expanded' class
-		<div className="admin-sidebar hover:w-64 z-10 group">
-			<Profile isLoggedIn={isLoggedIn} name={name} role={role} />
+		<div
+			className={`admin-sidebar ${isFocused ? "w-64" : "w-20"} hover:w-64 z-10 group select-none`}
+		>
+			<Profile
+				isLoggedIn={isLoggedIn}
+				name={name}
+				role={role}
+				isFocused={isFocused}
+			/>
 			<AdminSidebarItems
 				isLoggedIn={isLoggedIn}
 				setIsLoggedIn={setIsLoggedIn}
@@ -166,8 +155,11 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 				setActiveItem={setActiveItem}
 				expandedItem={expandedItem}
 				setExpandedItem={setExpandedItem}
+				isFocused={isFocused}
+				setIsFocused={setIsFocused}
+				focusedItem={focusedItem}
+				setFocusedItem={setFocusedItem}
 			/>
-			{/* Separate Settings and Logout */}
 			<div className="admin-footer-items">
 				<ul className="admin-menu flex flex-col items-center gap-2 p-4">
 					{/* Settings Item */}
@@ -177,7 +169,15 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 							className={`${activeItem === "/admin/settings" ? "active" : ""} w-full rounded-md p-2 hover:text-[#7b4899]`}
 							onClick={() => {
 								setActiveItem("/admin/settings");
-								window.location.href = "/admin/settings"; // Simple navigation for example
+								window.location.href = "/admin/settings";
+							}}
+							onFocus={() => {
+								setFocusedItem("/admin/settings");
+								setIsFocused(true);
+							}}
+							onBlur={() => {
+								setFocusedItem(null);
+								setIsFocused(false);
 							}}
 						>
 							<Link
@@ -187,7 +187,11 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 								<div>
 									<Settings />
 								</div>
-								<span className="hidden group-hover:block">Settings</span>
+								<span
+									className={`${isFocused ? "block" : "hidden group-hover:block"}`}
+								>
+									Settings
+								</span>
 							</Link>
 						</li>
 					</div>
@@ -197,6 +201,15 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 						<li
 							key={"logout"}
 							className="w-full px-2"
+							onFocus={() => {
+								setFocusedItem("/admin/logout");
+								setIsFocused(true);
+							}}
+							onBlur={() => {
+								setFocusedItem(null);
+								setIsFocused(false);
+							}}
+							tabIndex={0}
 							onClick={async () => {
 								try {
 									await authService.logout();
@@ -209,15 +222,18 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 							}}
 						>
 							<div
-								tabIndex={0}
-								className="flex justify-center w-full cursor-pointer gap-4 rounded-md hover:text-[#be0000]"
+								className={`flex justify-center w-full cursor-pointer gap-4 rounded-md hover:text-[#be0000] ${isFocused ? "!text-[#be0000]" : ""}`}
 							>
 								{/* Always apply margin */}
 								<div>
 									<LogOut />
 								</div>
 								{/* Always show text */}
-								<span className="hidden group-hover:block">Logout</span>
+								<span
+									className={`${isFocused ? "block" : "hidden group-hover:block"}`}
+								>
+									Logout
+								</span>
 							</div>
 						</li>
 					)}
@@ -231,12 +247,15 @@ interface ProfileProps {
 	isLoggedIn: boolean;
 	name?: string;
 	role?: string;
+	isFocused: boolean;
 }
 
 // Display either profile information or log in button
-export function Profile({ isLoggedIn, name, role }: ProfileProps) {
+export function Profile({ isLoggedIn, name, role, isFocused }: ProfileProps) {
 	return (
-		<div className="align-middle my-7 flex justify-center w-max mx-auto group-hover:justify-start group-hover:mx-6">
+		<div
+			className={`align-middle my-7 flex justify-center w-max mx-auto group-hover:!justify-start group-hover:mx-6 ${isFocused ? "!justify-start" : ""}`}
+		>
 			{!isLoggedIn && (
 				<div className="w-full flex justify-center">
 					<Link to={"/login"} className="w-full">
@@ -252,13 +271,15 @@ export function Profile({ isLoggedIn, name, role }: ProfileProps) {
 					src={
 						"https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png"
 					}
-					alt="Profile"
+					alt="Your profile picture"
 					className="profile-pic"
 				/>
 			)}
 			{/* Always render name/role based on isLoggedIn */}
 			{isLoggedIn && (
-				<div className="hidden group-hover:block pl-3 align-middle profile-info">
+				<div
+					className={`${isFocused ? "block" : "hidden group-hover:block"} pl-3 align-middle profile-info`}
+				>
 					<p className="text-xl font-medium text-wrap whitespace-nowrap">
 						{name}
 					</p>
@@ -272,10 +293,14 @@ export function Profile({ isLoggedIn, name, role }: ProfileProps) {
 interface AdminSidebarItemsProps {
 	isLoggedIn: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
-	activeItem: string; // Pass activeItem state
-	setActiveItem: Dispatch<SetStateAction<string>>; // Pass setter
-	expandedItem: string | null; // Pass expandedItem state
-	setExpandedItem: Dispatch<SetStateAction<string | null>>; // Pass setter
+	activeItem: string;
+	setActiveItem: Dispatch<SetStateAction<string>>;
+	expandedItem: string | null;
+	setExpandedItem: Dispatch<SetStateAction<string | null>>;
+	isFocused: boolean;
+	setIsFocused: Dispatch<SetStateAction<boolean>>;
+	focusedItem: string | null;
+	setFocusedItem: Dispatch<SetStateAction<string | null>>;
 }
 
 // Display and handle sidebar entries - Updated Logic
@@ -284,6 +309,10 @@ export function AdminSidebarItems({
 	setActiveItem,
 	expandedItem,
 	setExpandedItem,
+	isFocused,
+	setIsFocused,
+	focusedItem,
+	setFocusedItem,
 }: AdminSidebarItemsProps) {
 	const handleItemClick = (item: SidebarItem | SubItem) => {
 		// If it's a parent item with subItems, toggle expansion
@@ -294,33 +323,12 @@ export function AdminSidebarItems({
 		} else if ("href" in item && item.href) {
 			// If it's a clickable item (parent without subItems or a subItem)
 			setActiveItem(item.href);
-			// Potentially navigate using Link or programmatically
-			// For simplicity here, we assume Link handles navigation
 		}
 	};
 
 	return (
-		<ul className="admin-menu flex flex-col flex-grow gap-5 p-6">
-			<li
-				key={"/"}
-				onClick={() => {
-					window.location.pathname = "/"; // Or use Link/navigate
-				}}
-			>
-				<Link
-					to="/"
-					className="flex justify-center w-full gap-4 hover:text-[#7b4899] group-hover:justify-start"
-				>
-					{/* Always apply margin */}
-					<div>
-						<HomeIcon />
-					</div>
-					{/* Always show text */}
-					<span className="hidden group-hover:block">Home</span>
-				</Link>
-			</li>
-
-			{adminSidebarItems.map((item) => {
+		<ul className="admin-menu flex flex-col flex-grow gap-5 p-4">
+			{mainItems.map((item) => {
 				const isParentActive =
 					expandedItem === item.description ||
 					(item.href && activeItem === item.href);
@@ -328,25 +336,41 @@ export function AdminSidebarItems({
 
 				return (
 					<div>
-						<hr className="border-t border-purple-200 border-2 rounded-full mb-4" />
+						{item.description !== "Home" && (
+							<hr className="border-t border-purple-200 border-2 rounded-full mb-1" />
+						)}
 						<li
 							key={item.description}
 							tabIndex={0}
+							onFocus={() => {
+								setFocusedItem(item.description);
+								setIsFocused(true);
+							}}
+							onBlur={() => {
+								setFocusedItem(null);
+								setIsFocused(false);
+							}}
 							// Add class if item itself is active or if it's the expanded parent
 							className={`${isParentActive && !item.subItems ? "active" : ""} ${isExpanded ? "parent-expanded" : ""} justify-center`}
 						>
 							<div
-								className="flex justify-center items-center w-full cursor-pointer group-hover:justify-between"
+								className={`flex justify-center items-center w-full cursor-pointer group-hover:justify-between ${isFocused ? "justify-between" : "justify-center"} p-2 rounded-lg`}
 								onClick={() => handleItemClick(item)}
 							>
-								<div className="peer flex items-center hover:text-[#7b4899] gap-4">
+								<div
+									className={`peer flex items-center hover:text-[#7b4899] gap-4 ${focusedItem === item.description ? "text-[#7b4899]" : ""}`}
+								>
 									{item.icon}
 									{/* Always show text */}
-									<div className="hidden group-hover:block">
+									<div
+										className={`${isFocused ? "block" : "hidden group-hover:block"}`}
+									>
 										{item.description}
 									</div>
 								</div>
-								<div className="hidden group-hover:block peer-hover:text-[#7b4899]">
+								<div
+									className={`${isFocused ? "block" : "hidden group-hover:block"} peer-hover:text-[#7b4899] ${focusedItem === item.description ? "text-[#7b4899]" : ""}`}
+								>
 									{item.subItems &&
 										(isExpanded ? (
 											<ChevronDown size={24} />
@@ -364,19 +388,35 @@ export function AdminSidebarItems({
 										return (
 											<li
 												key={subItem.href}
-												className={`${isSubActive ? "active" : ""} hover:text-[#7b4899]`}
+												className={`${isSubActive ? "active" : ""} hover:text-[#7b4899] ml-3 p-2 mr-1 rounded-lg`}
 												onClick={(e) => {
 													e.stopPropagation(); // Prevent parent li click
 													handleItemClick(subItem);
 												}}
+												onKeyDown={(e) => {
+													if (e.key === "Enter" || e.key === " ") {
+														e.preventDefault();
+														handleItemClick(subItem);
+													}
+												}}
 											>
 												<Link
 													to={subItem.href}
-													className="flex items-center w-full"
+													className={`flex items-center w-full ${focusedItem === subItem.description ? "text-[#7b4899]" : ""} p-1`}
+													onFocus={() => {
+														setFocusedItem(subItem.description);
+														setIsFocused(true);
+													}}
+													onBlur={() => {
+														setFocusedItem(null);
+														setIsFocused(false);
+													}}
+													tabIndex={0}
 												>
 													<div className="mr-1">{subItem.icon}</div>{" "}
-													{/* Icon for sub-item */}
-													<span className="hidden group-hover:block">
+													<span
+														className={`${isFocused ? "block" : "hidden group-hover:block"}`}
+													>
 														{subItem.description}
 													</span>
 												</Link>
