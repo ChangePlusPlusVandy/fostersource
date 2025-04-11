@@ -254,7 +254,7 @@ interface ProfileProps {
 export function Profile({ isLoggedIn, name, role, isFocused }: ProfileProps) {
 	return (
 		<div
-			className={`align-middle my-7 flex justify-center w-max mx-auto group-hover:!justify-start group-hover:mx-6 ${isFocused ? "!justify-start" : ""}`}
+			className={`align-middle my-7 flex justify-center w-max mx-auto group-hover:mx-6 ${isFocused ? "!mx-6" : ""}`}
 		>
 			{!isLoggedIn && (
 				<div className="w-full flex justify-center">
@@ -329,7 +329,7 @@ export function AdminSidebarItems({
 	};
 
 	return (
-		<ul className="admin-menu flex flex-col flex-grow gap-5 p-4">
+		<ul className="admin-menu flex flex-col flex-grow px-4">
 			{mainItems.map((item) => {
 				const isParentActive =
 					expandedItem === item.description ||
@@ -339,7 +339,7 @@ export function AdminSidebarItems({
 				return (
 					<div>
 						{item.description !== "Home" && (
-							<hr className="border-t border-purple-200 border-2 rounded-full mb-1" />
+							<hr className="border-t border-purple-200 border-2 rounded-full my-2" />
 						)}
 						<li
 							key={item.description}
@@ -399,6 +399,7 @@ export function AdminSidebarItems({
 													if (e.key === "Enter" || e.key === " ") {
 														e.preventDefault();
 														handleItemClick(subItem);
+														window.location.href = subItem.href;
 													}
 												}}
 											>
