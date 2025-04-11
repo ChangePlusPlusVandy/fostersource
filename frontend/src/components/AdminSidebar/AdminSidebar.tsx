@@ -362,7 +362,7 @@ export function AdminSidebarItems({
 								}
 							}}
 							// Add class if item itself is active or if it's the expanded parent
-							className={`${isParentActive && !item.subItems ? "active" : ""} ${isExpanded ? "parent-expanded" : ""} justify-center`}
+							className={`${isParentActive && !item.subItems ? "active" : ""} ${isExpanded ? "parent-expanded" : ""} justify-center rounded-lg`}
 						>
 							<div
 								className={`flex justify-center items-center w-full cursor-pointer group-hover:justify-between ${isFocused ? "justify-between" : "justify-center"} p-2 rounded-lg`}
@@ -393,13 +393,13 @@ export function AdminSidebarItems({
 
 							{/* Render Sub-menu if item has subItems, and is expanded */}
 							{item.subItems && isExpanded && (
-								<ul className="admin-submenu">
+								<ul className="admin-submenu py-1">
 									{item.subItems.map((subItem) => {
 										const isSubActive = activeItem === subItem.href;
 										return (
 											<li
 												key={subItem.href}
-												className={`${isSubActive ? "active" : ""} hover:text-[#7b4899] ml-3 p-2 mr-1 rounded-lg`}
+												className={`${isSubActive ? "active" : ""} hover:text-[#7b4899] ml-3 mr-1 rounded-lg`}
 												onClick={(e) => {
 													e.stopPropagation(); // Prevent parent li click
 													handleItemClick(subItem);
@@ -415,7 +415,7 @@ export function AdminSidebarItems({
 											>
 												<Link
 													to={subItem.href}
-													className={`flex items-center w-full ${focusedItem === subItem.description ? "text-[#7b4899]" : ""} p-1`}
+													className={`flex items-center w-full ${focusedItem === subItem.description ? "text-[#7b4899]" : ""} px-2 py-1 rounded-lg`}
 													onFocus={() => {
 														setFocusedItem(subItem.description);
 														setIsFocused(true);
