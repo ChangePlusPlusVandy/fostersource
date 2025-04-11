@@ -99,7 +99,6 @@ export const mainItems: SidebarItem[] = [
 	},
 ];
 
-// State of collapsibility, abstracted
 interface AdminSidebarProps {
 	isLoggedIn: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
@@ -281,7 +280,6 @@ export function Profile({ isLoggedIn, name, role, isFocused }: ProfileProps) {
 					className="profile-pic"
 				/>
 			)}
-			{/* Always render name/role based on isLoggedIn */}
 			{isLoggedIn && (
 				<div
 					className={`${isFocused ? "block" : "hidden group-hover:block"} pl-3 align-middle profile-info`}
@@ -421,10 +419,12 @@ export function AdminSidebarItems({
 											>
 												<Link
 													to={subItem.href}
-													className={`flex items-center w-full ${focusedItem === subItem.description ? "text-[#7b4899]" : ""} px-2 py-1 rounded-lg`}
+													className={`flex items-center w-full px-2 py-1 rounded-lg`}
 													onFocus={() => {
-														setFocusedItem(subItem.description);
-														setIsFocused(true);
+														setTimeout(() => {
+															setFocusedItem(subItem.description);
+															setIsFocused(true);
+														}, 0);
 													}}
 													onBlur={() => {
 														setFocusedItem(null);
@@ -432,9 +432,13 @@ export function AdminSidebarItems({
 													}}
 													tabIndex={0}
 												>
-													<div className="mr-1">{subItem.icon}</div>{" "}
+													<div
+														className={`mr-1 ${focusedItem === subItem.description ? "text-[#7b4899]" : ""}`}
+													>
+														{subItem.icon}
+													</div>{" "}
 													<span
-														className={`${isFocused ? "block" : "hidden group-hover:block"}`}
+														className={`${isFocused ? "block" : "hidden group-hover:block"} ${focusedItem === subItem.description ? "text-[#7b4899]" : ""}`}
 													>
 														{subItem.description}
 													</span>
