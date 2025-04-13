@@ -38,6 +38,7 @@ import Registrants from "../pages/Admin/NewProductPage/Registrants";
 import SurveySummary from "../pages/Admin/SurveySummaryPage/SurveySummary";
 import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
+import FAQPage from "../pages/FAQPage/FAQPage";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -187,6 +188,7 @@ function AppRoutes() {
 								</PrivateRoute>
 							}
 						/>
+						<Route path="/faqs" element={<FAQPage />} />
 						<Route
 							path="/courseDetails"
 							element={<CoursePage setCartItemCount={setCartItemCount} />}
