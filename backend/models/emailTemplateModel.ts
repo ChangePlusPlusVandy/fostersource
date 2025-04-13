@@ -17,6 +17,6 @@ const emailSchema: Schema = new Schema(
   }
 );
 
-const Email: Model<IEmail> = mongoose.model<IEmail>("Email", emailSchema);
+const EmailTemplate: Model<IEmail> = mongoose.model<IEmail>("Email", emailSchema);
 
-export default Email;
+export default EmailTemplate;

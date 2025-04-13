@@ -6,6 +6,14 @@ import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
 import SurveyModal from "./SurveyModal";
 
+interface CartItem {
+	className: string;
+	cost: number;
+	creditNumber: number;
+	instructor: string;
+	_id: string;
+}
+
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
 }
@@ -16,6 +24,17 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const location = useLocation();
 	const searchParams = new URLSearchParams(location.search);
 	const courseId = searchParams.get("courseId");
+
+	const user = JSON.parse(localStorage.getItem("user") || "{}");
+	const cartItems: CartItem[] = user?.cart ? user.cart : [];
+	const checkCourseInCart = () =>{
+		if(cartItems){
+			if(cartItems.some(item => item._id === courseId)){
+				setIsAdded(true);
+			}
+		}
+	}
+
 
 	const navigate = useNavigate();
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(
@@ -99,6 +118,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 		}
 	};
 
+
 	// useEffect(() => {
 	// 	const id = queryParams.get("courseId");
 	// 	setCourseId(id || "");
@@ -106,6 +126,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 
 	useEffect(() => {
 		fetchCourse();
+		checkCourseInCart();
 	}, [courseId]);
 
 	useEffect(() => {
