@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import PDFDocument from 'pdfkit'; 
+import cloudinary from '../config/cloudinary';
+import axios from 'axios';
 
 export const generateCertificate = async (
   req: Request, 
@@ -26,9 +28,14 @@ export const generateCertificate = async (
 
     doc.pipe(res);
 
-    const backgroundPath = `./uploads/${certificateType}Certificate.png`;
-    doc.image(backgroundPath, 0, 0, { width: doc.page.width, height: doc.page.height }); 
-
+    const backgroundPath = cloudinary.url(`${certificateType}Certificate`, {
+      fetch_format: 'auto',
+      quality: 'auto',
+    });
+    
+    const backgroundImage = await axios.get(backgroundPath, { responseType: 'arraybuffer' }); 
+    doc.image(backgroundImage.data, 0, 0, { width: doc.page.width, height: doc.page.height }); 
+    
     if (certificateType === "completion") {
       doc.font('Helvetica-Bold').fillColor('#071860');
       doc.fontSize(22).text(participantName, 160, 275, { width: 520, height: 40, align: 'center' }); 

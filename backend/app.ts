@@ -88,7 +88,7 @@ app.use("/api/handout", verifyFirebaseAuth, handoutRoutes);
 app.use('/api/emails', verifyFirebaseAuth, emailRoutes);
 app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
 app.use("/api/upload", verifyFirebaseAuth, uploadRoutes);
-app.use("/api/certificatePDFs", pdfRoutes); 
+app.use("/api/certificatePDFs", verifyFirebaseAuth, pdfRoutes); 
 
 // Error middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
