@@ -9,7 +9,7 @@ const Survey = () => {
             _id: '',
             question: '',
             explanation: '',
-            isMCQ: false,
+            answerType: 'Text Input',
             answers: [''],
             isRequired: false,
             isEdited: false,
@@ -55,7 +55,7 @@ const Survey = () => {
                 _id: '',
                 question: '',
                 explanation: '',
-                isMCQ: false,
+                answerType: 'Text Input',
                 answers: [''],
                 isRequired: true,
                 isEdited: true,
@@ -85,11 +85,11 @@ const Survey = () => {
         setHasUnsavedChanges(true);
     };
 
-    const handleAnswerTypeChange = (index: number, value: boolean) => {
+    const handleAnswerTypeChange = (index: number, value: string) => {
         const updatedQuestions = [...questions];
-        updatedQuestions[index].isMCQ = value;
-        // Reset options (for Multiple Choice)
-        if (value) {
+        updatedQuestions[index].answerType = value;
+        // Reset options (for Multiple Choice and Multi-select)
+        if (value !== 'Text Input') {
             updatedQuestions[index].answers = [''];
         }
         setQuestions(updatedQuestions);
@@ -162,7 +162,7 @@ const Survey = () => {
                         const response = await apiClient.post("http://localhost:5001/api/questions", {
                             question: q.question,
                             explanation: q.explanation,
-                            isMCQ: q.isMCQ,
+                            answerType: q.answerType,
                             answers: q.answers || [],
                             isRequired: q.isRequired,
                         });
@@ -255,17 +255,18 @@ const Survey = () => {
                                 <label htmlFor={`answer-type-${index}`} className="block font-semibold">Answer Type</label>
                                 <select
                                     id={`answer-type-${index}`}
-                                    value={question.isMCQ ? "true" : "false"}
-                                    onChange={(e) => handleAnswerTypeChange(index, e.target.value === "true")}
+                                    value={question.answerType}
+                                    onChange={(e) => handleAnswerTypeChange(index, e.target.value)}
                                     className="w-3/4 mt-2 p-3 border rounded-md"
                                 >
-                                    <option value="false">Text Input</option>
-                                    <option value="true">Multiple Choice</option>
+                                    <option value="Text Input">Text Input</option>
+                                    <option value="Multiple Choice">Multiple Choice</option>
+                                    <option value="Multi-select">Multi-select</option>
                                 </select>
                             </div>
 
                             {/* Options (for Multiple Choice) */}
-                            {(question.isMCQ) && (
+                            {(question.answerType === 'Multiple Choice' || question.answerType === 'Multi-select') && (
                                 <div className="mt-4 space-y-3 pl-16">
                                     {question.answers.map((answer, oIndex) => (
                                         <div key={oIndex} className="flex items-center space-x-3">
