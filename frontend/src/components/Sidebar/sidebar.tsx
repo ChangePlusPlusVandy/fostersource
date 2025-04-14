@@ -17,6 +17,8 @@ import {
 
 import authService from "../../services/authService";
 import { log } from "console";
+import { User } from "../../shared/types/user";
+import apiClient from "../../services/apiClient";
 
 // User information
 export const userInfo = {
@@ -127,7 +129,6 @@ export function Sidebar({
 			<SidebarItems
 				isCollapsed={isCollapsed}
 				isLoggedIn={isLoggedIn}
-				isAdmin={userInfo.isAdmin}
 				setIsLoggedIn={setIsLoggedIn}
 				cartItemCount={cartItemCount}
 			/>
@@ -176,7 +177,6 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 
 interface SidebarItemsProps {
 	isLoggedIn: boolean;
-	isAdmin: boolean;
 	isCollapsed: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 	cartItemCount: number;
@@ -186,10 +186,26 @@ interface SidebarItemsProps {
 export function SidebarItems({
 	isCollapsed,
 	isLoggedIn,
-	isAdmin,
 	setIsLoggedIn,
 	cartItemCount,
 }: SidebarItemsProps) {
+	const [isAdmin, setIsAdmin] = useState(
+		localStorage.user && JSON.parse(localStorage.user).role === "staff"
+	);
+
+	// const checkAdmin = async () => {
+	// 	try {
+	// 		const response = await apiClient.get("/users/is-admin");
+	// 		setIsAdmin(response.data.isAdmin);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// };
+
+	// useEffect(() => {
+	// 	checkAdmin();
+	// }, []);
+
 	const handleLogOut = async () => {
 		try {
 			await authService.logout();
@@ -235,10 +251,13 @@ export function SidebarItems({
 			{isAdmin && (
 				<li
 					className={`${adminActive}`}
-					onClick={() => setActiveItem(window.location.pathname)}
+					onClick={() => {
+						setActiveItem(window.location.pathname);
+						window.location.href = admin.href;
+					}}
 				>
 					<div className={`${iconDescMargin}`}>{admin.icon}</div>
-					<Link to={admin.href}>{!isCollapsed && admin.description}</Link>
+					<Link to={""}>{!isCollapsed && admin.description}</Link>
 				</li>
 			)}
 			{sidebarItems}

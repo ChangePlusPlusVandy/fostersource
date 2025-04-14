@@ -33,31 +33,6 @@ export const createQuestionResponse = async (
 	}
 };
 
-// @desc    Update a question response
-// @route   PUT /api/questionResponses/:id
-// @access  Public
-export const updateQuestionResponse = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
-	try {
-		const { id } = req.params;
-		const update = req.body;
-		const updatedResponse = await QuestionResponse.findByIdAndUpdate(
-			id,
-			update,
-			{ new: true }
-		);
-		if (!updatedResponse) {
-			res.status(404).json({ message: "Response not found" });
-			return;
-		}
-		res.status(200).json(updatedResponse);
-	} catch (error) {
-		res.status(500).json({ message: "PUT error" });
-	}
-};
-
 // @desc    Delete a question response
 // @route   DELETE /api/questionResponses/:id
 // @access  Public
