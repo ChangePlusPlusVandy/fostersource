@@ -1,15 +1,9 @@
 import React, { useState } from "react";
 import authService from "../../services/authService";
-import familyImage from "./family.png"; // Use the same image as in Login
+import familyImage from "./family.png"; 
+import Select from 'react-select'
+import countryList from 'react-select-country-list'
 import fostersourceImage from "./fostersource-logo.png";
-
-const countries = [
-	"United States",
-	"Canada",
-	"United Kingdom",
-	"Australia",
-	// Add more countries as needed
-];
 
 const states = [
 	"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",
@@ -260,16 +254,12 @@ const Register: React.FC = () => {
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">Country (optional)</label>
-									<select
-										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-										value={country}
-										onChange={(e) => setCountry(e.target.value)}
-									>
-										<option value="">Choose a Country</option>
-										{countries.map((country) => (
-											<option key={country} value={country}>{country}</option>
-										))}
-									</select>
+									<Select
+										options={countryList().getData().map(country => ({ value: country.value, label: country.label }))}
+										value={country ? { value: country, label: country } : null}
+										onChange={(selectedOption) => setCountry(selectedOption ? selectedOption.value : "")}
+										placeholder="Choose a Country"
+									/>
 								</div>
 								<button
 									type="submit"
