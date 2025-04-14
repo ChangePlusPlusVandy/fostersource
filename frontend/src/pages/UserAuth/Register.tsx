@@ -3,6 +3,14 @@ import authService from "../../services/authService";
 import familyImage from "./family.png"; // Use the same image as in Login
 import fostersourceImage from "./fostersource-logo.png";
 
+const countries = [
+	"United States",
+	"Canada",
+	"United Kingdom",
+	"Australia",
+	// Add more countries as needed
+];
+
 const Register: React.FC = () => {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
@@ -154,10 +162,10 @@ const Register: React.FC = () => {
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">Phone Number (optional)</label>
 									<input
-										type="text"
+										type="tel"
 										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
 										value={phone}
-										onChange={(e) => setPhone(e.target.value)}
+										onChange={(e) => setPhone(e.target.value.replace(/[^0-9+]/g, ''))}
 									/>
 								</div>
 								<div>
@@ -213,7 +221,7 @@ const Register: React.FC = () => {
 										type="text"
 										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
 										value={state}
-										onChange={(e) => setState(e.target.value)}
+										onChange={(e) => setState(e.target.value.replace(/[^a-zA-Z]/g, ''))}
 									/>
 								</div>
 								<div>
@@ -222,17 +230,21 @@ const Register: React.FC = () => {
 										type="text"
 										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
 										value={zip}
-										onChange={(e) => setZip(e.target.value)}
+										onChange={(e) => setZip(e.target.value.replace(/[^0-9]/g, ''))}
 									/>
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">Country (optional)</label>
-									<input
-										type="text"
+									<select
 										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
 										value={country}
 										onChange={(e) => setCountry(e.target.value)}
-									/>
+									>
+										<option value="">Choose a Country</option>
+										{countries.map((country) => (
+											<option key={country} value={country}>{country}</option>
+										))}
+									</select>
 								</div>
 								<button
 									type="submit"
