@@ -44,6 +44,7 @@ const EditProgressModal: React.FC<EditProgressModalProps> = ({ isOpen, onClose, 
   if (!isOpen) return null;
 
   const handleComponentChange = (component: 'webinar' | 'survey' | 'certificate', checked: boolean) => {
+    console.log('Component change:', component, checked);
     const updatedProgress = {
       ...editedProgress,
       completedComponents: {
@@ -52,9 +53,20 @@ const EditProgressModal: React.FC<EditProgressModalProps> = ({ isOpen, onClose, 
       }
     };
     
+    // Check if all components are complete
+    const allComplete = Object.values(updatedProgress.completedComponents).every(Boolean);
+    updatedProgress.isComplete = allComplete;
+    if (allComplete && !updatedProgress.dateCompleted) {
+      updatedProgress.dateCompleted = new Date();
+    }
+    
     setEditedProgress(updatedProgress);
-    // Immediately save changes
-    onSave(updatedProgress);
+  };
+
+  const handleSave = () => {
+    console.log('Save button clicked');
+    console.log('Current edited progress:', editedProgress);
+    onSave(editedProgress);
   };
 
   return (
@@ -123,647 +135,26 @@ const EditProgressModal: React.FC<EditProgressModalProps> = ({ isOpen, onClose, 
               </label>
             </div>
           </div>
+
+          <div className="flex justify-end space-x-2 mt-6">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-[#8757a3] text-white rounded hover:bg-[#6d4a92]"
+            >
+              Save Changes
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
-
-// Mock data for testing
-const mockCourses = [
-  {
-    _id: '67acf95247f5d8867107e887',
-    className: 'Introduction to Philosophy',
-    discussion: '',
-    cost: 0,
-    instructorName: '',
-    instructorDescription: '',
-    instructorRole: '',
-    lengthCourse: 0,
-    time: new Date(),
-    isInPerson: false,
-    isLive: false,
-    categories: [],
-    creditNumber: 0,
-    courseDescription: '',
-    thumbnailPath: '',
-    students: ['user1', 'user2', 'user3', 'user4', 'user5', 'user6', 'user7', 'user8', 'user9', 'user10', 'user11', 'user12', 'user13', 'user14', 'user15', 'user16', 'user17', 'user18', 'user19', 'user20'],
-    regStart: new Date(),
-    regEnd: new Date(),
-    handouts: [],
-    ratings: [],
-    components: []
-  },
-  {
-    _id: '67acf95247f5d8867107e888',
-    className: 'Advanced Mathematics',
-    discussion: '',
-    cost: 0,
-    instructorName: '',
-    instructorDescription: '',
-    instructorRole: '',
-    lengthCourse: 0,
-    time: new Date(),
-    isInPerson: false,
-    isLive: false,
-    categories: [],
-    creditNumber: 0,
-    courseDescription: '',
-    thumbnailPath: '',
-    students: ['user3', 'user4', 'user5'],
-    regStart: new Date(),
-    regEnd: new Date(),
-    handouts: [],
-    ratings: [],
-    components: []
-  }
-];
-
-const mockUsers = [
-  {
-    _id: 'user1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    role: 'foster parent' as const,
-    firebaseId: 'firebase1',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user2',
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    role: 'certified kin' as const,
-    firebaseId: 'firebase2',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user3',
-    name: 'Bob Johnson',
-    email: 'bob@example.com',
-    role: 'staff' as const,
-    firebaseId: 'firebase3',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user4',
-    name: 'Alice Brown',
-    email: 'alice@example.com',
-    role: 'foster parent' as const,
-    firebaseId: 'firebase4',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user5',
-    name: 'Charlie Wilson',
-    email: 'charlie@example.com',
-    role: 'certified kin' as const,
-    firebaseId: 'firebase5',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user6',
-    name: 'Diana Miller',
-    email: 'diana@example.com',
-    role: 'staff' as const,
-    firebaseId: 'firebase6',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user7',
-    name: 'Edward Davis',
-    email: 'edward@example.com',
-    role: 'foster parent' as const,
-    firebaseId: 'firebase7',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user8',
-    name: 'Fiona Garcia',
-    email: 'fiona@example.com',
-    role: 'certified kin' as const,
-    firebaseId: 'firebase8',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user9',
-    name: 'George Martinez',
-    email: 'george@example.com',
-    role: 'staff' as const,
-    firebaseId: 'firebase9',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user10',
-    name: 'Hannah Lee',
-    email: 'hannah@example.com',
-    role: 'foster parent' as const,
-    firebaseId: 'firebase10',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user11',
-    name: 'Ian Thompson',
-    email: 'ian@example.com',
-    role: 'certified kin' as const,
-    firebaseId: 'firebase11',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user12',
-    name: 'Julia White',
-    email: 'julia@example.com',
-    role: 'staff' as const,
-    firebaseId: 'firebase12',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user13',
-    name: 'Kevin Harris',
-    email: 'kevin@example.com',
-    role: 'foster parent' as const,
-    firebaseId: 'firebase13',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user14',
-    name: 'Lisa Clark',
-    email: 'lisa@example.com',
-    role: 'certified kin' as const,
-    firebaseId: 'firebase14',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user15',
-    name: 'Michael Lewis',
-    email: 'michael@example.com',
-    role: 'staff' as const,
-    firebaseId: 'firebase15',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user16',
-    name: 'Nancy Young',
-    email: 'nancy@example.com',
-    role: 'foster parent' as const,
-    firebaseId: 'firebase16',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user17',
-    name: 'Oscar Allen',
-    email: 'oscar@example.com',
-    role: 'certified kin' as const,
-    firebaseId: 'firebase17',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user18',
-    name: 'Patricia King',
-    email: 'patricia@example.com',
-    role: 'staff' as const,
-    firebaseId: 'firebase18',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user19',
-    name: 'Quentin Wright',
-    email: 'quentin@example.com',
-    role: 'foster parent' as const,
-    firebaseId: 'firebase19',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  },
-  {
-    _id: 'user20',
-    name: 'Rachel Scott',
-    email: 'rachel@example.com',
-    role: 'certified kin' as const,
-    firebaseId: 'firebase20',
-    isColorado: true,
-    address1: '',
-    city: '',
-    state: '',
-    zip: '',
-    phone: '',
-    certification: '',
-    cart: [],
-    progress: [],
-    payments: []
-  }
-];
-
-const mockProgress = [
-  {
-    user: 'user1',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: true,
-      survey: false,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-01')
-  },
-  {
-    user: 'user2',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-15'),
-    createdAt: new Date('2024-01-01')
-  },
-  {
-    user: 'user3',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: false,
-      survey: true,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-02')
-  },
-  {
-    user: 'user4',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-16'),
-    createdAt: new Date('2024-01-02')
-  },
-  {
-    user: 'user5',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: true,
-      survey: false,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-03')
-  },
-  {
-    user: 'user6',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-17'),
-    createdAt: new Date('2024-01-03')
-  },
-  {
-    user: 'user7',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: false,
-      survey: true,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-04')
-  },
-  {
-    user: 'user8',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-18'),
-    createdAt: new Date('2024-01-04')
-  },
-  {
-    user: 'user9',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: true,
-      survey: false,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-05')
-  },
-  {
-    user: 'user10',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-19'),
-    createdAt: new Date('2024-01-05')
-  },
-  {
-    user: 'user11',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: false,
-      survey: true,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-06')
-  },
-  {
-    user: 'user12',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-20'),
-    createdAt: new Date('2024-01-06')
-  },
-  {
-    user: 'user13',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: true,
-      survey: false,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-07')
-  },
-  {
-    user: 'user14',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-21'),
-    createdAt: new Date('2024-01-07')
-  },
-  {
-    user: 'user15',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: false,
-      survey: true,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-08')
-  },
-  {
-    user: 'user16',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-22'),
-    createdAt: new Date('2024-01-08')
-  },
-  {
-    user: 'user17',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: true,
-      survey: false,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-09')
-  },
-  {
-    user: 'user18',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-23'),
-    createdAt: new Date('2024-01-09')
-  },
-  {
-    user: 'user19',
-    course: '67acf95247f5d8867107e887',
-    isComplete: false,
-    completedComponents: {
-      webinar: false,
-      survey: true,
-      certificate: false
-    },
-    dateCompleted: undefined,
-    createdAt: new Date('2024-01-10')
-  },
-  {
-    user: 'user20',
-    course: '67acf95247f5d8867107e887',
-    isComplete: true,
-    completedComponents: {
-      webinar: true,
-      survey: true,
-      certificate: true
-    },
-    dateCompleted: new Date('2024-01-24'),
-    createdAt: new Date('2024-01-10')
-  }
-];
 
 const ProductProgressReport: React.FC = () => {
   const [selectedCourse, setSelectedCourse] = useState<CourseOption | null>(null);
@@ -779,11 +170,12 @@ const ProductProgressReport: React.FC = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedProgress, setSelectedProgress] = useState<UserProgress | null>(null);
 
-  // Load courses from mock data
+  // Load courses from API
   useEffect(() => {
     const fetchAllCourses = async () => {
       try {
-        const courses = mockCourses.map(course => ({
+        const response = await apiClient.get('/courses');
+        const courses = response.data.data.map((course: Course) => ({
           value: course._id,
           label: course.className,
           course: course
@@ -810,38 +202,58 @@ const ProductProgressReport: React.FC = () => {
     return filteredCourses;
   };
 
-  // Fetch progress from mock data
+  // Fetch progress from API
   const fetchProgress = async () => {
+    if (!selectedCourse?.value) return;
+    
     setIsLoading(true);
     try {
-      const mockCourse = mockCourses.find(c => c._id === selectedCourse?.value);
-      const mockEnrolledUsers = mockUsers.filter(u => mockCourse?.students.includes(u._id || ''));
-      const mockCourseProgress = mockProgress.filter(p => p.course === selectedCourse?.value);
-      
-      const combinedProgress: UserProgress[] = mockEnrolledUsers.map((user: User) => {
-        const userProgress = mockCourseProgress.find(p => p.user === user._id) || {
+      // Get enrolled users for the course
+      const usersResponse = await apiClient.get(`/courses/${selectedCourse.value}/users`);
+      const enrolledUsers = usersResponse.data.users;
+
+      // Get progress data for the course
+      const progressResponse = await apiClient.get(`/courses/${selectedCourse.value}/progress`);
+      const courseProgress = progressResponse.data.progress || [];
+
+      // Combine user data with progress data
+      const combinedProgress: UserProgress[] = enrolledUsers.map((user: User) => {
+        const userProgress = courseProgress.find((p: any) => p.user?._id === user._id);
+        
+        // Default progress values
+        const defaultProgress = {
           isComplete: false,
           completedComponents: {
             webinar: false,
             survey: false,
             certificate: false
           },
-          dateCompleted: undefined,
+          dateCompleted: null,
           createdAt: new Date()
         };
 
+        // Merge user progress with defaults
+        const mergedProgress = userProgress ? {
+          isComplete: userProgress.isComplete || false,
+          completedComponents: {
+            webinar: userProgress.completedComponents?.webinar || false,
+            survey: userProgress.completedComponents?.survey || false,
+            certificate: userProgress.completedComponents?.certificate || false
+          },
+          dateCompleted: userProgress.dateCompleted || null,
+          createdAt: userProgress.createdAt || new Date()
+        } : defaultProgress;
+
         return {
           user,
-          course: selectedCourse?.course || {} as Course,
-          isComplete: userProgress.isComplete,
-          completedComponents: userProgress.completedComponents,
-          dateCompleted: userProgress.dateCompleted,
-          registeredDate: userProgress.createdAt
+          course: selectedCourse.course,
+          ...mergedProgress
         };
       });
 
       let filteredProgress = combinedProgress;
 
+      // Apply filters
       if (selectedUserType !== 'All') {
         filteredProgress = filteredProgress.filter(p => p.user.role === selectedUserType);
       }
@@ -867,6 +279,7 @@ const ProductProgressReport: React.FC = () => {
       setUserProgress(filteredProgress);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setUserProgress([]);
     } finally {
       setIsLoading(false);
     }
@@ -880,41 +293,36 @@ const ProductProgressReport: React.FC = () => {
   }, [selectedCourse, startDate, endDate, selectedUserType, excludeFinished]);
 
   const handleSaveProgress = async (updatedProgress: UserProgress) => {
+    console.log('=== Starting Progress Update ===');
+    console.log('Selected Progress:', updatedProgress);
+    console.log('Making API call to:', `/courses/${updatedProgress.course._id}/progress/${updatedProgress.user._id}`);
+    console.log('With data:', {
+      webinarComplete: updatedProgress.completedComponents.webinar,
+      surveyComplete: updatedProgress.completedComponents.survey,
+      certificateComplete: updatedProgress.completedComponents.certificate
+    });
+
     try {
-      const progressIndex = mockProgress.findIndex(p => 
-        p.course === updatedProgress.course._id && p.user === updatedProgress.user._id
+      const response = await apiClient.put(
+        `/courses/${updatedProgress.course._id}/progress/${updatedProgress.user._id}`,
+        {
+          webinarComplete: updatedProgress.completedComponents.webinar,
+          surveyComplete: updatedProgress.completedComponents.survey,
+          certificateComplete: updatedProgress.completedComponents.certificate
+        }
       );
 
-      if (progressIndex === -1) {
-        mockProgress.push({
-          user: updatedProgress.user._id || '',
-          course: updatedProgress.course._id,
-          isComplete: updatedProgress.isComplete,
-          completedComponents: {
-            webinar: updatedProgress.completedComponents.webinar || false,
-            survey: updatedProgress.completedComponents.survey || false,
-            certificate: updatedProgress.completedComponents.certificate || false
-          },
-          dateCompleted: updatedProgress.dateCompleted,
-          createdAt: updatedProgress.registeredDate || new Date()
-        });
-      } else {
-        mockProgress[progressIndex] = {
-          ...mockProgress[progressIndex],
-          isComplete: updatedProgress.isComplete,
-          completedComponents: {
-            webinar: updatedProgress.completedComponents.webinar || false,
-            survey: updatedProgress.completedComponents.survey || false,
-            certificate: updatedProgress.completedComponents.certificate || false
-          },
-          dateCompleted: updatedProgress.dateCompleted
-        };
-      }
+      console.log('API Response:', response);
+      console.log('=== End Progress Update ===');
 
-      await fetchProgress();
-      setEditModalOpen(false);
+      if (response.data.success) {
+        await fetchProgress();
+        setEditModalOpen(false);
+      } else {
+        console.error('Failed to update progress:', response.data.message);
+      }
     } catch (error) {
-      console.error('Error updating progress:', error);
+      console.error('Error in handleSaveProgress:', error);
     }
   };
 

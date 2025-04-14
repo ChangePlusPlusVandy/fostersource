@@ -5,6 +5,7 @@ import apiClient from "../../../services/apiClient";
 import { Payment } from "../../../shared/types/payment";
 import SearchDropdown from "../ComponentPage/DropDownSearch";
 import { Course } from "../../../shared/types/course";
+import { format } from 'date-fns';
 
 interface Registration {
     title: string; 
@@ -88,7 +89,6 @@ export default function RegistrationPage() {
                 }
             }
 
-
             setRegistrations(receivedPayments); 
         } catch (error) {
             console.error(error); 
@@ -100,24 +100,40 @@ export default function RegistrationPage() {
     }
 
     const downloadData = () => {
-        const headers = Object.keys(displayedRegistrations[0]).join("\t"); // Header row
-        const rows = displayedRegistrations.map((row) => Object.values(row).join("\t")).join("\n"); // Data rows
+        if (!registrations.length) return;
 
-        const tsvContent = `${headers}\n${rows}`;
-        const blob = new Blob([tsvContent], { type: "text/tab-separated-values" });
+        const headers = [
+            'Product Title',
+            'Registered User Name',
+            'Registered User Email',
+            'Order Date',
+            'Transaction ID',
+            'Amount Paid'
+        ];
+
+        const rows = registrations.map(registration => [
+            registration.title,
+            registration.user,
+            registration.email,
+            format(new Date(registration.date), 'MM/dd/yyyy h:mm a'),
+            registration.transactionId,
+            `$${registration.paid.toFixed(2)}`
+        ]);
+
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
-
-        // Create a temporary download link
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "table_data.tsv";
-        document.body.appendChild(a);
-        a.click();
-
-        // Cleanup
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'registration_report.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     const removeQuery = (index: number) => {
         setSearchQuery(searchQuery => searchQuery.filter((_, i) => i !== index)); 
@@ -194,11 +210,14 @@ export default function RegistrationPage() {
 
 
                         <button 
-                            className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
+                            className={`text-white px-6 py-2.5 rounded-lg font-medium ${
+                                registrations.length ? 'hover:opacity-90' : 'opacity-50 cursor-not-allowed'
+                            }`}
                             style={{ backgroundColor: '#8757a3' }}
                             onClick={downloadData}
+                            disabled={!registrations.length}
                         >
-                            Download as TSV
+                            Download as CSV
                         </button>
                     </div>
 

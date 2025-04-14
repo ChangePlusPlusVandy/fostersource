@@ -54,7 +54,7 @@ progressSchema.post("save", async function (doc) {
 	if (doc.user) {
 		try {
 			await User.findByIdAndUpdate(doc.user, {
-				$push: { progress: doc._id },
+				$addToSet: { progress: doc._id },
 			});
 		} catch (error) {
 			console.error("Failed to update user's progress array:", error);

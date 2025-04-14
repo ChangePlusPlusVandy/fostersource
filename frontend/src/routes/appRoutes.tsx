@@ -254,9 +254,9 @@ function AppRoutes() {
 						<Route
 							path="admin/product-progress-report"
 							element={
-								
+								<AdminRoute>
 									<ProductProgressReport />
-								
+								</AdminRoute>
 							}
 						/>
 						<Route

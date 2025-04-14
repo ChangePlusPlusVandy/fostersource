@@ -25,8 +25,8 @@ export interface IUser extends Document {
 	zip: string;
 	certification: string;
 	phone: string;
-	progress: IProgress;
-	payments: IPayment;
+	progress: mongoose.Types.ObjectId[];
+	payments: mongoose.Types.ObjectId[];
 	cart: string;
 }
 
@@ -59,18 +59,8 @@ const userSchema: Schema = new Schema(
 		zip: { type: String, required: true },
 		certification: { type: String, required: true },
 		phone: { type: String, required: true },
-		progress: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: "Progress",
-			},
-		],
-		payments: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: "Payment",
-			},
-		],
+		progress: [{ type: mongoose.Schema.Types.ObjectId, ref: "Progress" }],
+		payments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
 		cart: { type: String, required: false, default: "[]" },
 	},
 	{

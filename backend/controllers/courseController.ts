@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Course from "../models/courseModel";
 import Rating from "../models/ratingModel";
-import User from "../models/userModel";
+import User, { IUser } from "../models/userModel";
 import Progress, { IProgress } from "../models/progressModel";
 
 // @desc    Get all courses or filter courses by query parameters
@@ -346,12 +346,56 @@ export const getCourseProgress = async (
 			return;
 		}
 
-		// Find all progress records for the course
-		const progress = await Progress.find({ course: courseId }).populate("user");
+		// Get all enrolled users for the course
+		const enrolledUsers = await User.find({ _id: { $in: course.students } });
+
+		// Get existing progress records
+		const existingProgress = await Progress.find({ course: courseId })
+			.populate("user")
+			.populate("course");
+
+		// Find users who don't have progress records
+		const usersWithProgress = new Set(
+			existingProgress.map((p) => {
+				const user = p.user as any;
+				return user._id.toString();
+			})
+		);
+		const usersWithoutProgress = enrolledUsers.filter(
+			(user: any) => !usersWithProgress.has(user._id.toString())
+		);
+
+		// Create new progress records for users without one
+		const newProgressRecords = await Promise.all(
+			usersWithoutProgress.map(async (user) => {
+				const newProgress = new Progress({
+					user: user._id,
+					course: courseId,
+					isComplete: false,
+					completedComponents: {
+						webinar: false,
+						survey: false,
+						certificate: false,
+					},
+					dateCompleted: null,
+				});
+				return newProgress.save();
+			})
+		);
+
+		// Combine existing and new progress records
+		const allProgress = [...existingProgress, ...newProgressRecords];
+
+		// Populate the new records
+		const populatedProgress = await Progress.find({
+			_id: { $in: allProgress.map((p) => p._id) },
+		})
+			.populate("user")
+			.populate("course");
 
 		res.status(200).json({
 			success: true,
-			progress,
+			progress: populatedProgress,
 		});
 	} catch (error: any) {
 		res.status(500).json({
@@ -372,81 +416,68 @@ export const updateUserProgress = async (
 		const { courseId, userId } = req.params;
 		const { webinarComplete, surveyComplete, certificateComplete } = req.body;
 
-		// Validate input
-		if (!courseId || !userId) {
-			res.status(400).json({
-				success: false,
-				message: "Course ID and User ID are required.",
-			});
-			return;
-		}
+		console.log("=== Progress Update Request ===");
+		console.log("Params:", { courseId, userId });
+		console.log("Body:", {
+			webinarComplete,
+			surveyComplete,
+			certificateComplete,
+		});
 
-		// Check if the course exists
-		const course = await Course.findById(courseId);
-		if (!course) {
-			res.status(404).json({
-				success: false,
-				message: "Course not found.",
-			});
-			return;
-		}
-
-		// Check if the user exists
-		const user = await User.findById(userId);
-		if (!user) {
-			res.status(404).json({
-				success: false,
-				message: "User not found.",
-			});
-			return;
-		}
-
-		// Find or create progress record
-		let progress = (await Progress.findOne({
+		// Find existing progress record
+		const progress = await Progress.findOne({
 			course: courseId,
 			user: userId,
-		})) as IProgress;
+		});
 
 		if (!progress) {
-			progress = new Progress({
-				course: courseId,
-				user: userId,
-				isComplete: false,
-				completedComponents: {
-					webinar: false,
-					survey: false,
-					certificate: false,
-				},
-				dateCompleted: null,
+			console.error("Progress record not found");
+			res.status(404).json({
+				success: false,
+				message: "Progress record not found.",
 			});
+			return;
 		}
 
-		// Update completed components if provided
-		const completedComponents = progress.completedComponents || {};
-		if (webinarComplete !== undefined)
-			completedComponents.webinar = webinarComplete;
-		if (surveyComplete !== undefined)
-			completedComponents.survey = surveyComplete;
-		if (certificateComplete !== undefined)
-			completedComponents.certificate = certificateComplete;
+		console.log("Found progress:", progress._id);
+
+		// Update completed components
+		const completedComponents = {
+			webinar: Boolean(webinarComplete),
+			survey: Boolean(surveyComplete),
+			certificate: Boolean(certificateComplete),
+		};
+
+		console.log("Setting completed components:", completedComponents);
 		progress.completedComponents = completedComponents;
 
 		// Check if all components are complete
-		const allComplete = Object.values(completedComponents).every(
-			(value) => value === true
-		);
+		const allComplete = Object.values(completedComponents).every(Boolean);
 		progress.isComplete = allComplete;
 		if (allComplete && !progress.dateCompleted) {
 			progress.dateCompleted = new Date();
 		}
 
+		console.log("Saving progress with data:", {
+			_id: progress._id,
+			completedComponents: progress.completedComponents,
+			isComplete: progress.isComplete,
+			dateCompleted: progress.dateCompleted,
+		});
+
 		await progress.save();
+		console.log("Progress saved successfully");
+
+		// Verify the save by fetching the updated record
+		const updatedProgress = await Progress.findById(progress._id);
+		console.log("Verified updated progress:", updatedProgress);
 
 		res.status(200).json({
 			success: true,
-			progress,
+			progress: updatedProgress,
 		});
 	} catch (error: any) {
+		console.error("Error in updateUserProgress:", error);
 		res.status(500).json({
 			success: false,
 			message: error.message || "Internal server error.",

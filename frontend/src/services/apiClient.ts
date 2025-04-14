@@ -21,9 +21,7 @@ async function getFirebaseToken(): Promise<string | null> {
 }
 
 apiClient.interceptors.request.use(async (config) => {
-	console.log("Making request to:", config.url);
 	const token = await getFirebaseToken();
-	console.log("Auth token:", token ? "Present" : "Missing");
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`;
 	}
