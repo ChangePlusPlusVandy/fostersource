@@ -17,23 +17,11 @@ export default function SurveyModal({ isOpen, onClose, surveyId }:SurveyModalPro
         const populateQuestions = async () => {
             let tempQuestions: any[] = []
             try {
-                const questionIds = (await apiClient.get("surveys")).data[0].questions
-                for(let id of questionIds){
-                    let question = (await apiClient.get(`questions?_id=${id}`)).data[0]
-                    let exists = false
-                    for(let existing of tempQuestions){
-                        if(existing._id === id){
-                            exists = true;
-                            break;
-                        }
-                    }
-                    if(!exists){
-                        tempQuestions = [...tempQuestions, question]
-                    }
-                }
-                setSurveyQuestions(tempQuestions)
+                const questionIds = (await apiClient.get("surveys")).data.questions
+                console.log(questionIds)
+                setSurveyQuestions(questionIds)
             } catch (error) {
-                console.error("Failed to check admin status", error);
+                console.error("Error: ", error);
             }
         };
 
