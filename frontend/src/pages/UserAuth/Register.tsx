@@ -11,11 +11,21 @@ const countries = [
 	// Add more countries as needed
 ];
 
+const states = [
+	"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",
+	"Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine",
+	"Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska",
+	"Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota",
+	"Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee",
+	"Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+];
+
 const Register: React.FC = () => {
-	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
+	const [firstName, setFirstName] = useState("");
+	const [lastName, setLastName] = useState("");
 	const [phone, setPhone] = useState("");
 	const [certification, setCertification] = useState("");
 	const [company, setCompany] = useState("");
@@ -59,9 +69,8 @@ const Register: React.FC = () => {
 		event.preventDefault();
 		setError("");
 
-		// Final submission logic
 		try {
-			await authService.register(email, password, name);
+			await authService.register(email, password, `${firstName} ${lastName}`);
 			window.location.href = "/catalog";
 		} catch (err: any) {
 			console.error("Registration error:", err);
@@ -81,16 +90,6 @@ const Register: React.FC = () => {
 					<form className="space-y-4" onSubmit={handleSubmit}>
 						{currentStep === 1 && (
 							<>
-								<div>
-									<label className="block mb-1 text-sm font-medium text-black">Name</label>
-									<input
-										type="text"
-										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-										value={name}
-										onChange={(e) => setName(e.target.value)}
-										required
-									/>
-								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">Email</label>
 									<input
@@ -159,6 +158,28 @@ const Register: React.FC = () => {
 						)}
 						{currentStep === 2 && (
 							<>
+								<div className="grid grid-cols-2 gap-4">
+									<div>
+										<label className="block mb-1 text-sm font-medium text-black">First Name</label>
+										<input
+											type="text"
+											className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+											value={firstName}
+											onChange={(e) => setFirstName(e.target.value.replace(/[^a-zA-Z]/g, ''))}
+											required
+										/>
+									</div>
+									<div>
+										<label className="block mb-1 text-sm font-medium text-black">Last Name</label>
+										<input
+											type="text"
+											className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+											value={lastName}
+											onChange={(e) => setLastName(e.target.value.replace(/[^a-zA-Z]/g, ''))}
+											required
+										/>
+									</div>
+								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">Phone Number (optional)</label>
 									<input
@@ -212,17 +233,21 @@ const Register: React.FC = () => {
 										type="text"
 										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
 										value={city}
-										onChange={(e) => setCity(e.target.value)}
+										onChange={(e) => setCity(e.target.value.replace(/[^a-zA-Z]/g, ''))}
 									/>
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">State (optional)</label>
-									<input
-										type="text"
+									<select
 										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
 										value={state}
-										onChange={(e) => setState(e.target.value.replace(/[^a-zA-Z]/g, ''))}
-									/>
+										onChange={(e) => setState(e.target.value)}
+									>
+										<option value="">Choose a State</option>
+										{states.map((state) => (
+											<option key={state} value={state}>{state}</option>
+										))}
+									</select>
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">Zip/Postal Code (optional)</label>
