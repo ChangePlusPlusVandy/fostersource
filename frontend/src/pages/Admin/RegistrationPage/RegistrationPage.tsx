@@ -29,8 +29,16 @@ export default function RegistrationPage() {
     const [searchQuery, setSearchQuery] = useState<string[]>([]); 
     const [registrations, setRegistrations] = useState<Registration[]>([]); 
     const displayedRegistrations = registrations
-        .filter(registration => registration.date >= new Date(startDate) && registration.date <= new Date(endDate))
-        .filter(registration => searchOptions.includes(registration.title.toLowerCase()))
+        .filter(registration => {
+            if (startDate && endDate) {
+                return registration.date >= new Date(startDate) && registration.date <= new Date(endDate);
+            }
+            return true;
+        })
+        .filter(registration => {
+            if (searchQuery.length === 0) return true;
+            return searchQuery.includes(registration.title.toLowerCase());
+        })
         .filter(registration => excludeZero ? registration.paid > 0 : true)
         .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage); 
 
@@ -142,7 +150,7 @@ export default function RegistrationPage() {
     useEffect(() => {
         fetchSearchOptions(); 
         fetchRegistrations(); 
-    }, [searchQuery]); 
+    }, []);
 
     const totalPages: number = Math.ceil(displayedRegistrations.length / itemsPerPage);
 

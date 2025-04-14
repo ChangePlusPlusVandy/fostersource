@@ -293,27 +293,17 @@ const ProductProgressReport: React.FC = () => {
   }, [selectedCourse, startDate, endDate, selectedUserType, excludeFinished]);
 
   const handleSaveProgress = async (updatedProgress: UserProgress) => {
-    console.log('=== Starting Progress Update ===');
-    console.log('Selected Progress:', updatedProgress);
-    console.log('Making API call to:', `/courses/${updatedProgress.course._id}/progress/${updatedProgress.user._id}`);
-    console.log('With data:', {
-      webinarComplete: updatedProgress.completedComponents.webinar,
-      surveyComplete: updatedProgress.completedComponents.survey,
-      certificateComplete: updatedProgress.completedComponents.certificate
-    });
-
     try {
       const response = await apiClient.put(
         `/courses/${updatedProgress.course._id}/progress/${updatedProgress.user._id}`,
         {
           webinarComplete: updatedProgress.completedComponents.webinar,
           surveyComplete: updatedProgress.completedComponents.survey,
-          certificateComplete: updatedProgress.completedComponents.certificate
+          certificateComplete: updatedProgress.completedComponents.certificate,
+          isComplete: updatedProgress.isComplete,
+          dateCompleted: updatedProgress.dateCompleted
         }
       );
-
-      console.log('API Response:', response);
-      console.log('=== End Progress Update ===');
 
       if (response.data.success) {
         await fetchProgress();
