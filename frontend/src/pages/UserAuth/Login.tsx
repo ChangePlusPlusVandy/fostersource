@@ -73,11 +73,7 @@ const Login: React.FC = () => {
 						<button
 							type="submit"
 							disabled={isLoading}
-							className={`w-full px-4 py-2 text-white bg-orange-500 rounded-lg transition ease-in-out duration-200 ${
-								isLoading
-									? "opacity-50 cursor-not-allowed"
-									: "hover:bg-orange-600"
-							}`}
+							className="w-full px-4 py-2 text-white bg-[#F79518] rounded-lg hover:bg-[#F79518] transition ease-in-out duration-200"
 						>
 							{isLoading ? "Logging in..." : "Login"}
 						</button>

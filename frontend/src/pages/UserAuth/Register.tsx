@@ -33,7 +33,6 @@ const Register: React.FC = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [currentStep, setCurrentStep] = useState(1);
 
-	// Password validation states
 	const [isLengthValid, setIsLengthValid] = useState(false);
 	const [isUppercaseValid, setIsUppercaseValid] = useState(false);
 	const [isLowercaseValid, setIsLowercaseValid] = useState(false);
@@ -119,19 +118,19 @@ const Register: React.FC = () => {
 								</div>
 								<div className="text-sm">
 									<p className={`flex items-center ${isLengthValid ? "text-green-500" : "text-red-500"}`}>
-										{isLengthValid ? "✔️" : "❌"} At least 8 characters long
+										{isLengthValid ? "🟢" : "🔴"} At least 8 characters long
 									</p>
 									<p className={`flex items-center ${isUppercaseValid ? "text-green-500" : "text-red-500"}`}>
-										{isUppercaseValid ? "✔️" : "❌"} Includes uppercase
+										{isUppercaseValid ? "🟢" : "🔴"} Includes uppercase
 									</p>
 									<p className={`flex items-center ${isLowercaseValid ? "text-green-500" : "text-red-500"}`}>
-										{isLowercaseValid ? "✔️" : "❌"} Includes lowercase
+										{isLowercaseValid ? "🟢" : "🔴"} Includes lowercase
 									</p>
 									<p className={`flex items-center ${isNumberValid ? "text-green-500" : "text-red-500"}`}>
-										{isNumberValid ? "✔️" : "❌"} Includes numbers
+										{isNumberValid ? "🟢" : "🔴"} Includes numbers
 									</p>
 									<p className={`flex items-center ${isSpecialCharValid ? "text-green-500" : "text-red-500"}`}>
-										{isSpecialCharValid ? "✔️" : "❌"} Includes special character
+										{isSpecialCharValid ? "🟢" : "🔴"} Includes special character
 									</p>
 								</div>
 								<div>
