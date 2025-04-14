@@ -8,8 +8,17 @@ const Register: React.FC = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
+	const [phone, setPhone] = useState("");
+	const [certification, setCertification] = useState("");
+	const [company, setCompany] = useState("");
+	const [address, setAddress] = useState("");
+	const [city, setCity] = useState("");
+	const [state, setState] = useState("");
+	const [zip, setZip] = useState("");
+	const [country, setCountry] = useState("");
 	const [error, setError] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+	const [currentStep, setCurrentStep] = useState(1);
 
 	// Password validation states
 	const [isLengthValid, setIsLengthValid] = useState(false);
@@ -27,20 +36,22 @@ const Register: React.FC = () => {
 		setIsSpecialCharValid(/[^A-Za-z0-9]/.test(password));
 	};
 
+	const handleNext = () => {
+		if (currentStep === 1) {
+			if (password !== confirmPassword || !isLengthValid || !isUppercaseValid || !isLowercaseValid || !isNumberValid || !isSpecialCharValid) {
+				setError("Please ensure all password requirements are met and passwords match.");
+				return;
+			}
+		}
+		setError("");
+		setCurrentStep(currentStep + 1);
+	};
+
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
 		setError("");
 
-		if (password !== confirmPassword) {
-			setError("Passwords do not match");
-			return;
-		}
-
-		if (!isLengthValid || !isUppercaseValid || !isLowercaseValid || !isNumberValid || !isSpecialCharValid) {
-			setError("Password does not meet the requirements");
-			return;
-		}
-
+		// Final submission logic
 		try {
 			await authService.register(email, password, name);
 			window.location.href = "/catalog";
@@ -60,76 +71,177 @@ const Register: React.FC = () => {
 					<h2 className="text-4xl font-semibold text-center text-black">Create your account</h2>
 					{error && <p className="text-red-500 text-center">{error}</p>}
 					<form className="space-y-4" onSubmit={handleSubmit}>
-						<div>
-							<label className="block mb-1 text-sm font-medium text-black">Name</label>
-							<input
-								type="text"
-								className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
-								required
-							/>
-						</div>
-						<div>
-							<label className="block mb-1 text-sm font-medium text-black">Email</label>
-							<input
-								type="email"
-								className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								required
-							/>
-						</div>
-						<div className="relative">
-							<label className="block mb-1 text-sm font-medium text-black">Password</label>
-							<input
-								type={showPassword ? "text" : "password"}
-								className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-								value={password}
-								onChange={(e) => handlePasswordChange(e.target.value)}
-								required
-							/>
-							<button
-								type="button"
-								onClick={() => setShowPassword(!showPassword)}
-								className="absolute right-2 top-9 text-black-600"
-							>
-								{showPassword ? "Hide" : "Show"}
-							</button>
-						</div>
-						<div className="text-sm">
-							<p className={`flex items-center ${isLengthValid ? "text-green-500" : "text-red-500"}`}>
-								{isLengthValid ? "✔️" : "❌"} At least 8 characters long
-							</p>
-							<p className={`flex items-center ${isUppercaseValid ? "text-green-500" : "text-red-500"}`}>
-								{isUppercaseValid ? "✔️" : "❌"} Includes uppercase
-							</p>
-							<p className={`flex items-center ${isLowercaseValid ? "text-green-500" : "text-red-500"}`}>
-								{isLowercaseValid ? "✔️" : "❌"} Includes lowercase
-							</p>
-							<p className={`flex items-center ${isNumberValid ? "text-green-500" : "text-red-500"}`}>
-								{isNumberValid ? "✔️" : "❌"} Includes numbers
-							</p>
-							<p className={`flex items-center ${isSpecialCharValid ? "text-green-500" : "text-red-500"}`}>
-								{isSpecialCharValid ? "✔️" : "❌"} Includes special character
-							</p>
-						</div>
-						<div>
-							<label className="block mb-1 text-sm font-medium text-black">Confirm Password</label>
-							<input
-								type="password"
-								className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-								value={confirmPassword}
-								onChange={(e) => setConfirmPassword(e.target.value)}
-								required
-							/>
-						</div>
-						<button
-							type="submit"
-							className="w-full px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition ease-in-out duration-200"
-						>
-							Register
-						</button>
+						{currentStep === 1 && (
+							<>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">Name</label>
+									<input
+										type="text"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+										required
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">Email</label>
+									<input
+										type="email"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										required
+									/>
+								</div>
+								<div className="relative">
+									<label className="block mb-1 text-sm font-medium text-black">Password</label>
+									<input
+										type={showPassword ? "text" : "password"}
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={password}
+										onChange={(e) => handlePasswordChange(e.target.value)}
+										required
+									/>
+									<button
+										type="button"
+										onClick={() => setShowPassword(!showPassword)}
+										className="absolute right-2 top-9 text-black-600"
+									>
+										{showPassword ? "Hide" : "Show"}
+									</button>
+								</div>
+								<div className="text-sm">
+									<p className={`flex items-center ${isLengthValid ? "text-green-500" : "text-red-500"}`}>
+										{isLengthValid ? "✔️" : "❌"} At least 8 characters long
+									</p>
+									<p className={`flex items-center ${isUppercaseValid ? "text-green-500" : "text-red-500"}`}>
+										{isUppercaseValid ? "✔️" : "❌"} Includes uppercase
+									</p>
+									<p className={`flex items-center ${isLowercaseValid ? "text-green-500" : "text-red-500"}`}>
+										{isLowercaseValid ? "✔️" : "❌"} Includes lowercase
+									</p>
+									<p className={`flex items-center ${isNumberValid ? "text-green-500" : "text-red-500"}`}>
+										{isNumberValid ? "✔️" : "❌"} Includes numbers
+									</p>
+									<p className={`flex items-center ${isSpecialCharValid ? "text-green-500" : "text-red-500"}`}>
+										{isSpecialCharValid ? "✔️" : "❌"} Includes special character
+									</p>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">Confirm Password</label>
+									<input
+										type="password"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={confirmPassword}
+										onChange={(e) => setConfirmPassword(e.target.value)}
+										required
+									/>
+								</div>
+								<button
+									type="button"
+									onClick={handleNext}
+									className={`w-full px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition ease-in-out duration-200 ${
+										!(isLengthValid && isUppercaseValid && isLowercaseValid && isNumberValid && isSpecialCharValid) ? "opacity-50 cursor-not-allowed" : ""
+									}`}
+									disabled={!(isLengthValid && isUppercaseValid && isLowercaseValid && isNumberValid && isSpecialCharValid)}
+								>
+									Next
+								</button>
+							</>
+						)}
+						{currentStep === 2 && (
+							<>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">Phone Number (optional)</label>
+									<input
+										type="text"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={phone}
+										onChange={(e) => setPhone(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">Who are you certified through?</label>
+									<input
+										type="text"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={certification}
+										onChange={(e) => setCertification(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">Company (optional)</label>
+									<input
+										type="text"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={company}
+										onChange={(e) => setCompany(e.target.value)}
+									/>
+								</div>
+								<button
+									type="button"
+									onClick={handleNext}
+									className="w-full px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition ease-in-out duration-200"
+								>
+									Next
+								</button>
+							</>
+						)}
+						{currentStep === 3 && (
+							<>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">Address Line (optional)</label>
+									<input
+										type="text"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={address}
+										onChange={(e) => setAddress(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">City (optional)</label>
+									<input
+										type="text"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={city}
+										onChange={(e) => setCity(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">State (optional)</label>
+									<input
+										type="text"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={state}
+										onChange={(e) => setState(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">Zip/Postal Code (optional)</label>
+									<input
+										type="text"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={zip}
+										onChange={(e) => setZip(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">Country (optional)</label>
+									<input
+										type="text"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={country}
+										onChange={(e) => setCountry(e.target.value)}
+									/>
+								</div>
+								<button
+									type="submit"
+									className="w-full px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition ease-in-out duration-200"
+								>
+									Finish
+								</button>
+							</>
+						)}
 					</form>
 					<p className="text-center text-sm text-black">
 						Already have an account?{" "}
