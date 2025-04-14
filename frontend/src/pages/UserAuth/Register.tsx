@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import authService from "../../services/authService";
 import familyImage from "./family.png"; 
 import Select from 'react-select'
@@ -27,7 +28,7 @@ const Register: React.FC = () => {
 	const [city, setCity] = useState("");
 	const [state, setState] = useState("");
 	const [zip, setZip] = useState("");
-	const [country, setCountry] = useState("");
+	const [country, setCountry] = useState<{ label: string; value: string } | null>(null);
 	const [error, setError] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const [currentStep, setCurrentStep] = useState(1);
@@ -108,7 +109,7 @@ const Register: React.FC = () => {
 										onClick={() => setShowPassword(!showPassword)}
 										className="absolute right-2 top-9 text-black-600"
 									>
-										{showPassword ? "Hide" : "Show"}
+										{showPassword ? <FaEyeSlash /> : <FaEye />}
 									</button>
 								</div>
 								<div className="text-sm">
@@ -256,8 +257,8 @@ const Register: React.FC = () => {
 									<label className="block mb-1 text-sm font-medium text-black">Country (optional)</label>
 									<Select
 										options={countryList().getData().map(country => ({ value: country.value, label: country.label }))}
-										value={country ? { value: country, label: country } : null}
-										onChange={(selectedOption) => setCountry(selectedOption ? selectedOption.value : "")}
+										value={country}
+										onChange={(selectedOption) => setCountry(selectedOption ? selectedOption : null)}
 										placeholder="Choose a Country"
 									/>
 								</div>
