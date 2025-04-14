@@ -56,6 +56,53 @@ export default function Registrants() {
 		// Add your actual delete logic here
 	};
 
+	const handleDownloadCSV = () => {
+		if (!registrantsData.length) {
+			console.warn('No registrants data available to download');
+			return;
+		}
+
+		// Create headers
+		const headers = [
+			'User Type',
+			'Full Name',
+			'Email',
+			'Registration Date',
+			'Completed',
+			'Amount Paid',
+			'Transaction ID',
+			'Pre-registered'
+		];
+
+		// Create rows
+		const rows = registrantsData.map(registrant => [
+			registrant.userType,
+			registrant.fullName,
+			registrant.email,
+			registrant.registrationDate,
+			registrant.completed,
+			registrant.paid,
+			registrant.transactionId,
+			registrant.preRegistered
+		]);
+
+		// Combine headers and rows
+		const csvContent = [
+			headers.join(','),
+			...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+		].join('\n');
+
+		// Create and trigger download
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const link = document.createElement('a');
+		const url = URL.createObjectURL(blob);
+		link.setAttribute('href', url);
+		link.setAttribute('download', 'registrants.csv');
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
+
 	return (
 		<div className="flex flex-col items-center justify-start min-h-screen w-full p-4 bg-gray-100">
 			<div className="flex flex-col items-stretch w-full h-full bg-white rounded-lg shadow">
@@ -82,8 +129,11 @@ export default function Registrants() {
 								Search
 							</button>
 						</div>
-						<button className="px-4 py-2 bg-[#7b4899] text-white rounded-md hover:bg-[#6a3e83] transition-colors duration-200 text-sm font-medium min-w-max">
-							Download as TSV
+						<button 
+							className="px-4 py-2 bg-[#7b4899] text-white rounded-md hover:bg-[#6a3e83] transition-colors duration-200 text-sm font-medium min-w-max"
+							onClick={handleDownloadCSV}
+						>
+							Download as CSV
 						</button>
 					</div>
 
