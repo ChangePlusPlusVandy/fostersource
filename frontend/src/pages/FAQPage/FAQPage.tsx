@@ -48,11 +48,11 @@ export default function FAQPage() {
               </div>
               <div>
                 You can also browse all upcoming live in-person events at
-                <a href="" className="cursor-pointer hover:underline ml-1" style={{color: "#F79518"}}>In-Person Training</a>
+                <a href="/catalog?format=Live" className="cursor-pointer hover:underline ml-1" style={{color: "#F79518"}}>In-Person Training</a>
                 . Online training has two options for events. You can browse by selecting
-                <a href="" className="cursor-pointer hover:underline mx-1" style={{color: "#F79518"}}>Upcoming</a>
+                <a href="/catalog?format=Live" className="cursor-pointer hover:underline mx-1" style={{color: "#F79518"}}>Upcoming</a>
                 or
-                <a href="" className="cursor-pointer hover:underline ml-1" style={{color: "#F79518"}}>On-Demand</a>.
+                <a href="/catalog?format=On-Demand" className="cursor-pointer hover:underline ml-1" style={{color: "#F79518"}}>On-Demand</a>.
               </div>
             </div>
           </div>
