@@ -55,6 +55,11 @@ const Register: React.FC = () => {
 				setError("Please ensure all password requirements are met and passwords match.");
 				return;
 			}
+		} else if (currentStep === 2) {
+			if (!firstName || !lastName || !certification) {
+				setError("Please fill in your first name, last name, and certification.");
+				return;
+			}
 		}
 		setError("");
 		setCurrentStep(currentStep + 1);
