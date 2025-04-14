@@ -29,6 +29,7 @@ import upload from "./middlewares/upload";
 import { uploadImage } from "./controllers/uploadController";
 import uploadRoutes from "./routes/uploadRoutes";
 import dotenv from "dotenv";
+import zoomRoutes from "./routes/zoomRoutes";
 dotenv.config();
 
 const app: Application = express();
@@ -89,6 +90,7 @@ app.use("/api/handout", verifyFirebaseAuth, handoutRoutes);
 app.use('/api/emails', verifyFirebaseAuth, emailRoutes);
 app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
 app.use("/api/upload", verifyFirebaseAuth, uploadRoutes);
+app.use("/api/zoom", verifyFirebaseAuth, zoomRoutes)
 
 // Error middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {

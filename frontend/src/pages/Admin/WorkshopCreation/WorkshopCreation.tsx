@@ -3,6 +3,8 @@ import WebinarComponent from "./Webinar";
 import InPersonComponent from "./InPerson";
 import OnDemandComponent from "./OnDemand";
 import Modal from "./Modal";
+import MeetingComponent from "./Meeting";
+import ExistingMeetingList from "./ModalComponents/ExistingMeetingList";
 
 interface WorkshopCreationProps {
 	workshopName: string;
@@ -13,7 +15,7 @@ export default function WorkshopCreation({
 	const [formData, setFormData] = useState({
 		title: "",
 		summary: "",
-		type: "webinar",
+		type: "meeting",
 		audioInstructions: "",
 		markAttendance: false,
 		requireAttendance: false,
@@ -33,6 +35,16 @@ export default function WorkshopCreation({
 		enablePractice: false,
 	});
 
+	const [meetingData, setMeetingData] = useState({
+		serviceType: "",
+		meetingID: "string",
+		startTime: new Date(),
+		duration: 0,
+		authParticipants: false,
+		autoRecord: false,
+		enablePractice: false,
+	});
+
 	const [inPersonData, setInPersonData] = useState({
 		startTime: null,
 		duration: 0,
@@ -43,7 +55,7 @@ export default function WorkshopCreation({
 		embeddingLink: "",
 	});
 
-	const [openModal, setOpenModal] = useState<"New" | "Existing" | null>(null);
+	const [openModal, setOpenModal] = useState<"NewWebinar" | "ExistingWebinar" | "NewMeeting" | "ExistingMeeting" | null>(null);
 
 	const handleChange = (e: any) => {
 		const { name, value } = e.target;
@@ -89,6 +101,17 @@ export default function WorkshopCreation({
 							<input
 								type="radio"
 								name="type"
+								value="meeting"
+								checked={formData.type === "meeting"}
+								onChange={handleChange}
+								required
+							/>{" "}
+							Meeting
+						</label>
+						<label className="flex items-center gap-2">
+							<input
+								type="radio"
+								name="type"
 								value="webinar"
 								checked={formData.type === "webinar"}
 								onChange={handleChange}
@@ -128,6 +151,13 @@ export default function WorkshopCreation({
 						<InPersonComponent
 							inPersonData={inPersonData}
 							setInPersonData={setInPersonData}
+						/>
+					): formData.type === "meeting" ? (
+						<MeetingComponent
+							meetingData={meetingData}
+							setMeetingData={setMeetingData}
+							openModal={openModal}
+							setOpenModal={setOpenModal}
 						/>
 					) : (
 						<OnDemandComponent
@@ -277,9 +307,32 @@ export default function WorkshopCreation({
 				</div>
 			</form>
 
-			{/* First Modal */}
+			{/* New Meeting Modal */}
 			<Modal
-				isOpen={openModal === "New"}
+				isOpen={openModal === "NewMeeting"}
+				onClose={() => setOpenModal(null)}
+				title="Create New Meeting"
+			>
+				<p>
+					This is the placeholder for adding a new meeting (once we get zoom).
+				</p>
+			</Modal>
+
+			{/* Existing Meeting Modal */}
+			<Modal
+				isOpen={openModal === "ExistingMeeting"}
+				onClose={() => setOpenModal(null)}
+				title="Add Existing Meeting"
+			>
+				<ExistingMeetingList
+					setMeetingData={setMeetingData}
+					setOpenModal={setOpenModal}
+				/>
+			</Modal>
+
+			{/* New Webinar Modal */}
+			<Modal
+				isOpen={openModal === "NewWebinar"}
 				onClose={() => setOpenModal(null)}
 				title="Create New Webinar"
 			>
@@ -288,9 +341,9 @@ export default function WorkshopCreation({
 				</p>
 			</Modal>
 
-			{/* Second Modal */}
+			{/* Existing Webinar Modal */}
 			<Modal
-				isOpen={openModal === "Existing"}
+				isOpen={openModal === "ExistingWebinar"}
 				onClose={() => setOpenModal(null)}
 				title="Add Existing Webinar"
 			>
