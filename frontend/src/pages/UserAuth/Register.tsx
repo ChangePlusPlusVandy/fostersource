@@ -238,16 +238,30 @@ const Register: React.FC = () => {
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">State (optional)</label>
-									<select
-										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-										value={state}
-										onChange={(e) => setState(e.target.value)}
-									>
-										<option value="">Choose a State</option>
-										{states.map((state) => (
-											<option key={state} value={state}>{state}</option>
-										))}
-									</select>
+									<Select
+										options={states.map(state => ({ value: state, label: state }))}
+										value={state ? { value: state, label: state } : null}
+										onChange={(selectedOption) => setState(selectedOption ? selectedOption.value : "")}
+										placeholder="Choose a State"
+										styles={{
+											control: (provided, state) => ({
+												...provided,
+												borderColor: state.isFocused ? 'orange' : provided.borderColor,
+												boxShadow: state.isFocused ? '0 0 0 1px orange' : provided.boxShadow,
+												'&:hover': {
+													borderColor: 'orange',
+												},
+											}),
+											placeholder: (provided) => ({
+												...provided,
+												color: 'gray',
+											}),
+											singleValue: (provided) => ({
+												...provided,
+												color: 'black',
+											}),
+										}}
+									/>
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">Zip/Postal Code (optional)</label>
@@ -265,6 +279,24 @@ const Register: React.FC = () => {
 										value={country}
 										onChange={(selectedOption) => setCountry(selectedOption ? selectedOption : null)}
 										placeholder="Choose a Country"
+										styles={{
+											control: (provided, state) => ({
+												...provided,
+												borderColor: state.isFocused ? 'orange' : provided.borderColor,
+												boxShadow: state.isFocused ? '0 0 0 1px orange' : provided.boxShadow,
+												'&:hover': {
+													borderColor: 'orange',
+												},
+											}),
+											placeholder: (provided) => ({
+												...provided,
+												color: 'gray',
+											}),
+											singleValue: (provided) => ({
+												...provided,
+												color: 'black',
+											}),
+										}}
 									/>
 								</div>
 								<button
