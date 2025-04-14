@@ -21,7 +21,7 @@ export default function MeetingComponent({
                     <p className="font-medium">Selected Meeting:</p>
                     <p>
                         <strong>{meetingData.topic}</strong> -{" "}
-                        {new Date(meetingData.startTime).toLocaleString()}
+                        {new Date(meetingData.start_time).toLocaleString()}
                     </p>
                 </div>
             )}

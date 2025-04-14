@@ -5,6 +5,7 @@ import OnDemandComponent from "./OnDemand";
 import Modal from "./Modal";
 import MeetingComponent from "./Meeting";
 import ExistingMeetingList from "./ModalComponents/ExistingMeetingList";
+import NewMeeting from "./ModalComponents/NewMeeting";
 
 interface WorkshopCreationProps {
 	workshopName: string;
@@ -313,9 +314,10 @@ export default function WorkshopCreation({
 				onClose={() => setOpenModal(null)}
 				title="Create New Meeting"
 			>
-				<p>
-					This is the placeholder for adding a new meeting (once we get zoom).
-				</p>
+				<NewMeeting
+					setMeetingData={setMeetingData}
+					setOpenModal={setOpenModal}
+				/>
 			</Modal>
 
 			{/* Existing Meeting Modal */}

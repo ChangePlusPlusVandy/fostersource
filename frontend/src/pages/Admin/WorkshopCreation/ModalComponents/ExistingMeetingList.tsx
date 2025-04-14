@@ -38,7 +38,7 @@ export default function ExistingMeetingList({
                     onClick={() => {
                         setMeetingData({
                             meetingID: meeting.id.toString(),
-                            startTime: meeting.start_time,
+                            start_time: meeting.start_time,
                             duration: meeting.duration,
                             serviceType: "Zoom",
                             authParticipants: false,

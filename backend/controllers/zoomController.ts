@@ -78,18 +78,26 @@ export const createMeeting = async (
     req: Request,
     res: Response
 ): Promise<void> => {
+    const { topic, startTime, duration } = req.body;
     try {
         await getToken().then(async (token) => {
-            const meetings = await fetch(`https://api.zoom.us/v2/users/${process.env.ZOOM_USER_ID}/meetings`, {
-                method: "GET",
+
+            const response = await fetch(`https://api.zoom.us/v2/users/${process.env.ZOOM_USER_ID}/meetings`, {
+                method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/x-www-form-urlencoded",
-                }
-            })
-            console.log(await meetings.json())
+                },
+                body: JSON.stringify({
+                    topic,
+                    start_time: startTime,
+                    duration: duration
+                })
+            });
+            let meeting = await response.json()
+            console.log(meeting)
             res.status(200).json({
-                meetings: meetings
+                meeting: meeting
             })
         })
     } catch (error) {
@@ -99,6 +107,8 @@ export const createMeeting = async (
             message: "Internal service error",
         });
     }
+
+
 };
 
 export const createWebinar = async (
@@ -107,17 +117,27 @@ export const createWebinar = async (
 ): Promise<void> => {
     try {
         await getToken().then(async (token) => {
-            const meetings = await fetch(`https://api.zoom.us/v2/users/${process.env.ZOOM_USER_ID}/meetings`, {
-                method: "GET",
+            const response = await fetch('https://api.zoom.us/v2/users/${process.env.ZOOM_USER_ID}/meetings', {
+                method: 'POST',
                 headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/x-www-form-urlencoded",
-                }
-            })
-            console.log(await meetings.json())
-            res.status(200).json({
-                meetings: meetings
-            })
+                    'Content-Type': 'application/json',
+                    Authorization: token
+                },
+                body: JSON.stringify({
+                    topic: 'My Meeting',
+                    type: 2,
+                    start_time: '2022-03-25T07:32:55Z',
+                    duration: 60,
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error creating meeting:', errorData);
+            } else {
+                const data = await response.json();
+                console.log('Meeting created:', data);
+            }
         })
     } catch (error) {
         console.error(error);
