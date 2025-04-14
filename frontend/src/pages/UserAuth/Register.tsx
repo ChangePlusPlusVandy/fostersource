@@ -6,7 +6,7 @@ import Select from 'react-select'
 import countryList from 'react-select-country-list'
 import fostersourceImage from "./fostersource-logo.png";
 
-const states = [
+const states = [ //tried using a library like i did for countries and failed miserably so here we go
 	"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",
 	"Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine",
 	"Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska",
@@ -147,7 +147,7 @@ const Register: React.FC = () => {
 								<button
 									type="button"
 									onClick={handleNext}
-									className={`w-full px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition ease-in-out duration-200 ${
+									className={`w-full px-4 py-2 text-white bg-[#F79518] rounded-lg hover:bg-[#F79518] transition ease-in-out duration-200 ${
 										!(isLengthValid && isUppercaseValid && isLowercaseValid && isNumberValid && isSpecialCharValid) ? "opacity-50 cursor-not-allowed" : ""
 									}`}
 									disabled={!(isLengthValid && isUppercaseValid && isLowercaseValid && isNumberValid && isSpecialCharValid)}
@@ -210,7 +210,7 @@ const Register: React.FC = () => {
 								<button
 									type="button"
 									onClick={handleNext}
-									className="w-full px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition ease-in-out duration-200"
+									className="w-full px-4 py-2 text-white bg-[#F79518] rounded-lg hover:bg-[#F79518] transition ease-in-out duration-200"
 								>
 									Next
 								</button>
@@ -301,7 +301,7 @@ const Register: React.FC = () => {
 								</div>
 								<button
 									type="submit"
-									className="w-full px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition ease-in-out duration-200"
+									className="w-full px-4 py-2 text-white bg-[#F79518] rounded-lg hover:bg-[#F79518] transition ease-in-out duration-200"
 								>
 									Finish
 								</button>

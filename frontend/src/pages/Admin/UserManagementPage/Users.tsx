@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiEye, FiTrash2, FiMic } from 'react-icons/fi';
-import { US_STATES, COUNTRIES, TIMEZONES } from './locationData';
+import { US_STATES, TIMEZONES } from './locationData';
 import { Pagination } from '../../../components/Pagination/Pagination';
 import apiClient from '../../../services/apiClient';
+import Select from 'react-select';
+import countryList from 'react-select-country-list';
 
 interface User {
     _id?: string;
@@ -642,19 +644,30 @@ const UserManagementPage: React.FC = () => {
                                     <label className="block text-sm text-gray-500 mb-1">
                                         State/Province/Region <span>(optional)</span>
                                     </label>
-                                    <select
-                                        name="stateProvinceRegion"
-                                        value={userForm.stateProvinceRegion}
-                                        onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border rounded-md"
-                                    >
-                                        <option value="">Choose a State</option>
-                                        {US_STATES.map(state => (
-                                            <option key={state.value} value={state.value}>
-                                                {state.label}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <Select
+                                        options={US_STATES.map(state => ({ value: state.value, label: state.label }))}
+                                        value={userForm.stateProvinceRegion ? { value: userForm.stateProvinceRegion, label: userForm.stateProvinceRegion } : null}
+                                        onChange={(selectedOption) => setUserForm(prev => ({ ...prev, stateProvinceRegion: selectedOption ? selectedOption.value : '' }))}
+                                        placeholder="Choose a State"
+                                        styles={{
+                                            control: (provided, state) => ({
+                                                ...provided,
+                                                borderColor: state.isFocused ? '#F79518' : provided.borderColor,
+                                                boxShadow: state.isFocused ? '0 0 0 1px #F79518' : provided.boxShadow,
+                                                '&:hover': {
+                                                    borderColor: '#F79518',
+                                                },
+                                            }),
+                                            placeholder: (provided) => ({
+                                                ...provided,
+                                                color: 'gray',
+                                            }),
+                                            singleValue: (provided) => ({
+                                                ...provided,
+                                                color: 'black',
+                                            }),
+                                        }}
+                                    />
                                 </div>
                             </div>
 
@@ -675,19 +688,30 @@ const UserManagementPage: React.FC = () => {
                                     <label className="block text-sm text-gray-500 mb-1">
                                         Country <span>(optional)</span>
                                     </label>
-                                    <select
-                                        name="country"
-                                        value={userForm.country}
-                                        onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border rounded-md"
-                                    >
-                                        <option value="">Choose a Country</option>
-                                        {COUNTRIES.map(country => (
-                                            <option key={country.value} value={country.value}>
-                                                {country.label}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <Select
+                                        options={countryList().getData().map(country => ({ value: country.value, label: country.label }))}
+                                        value={userForm.country ? { value: userForm.country, label: userForm.country } : null}
+                                        onChange={(selectedOption) => setUserForm(prev => ({ ...prev, country: selectedOption ? selectedOption.value : '' }))}
+                                        placeholder="Choose a Country"
+                                        styles={{
+                                            control: (provided, state) => ({
+                                                ...provided,
+                                                borderColor: state.isFocused ? '#F79518' : provided.borderColor,
+                                                boxShadow: state.isFocused ? '0 0 0 1px #F79518' : provided.boxShadow,
+                                                '&:hover': {
+                                                    borderColor: '#F79518',
+                                                },
+                                            }),
+                                            placeholder: (provided) => ({
+                                                ...provided,
+                                                color: 'gray',
+                                            }),
+                                            singleValue: (provided) => ({
+                                                ...provided,
+                                                color: 'black',
+                                            }),
+                                        }}
+                                    />
                                 </div>
                             </div>
 
@@ -706,37 +730,60 @@ const UserManagementPage: React.FC = () => {
 
                             <div className="mb-4">
                                 <label className="block text-sm text-gray-500 mb-1">User Type</label>
-                                <select
-                                    name="userType"
-                                    value={userForm.userType}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                    required
-                                >
-                                    <option value="">Choose a User Type</option>
-                                    {USER_TYPES.map(type => (
-                                        <option key={type} value={type}>{type}</option>
-                                    ))}
-                                </select>
+                                <Select
+                                    options={USER_TYPES.map(type => ({ value: type, label: type }))}
+                                    value={userForm.userType ? { value: userForm.userType, label: userForm.userType } : null}
+                                    onChange={(selectedOption) => setUserForm(prev => ({ ...prev, userType: selectedOption ? selectedOption.value : '' }))}
+                                    placeholder="Choose a User Type"
+                                    styles={{
+                                        control: (provided, state) => ({
+                                            ...provided,
+                                            borderColor: state.isFocused ? '#F79518' : provided.borderColor,
+                                            boxShadow: state.isFocused ? '0 0 0 1px #F79518' : provided.boxShadow,
+                                            '&:hover': {
+                                                borderColor: '#F79518',
+                                            },
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            color: 'gray',
+                                        }),
+                                        singleValue: (provided) => ({
+                                            ...provided,
+                                            color: 'black',
+                                        }),
+                                    }}
+                                />
                             </div>
 
                             <div className="mb-4">
                                 <label className="block text-sm text-gray-500 mb-1">
                                     Timezone <span>(optional)</span>
                                 </label>
-                                <select
-                                    name="timezone"
-                                    value={userForm.timezone}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                >
-                                    <option value="">Choose a Timezone</option>
-                                    {TIMEZONES.map(timezone => (
-                                        <option key={timezone.value} value={timezone.value}>
-                                            {timezone.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                <Select
+                                    options={TIMEZONES.map(timezone => ({ value: timezone.value, label: timezone.label }))}
+                                    value={userForm.timezone ? { value: userForm.timezone, label: userForm.timezone } : null}
+                                    onChange={(selectedOption) => setUserForm(prev => ({ ...prev, timezone: selectedOption ? selectedOption.value : '' }))}
+                                    placeholder="Choose a Timezone"
+                                    styles={{
+                                        control: (provided, state) => ({
+                                            ...provided,
+                                            borderColor: state.isFocused ? '#F79518' : provided.borderColor,
+                                            boxShadow: state.isFocused ? '0 0 0 1px #F79518' : provided.boxShadow,
+                                            '&:hover': {
+                                                borderColor: '#F79518',
+                                            },
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            color: 'gray',
+                                        }),
+                                        singleValue: (provided) => ({
+                                            ...provided,
+                                            color: 'black',
+                                        }),
+                                    }}
+                                />
                             </div>
 
                             <div className="mb-6">
@@ -766,8 +813,7 @@ const UserManagementPage: React.FC = () => {
                             <div className="flex justify-end">
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-[#7b499a] text-white rounded-md hover:bg-[#6a3e85] transition-colors"
-                                    
+                                    className="px-4 py-2 bg-[#F79518] text-white rounded-md hover:bg-[#F79518] transition-colors"
                                 >
                                     {editingUserId ? 'Update User' : 'Create User'}
                                 </button>
