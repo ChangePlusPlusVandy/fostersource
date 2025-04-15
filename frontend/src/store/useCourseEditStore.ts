@@ -33,6 +33,12 @@ interface CourseEditState {
 	shortUrl?: string;
 	draft: boolean;
 
+	// Hydration & data control
+	hasHydrated: boolean;
+	hasFetchedFromBackend: boolean;
+	setHydrated: () => void;
+	setFetchedFromBackend: () => void;
+
 	// Methods
 	setField: <K extends keyof CourseEditState>(
 		key: K,
@@ -44,7 +50,13 @@ interface CourseEditState {
 
 const initialState: Omit<
 	CourseEditState,
-	"setField" | "setAllFields" | "reset"
+	| "setField"
+	| "setAllFields"
+	| "reset"
+	| "hasHydrated"
+	| "hasFetchedFromBackend"
+	| "setHydrated"
+	| "setFetchedFromBackend"
 > = {
 	_id: undefined,
 	handouts: [],
@@ -78,40 +90,69 @@ const initialState: Omit<
 
 export const useCourseEditStore = create<CourseEditState>()(
 	persist(
-		(set) => ({
-			...initialState,
+		(set) => {
+			return {
+				...initialState,
+				hasHydrated: false,
+				hasFetchedFromBackend: false,
 
-			setField: (key, value) =>
-				set((state) => ({
-					...state,
-					[key]: value,
-				})),
+				setHydrated: () => set({ hasHydrated: true }),
+				setFetchedFromBackend: () => set({ hasFetchedFromBackend: true }),
 
-			setAllFields: (data) =>
-				set((state) => ({
-					...state,
-					...data,
-				})),
+				setField: (key, value) =>
+					set((state) => ({
+						...state,
+						[key]: value,
+					})),
 
-			reset: () =>
-				set(() => ({
-					...initialState,
-				})),
-		}),
+				setAllFields: (data) =>
+					set((state) => ({
+						...state,
+						...data,
+					})),
+
+				reset: () =>
+					set(() => ({
+						...initialState,
+						hasFetchedFromBackend: false,
+					})),
+			};
+		},
 		{
 			name: "course-edit-store",
 			storage: createJSONStorage(() => sessionStorage),
+
+			// ✅ Correct usage here
+			onRehydrateStorage: (state) => {
+				return () => {
+					state?.setHydrated(); // this is how Zustand recommends setting hydration flag
+				};
+			},
 		}
 	)
 );
 
 export type CourseFormData = Omit<
 	CourseEditState,
-	"setField" | "setAllFields" | "reset"
+	| "setField"
+	| "setAllFields"
+	| "reset"
+	| "hasHydrated"
+	| "setHydrated"
+	| "hasFetchedFromBackend"
+	| "setFetchedFromBackend"
 >;
 
 export const getCleanCourseData = (): CourseFormData => {
-	const { setField, setAllFields, reset, ...courseData } =
-		useCourseEditStore.getState();
+	const {
+		setField,
+		setAllFields,
+		reset,
+		hasHydrated,
+		setHydrated,
+		hasFetchedFromBackend,
+		setFetchedFromBackend,
+		...courseData
+	} = useCourseEditStore.getState();
 	return courseData;
 };
