@@ -1,5 +1,6 @@
 import { Request, response, Response } from "express";
 import Video from "../models/videoModel";
+import Course from "../models/courseModel";
 
 // @desc    Get all videos or filter videos by query parameters
 // @route   GET /api/videos
@@ -18,6 +19,9 @@ export const getVideos = async (req: Request, res: Response): Promise<void> => {
 		}
 		if (query.published) {
 			filters.published = query.published === "true";
+		}
+		if (query._id) {
+			filters._id = query._id;
 		}
 
 		const videos = await Video.find(filters).populate("courseId");
@@ -64,6 +68,11 @@ export const createVideo = async (
 		});
 
 		const savedVideo = await newVideo.save();
+
+		// Push video ID into course.components array
+		await Course.findByIdAndUpdate(courseId, {
+			$push: { components: savedVideo._id },
+		});
 
 		res.status(201).json({
 			success: true,
