@@ -18,8 +18,8 @@ import paymentRoutes from "./routes/paymentRoutes";
 import loginRoutes from "./routes/loginRoutes";
 import certificateRoutes from "./routes/certificateRoutes";
 import handoutRoutes from "./routes/handoutRoutes";
-import courseCategoriesRoutes from "./routes/courseCategoriesRoutes"
-import emailRoutes from './routes/emailRoutes';
+import courseCategoriesRoutes from "./routes/courseCategoryRoutes";
+import emailRoutes from "./routes/emailRoutes";
 import speakerRoutes from "./routes/speakerRoutes";
 
 // Import middleware
@@ -84,9 +84,9 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/videos", verifyFirebaseAuth, videoRoutes);
 app.use("/api/payments", verifyFirebaseAuth, paymentRoutes);
 app.use("/api/certificates", verifyFirebaseAuth, certificateRoutes);
-app.use("/api/settings/selectedCategories", verifyFirebaseAuth, courseCategoriesRoutes);
+app.use("/api/courseCategories", verifyFirebaseAuth, courseCategoriesRoutes);
 app.use("/api/handout", verifyFirebaseAuth, handoutRoutes);
-app.use('/api/emails', verifyFirebaseAuth, emailRoutes);
+app.use("/api/emails", verifyFirebaseAuth, emailRoutes);
 app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
 app.use("/api/upload", verifyFirebaseAuth, uploadRoutes);
 

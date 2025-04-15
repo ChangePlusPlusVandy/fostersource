@@ -17,6 +17,7 @@ export interface IUser extends Document {
 		| "speaker"
 		| "former parent"
 		| "caregiver";
+	// TODO: update after user types can be created in admin
 	name: string;
 	address1: string;
 	address2?: string;
@@ -26,8 +27,8 @@ export interface IUser extends Document {
 	certification: string;
 	company: string;
 	phone: string;
-	progress: IProgress;
-	payments: IPayment;
+	progress: mongoose.Types.ObjectId | IProgress;
+	payments: (mongoose.Types.ObjectId | IPayment)[];
 	cart: string;
 }
 
