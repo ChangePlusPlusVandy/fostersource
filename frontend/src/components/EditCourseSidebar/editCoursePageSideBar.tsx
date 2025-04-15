@@ -28,22 +28,30 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 	const setAllFields = useCourseEditStore((state) => state.setAllFields);
 	const reset = useCourseEditStore((state) => state.reset);
 
+	const hydrated = useCourseEditStore.persist.hasHydrated();
+
+	const { hasFetchedFromBackend, setFetchedFromBackend } = useCourseEditStore();
+
 	useEffect(() => {
-		const hydrated = useCourseEditStore.persist.hasHydrated(); // Zustand persist provides this
-		if (courseId && !hydrated) {
+		if (!courseId) {
+			reset(); // New course, reset store
+			return;
+		}
+
+		if (hydrated && !hasFetchedFromBackend) {
 			const loadCourse = async () => {
 				try {
 					const res = await apiClient.get(`/courses/${courseId}`);
 					setAllFields({ ...res.data.data, _id: courseId });
+					setFetchedFromBackend(); // ✅ Prevent future fetches
 				} catch (err) {
 					console.error("Failed to fetch course", err);
 				}
 			};
+
 			loadCourse();
-		} else if (!courseId) {
-			reset();
 		}
-	}, [courseId]);
+	}, [courseId, hydrated, hasFetchedFromBackend]);
 
 	const basePath = courseId
 		? `/admin/product/edit/${courseId}`

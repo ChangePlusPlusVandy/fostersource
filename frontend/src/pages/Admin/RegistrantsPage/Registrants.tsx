@@ -1,60 +1,85 @@
+import { useEffect, useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
+import apiClient from "../../../services/apiClient";
+import qs from "qs";
+import { useCourseEditStore } from "../../../store/useCourseEditStore";
+
+interface RegistrantDisplayInfo {
+	id: string;
+	userType: string;
+	fullName: string;
+	email: string;
+	registrationDate: string;
+	completed: string;
+	paid: string;
+	transactionId: string;
+	preRegistered: string;
+}
 
 export default function Registrants() {
-	// Sample data based on the image - replace with your actual data source
-	const registrantsData = [
-		{
-			userType: "Foster Parent (Colorado)",
-			fullName: "Angela Shultzabergergacdaca",
-			email: "vince.lin@vanderbilt.edu",
-			registrationDate: "02/01/2025",
-			completed: "03/01/2025", // Or could be a status like 'Completed'
-			paid: "$20.00",
-			transactionId: "9873214832147381",
-			preRegistered: "Yes",
-			id: "1", // Unique ID for key prop and delete action
-		},
-		{
-			userType: "Former FP/Adoptive Parent/ Not currently fostering",
-			fullName: "Angelafdsa Shultzaberfdafdsager",
-			email: "vince.lin@vanderbilt.edu",
-			registrationDate: "02/01/2025",
-			completed: "1 out of 3", // Example of progress
-			paid: "$0.00",
-			transactionId: "", // Example of empty field
-			preRegistered: "No",
-			id: "2",
-		},
-		{
-			userType: "Foster Parent (Non-Colorado)",
-			fullName: "Angelagdasvdsa Shultzaberger",
-			email: "vince.lin@vanderbilt.edu",
-			registrationDate: "02/01/2025",
-			completed: "0 out of 3",
-			paid: "$10.00",
-			transactionId: "4315636436147347",
-			preRegistered: "No",
-			id: "3",
-		},
-		// Add a longer name example to test wrapping
-		{
-			userType: "Very Long User Type Description That Might Need Wrapping",
-			fullName: "Maximillian Bartholomew Von Shultzaberger III Esquire",
-			email: "long.email.address.for.testing.wrapping@institution.example.com",
-			registrationDate: "02/01/2025",
-			completed: "Pending Review",
-			paid: "$100.00",
-			transactionId: "LongTransactionIDString1234567890abcdef",
-			preRegistered: "Yes",
-			id: "4",
-		},
-	];
+	const { students, setField, setAllFields } = useCourseEditStore();
 
-	// Placeholder for delete function
-	const handleDelete = (userId: string) => {
-		console.log("Delete user:", userId);
-		// Add your actual delete logic here
+	const courseId = "67acf95247f5d8867107e881"; // Replace with useParams later
+
+	const [registrants, setRegistrants] = useState<RegistrantDisplayInfo[]>([]);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		const fetchRegistrants = async () => {
+			try {
+				const query = qs.stringify(
+					{ _id: { $in: students } },
+					{ arrayFormat: "brackets" }
+				);
+				const usersRes = await apiClient.get(`/users?${query}`);
+				const users = usersRes.data.users;
+
+				const formatted: RegistrantDisplayInfo[] = users.map((user: any) => ({
+					id: user._id,
+					userType: user.userType || "N/A",
+					fullName: user.name || "Unknown",
+					email: user.email || "No email",
+					registrationDate: "N/A",
+					completed: "N/A",
+					paid: "$?.??",
+					transactionId: "-",
+					preRegistered: "N/A",
+				}));
+
+				// TODO: fix this
+
+				setRegistrants(formatted);
+			} catch (err: any) {
+				console.error("Failed to load registrants", err);
+				setError("Failed to load registrants.");
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchRegistrants();
+	}, [courseId]);
+
+	const handleDelete = (id: string) => {
+		console.log("Delete user:", id);
+		setRegistrants((prev) => prev.filter((r) => r.id !== id));
 	};
+
+	const filteredRegistrants = registrants.filter((r) =>
+		r.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+	);
+
+	if (isLoading) {
+		return (
+			<div className="text-center py-12 text-sm">Loading registrants...</div>
+		);
+	}
+
+	if (error) {
+		return <div className="text-center py-12 text-red-500">{error}</div>;
+	}
 
 	return (
 		<div className="flex flex-col items-stretch w-full h-full bg-white">
@@ -67,6 +92,8 @@ export default function Registrants() {
 							type="text"
 							placeholder="Enter registrant name"
 							className="peer p-2 border border-gray-300 rounded-l-md flex-grow focus:outline-none text-sm"
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
 						/>
 						<button className="peer-focus:bg-[#7b4899] px-4 py-2 bg-[#a881c2] text-white rounded-r-md hover:bg-[#936aa9] transition-colors duration-200 text-sm font-medium">
 							Search
@@ -91,36 +118,37 @@ export default function Registrants() {
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{registrantsData.map((registrant) => (
-								<tr
-									key={registrant.id}
-									className="hover:bg-gray-100 text-sm text-gray-700"
-								>
-									<TableCell text={registrant.userType} />
-									<TableCell text={registrant.fullName} />
-									<TableCell text={registrant.email} />
-									<TableCell text={registrant.registrationDate} />
-									<TableCell text={registrant.completed} />
-									<TableCell text={registrant.paid} />
-									<TableCell text={registrant.transactionId} />
-									<TableCell text={registrant.preRegistered} />
-									<td className="px-4 py-3 text-center">
-										<button
-											onClick={() => handleDelete(registrant.id)}
-											className="text-red-500 hover:text-red-700"
-											aria-label={`Delete ${registrant.fullName}`}
-										>
-											<FaTrashAlt />
-										</button>
-									</td>
-								</tr>
-							))}
-							{registrantsData.length === 0 && (
+							{filteredRegistrants.length === 0 ? (
 								<tr>
 									<td colSpan={9} className="text-center py-4 text-gray-500">
 										No registrants found.
 									</td>
 								</tr>
+							) : (
+								filteredRegistrants.map((registrant) => (
+									<tr
+										key={registrant.id}
+										className="hover:bg-gray-100 text-sm text-gray-700"
+									>
+										<TableCell text={registrant.userType} />
+										<TableCell text={registrant.fullName} />
+										<TableCell text={registrant.email} />
+										<TableCell text={registrant.registrationDate} />
+										<TableCell text={registrant.completed} />
+										<TableCell text={registrant.paid} />
+										<TableCell text={registrant.transactionId} />
+										<TableCell text={registrant.preRegistered} />
+										<td className="px-4 py-3 text-center">
+											<button
+												onClick={() => handleDelete(registrant.id)}
+												className="text-red-500 hover:text-red-700"
+												aria-label={`Delete ${registrant.fullName}`}
+											>
+												<FaTrashAlt />
+											</button>
+										</td>
+									</tr>
+								))
 							)}
 						</tbody>
 					</table>
@@ -148,21 +176,17 @@ const TableHeader = ({
 }: {
 	category: string;
 	width: string;
-}) => {
-	return (
-		<th
-			scope="col"
-			className={`min-w-content w-[${width}] px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200`}
-		>
-			{category}
-		</th>
-	);
-};
+}) => (
+	<th
+		scope="col"
+		className={`min-w-content w-[${width}] px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200`}
+	>
+		{category}
+	</th>
+);
 
-const TableCell = ({ text }: { text: string }) => {
-	return (
-		<td className="px-2 py-2 border-r border-gray-200 break-words text-xs">
-			{text}
-		</td>
-	);
-};
+const TableCell = ({ text }: { text: string }) => (
+	<td className="px-2 py-2 border-r border-gray-200 break-words text-xs">
+		{text}
+	</td>
+);
