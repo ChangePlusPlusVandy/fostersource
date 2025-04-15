@@ -6,6 +6,8 @@ import Modal from "./Modal";
 import MeetingComponent from "./Meeting";
 import ExistingMeetingList from "./ModalComponents/ExistingMeetingList";
 import NewMeeting from "./ModalComponents/NewMeeting";
+import ExistingWebinarList from "./ModalComponents/ExistingWebinarList";
+import NewWebinar from "./ModalComponents/NewWebinar";
 
 interface WorkshopCreationProps {
 	workshopName: string;
@@ -338,9 +340,10 @@ export default function WorkshopCreation({
 				onClose={() => setOpenModal(null)}
 				title="Create New Webinar"
 			>
-				<p>
-					This is the placeholder for adding a new webinar (once we get zoom).
-				</p>
+				<NewWebinar
+					setWebinarData={setWebinarData}
+					setOpenModal={setOpenModal}
+				/>
 			</Modal>
 
 			{/* Existing Webinar Modal */}
@@ -349,7 +352,10 @@ export default function WorkshopCreation({
 				onClose={() => setOpenModal(null)}
 				title="Add Existing Webinar"
 			>
-				<p>This is placeholder for finding existing webinars.</p>
+				<ExistingWebinarList
+					setWebinarData={setWebinarData}
+					setOpenModal={setOpenModal}
+				/>
 			</Modal>
 		</div>
 	);

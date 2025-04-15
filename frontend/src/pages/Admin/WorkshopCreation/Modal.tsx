@@ -25,7 +25,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
                 {title && <h2 className="text-xl font-semibold mb-4">{title}</h2>}
 
                 {/* Content */}
-                <div>{children}</div>
+                <div className="overflow-y-auto max-h-[70vh] pr-2">
+                    {children}
+                </div>
             </div>
         </div>
     );

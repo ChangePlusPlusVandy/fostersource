@@ -53,14 +53,15 @@ export const getWebinars = async (
 ): Promise<void> => {
     try {
         await getToken().then(async (token) => {
-            const webinars = await fetch(`https://api.zoom.us/v2/users/${process.env.ZOOM_USER_ID}/webinars`, {
+
+            const response = await fetch(`https://api.zoom.us/v2/users/${process.env.ZOOM_USER_ID}/webinars`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/x-www-form-urlencoded",
                 }
             })
-            console.log(await webinars.json())
+            let webinars = (await response.json()).webinars
             res.status(200).json({
                 webinars: webinars
             })
@@ -115,29 +116,26 @@ export const createWebinar = async (
     req: Request,
     res: Response
 ): Promise<void> => {
+    const { topic, startTime, duration } = req.body;
     try {
         await getToken().then(async (token) => {
-            const response = await fetch('https://api.zoom.us/v2/users/${process.env.ZOOM_USER_ID}/meetings', {
+            const response = await fetch(`https://api.zoom.us/v2/users/${process.env.ZOOM_USER_ID}/webinars`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: token
+                    "Authorization": `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    topic: 'My Meeting',
-                    type: 2,
-                    start_time: '2022-03-25T07:32:55Z',
-                    duration: 60,
+                    topic,
+                    start_time: startTime,
+                    duration: duration
                 })
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Error creating meeting:', errorData);
-            } else {
-                const data = await response.json();
-                console.log('Meeting created:', data);
-            }
+            let webinar = await response.json()
+            console.log(webinar)
+            res.status(200).json({
+                webinar: webinar
+            })
         })
     } catch (error) {
         console.error(error);
