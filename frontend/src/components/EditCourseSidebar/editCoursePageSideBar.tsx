@@ -29,7 +29,8 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 	const reset = useCourseEditStore((state) => state.reset);
 
 	useEffect(() => {
-		if (courseId) {
+		const hydrated = useCourseEditStore.persist.hasHydrated(); // Zustand persist provides this
+		if (courseId && !hydrated) {
 			const loadCourse = async () => {
 				try {
 					const res = await apiClient.get(`/courses/${courseId}`);
@@ -39,8 +40,8 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 				}
 			};
 			loadCourse();
-		} else {
-			reset(); // New course
+		} else if (!courseId) {
+			reset();
 		}
 	}, [courseId]);
 

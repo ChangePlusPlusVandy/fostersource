@@ -69,6 +69,8 @@ export default function WorkshopCreation() {
 		}
 	};
 
+	// TODO: get video or webinar
+
 	return (
 		<div>
 			<form onSubmit={handleSubmit} className="p-6 w-full ">

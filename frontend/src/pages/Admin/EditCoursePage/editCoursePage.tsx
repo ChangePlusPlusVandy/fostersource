@@ -11,6 +11,7 @@ import {
 import ReactSelect from "react-select";
 import SaveCourseButton from "../../../components/SaveCourseButtons";
 import { useCourseEditStore } from "../../../store/useCourseEditStore";
+import Modal from "../../../components/Modal";
 
 export const SetOptionsContext = createContext<React.Dispatch<
 	React.SetStateAction<OptionType[]>
@@ -38,22 +39,13 @@ const EditCourse = () => {
 		discussion,
 		courseDescription,
 		creditNumber,
-		time,
-		regStart,
-		courseType,
-		cost,
 		categories,
-		productType,
-		isLive,
-		isInPerson,
-		components,
 		thumbnailPath,
+		bannerPath,
 		shortUrl,
 		setField,
 		setAllFields,
 	} = useCourseEditStore();
-
-	const [file, setFile] = useState<File | null>(null);
 
 	type Category = { _id: string; category: string };
 
@@ -63,6 +55,8 @@ const EditCourse = () => {
 	const [enteredCategory, setEnteredCategory] = useState<string>("");
 	const [oldOptions, setOldOptions] = useState<OptionType[]>([]);
 	const [undoEdit, setUndoEdit] = useState<boolean>(false);
+
+	const date = new Date();
 
 	const getOptions = async () => {
 		try {
@@ -97,6 +91,7 @@ const EditCourse = () => {
 		getOptions();
 	}, []);
 
+	const [file, setFile] = useState<File | null>(null);
 	const [bannerImage, setBannerImage] = useState<File | null>(null);
 
 	const handleFileChange = async (
@@ -110,7 +105,6 @@ const EditCourse = () => {
 			const uploadedUrl = await uploadImageToCloudinary(selectedFile);
 
 			if (uploadedUrl) {
-				console.log("Catalog image uploaded to:", uploadedUrl);
 				setField("thumbnailPath", uploadedUrl);
 			}
 		}
@@ -125,8 +119,7 @@ const EditCourse = () => {
 
 			const uploadedUrl = await uploadImageToCloudinary(selectedFile);
 			if (uploadedUrl) {
-				console.log("Banner image uploaded to:", uploadedUrl);
-				// Store uploadedUrl somewhere
+				setField("bannerPath", uploadedUrl);
 			}
 		}
 	};
@@ -139,7 +132,7 @@ const EditCourse = () => {
 
 			const uploadedUrl = await uploadImageToCloudinary(droppedFile);
 			if (uploadedUrl) {
-				console.log("Catalog image uploaded to:", uploadedUrl);
+				setField("thumbnailPath", uploadedUrl);
 			}
 		}
 	};
@@ -152,7 +145,7 @@ const EditCourse = () => {
 
 			const uploadedUrl = await uploadImageToCloudinary(droppedFile);
 			if (uploadedUrl) {
-				console.log("Banner image uploaded to:", uploadedUrl);
+				setField("bannerPath", uploadedUrl);
 			}
 		}
 	};
@@ -358,7 +351,7 @@ const EditCourse = () => {
 							<div className="text-xs">
 								<textarea
 									className="w-full h-11 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
-									placeholder="Enter text here..."
+									placeholder="Enter summary displayed on preview"
 									value={discussion}
 									onChange={(e) => setField("discussion", e.target.value)}
 								/>
@@ -368,7 +361,7 @@ const EditCourse = () => {
 							<p className="text-sm">Description</p>
 							<textarea
 								className="w-full h-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
-								placeholder="Summary of the class"
+								placeholder="Short description that will show on the overview tab"
 								value={courseDescription}
 								onChange={(e) => setField("courseDescription", e.target.value)}
 							/>
@@ -440,7 +433,7 @@ const EditCourse = () => {
 							</button>
 						</div>
 					</div>
-					{modalOpen && (
+					{/* {modalOpen && (
 						<div
 							className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
 							onClick={() => setModalopen(false)}
@@ -448,51 +441,45 @@ const EditCourse = () => {
 							<div
 								className="md:w-[389px] md:h-[199px] w-[300px] h-[140px] flex bg-white overflow-auto border rounded-md p-5 md:p-6"
 								onClick={(e) => e.stopPropagation()}
-							>
-								<div className="flex flex-col w-full">
-									<div className="flex flex-row">
-										<p className="font-medium md:text-2xl text-lg">
-											Add Category Type
-										</p>
-										<button
-											className="flex ml-auto w-7 h-7 border border-gray-500 items-center justify-center rounded-sm"
-											onClick={(e) => setModalopen(false)}
-										>
-											<p className="text-3xl font-thin">×</p>
-										</button>
-									</div>
-									<p className="mt-2 md:mt-3 text-xs md:text-sm">Name</p>
-									<input
-										className="border w-full"
-										type="text"
-										value={enteredCategory}
-										onChange={(e) => setEnteredCategory(e.target.value)}
-									/>
-									<div className="flex flex-row ml-auto">
-										<button
-											className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border border-gray-400 bg-gray-white rounded-md mt-5 mr-3"
-											onClick={() => {
-												setModalopen(false);
-												setEnteredCategory("");
-											}}
-										>
-											<p className="text-gray-400 text-sm">Cancel</p>
-										</button>
-										<button
-											className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border bg-purple-500 rounded-md  mt-5"
-											onClick={() => {
-												setModalopen(false);
-												setEnteredCategory("");
-												addOption(enteredCategory);
-											}}
-										>
-											<p className="text-white text-sm">Create Type</p>
-										</button>
-									</div>
-								</div>
+							> */}
+					<Modal
+						isOpen={modalOpen}
+						onClose={() => setModalopen(false)}
+						title="Add Category Type"
+						footer={
+							<div className="flex flex-row ml-auto">
+								<button
+									className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border border-gray-400 bg-gray-white rounded-md mt-5 mr-3"
+									onClick={() => {
+										setModalopen(false);
+										setEnteredCategory("");
+									}}
+								>
+									<p className="text-gray-400 text-sm">Cancel</p>
+								</button>
+								<button
+									className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border bg-purple-500 rounded-md  mt-5"
+									onClick={() => {
+										setModalopen(false);
+										setEnteredCategory("");
+										addOption(enteredCategory);
+									}}
+								>
+									<p className="text-white text-sm">Create Type</p>
+								</button>
 							</div>
+						}
+					>
+						<div className="flex flex-col w-full">
+							<p className="mt-2 md:mt-3 text-xs md:text-sm">Name</p>
+							<input
+								className="border w-full"
+								type="text"
+								value={enteredCategory}
+								onChange={(e) => setEnteredCategory(e.target.value)}
+							/>
 						</div>
-					)}
+					</Modal>
 				</div>
 			</div>
 
@@ -506,7 +493,7 @@ const EditCourse = () => {
 						<div className="flex flex-row">
 							<p className="text-xs whitespace-nowrap">No Rating</p>
 							<p className="text-xs ml-5">{creditNumber}</p>
-							{/* <p className="text-xs ml-5 whitespace-nowrap">
+							<p className="text-xs ml-5 whitespace-nowrap">
 								{date &&
 									(() => {
 										const dateObj = new Date(date);
@@ -528,7 +515,7 @@ const EditCourse = () => {
 											</>
 										);
 									})()}
-							</p> */}
+							</p>
 							<div className="relative w-full h-[300px]">
 								{thumbnailPath && (
 									<div className="absolute right-0 top-0">
@@ -542,7 +529,7 @@ const EditCourse = () => {
 							</div>
 						</div>
 						<div className="-mt-56">
-							<p className="text-xs max-w-[513px]">{courseDescription}</p>
+							<p className="text-xs max-w-[513px]">{discussion}</p>
 						</div>
 						<div className="mt-16 flex flex-row">
 							<button className="w-40 h-9 bg-orange-400 rounded-lg">

@@ -1,23 +1,21 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { IRating } from "./ratingModel";
 import { IHandout } from "./handoutModel";
-
-// export interface IHandout {
-// 	title: string;
-// 	file: string;
-// }
+import { IUser } from "./userModel";
+import { ISpeaker } from "./speakerModel";
 
 export interface ICourse extends Document {
-	handouts: IHandout[];
-	ratings: IRating[];
+	handouts: (mongoose.Types.ObjectId | IHandout)[];
+	ratings: (mongoose.Types.ObjectId | IRating)[];
 	className: string;
 	discussion: string;
-	components: Object[];
+	components: (mongoose.Types.ObjectId | Object)[];
 	isLive: boolean;
 	categories: string[];
 	creditNumber: number;
 	courseDescription: string;
 	thumbnailPath: string;
+	bannerPath: string;
 	cost: number;
 	instructorName: string;
 	instructorDescription: string;
@@ -26,22 +24,15 @@ export interface ICourse extends Document {
 	lengthCourse: number;
 	time: Date;
 	isInPerson: boolean;
-	students: mongoose.Types.ObjectId[]; //for the users
-	managers: mongoose.Types.ObjectId[];
+	students: (mongoose.Types.ObjectId | IUser)[]; //for the users
+	managers: (mongoose.Types.ObjectId | IUser)[];
+	speakers: (mongoose.Types.ObjectId | ISpeaker)[];
 	regStart: Date;
 	regEnd: Date;
 	productType: string[];
 	shortUrl: string;
 	draft: boolean;
 }
-
-// const HandoutSchema = new Schema(
-//     {
-//         title: { type: String, required: true },
-//         file: { type: String, required: true }
-//     },
-//     { _id: false }
-// );
 
 const CourseSchema: Schema = new Schema(
 	{
@@ -65,6 +56,7 @@ const CourseSchema: Schema = new Schema(
 		creditNumber: { type: Number, required: false },
 		courseDescription: { type: String, required: false },
 		thumbnailPath: { type: String, required: false },
+		bannerPath: { type: String, required: false },
 		cost: { type: Number, required: false },
 		instructorDescription: { type: String, required: false },
 		instructorRole: { type: String, required: false },
@@ -87,6 +79,12 @@ const CourseSchema: Schema = new Schema(
 			{
 				type: Schema.Types.ObjectId,
 				ref: "User",
+			},
+		],
+		speakers: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Speaker",
 			},
 		],
 		regStart: { type: Date, required: false },

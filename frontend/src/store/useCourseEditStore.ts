@@ -1,19 +1,21 @@
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export type CourseType = "webinar" | "course" | "meeting";
 
 interface CourseEditState {
 	_id?: string;
-	handouts: string[]; // storing ObjectId strings
+	handouts: string[];
 	ratings: string[];
 	className: string;
 	discussion: string;
-	components: any[]; // You can type this more strictly if needed
+	components: any[];
 	isLive: boolean;
 	categories: string[];
 	creditNumber: number;
 	courseDescription: string;
 	thumbnailPath: string;
+	bannerPath: string;
 	cost: number;
 	instructorName: string;
 	instructorDescription: string;
@@ -22,8 +24,9 @@ interface CourseEditState {
 	lengthCourse: number;
 	time: Date;
 	isInPerson: boolean;
-	students: string[]; // ObjectIds as strings
+	students: string[];
 	managers: string[];
+	speakers: string[];
 	regStart: Date;
 	regEnd?: Date;
 	productType: string[];
@@ -54,6 +57,7 @@ const initialState: Omit<
 	creditNumber: 0,
 	courseDescription: "",
 	thumbnailPath: "",
+	bannerPath: "",
 	cost: 0,
 	instructorName: "",
 	instructorDescription: "",
@@ -64,6 +68,7 @@ const initialState: Omit<
 	isInPerson: false,
 	students: [],
 	managers: [],
+	speakers: [],
 	regStart: new Date(),
 	regEnd: undefined,
 	productType: [],
@@ -71,17 +76,34 @@ const initialState: Omit<
 	draft: true,
 };
 
-export const useCourseEditStore = create<CourseEditState>()((set) => ({
-	...initialState,
+export const useCourseEditStore = create<CourseEditState>()(
+	persist(
+		(set) => ({
+			...initialState,
 
-	setField: (key, value) => set((state) => ({ ...state, [key]: value })),
-	setAllFields: (data) =>
-		set((state) => ({
-			...state,
-			...data,
-		})),
-	reset: () => set(() => ({ ...initialState })),
-}));
+			setField: (key, value) =>
+				set((state) => ({
+					...state,
+					[key]: value,
+				})),
+
+			setAllFields: (data) =>
+				set((state) => ({
+					...state,
+					...data,
+				})),
+
+			reset: () =>
+				set(() => ({
+					...initialState,
+				})),
+		}),
+		{
+			name: "course-edit-store",
+			storage: createJSONStorage(() => sessionStorage),
+		}
+	)
+);
 
 export type CourseFormData = Omit<
 	CourseEditState,
