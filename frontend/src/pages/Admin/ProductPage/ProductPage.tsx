@@ -13,7 +13,7 @@ import {
 import apiClient from "../../../services/apiClient";
 import { Course } from "../../../shared/types/course";
 import { Rating } from "../../../shared/types/rating";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AdminCoursePreview from "../../../components/AdminCoursePreview/AdminCoursePreview";
 
 export interface Product {
@@ -175,8 +175,9 @@ export default function ProductPage() {
 	const [itemsPerPage, setItemsPerPage] = useState(15);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [products, setProducts] = useState<Product[]>([]);
-	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [productLoading, setProductLoading] = useState(false);
+
+	const navigate = useNavigate();
 
 	const elemColors: Record<string, string> = {
 		Ongoing: "#30CD5A",
@@ -370,7 +371,7 @@ export default function ProductPage() {
 							className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
 							style={{ backgroundColor: "#8757a3" }}
 							onClick={() => {
-								setIsModalOpen(true);
+								navigate("/admin/product/create");
 							}}
 						>
 							Add Course

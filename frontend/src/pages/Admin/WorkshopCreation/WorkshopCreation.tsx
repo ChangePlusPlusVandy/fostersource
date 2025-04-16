@@ -3,13 +3,11 @@ import WebinarComponent from "./Webinar";
 import InPersonComponent from "./InPerson";
 import OnDemandComponent from "./OnDemand";
 import Modal from "./Modal";
+import SaveCourseButton from "../../../components/SaveCourseButtons";
+import apiClient from "../../../services/apiClient";
+import { getCleanCourseData } from "../../../store/useCourseEditStore";
 
-interface WorkshopCreationProps {
-	workshopName: string;
-}
-export default function WorkshopCreation({
-	workshopName,
-}: WorkshopCreationProps) {
+export default function WorkshopCreation() {
 	const [formData, setFormData] = useState({
 		title: "",
 		summary: "",
@@ -50,17 +48,32 @@ export default function WorkshopCreation({
 		setFormData({ ...formData, [name]: value });
 	};
 
+	const course = getCleanCourseData();
+
 	const handleSubmit = (event: any) => {
 		event.preventDefault();
 		console.log("Form submitted:", formData);
 	};
 
+	const createVideo = async () => {
+		try {
+			const response = await apiClient.post("/videos", {
+				title: formData.title,
+				description: formData.summary,
+				videoUrl: onDemandData.embeddingLink,
+				courseId: course._id,
+				published: true, // could be toggled later
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	// TODO: get video or webinar
+
 	return (
 		<div>
 			<form onSubmit={handleSubmit} className="p-6 w-full ">
-				<h2 className="text-xl font-semibold flex items-center gap-2">
-					{workshopName}
-				</h2>
 				<div className="mt-4">
 					<label className="text-sm font-medium block">Title</label>
 					<input
@@ -261,18 +274,13 @@ export default function WorkshopCreation({
 						required
 					/>
 				</div>
-				<div className="mt-6 flex justify-end gap-2">
+				<div className="flex gap-4 justify-end">
+					<button className="text-purple2">Discard</button>
 					<button
-						type="submit"
-						className="px-4 py-2 bg-purple-800 text-white rounded"
+						onClick={createVideo}
+						className="bg-purple2 text-white px-10 py-2 rounded-md"
 					>
-						Save and Exit
-					</button>
-					<button
-						type="button"
-						className="px-4 py-2 border border-purple-800 text-purple-800 rounded"
-					>
-						Exit
+						Save
 					</button>
 				</div>
 			</form>

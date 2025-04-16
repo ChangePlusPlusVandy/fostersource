@@ -1,8 +1,12 @@
 import React from "react";
-import logo from "./logo.svg";
+import AppRoutes from "./routes/appRoutes";
 
-function App() {
-	return <div className="App">Hi</div>;
-}
+const App: React.FC = () => {
+	return (
+		<div className="min-h-screen flex flex-col">
+			<AppRoutes />
+		</div>
+	);
+};
 
 export default App;
