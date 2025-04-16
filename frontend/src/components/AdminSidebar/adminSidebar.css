@@ -1,5 +1,5 @@
 .admin-sidebar {
-	width: 250px;
+	transition: width 0.3s ease-in-out;
 	padding-left: 0;
 	max-height: max-content;
 	background-color: #ffffff;
@@ -11,7 +11,6 @@
 	border-radius: 0.7rem;
 	overflow-x: hidden;
 	overflow-y: auto;
-	transition: width 0.3s ease-in-out;
 	display: flex;
 	flex-direction: column;
 }
@@ -83,19 +82,9 @@ body {
 
 .admin-submenu {
 	list-style: none;
-	padding: 0;
-	margin: 0.5rem 0 0 0;
 	overflow: hidden;
 	max-height: 500px;
 	transition: max-height 0.3s ease-in-out;
-}
-
-.admin-submenu li {
-	padding-left: 0.7rem;
-	padding-top: 0.5rem;
-	padding-bottom: 0.5rem;
-	position: relative;
-	border-radius: 0.5rem;
 }
 
 .admin-submenu li.active::after {
@@ -122,9 +111,4 @@ body {
 
 .admin-footer-items .admin-menu {
 	flex-grow: 0;
-}
-
-.admin-footer-items li:last-child:hover svg,
-.admin-footer-items li:last-child:hover span {
-	color: #be0000 !important;
 }
