@@ -4,7 +4,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IQuestion extends Document {
 	question: string;
 	explanation?: string;
-	isMCQ: boolean;
+	answerType: string;
 	answers?: string[];
 	isRequired: boolean;
 }
@@ -14,7 +14,7 @@ const QuestionSchema: Schema = new Schema(
 	{
 		question: { type: String, required: true },
 		explanation: { type: String },
-		isMCQ: { type: Boolean, required: true },
+		answerType: { type: String, required: true },
 		answers: [{ type: String }],
 		isRequired: {type: Boolean, required: true },
 	},
