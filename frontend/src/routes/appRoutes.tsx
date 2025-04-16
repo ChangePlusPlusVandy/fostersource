@@ -154,7 +154,7 @@ function AppRoutes() {
 						display: "flex",
 						flex: 1,
 						overflow: "auto",
-						marginLeft: isCollapsed ? "6rem" : "17rem",
+						marginLeft: isCollapsed || isAdminRoute ? "6rem" : "17rem",
 					}}
 				>
 					<Routes>
