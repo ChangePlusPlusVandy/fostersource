@@ -1,10 +1,21 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import {
+	FaStar as _FaStar,
+	FaStarHalfAlt as _FaStarHalfAlt,
+} from "react-icons/fa";
+import { ComponentType } from "react";
+
 import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
 import SurveyModal from "./SurveyModal";
+
+const FaStar = _FaStar as ComponentType<{ size?: number; color?: string }>;
+const FaStarHalfAlt = _FaStarHalfAlt as ComponentType<{
+	size?: number;
+	color?: string;
+}>;
 
 interface CartItem {
 	className: string;

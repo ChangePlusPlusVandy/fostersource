@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt as _FaTrashAlt } from "react-icons/fa";
+import { ComponentType } from "react";
 import apiClient from "../../../services/apiClient";
 import qs from "qs";
 import { useCourseEditStore } from "../../../store/useCourseEditStore";
+
+const FaTrashAlt = _FaTrashAlt as ComponentType<{
+	size?: number;
+	color?: string;
+}>;
 
 interface RegistrantDisplayInfo {
 	id: string;
