@@ -9,8 +9,8 @@ export default function Home() {
 	const handleFilterRedirect = (format: string) => {
 		navigate(`/catalog?format=${format}`);
 	};
-
 	return (
+		
 		<div className="bg-gray-100 min-h-screen flex w-full">
 			<div className="flex-grow">
 				<main className="container mx-auto py-8 px-6 max-w-screen-lg">
