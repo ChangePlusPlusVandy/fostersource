@@ -59,7 +59,7 @@ export const items = [
 	{
 		icon: <MessageCircleQuestion />,
 		description: "FAQs",
-		href: "#",
+		href: "/faqs",
 	},
 	{ icon: <ShoppingCart />, description: "Cart", href: "/cart" },
 	{
