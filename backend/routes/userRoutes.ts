@@ -5,10 +5,9 @@ import {
 	updateUser,
 	deleteUser,
 	register,
-	checkAdmin
+	checkAdmin,
 } from "../controllers/userController";
 import { verifyFirebaseAuth } from "../middlewares/authMiddleware";
-
 
 const router = express.Router();
 
@@ -27,7 +26,8 @@ router.delete("/:id", deleteUser);
 // PUT Registers a user for a bunch of classes
 router.post("/register", register);
 
-//router.get("/is-admin", verifyFirebaseAuth, checkAdmin); // Protect the route
+// @ts-ignore
+router.get("/is-admin", verifyFirebaseAuth, checkAdmin); // Protect the route
 
-
+// @ts-ignore
 export default router;

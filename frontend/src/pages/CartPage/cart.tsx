@@ -1,17 +1,21 @@
-import {registerFromCart, removeFromCart} from "../../services/registrationServices";
+import CoursePayment from "../../components/PaymentButton";
+import {
+	registerFromCart,
+	removeFromCart,
+} from "../../services/registrationServices";
 
 interface CartItem {
 	className: string;
 	cost: number;
 	creditNumber: number;
 	instructor: string;
-	_id: string
+	_id: string;
 }
 export default function Cart() {
-
 	const user = JSON.parse(localStorage.getItem("user") || "{}");
 	const cartItems: CartItem[] = user?.cart ? user.cart : [];
 	const totalCost = cartItems.reduce((sum, item) => sum + item.cost, 0);
+	const courseIds = cartItems.map((item) => item._id);
 
 	const handleRemoveItem = (course: {
 		className: string;
@@ -23,7 +27,7 @@ export default function Cart() {
 	};
 
 	const handleCheckout = (): void => {
-		registerFromCart()
+		registerFromCart();
 	};
 
 	return (
@@ -64,12 +68,21 @@ export default function Cart() {
 				<p className="text-lg">
 					Total Cost: <span className="font-bold">${totalCost.toFixed(2)}</span>
 				</p>
-				<button
-					onClick={handleCheckout}
-					className="mt-4 px-6 py-3 bg-orange-500 text-white text-lg font-medium rounded-lg hover:bg-orange-600 transition"
-				>
-					Checkout
-				</button>
+				{totalCost === 0 ? (
+					<button
+						onClick={handleCheckout}
+						className="mt-4 px-6 py-3 bg-orange-500 text-white text-lg font-medium rounded-lg hover:bg-orange-600 transition"
+					>
+						Checkout
+					</button>
+				) : (
+					<CoursePayment
+						courseIds={courseIds}
+						price={totalCost}
+						userId={user._id}
+						onSuccess={handleCheckout}
+					/>
+				)}
 			</div>
 		</div>
 	);

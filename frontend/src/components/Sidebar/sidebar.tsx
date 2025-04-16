@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 
 import authService from "../../services/authService";
-import { log } from "console";
 
 // User information
 export const userInfo = {
@@ -74,7 +73,7 @@ export const items = [
 export const admin = {
 	icon: <KeyRound />,
 	description: "Admin Tools",
-	href: "/admin",
+	href: "/admin/products",
 };
 
 // Logout information for conditional rendering
@@ -127,7 +126,6 @@ export function Sidebar({
 			<SidebarItems
 				isCollapsed={isCollapsed}
 				isLoggedIn={isLoggedIn}
-				isAdmin={userInfo.isAdmin}
 				setIsLoggedIn={setIsLoggedIn}
 				cartItemCount={cartItemCount}
 			/>
@@ -176,7 +174,6 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 
 interface SidebarItemsProps {
 	isLoggedIn: boolean;
-	isAdmin: boolean;
 	isCollapsed: boolean;
 	setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
 	cartItemCount: number;
@@ -186,10 +183,26 @@ interface SidebarItemsProps {
 export function SidebarItems({
 	isCollapsed,
 	isLoggedIn,
-	isAdmin,
 	setIsLoggedIn,
 	cartItemCount,
 }: SidebarItemsProps) {
+	const [isAdmin, setIsAdmin] = useState(
+		localStorage.user && JSON.parse(localStorage.user).role === "staff"
+	);
+
+	// const checkAdmin = async () => {
+	// 	try {
+	// 		const response = await apiClient.get("/users/is-admin");
+	// 		setIsAdmin(response.data.isAdmin);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// };
+
+	// useEffect(() => {
+	// 	checkAdmin();
+	// }, []);
+
 	const handleLogOut = async () => {
 		try {
 			await authService.logout();
@@ -215,8 +228,8 @@ export function SidebarItems({
 				className={`${active}`}
 				onClick={() => setActiveItem(window.location.pathname)}
 			>
-				<div className={`${iconDescMargin}`}>{icon}</div>
 				<Link to={href}>
+					<div className={`${iconDescMargin}`}>{icon}</div>
 					{!isCollapsed && description}{" "}
 					{description === "Cart" && cartItemCount !== 0
 						? `(${cartItemCount})`
@@ -235,18 +248,23 @@ export function SidebarItems({
 			{isAdmin && (
 				<li
 					className={`${adminActive}`}
-					onClick={() => setActiveItem(window.location.pathname)}
+					onClick={() => {
+						setActiveItem(window.location.pathname);
+						window.location.href = admin.href;
+					}}
 				>
 					<div className={`${iconDescMargin}`}>{admin.icon}</div>
-					<Link to={admin.href}>{!isCollapsed && admin.description}</Link>
+					<Link to={""}>{!isCollapsed && admin.description}</Link>
 				</li>
 			)}
 			{sidebarItems}
 			{isLoggedIn && (
 				<div className="logout">
 					<li className={`${logoutActive}`} onClick={() => handleLogOut()}>
-						<div className={`${iconDescMargin}`}>{logout.icon}</div>
-						<Link to={logout.href}>{!isCollapsed && logout.description}</Link>
+						<Link to={logout.href}>
+							<div className={`${iconDescMargin}`}>{logout.icon}</div>
+							{!isCollapsed && logout.description}
+						</Link>
 					</li>
 				</div>
 			)}

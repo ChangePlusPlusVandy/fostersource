@@ -1,0 +1,114 @@
+.admin-sidebar {
+	transition: width 0.3s ease-in-out;
+	padding-left: 0;
+	max-height: max-content;
+	background-color: #ffffff;
+	margin-right: 1rem;
+	margin-left: 1rem;
+	min-height: 80vh;
+	max-height: 95vh;
+	box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+	border-radius: 0.7rem;
+	overflow-x: hidden;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.admin-sidebar.expanded {
+	width: 250px;
+}
+
+.profile-pic {
+	vertical-align: middle;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+}
+
+.admin-login {
+	background-color: #f79518;
+	text-align: center;
+	border-radius: 0.5rem;
+}
+
+.admin-menu li > div:first-child {
+	transition: background-color 0.2s ease;
+}
+
+.admin-menu li a,
+.admin-menu li > div {
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	color: inherit;
+	width: 100%;
+}
+
+.admin-menu li.active {
+	background-color: #7b489933;
+}
+
+.admin-menu li.active > div:first-child,
+.admin-menu li.parent-expanded:not(.active)::after {
+	display: none;
+}
+
+.admin-menu .logout li:hover a {
+	color: #be0000 !important;
+}
+
+.admin-menu .logout li:hover svg {
+	color: #be0000 !important;
+}
+
+.admin-menu .logout li.active {
+	background-color: #f7181833 !important;
+	color: #be0000 !important;
+}
+
+.admin-menu .logout li.active a {
+	color: #be0000 !important;
+}
+
+.admin-menu .logout li.active::after {
+	background-color: #be0000 !important;
+}
+
+body {
+	font-family: "Poppins", sans-serif;
+	font-size: large;
+}
+
+.admin-submenu {
+	list-style: none;
+	overflow: hidden;
+	max-height: 500px;
+	transition: max-height 0.3s ease-in-out;
+}
+
+.admin-submenu li.active::after {
+	height: 80%;
+}
+
+.admin-submenu li a {
+	width: 100%;
+}
+
+.admin-submenu li svg {
+	width: 18px;
+	height: 18px;
+	margin-right: 0.75rem;
+}
+
+.admin-footer-items {
+	margin-top: auto;
+	flex-shrink: 0;
+	border-top: 1px solid #eee;
+	padding-top: 0.5rem;
+	padding-bottom: 1rem;
+}
+
+.admin-footer-items .admin-menu {
+	flex-grow: 0;
+}

@@ -23,9 +23,9 @@ export const createQuestion = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
-	const { question, isMCQ, answers } = req.body;
+	const { question, explanation, answerType, answers, isRequired} = req.body;
 	try {
-		const newQuestion = new Question({ question, isMCQ, answers });
+		const newQuestion = new Question({ question, explanation, answerType, answers, isRequired });
 		const savedQuestion = await newQuestion.save();
 		res.status(201).json(savedQuestion);
 	} catch (error) {

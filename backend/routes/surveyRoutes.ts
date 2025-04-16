@@ -1,7 +1,7 @@
 import express from "express";
 import {
-	getSurveys,
-	createSurvey,
+	getSurvey,
+	// createSurvey,
 	updateSurvey,
 	deleteSurvey,
 } from "../controllers/surveyController";
@@ -9,10 +9,10 @@ import {
 const router = express.Router();
 
 // GET all surveys or filter by query parameters
-router.get("/", getSurveys);
+router.get("/", getSurvey);
 
 // POST new survey
-router.post("/", createSurvey);
+// router.post("/", createSurvey);
 
 // PUT update survey by ID
 router.put("/:id", updateSurvey);

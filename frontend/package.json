@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
+		"@paypal/react-paypal-js": "^8.8.3",
 		"@react-google-maps/api": "^2.20.6",
 		"@testing-library/jest-dom": "^5.17.0",
 		"@testing-library/react": "^13.4.0",
@@ -13,7 +14,7 @@
 		"@types/node": "^16.18.113",
 		"@types/react": "^18.3.11",
 		"@types/react-dom": "^18.3.1",
-		"axios": "^1.7.7",
+		"axios": "^1.8.3",
 		"date-fns": "^4.1.0",
 		"firebase": "^11.0.1",
 		"framer-motion": "^12.4.1",
@@ -22,10 +23,12 @@
 		"react-dom": "^18.3.1",
 		"react-icons": "^5.4.0",
 		"react-router-dom": "^6.29.0",
-		"react-scripts": "^3.0.1",
+		"react-scripts": "^5.0.1",
+		"react-select": "^5.10.1",
 		"source-map-loader": "^5.0.0",
 		"typescript": "^4.9.5",
-		"web-vitals": "^2.1.4"
+		"web-vitals": "^2.1.4",
+		"zustand": "^5.0.3"
 	},
 	"scripts": {
 		"start": "react-scripts start",

@@ -8,3 +8,5 @@ frontend/node_modules/
 frontend/build/
 .idea/*
 .DS_Store
+
+backend/uploads/*

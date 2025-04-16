@@ -5,7 +5,10 @@ import CatalogCourseComponent from "./CatalogCourseComponent";
 import CatalogSearchBar from "./CatalogSearchBar";
 import { dummyCourses } from "../../shared/DummyCourses";
 import apiClient from "../../services/apiClient";
-import {addToCart, insertCoursesIndividually} from "../../services/registrationServices";
+import {
+	addToCart,
+	insertCoursesIndividually,
+} from "../../services/registrationServices";
 
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
@@ -20,14 +23,17 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 	const [selectedCredits, setSelectedCredits] = useState<string>("All");
 	const [selectedFormat, setSelectedFormat] = useState<string>("All");
 	const [selectedCost, setSelectedCost] = useState<string>("All");
+	const [loading, setLoading] = useState(false);
 
 	// Read query parameters from the URL and apply filters
 	useEffect(() => {
 		async function fetchData() {
 			try {
+				setLoading(true);
 				const response = await apiClient.get("/courses");
 				setCourses(response.data.data);
 				setFilteredCourses(response.data.data);
+				setLoading(false);
 			} catch (error) {
 				console.error(error);
 			}
@@ -122,7 +128,7 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 
 	async function registerAll() {
 		await insertCoursesIndividually().then(() => {
-			console.log("Inserted!")
+			console.log("Inserted!");
 		});
 	}
 
@@ -139,9 +145,15 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 
 			<div className="container mx-auto">
 				<div className="flex flex-col gap-6">
-					{filteredCourses.length > 0 ? (
+					{loading ? (
+						<p>Loading...</p>
+					) : filteredCourses.length > 0 ? (
 						filteredCourses.map((course, index) => (
-							<CatalogCourseComponent key={index} course={course} setCartItemCount={setCartItemCount} />
+							<CatalogCourseComponent
+								key={index}
+								course={course}
+								setCartItemCount={setCartItemCount}
+							/>
 						))
 					) : (
 						<p className="text-gray-600 text-center">No courses found.</p>

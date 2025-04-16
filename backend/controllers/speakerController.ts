@@ -1,5 +1,26 @@
 import { Request, Response } from "express";
 import Speaker from "../models/speakerModel";
+// import multer from "multer";
+// import path from "path";
+// import fs from "fs";
+
+// Configure multer for file uploads
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     const uploadPath = path.join(__dirname, "../../backend/uploads");
+//     if (!fs.existsSync(uploadPath)) {
+//       fs.mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, `${Date.now()}-${file.originalname}`);
+//   },
+// });
+
+// const upload = multer({ storage });
+
+// export const uploadSpeakerImage = upload.single("image");
 
 // @desc    Get all speakers or filter by query parameters
 // @route   GET /api/speakers
@@ -11,14 +32,14 @@ export const getSpeakers = async (
 	try {
 		const filters = req.query;
 		const speakers = await Speaker.find(filters);
-
 		res.status(200).json(speakers);
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-		} else {
-			res.status(500).json({ message: "An unknown error occurred" });
-		}
+		res
+			.status(500)
+			.json({
+				message:
+					error instanceof Error ? error.message : "An unknown error occurred",
+			});
 	}
 };
 
@@ -30,43 +51,35 @@ export const createSpeaker = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		const { id, name, title, email, company, bio, disclosures, image } =
-			req.body;
+		console.log("Request body:", req.body);
+		console.log("Request file:", req.file);
 
-		// Check if speaker exists
-		const existingSpeaker = await Speaker.findOne({ id });
+		const { name, title, email, company, bio, disclosures } = req.body;
 
-		if (existingSpeaker) {
-			res.status(200).json({
-				speaker: existingSpeaker,
-				message: "Speaker already exists",
-			});
-			return;
-		}
+		// Store image URL if an image is uploaded
+		const imageUrl = req.file
+			? `http://localhost:5001/uploads/${req.file.filename}`
+			: null;
 
-		// Create new speaker
 		const speaker = new Speaker({
-			id,
 			name,
 			title,
 			email,
 			company,
 			bio,
-			disclosures,
-			image,
+			disclosures: disclosures ? disclosures.split(",") : [],
+			image: imageUrl,
 		});
-		await speaker.save();
 
-		res.status(201).json({
-			speaker,
-			message: "Speaker created successfully",
-		});
+		await speaker.save();
+		res.status(201).json({ speaker, message: "Speaker created successfully" });
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-		} else {
-			res.status(500).json({ message: "An unknown error occurred" });
-		}
+		res
+			.status(500)
+			.json({
+				message:
+					error instanceof Error ? error.message : "An unknown error occurred",
+			});
 	}
 };
 
@@ -81,11 +94,14 @@ export const updateSpeaker = async (
 		const { id: speakerId } = req.params;
 		const updates = req.body;
 
-		const updatedSpeaker = await Speaker.findByIdAndUpdate(
-			speakerId,
-			updates,
-			{ new: true } // Returns the updated document
-		);
+		// If a new image is uploaded, store its URL
+		if (req.file) {
+			updates.image = `http://localhost:5001/uploads/${req.file.filename}`;
+		}
+
+		const updatedSpeaker = await Speaker.findByIdAndUpdate(speakerId, updates, {
+			new: true,
+		});
 
 		if (!updatedSpeaker) {
 			res.status(404).json({ message: "Speaker not found" });
@@ -94,11 +110,12 @@ export const updateSpeaker = async (
 
 		res.status(200).json(updatedSpeaker);
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-		} else {
-			res.status(500).json({ message: "An unknown error occurred" });
-		}
+		res
+			.status(500)
+			.json({
+				message:
+					error instanceof Error ? error.message : "An unknown error occurred",
+			});
 	}
 };
 
@@ -115,25 +132,22 @@ export const deleteSpeaker = async (
 		// Check if speaker exists
 		const speaker = await Speaker.findById(id);
 		if (!speaker) {
-			res.status(404).json({
-				success: false,
-				message: "Speaker not found.",
-			});
+			res.status(404).json({ success: false, message: "Speaker not found." });
 			return;
 		}
 
 		// Delete the speaker
 		await Speaker.deleteOne({ _id: id });
 
-		res.status(200).json({
-			success: true,
-			message: "Speaker deleted successfully.",
-		});
+		res
+			.status(200)
+			.json({ success: true, message: "Speaker deleted successfully." });
 	} catch (error) {
-		if (error instanceof Error) {
-			res.status(500).json({ message: error.message });
-		} else {
-			res.status(500).json({ message: "An unknown error occurred" });
-		}
+		res
+			.status(500)
+			.json({
+				message:
+					error instanceof Error ? error.message : "An unknown error occurred",
+			});
 	}
 };
