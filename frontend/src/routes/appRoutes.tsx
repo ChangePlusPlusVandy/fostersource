@@ -60,6 +60,11 @@ function AppRoutes() {
 		window.location.href.indexOf("/admin") > -1
 	);
 
+	const [isAuthRoute, setIsAuthRoute] = useState(
+		window.location.href.indexOf("/register") > -1 ||
+			window.location.href.indexOf("/login") > -1
+	);
+
 	// useEffect(() => {
 	// 	setIsAdminRoute(window.location.href.indexOf("/admin") > -1);
 	// }, [window.location.href]);
@@ -137,6 +142,8 @@ function AppRoutes() {
 								setIsLoggedIn={setIsLoggedIn}
 							/>
 						</div>
+					) : isAuthRoute ? (
+						<div></div>
 					) : (
 						<Sidebar
 							isCollapsed={isCollapsed}
@@ -281,37 +288,35 @@ function AppRoutes() {
 						/>
 						<Route
 							path="/admin/survey/responses"
-							element={
-								<SurveySummary></SurveySummary>
-							}
+							element={<SurveySummary></SurveySummary>}
 						/>
 						<Route
 							path="/admin/product/edit/:id"
 							element={
 								<AdminRoute>
-								<EditSideBar />
+									<EditSideBar />
 								</AdminRoute>
 							}
-							>
+						>
 							<Route index element={<Navigate to="details" replace />} />
 							<Route path="details" element={<EditCourse />} />
 							<Route path="pricing" element={<Pricing />} />
 							<Route
 								path="components"
 								element={
-								<ComponentPage
-									workshop={undefined}
-									survey={undefined}
-									certificate={undefined}
-								/>
+									<ComponentPage
+										workshop={undefined}
+										survey={undefined}
+										certificate={undefined}
+									/>
 								}
 							/>
 							<Route
 								path="workshop"
 								element={
-								<WorkshopCreation
-									workshopName={`Workshop | The Inclusive Family Support Model`}
-								/>
+									<WorkshopCreation
+										workshopName={`Workshop | The Inclusive Family Support Model`}
+									/>
 								}
 							/>
 							<Route path="speakers" element={<SpeakerPage />} />

@@ -8,6 +8,20 @@ interface AuthState {
 	user: firebase.User | null;
 }
 
+interface RegisterCredentials {
+	email: string;
+	password: string;
+	name: string;
+	phone: string;
+	certification: string;
+	company: string;
+	address1: string;
+	address2: string;
+	city: string;
+	state: string;
+	zip: string;
+	country: string;
+}
 class AuthService {
 	private static instance: AuthService;
 	private authState: AuthState = {
@@ -106,7 +120,20 @@ class AuthService {
 		return this.authState.user;
 	}
 
-	async register(email: string, password: string, name: string): Promise<void> {
+	async register({
+		email,
+		password,
+		name,
+		phone = "N/A",
+		certification,
+		company = "N/A",
+		address1 = "N/A",
+		address2 = "N/A",
+		city = "N/A",
+		state = "N/A",
+		country = "N/A",
+		zip = "N/A",
+	}: RegisterCredentials): Promise<void> {
 		try {
 			const userCredential = await auth.createUserWithEmailAndPassword(
 				email,
@@ -128,7 +155,16 @@ class AuthService {
 					email,
 					name,
 					role: "foster parent",
-					isColorado: true,
+					phone,
+					certification,
+					company,
+					address1,
+					address2,
+					city,
+					state,
+					country,
+					zip,
+					isColorado: state === "Colorado",
 				},
 				{
 					headers: {
