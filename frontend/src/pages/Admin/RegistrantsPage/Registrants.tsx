@@ -3,7 +3,7 @@ import { FaTrashAlt as _FaTrashAlt } from "react-icons/fa";
 import { ComponentType } from "react";
 import apiClient from "../../../services/apiClient";
 import qs from "qs";
-import { useCourseEditStore } from "../../../store/useCourseEditStore";
+import { getCleanCourseData, useCourseEditStore } from "../../../store/useCourseEditStore";
 
 const FaTrashAlt = _FaTrashAlt as ComponentType<{
 	size?: number;
@@ -25,7 +25,8 @@ interface RegistrantDisplayInfo {
 export default function Registrants() {
 	const { students, setField, setAllFields } = useCourseEditStore();
 
-	const courseId = "67acf95247f5d8867107e881"; // Replace with useParams later
+	const courseId = getCleanCourseData(); // Replace with useParams later
+	const numCourseComponents = 0; // TODO: make this accurate
 
 	const [registrants, setRegistrants] = useState<RegistrantDisplayInfo[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -54,7 +55,20 @@ export default function Registrants() {
 					preRegistered: "N/A",
 				}));
 
-				// TODO: fix this
+				for (const partialRegInfo of formatted) {
+					const [paymentDate, paymentAmt, paymentId] = await fetchPaymentData(partialRegInfo.id);
+					const [completedCheck, completedStatus] = await fetchProgressData(partialRegInfo.id);  
+
+					if (paymentDate != null) {
+						partialRegInfo.registrationDate = paymentDate; 
+						partialRegInfo.paid = `$${paymentAmt}`; 
+						partialRegInfo.transactionId = paymentId; 
+					} 
+					if (completedCheck != null) {
+						partialRegInfo.completed = completedCheck ? completedStatus : `${completedStatus} out of ${numCourseComponents}`; 
+					}
+					
+				}
 
 				setRegistrants(formatted);
 			} catch (err: any) {
@@ -64,6 +78,50 @@ export default function Registrants() {
 				setIsLoading(false);
 			}
 		};
+
+		const fetchPaymentData = async (userId: string) => {
+			try {
+				const paymentQuery = qs.stringify(
+					{ 
+						userId: userId, 
+						courses: { $in: [courseId] } },
+					{ arrayFormat: "brackets" }
+				);
+				const paymentRes = await apiClient.get(`/payments?${paymentQuery}`); 
+				const paymentData = paymentRes.data; 
+
+				const paymentDate = paymentData.date; 
+				const paymentAmt = paymentData.amount; 
+				const paymentId = paymentData.transactionId; 
+				return [paymentDate, paymentAmt, paymentId]; 
+			} catch (error) {
+				console.error("Failed to load payment data", error);
+				return [null, null, null]; 
+			}
+		};
+
+		const fetchProgressData = async (userId: string) => {
+			try {
+				const progressQuery = qs.stringify(
+					{userId: userId, courseId: courseId},
+					{ arrayFormat: "brackets" }
+				); 
+				const progressRes = await apiClient.get(`/progress?${progressQuery}`); 
+				const progressData = progressRes.data; 
+
+				const courseCompleted = progressData.isComplete; 
+				if (courseCompleted) {
+					const courseStatus = progressData.dateCompleted.toDateString(); 
+					return [courseCompleted, courseStatus]; 
+				} else {
+					const courseStatus = progressData.completedCourses == null ? 0 : progressData.completedCourses.length; 
+					return [courseCompleted, courseStatus]; 
+				}
+			} catch (error) {
+				console.error("Failed to load progress data", error);
+				return [null, null];  
+			}
+		}; 
 
 		fetchRegistrants();
 	}, [courseId]);
