@@ -39,6 +39,7 @@ import Registrants from "../pages/Admin/RegistrantsPage/Registrants";
 import SurveySummary from "../pages/Admin/SurveySummaryPage/SurveySummary";
 import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
+import ProductProgressReport from "../pages/Admin/ProductSummaryPage/ProductProgressReport";
 import FAQPage from "../pages/FAQPage/FAQPage";
 import HandoutPage from "../pages/Admin/HandoutsPage/handoutsPage";
 // import AdminPage from "../pages/Admin/AdminPage";
@@ -239,6 +240,14 @@ function AppRoutes() {
 							}
 						/>
 						<Route
+							path="admin/reports/progress"
+							element={
+								<AdminRoute>
+									<ProductProgressReport />
+                 </AdminRoute>
+                }
+              />
+            <Route
 							path="admin/registrants"
 							element={
 								<AdminRoute>
