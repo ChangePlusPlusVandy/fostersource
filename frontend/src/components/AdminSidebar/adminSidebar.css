@@ -1,27 +1,22 @@
 .admin-sidebar {
-	min-width: 70px;
-	width: 70px;
+	transition: width 0.3s ease-in-out;
 	padding-left: 0;
-	max-height: min-content;
+	max-height: max-content;
 	background-color: #ffffff;
 	margin-right: 1rem;
 	margin-left: 1rem;
-	height: 80vh;
+	min-height: 80vh;
+	max-height: 95vh;
 	box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 	border-radius: 0.7rem;
-	overflow: auto;
-	transition: all 0.2s;
+	overflow-x: hidden;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
 }
 
-.profile {
-	vertical-align: middle;
-	font: medium;
-	max-width: 75%;
-	margin-top: 1.8rem;
-	margin-left: 1.8rem;
-	margin-right: 1.8rem;
-	margin-bottom: 20px;
-	align-items: center;
+.admin-sidebar.expanded {
+	width: 250px;
 }
 
 .profile-pic {
@@ -37,49 +32,26 @@
 	border-radius: 0.5rem;
 }
 
-.admin-menu {
-	font-weight: 500;
-	list-style-type: none;
+.admin-menu li > div:first-child {
+	transition: background-color 0.2s ease;
 }
 
-.admin-menu li {
-	vertical-align: middle;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	padding-top: 0.7rem;
-	padding-bottom: 0.7rem;
-	padding-left: 1.8rem;
-	padding-right: 1.8rem;
-	position: relative;
-}
-
-.admin-menu a {
+.admin-menu li a,
+.admin-menu li > div {
 	text-decoration: none;
 	display: flex;
 	align-items: center;
-}
-
-.admin-menu li:hover svg {
-	color: #8757a3;
+	color: inherit;
+	width: 100%;
 }
 
 .admin-menu li.active {
 	background-color: #7b489933;
-	color: black;
 }
 
-.admin-menu li.active::after {
-	content: "";
-	position: absolute;
-	right: 0;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 3px;
-	height: 65%;
-	background-color: #8757a3;
-	border-top-left-radius: 5px;
-	border-bottom-left-radius: 5px;
+.admin-menu li.active > div:first-child,
+.admin-menu li.parent-expanded:not(.active)::after {
+	display: none;
 }
 
 .admin-menu .logout li:hover a {
@@ -108,25 +80,35 @@ body {
 	font-size: large;
 }
 
-.profile-pic {
-	width: 40px;
-	height: 40px;
+.admin-submenu {
+	list-style: none;
+	overflow: hidden;
+	max-height: 500px;
+	transition: max-height 0.3s ease-in-out;
 }
 
-.admin-sidebar {
-	min-width: 70px;
-	width: 70px;
-	padding-left: 0;
+.admin-submenu li.active::after {
+	height: 80%;
 }
 
-.admin-menu li {
-	padding-left: 1.5rem;
+.admin-submenu li a {
+	width: 100%;
 }
 
-.profile {
-	padding-left: 0px;
-	padding-right: 0px;
-	margin-left: 0.95rem;
-	margin-right: 0px;
-	max-width: 60%;
+.admin-submenu li svg {
+	width: 18px;
+	height: 18px;
+	margin-right: 0.75rem;
+}
+
+.admin-footer-items {
+	margin-top: auto;
+	flex-shrink: 0;
+	border-top: 1px solid #eee;
+	padding-top: 0.5rem;
+	padding-bottom: 1rem;
+}
+
+.admin-footer-items .admin-menu {
+	flex-grow: 0;
 }

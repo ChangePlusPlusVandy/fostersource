@@ -1,109 +1,145 @@
 import React, { useEffect, useState, useRef, ReactNode } from "react";
 import { useLocation, useNavigate, Outlet, NavLink } from "react-router-dom";
+import { useCourseEditStore } from "../../store/useCourseEditStore";
 
 import "./editCoursePageSideBar.css";
+import { useParams } from "react-router-dom";
+import apiClient from "../../services/apiClient";
 
 interface SideBarProps {
 	children?: ReactNode;
 }
 
 const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
-	const location = useLocation();
-	const isEditPageRoute = location.pathname === "/editCoursePage";
-	const isPricePageRoute = location.pathname === "/";
-	const isComponentsPageRoute = location.pathname === "/";
-	const isSpeakersPageRoute = location.pathname === "/";
-	const isHandoutsPageRoute = location.pathname === "/";
-	const isManagersPageRoute = location.pathname === "/";
-	const isRegistrantsPageRoute = location.pathname === "/";
-	const isParticipationPageRoute = location.pathname === "/";
-	const isEmailPageRoute = location.pathname === "/";
+	// const location = useLocation();
+	// const isEditPageRoute = location.pathname === "/editCoursePage";
+	// const isPricePageRoute = location.pathname === "/";
+	// const isComponentsPageRoute = location.pathname === "/";
+	// const isSpeakersPageRoute = location.pathname === "/";
+	// const isHandoutsPageRoute = location.pathname === "/";
+	// const isManagersPageRoute = location.pathname === "/";
+	// const isRegistrantsPageRoute = location.pathname === "/";
+	// const isParticipationPageRoute = location.pathname === "/";
+	// const isEmailPageRoute = location.pathname === "/";
+	const { id: courseId } = useParams();
 
 	const navigate = useNavigate();
+
+	const setAllFields = useCourseEditStore((state) => state.setAllFields);
+	const reset = useCourseEditStore((state) => state.reset);
+
+	const hydrated = useCourseEditStore.persist.hasHydrated();
+
+	const { hasFetchedFromBackend, setFetchedFromBackend } = useCourseEditStore();
+
+	useEffect(() => {
+		if (!courseId) {
+			reset(); // New course, reset store
+			return;
+		}
+
+		if (hydrated && !hasFetchedFromBackend) {
+			const loadCourse = async () => {
+				try {
+					const res = await apiClient.get(`/courses/${courseId}`);
+					setAllFields({ ...res.data.data, _id: courseId });
+					setFetchedFromBackend(); // ✅ Prevent future fetches
+				} catch (err) {
+					console.error("Failed to fetch course", err);
+				}
+			};
+
+			loadCourse();
+		}
+	}, [courseId, hydrated, hasFetchedFromBackend]);
+
+	const basePath = courseId
+		? `/admin/product/edit/${courseId}`
+		: `/admin/product/create`;
 
 	const sidebarItems = [
 		{
 			name: "Details",
-			path: "/admin/product/edit/details",
+			path: `${basePath}/details`,
 			highlightLeftOffset: "51.4px",
 		},
 		{
 			name: "Pricing",
-			path: "/admin/product/edit/pricing",
+			path: `${basePath}/pricing`,
 			highlightLeftOffset: "51.4px",
 		},
 		{
 			name: "Components",
-			path: "/admin/product/edit/components",
+			path: `${basePath}/components`,
 			highlightLeftOffset: "13.6px",
 		},
 		{
 			name: "Speakers",
-			path: "/admin/product/edit/speakers",
+			path: `${basePath}/speakers`,
 			highlightLeftOffset: "37px",
 		},
 		{
 			name: "Handouts",
-			path: "/admin/product/edit/handouts",
+			path: `${basePath}/handouts`,
 			highlightLeftOffset: "34px",
 		},
 		{
 			name: "Managers",
-			path: "/admin/product/edit/managers",
+			path: `${basePath}/managers`,
 			highlightLeftOffset: "31.5px",
 		},
 		{
 			name: "Registrants",
-			path: "/admin/product/edit/registrants",
+			path: `${basePath}/registrants`,
 			highlightLeftOffset: "24.5px",
 		},
 		{
 			name: "Participation",
-			path: "/admin/product/edit/participation",
+			path: `${basePath}/participation`,
 			highlightLeftOffset: "16px",
 		},
 		{
 			name: "Email",
-			path: "/admin/product/edit/email",
+			path: `${basePath}/email`,
 			highlightLeftOffset: "59.5px",
 		},
 	];
 
-	const handleDetailsClick = () => {
-		navigate("/admin/product/edit/details");
-	};
+	// const handleDetailsClick = () => {
+	// 	navigate("/admin/product/edit/details");
+	// };
 
-	const handlePricingClick = () => {
-		navigate("/admin/product/edit/pricing");
-	};
+	// const handlePricingClick = () => {
+	// 	navigate("/admin/product/edit/pricing");
+	// };
 
-	const handleComponentClick = () => {
-		navigate("/admin/product/edit/components");
-	};
+	// const handleComponentClick = () => {
+	// 	navigate("/admin/product/edit/components");
+	// };
 
-	const handleSpeakersClick = () => {
-		navigate("/admin/product/edit/speakers");
-	};
+	// const handleSpeakersClick = () => {
+	// 	navigate("/admin/product/edit/speakers");
+	// };
 
-	const handleHandoutsClick = () => {
-		navigate("/");
-	};
+	// const handleHandoutsClick = () => {
+	// 	navigate("/");
+	// };
 
-	const handleManagersClick = () => {
-		navigate("/");
-	};
+	// const handleManagersClick = () => {
+	// 	navigate("/");
+	// };
 
-	const handleRegistrantsClick = () => {
-		navigate("/");
-	};
+	// const handleRegistrantsClick = () => {
+	// 	navigate("/");
+	// };
 
-	const handleParticipationClick = () => {
-		navigate("/");
-	};
+	// const handleParticipationClick = () => {
+	// 	navigate("/");
+	// };
 
-	const handleEmailClick = () => {
-		navigate("/");
-	};
+	// const handleEmailClick = () => {
+	// 	navigate("/");
+	// };
 
 	const handleExitClick = () => {
 		navigate("/");

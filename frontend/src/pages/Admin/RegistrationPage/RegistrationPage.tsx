@@ -8,12 +8,12 @@ import { Course } from "../../../shared/types/course";
 import { format } from 'date-fns';
 
 interface Registration {
-    title: string; 
-    user: string; 
-    email: string; 
-    date: Date; 
-    transactionId: string; 
-    paid: number; 
+	title: string;
+	user: string;
+	email: string;
+	date: Date;
+	transactionId: string;
+	paid: number;
 }
 
 export default function RegistrationPage() {

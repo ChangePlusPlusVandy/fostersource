@@ -25,7 +25,6 @@ export default function AdminPage() {
 	const [itemsPerPage, setItemsPerPage] = useState(2);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [products, setProducts] = useState<Product[]>([]);
-	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [productLoading, setProductLoading] = useState(false);
 
 	const elemColors: Record<string, string> = {
@@ -225,9 +224,6 @@ export default function AdminPage() {
 						<button
 							className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
 							style={{ backgroundColor: "#8757a3" }}
-							onClick={() => {
-								setIsModalOpen(true);
-							}}
 						>
 							Add Course
 						</button>

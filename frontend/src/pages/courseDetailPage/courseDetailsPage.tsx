@@ -1,10 +1,29 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import {
+	FaStar as _FaStar,
+	FaStarHalfAlt as _FaStarHalfAlt,
+} from "react-icons/fa";
+import { ComponentType } from "react";
+
 import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
 import SurveyModal from "./SurveyModal";
+
+const FaStar = _FaStar as ComponentType<{ size?: number; color?: string }>;
+const FaStarHalfAlt = _FaStarHalfAlt as ComponentType<{
+	size?: number;
+	color?: string;
+}>;
+
+interface CartItem {
+	className: string;
+	cost: number;
+	creditNumber: number;
+	instructor: string;
+	_id: string;
+}
 
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
@@ -16,6 +35,16 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const location = useLocation();
 	const searchParams = new URLSearchParams(location.search);
 	const courseId = searchParams.get("courseId");
+
+	const user = JSON.parse(localStorage.getItem("user") || "{}");
+	const cartItems: CartItem[] = user?.cart ? user.cart : [];
+	const checkCourseInCart = () => {
+		if (cartItems) {
+			if (cartItems.some((item) => item._id === courseId)) {
+				setIsAdded(true);
+			}
+		}
+	};
 
 	const navigate = useNavigate();
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(
@@ -106,6 +135,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 
 	useEffect(() => {
 		fetchCourse();
+		checkCourseInCart();
 	}, [courseId]);
 
 	useEffect(() => {
@@ -330,6 +360,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 								lengthCourse={courseDetailsData.lengthCourse}
 								isSurveyModalOpen={isSurveyModalOpen}
 								setIsSurveyModalOpen={setIsSurveyModalOpen}
+								components={courseDetailsData.components}
 							/>
 						</div>
 					</div>
@@ -392,17 +423,20 @@ const DisplayBar = ({
 	lengthCourse,
 	isSurveyModalOpen,
 	setIsSurveyModalOpen,
+	components,
 }: {
 	creditHours: number;
 	time: Date;
 	lengthCourse: number;
 	isSurveyModalOpen: boolean;
 	setIsSurveyModalOpen: any;
+	components: any[];
 }) => {
 	const [currentPage, setCurrentPage] = useState("Webinar");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
 	const [survey, setSurvey] = useState(false);
+	const [videoLink, setVideoLink] = useState<string | null>("");
 
 	useEffect(() => {
 		const webinarEnd = new Date(time);
@@ -438,6 +472,32 @@ const DisplayBar = ({
 
 	/* TODO: Needs to be complete once certificate page is out */
 	const handleAccessCertificate = () => {};
+
+	const getYouTubeEmbedUrl = (url: string) => {
+		const match = url.match(
+			/(?:youtube\.com.*(?:\?|&)v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+		);
+		const videoId = match?.[1];
+		return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+	};
+
+	const retrieveVideo = async () => {
+		try {
+			const response = await apiClient.get(`/videos`, {
+				params: {
+					_id: components[0],
+				},
+			});
+			console.log(response.data.data[0].videoUrl);
+			setVideoLink(getYouTubeEmbedUrl(response.data.data[0].videoUrl));
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	useEffect(() => {
+		retrieveVideo();
+	}, [components]);
 
 	return (
 		<div className="flex min-w-min min-h-min justify-between w-full gap-2">
@@ -497,8 +557,8 @@ const DisplayBar = ({
 					</button>
 				</div>
 				{currentPage === "Webinar" && (
-					<div className="flex justify-between">
-						<div className="text-sm	font-normal flex flex-col gap-1">
+					<div className="flex justify-between h-[400px]">
+						{/* <div className="text-sm	font-normal flex flex-col gap-1">
 							<div>Date: {new Date(time).toLocaleDateString()}</div>
 							<div>
 								Time:{" "}
@@ -511,7 +571,7 @@ const DisplayBar = ({
 							<div>Length: {lengthCourse} hours</div>
 						</div>
 						<div className="flex flex-col w-max gap-2">
-							{/*Needs to be complete add to calendar button*/}
+
 							<button className="bg-[#F79518] w-full rounded-md text-center text-white text-xs align-middle px-6 py-3">
 								Add Webinar to Calendar
 							</button>
@@ -522,10 +582,19 @@ const DisplayBar = ({
 								Test Network
 							</button>
 							<button className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3">
-								{/*Needs to be complete*/}
+
 								Handout(s)
 							</button>
-						</div>
+						</div> */}
+						<iframe
+							width="100%"
+							height="100%"
+							src={videoLink ? videoLink : ""}
+							title="YouTube Video Player"
+							frameBorder="0"
+							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+							allowFullScreen
+						></iframe>
 					</div>
 				)}
 				{currentPage === "Survey" && (

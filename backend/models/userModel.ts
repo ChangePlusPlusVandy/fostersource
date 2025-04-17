@@ -17,6 +17,7 @@ export interface IUser extends Document {
 		| "speaker"
 		| "former parent"
 		| "caregiver";
+	// TODO: update after user types can be created in admin
 	name: string;
 	address1: string;
 	address2?: string;
@@ -24,9 +25,11 @@ export interface IUser extends Document {
 	state: string;
 	zip: string;
 	certification: string;
+	company: string;
 	phone: string;
-	progress: mongoose.Types.ObjectId[];
-	payments: mongoose.Types.ObjectId[];
+	language: "English" | "Spanish";
+	progress: mongoose.Types.ObjectId | IProgress;
+	payments: (mongoose.Types.ObjectId | IPayment)[];
 	cart: string;
 }
 
@@ -58,9 +61,21 @@ const userSchema: Schema = new Schema(
 		state: { type: String, required: true },
 		zip: { type: String, required: true },
 		certification: { type: String, required: true },
+		company: { type: String, required: true },
 		phone: { type: String, required: true },
-		progress: [{ type: mongoose.Schema.Types.ObjectId, ref: "Progress" }],
-		payments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Payment" }],
+		language: { type: String, enum: ["English", "Spanish"], default: "English" },
+		progress: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Progress",
+			},
+		],
+		payments: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "Payment",
+			},
+		],
 		cart: { type: String, required: false, default: "[]" },
 	},
 	{
