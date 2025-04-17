@@ -73,6 +73,53 @@ export default function Registrants() {
 		setRegistrants((prev) => prev.filter((r) => r.id !== id));
 	};
 
+	const handleDownloadCSV = () => {
+		if (!registrants.length) {
+			console.warn("No registrants data available to download");
+			return;
+		}
+
+		// Create headers
+		const headers = [
+			"User Type",
+			"Full Name",
+			"Email",
+			"Registration Date",
+			"Completed",
+			"Amount Paid",
+			"Transaction ID",
+			"Pre-registered",
+		];
+
+		// Create rows
+		const rows = registrants.map((registrant) => [
+			registrant.userType,
+			registrant.fullName,
+			registrant.email,
+			registrant.registrationDate,
+			registrant.completed,
+			registrant.paid,
+			registrant.transactionId,
+			registrant.preRegistered,
+		]);
+
+		// Combine headers and rows
+		const csvContent = [
+			headers.join(","),
+			...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+		].join("\n");
+
+		// Create and trigger download
+		const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+		const link = document.createElement("a");
+		const url = URL.createObjectURL(blob);
+		link.setAttribute("href", url);
+		link.setAttribute("download", "registrants.csv");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
+
 	const filteredRegistrants = registrants.filter((r) =>
 		r.fullName.toLowerCase().includes(searchTerm.toLowerCase())
 	);
@@ -105,8 +152,11 @@ export default function Registrants() {
 							Search
 						</button>
 					</div>
-					<button className="px-4 py-2 bg-[#7b4899] text-white rounded-md hover:bg-[#6a3e83] transition-colors duration-200 text-sm font-medium min-w-max">
-						Download as TSV
+					<button
+						className="px-4 py-2 bg-[#7b4899] text-white rounded-md hover:bg-[#6a3e83] transition-colors duration-200 text-sm font-medium min-w-max"
+						onClick={handleDownloadCSV}
+					>
+						Download as CSV
 					</button>
 				</div>
 

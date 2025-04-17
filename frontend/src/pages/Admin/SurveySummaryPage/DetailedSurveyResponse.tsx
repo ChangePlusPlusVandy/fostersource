@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react"; 
 import apiClient from "../../../services/apiClient";
 import { QuestionType } from "../../../shared/types/question";
@@ -34,8 +33,10 @@ export default function DetailedSurveyResponse({ surveyQuestionIDs, toggleModal 
   const fetchSurveyQuestions = async () => {
     try {
       const receivedSurveyQuestions: SurveyQuestion[] = []; 
+      const receivedResponses: SurveyResponse[] = [];
 
-      surveyQuestionIDs.forEach(async (surveyQuestionID) => {
+      // Fetch all questions and their responses
+      for (const surveyQuestionID of surveyQuestionIDs) {
         const response = await apiClient.get(`/questions/${surveyQuestionID}`); 
         const rawQuestionData: QuestionType = response.data; 
         
@@ -49,17 +50,82 @@ export default function DetailedSurveyResponse({ surveyQuestionIDs, toggleModal 
         }
 
         const questionIdResponse = await apiClient.get(`/questionResponses/${surveyQuestionID}`); 
-        questionData.numResponses = questionIdResponse.data.length; 
-        questionData.responses = questionIdResponse.data.map((response: any) => response.answer); 
+        const responses = questionIdResponse.data;
+        
+        // Update question data
+        questionData.numResponses = responses.length; 
+        questionData.responses = responses.map((response: any) => response.answer);
+        
+        // Calculate response breakdown for MCQ questions
+        if (questionData.isMCQ) {
+          questionData.responseBreakdown = questionData.responseOptions.map(option => 
+            questionData.responses.filter(response => response === option).length
+          );
+        }
 
-        receivedSurveyQuestions.push(questionData); 
-      }); 
+        receivedSurveyQuestions.push(questionData);
 
-      setSurveyQuestions(receivedSurveyQuestions); 
+        // Process responses
+        responses.forEach((response: any) => {
+          const existingResponse = receivedResponses.find(r => r.userEmail === response.userEmail);
+          if (existingResponse) {
+            existingResponse.answers.push(response.answer);
+          } else {
+            receivedResponses.push({
+              userName: response.userName || 'Anonymous',
+              userEmail: response.userEmail,
+              date: new Date(response.createdAt),
+              answers: [response.answer]
+            });
+          }
+        });
+      }
+
+      setSurveyQuestions(receivedSurveyQuestions);
+      setSurveyResponses(receivedResponses);
     } catch (error) {
-      console.error(error); 
+      console.error('Error fetching survey data:', error); 
     }
   }
+
+  const handleDownloadCSV = () => {
+    if (!surveyQuestions.length || !surveyResponses.length) {
+      console.warn('No survey data available to download');
+      return;
+    }
+
+    // Create headers
+    const headers = [
+      'Submitted',
+      'Name',
+      'Registered User Email',
+      ...surveyQuestions.map((q, idx) => `${idx + 1}. ${q.question}`)
+    ];
+
+    // Create rows
+    const rows = surveyResponses.map(response => [
+      response.date.toDateString(),
+      response.userName,
+      response.userEmail,
+      ...response.answers
+    ]);
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'survey_responses.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   useEffect(() => {
     fetchSurveyQuestions(); 
@@ -120,9 +186,9 @@ export default function DetailedSurveyResponse({ surveyQuestionIDs, toggleModal 
               <button 
                 className="text-white text-sm px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
                 style={{ backgroundColor: '#8757a3' }}
-                // onClick={} //TODO: implement download as PDF
+                onClick={handleDownloadCSV}
               >
-                Download as TSV
+                Download as CSV
               </button>
               <button 
                 className="text-white text-sm px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
