@@ -6,9 +6,11 @@ import {
 	FiTrash2 as _FiTrash2,
 	FiMic as _FiMic,
 } from "react-icons/fi";
-import { US_STATES, COUNTRIES } from "./locationData";
+import { US_STATES, TIMEZONES } from "./locationData";
 import { Pagination } from "../../../components/Pagination/Pagination";
 import apiClient from "../../../services/apiClient";
+import Select from "react-select";
+import countryList from "react-select-country-list";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
@@ -35,6 +37,7 @@ interface User {
 	country?: string;
 	phoneNumber?: string;
 	phone?: string;
+	timezone?: string;
 	language: "English" | "Spanish";
 	selected?: boolean;
 }
@@ -51,6 +54,7 @@ interface UserForm {
 	country: string;
 	phoneNumber: string;
 	userType: string;
+	timezone: string;
 	language: "English" | "Spanish";
 }
 
@@ -107,6 +111,7 @@ const UserManagementPage: React.FC = () => {
 		country: "",
 		phoneNumber: "",
 		userType: "",
+		timezone: "",
 		language: "English",
 	});
 	const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -279,6 +284,7 @@ const UserManagementPage: React.FC = () => {
 			country: "",
 			phoneNumber: "",
 			userType: "",
+			timezone: "",
 			language: "English",
 		});
 	};
@@ -296,6 +302,7 @@ const UserManagementPage: React.FC = () => {
 			country: user.country || "",
 			phoneNumber: user.phoneNumber || "",
 			userType: user.userType,
+			timezone: user.timezone || "",
 			language: user.language || "English",
 		});
 		setEditingUserId(user._id || null);
@@ -715,21 +722,51 @@ const UserManagementPage: React.FC = () => {
 									<label className="block text-sm text-gray-500 mb-1">
 										State/Province/Region <span>(optional)</span>
 									</label>
-									<select
-										name="stateProvinceRegion"
-										value={userForm.stateProvinceRegion}
-										onChange={handleInputChange}
-										className="w-full px-3 py-2 border rounded-md"
-									>
-										<option value="" className="text-sm text-gray-400">
-											Choose a State
-										</option>
-										{US_STATES.map((state) => (
-											<option key={state.value} value={state.value}>
-												{state.label}
-											</option>
-										))}
-									</select>
+									<Select
+										options={US_STATES.map((state) => ({
+											value: state.value,
+											label: state.label,
+										}))}
+										value={
+											userForm.stateProvinceRegion
+												? {
+														value: userForm.stateProvinceRegion,
+														label: userForm.stateProvinceRegion,
+													}
+												: null
+										}
+										onChange={(selectedOption) =>
+											setUserForm((prev) => ({
+												...prev,
+												stateProvinceRegion: selectedOption
+													? selectedOption.value
+													: "",
+											}))
+										}
+										placeholder="Choose a State"
+										styles={{
+											control: (provided, state) => ({
+												...provided,
+												borderColor: state.isFocused
+													? "#F79518"
+													: provided.borderColor,
+												boxShadow: state.isFocused
+													? "0 0 0 1px #F79518"
+													: provided.boxShadow,
+												"&:hover": {
+													borderColor: "#F79518",
+												},
+											}),
+											placeholder: (provided) => ({
+												...provided,
+												color: "gray",
+											}),
+											singleValue: (provided) => ({
+												...provided,
+												color: "black",
+											}),
+										}}
+									/>
 								</div>
 							</div>
 
@@ -750,21 +787,48 @@ const UserManagementPage: React.FC = () => {
 									<label className="block text-sm text-gray-500 mb-1">
 										Country <span>(optional)</span>
 									</label>
-									<select
-										name="country"
-										value={userForm.country}
-										onChange={handleInputChange}
-										className="w-full px-3 py-2 border rounded-md"
-									>
-										<option value="" className="text-sm text-gray-400">
-											Choose a Country
-										</option>
-										{COUNTRIES.map((country) => (
-											<option key={country.value} value={country.value}>
-												{country.label}
-											</option>
-										))}
-									</select>
+									<Select
+										options={countryList()
+											.getData()
+											.map((country) => ({
+												value: country.value,
+												label: country.label,
+											}))}
+										value={
+											userForm.country
+												? { value: userForm.country, label: userForm.country }
+												: null
+										}
+										onChange={(selectedOption) =>
+											setUserForm((prev) => ({
+												...prev,
+												country: selectedOption ? selectedOption.value : "",
+											}))
+										}
+										placeholder="Choose a Country"
+										styles={{
+											control: (provided, state) => ({
+												...provided,
+												borderColor: state.isFocused
+													? "#F79518"
+													: provided.borderColor,
+												boxShadow: state.isFocused
+													? "0 0 0 1px #F79518"
+													: provided.boxShadow,
+												"&:hover": {
+													borderColor: "#F79518",
+												},
+											}),
+											placeholder: (provided) => ({
+												...provided,
+												color: "gray",
+											}),
+											singleValue: (provided) => ({
+												...provided,
+												color: "black",
+											}),
+										}}
+									/>
 								</div>
 							</div>
 
@@ -781,58 +845,126 @@ const UserManagementPage: React.FC = () => {
 								/>
 							</div>
 
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-								<div>
-									<label className="block text-sm font-semibold mb-1">
-										User Type
-									</label>
-									<select
-										name="userType"
-										value={userForm.userType}
-										onChange={handleInputChange}
-										className="w-full px-3 py-2 border rounded-md"
-										required
-									>
-										<option value="" className="text-sm text-gray-400">
-											Choose a User Type
-										</option>
-										{USER_TYPES.map((type) => (
-											<option key={type} value={type}>
-												{type}
-											</option>
-										))}
-									</select>
-								</div>
+							<div className="mb-4">
+								<label className="block text-sm text-gray-500 mb-1">
+									User Type
+								</label>
+								<Select
+									options={USER_TYPES.map((type) => ({
+										value: type,
+										label: type,
+									}))}
+									value={
+										userForm.userType
+											? { value: userForm.userType, label: userForm.userType }
+											: null
+									}
+									onChange={(selectedOption) =>
+										setUserForm((prev) => ({
+											...prev,
+											userType: selectedOption ? selectedOption.value : "",
+										}))
+									}
+									placeholder="Choose a User Type"
+									styles={{
+										control: (provided, state) => ({
+											...provided,
+											borderColor: state.isFocused
+												? "#F79518"
+												: provided.borderColor,
+											boxShadow: state.isFocused
+												? "0 0 0 1px #F79518"
+												: provided.boxShadow,
+											"&:hover": {
+												borderColor: "#F79518",
+											},
+										}),
+										placeholder: (provided) => ({
+											...provided,
+											color: "gray",
+										}),
+										singleValue: (provided) => ({
+											...provided,
+											color: "black",
+										}),
+									}}
+								/>
+							</div>
 
-								<div>
-									<label className="block text-sm font-semibold mb-1">
-										Language:
-									</label>
-									<div className="relative">
-										<div className="flex rounded-full border border-gray-300 p-1 bg-white">
-											<button
-												type="button"
-												className={`flex-1 py-2 px-4 rounded-full text-center ${
-													userForm.language === "English"
-														? "bg-purple-200 text-purple-800 font-medium shadow-sm"
-														: "text-gray-700"
-												}`}
-												onClick={() => handleLanguageChange("English")}
-											>
-												English
-											</button>
-											<button
-												type="button"
-												className={`flex-1 py-2 px-4 rounded-full text-center ${
-													userForm.language === "Spanish"
-														? "bg-purple-200 text-purple-800 font-medium shadow-sm"
-														: "text-gray-700"
-												}`}
-												onClick={() => handleLanguageChange("Spanish")}
-											>
-												Spanish
-											</button>
-										</div>
+							<div className="mb-4">
+								<label className="block text-sm text-gray-500 mb-1">
+									Timezone <span>(optional)</span>
+								</label>
+								<Select
+									options={TIMEZONES.map((timezone) => ({
+										value: timezone.value,
+										label: timezone.label,
+									}))}
+									value={
+										userForm.timezone
+											? { value: userForm.timezone, label: userForm.timezone }
+											: null
+									}
+									onChange={(selectedOption) =>
+										setUserForm((prev) => ({
+											...prev,
+											timezone: selectedOption ? selectedOption.value : "",
+										}))
+									}
+									placeholder="Choose a Timezone"
+									styles={{
+										control: (provided, state) => ({
+											...provided,
+											borderColor: state.isFocused
+												? "#F79518"
+												: provided.borderColor,
+											boxShadow: state.isFocused
+												? "0 0 0 1px #F79518"
+												: provided.boxShadow,
+											"&:hover": {
+												borderColor: "#F79518",
+											},
+										}),
+										placeholder: (provided) => ({
+											...provided,
+											color: "gray",
+										}),
+										singleValue: (provided) => ({
+											...provided,
+											color: "black",
+										}),
+									}}
+								/>
+							</div>
+
+							<div>
+								<label className="block text-sm font-semibold mb-1">
+									Language:
+								</label>
+								<div className="relative">
+									<div className="flex rounded-full border border-gray-300 p-1 bg-white">
+										<button
+											type="button"
+											className={`flex-1 py-2 px-4 rounded-full text-center ${
+												userForm.language === "English"
+													? "bg-purple-200 text-purple-800 font-medium shadow-sm"
+													: "text-gray-700"
+											}`}
+											onClick={() => handleLanguageChange("English")}
+										>
+											English
+										</button>
+										<button
+											type="button"
+											className={`flex-1 py-2 px-4 rounded-full text-center ${
+												userForm.language === "Spanish"
+													? "bg-purple-200 text-purple-800 font-medium shadow-sm"
+													: "text-gray-700"
+											}`}
+											onClick={() => handleLanguageChange("Spanish")}
+										>
+											Spanish
+										</button>
 									</div>
 								</div>
 							</div>

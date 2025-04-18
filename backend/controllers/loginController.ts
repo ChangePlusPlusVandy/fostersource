@@ -66,11 +66,14 @@ export const createUser = async (
 			zip,
 			certification,
 			phone,
+			company,
 			progress,
 			payments,
 			role = "foster parent", // Default role
-			isColorado = true, // Default value
+			isColorado, // Default value
 		} = req.body;
+
+		console.log(req.body);
 
 		const firebaseToken = req.headers.authorization?.split(" ")[1];
 
@@ -103,14 +106,15 @@ export const createUser = async (
 			role,
 			isColorado,
 			address2,
+			company,
 			progress,
 			payments,
-			address1: "N/A",
-			city: "N/A",
-			state: "N/A",
-			zip: "N/A",
-			certification: "N/A",
-			phone: "N/A",
+			address1,
+			city,
+			state,
+			zip,
+			certification,
+			phone,
 		});
 
 		const savedUser = await newUser.save();

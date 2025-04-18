@@ -64,6 +64,11 @@ function AppRoutes() {
 		window.location.href.indexOf("/admin") > -1
 	);
 
+	const [isAuthRoute, setIsAuthRoute] = useState(
+		window.location.href.indexOf("/register") > -1 ||
+			window.location.href.indexOf("/login") > -1
+	);
+
 	// useEffect(() => {
 	// 	setIsAdminRoute(window.location.href.indexOf("/admin") > -1);
 	// }, [window.location.href]);
@@ -113,7 +118,7 @@ function AppRoutes() {
 				}}
 				className="bg-gray-100"
 			>
-				{isAdminRoute ? (
+				{isAdminRoute || isAuthRoute ? (
 					<></>
 				) : (
 					<div>
@@ -141,6 +146,8 @@ function AppRoutes() {
 								setIsLoggedIn={setIsLoggedIn}
 							/>
 						</div>
+					) : isAuthRoute ? (
+						<div></div>
 					) : (
 						<Sidebar
 							isCollapsed={isCollapsed}
@@ -156,7 +163,11 @@ function AppRoutes() {
 						display: "flex",
 						flex: 1,
 						overflow: "auto",
-						marginLeft: isCollapsed || isAdminRoute ? "6rem" : "17rem",
+						marginLeft: isAuthRoute
+							? "0"
+							: isCollapsed || isAdminRoute
+								? "6rem"
+								: "17rem",
 					}}
 				>
 					<Routes>
@@ -244,10 +255,10 @@ function AppRoutes() {
 							element={
 								<AdminRoute>
 									<ProductProgressReport />
-                 </AdminRoute>
-                }
-              />
-            <Route
+								</AdminRoute>
+							}
+						/>
+						<Route
 							path="admin/registrants"
 							element={
 								<AdminRoute>
