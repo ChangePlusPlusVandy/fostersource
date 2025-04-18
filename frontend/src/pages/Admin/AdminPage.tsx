@@ -108,11 +108,13 @@ export default function AdminPage() {
 		}
 	};
 
-	const toggleSelection = (id: number) => {
+	const toggleSelection = (id: string) => {
 		setProducts(
-			products.map((c) => (c.id === id ? { ...c, selected: !c.selected } : c))
+		  products.map((c) =>
+			c.course._id === id ? { ...c, selected: !c.selected } : c
+		  )
 		);
-	};
+	  };
 
 	const setFilter = (filterType: string, filterSpec: string) => {};
 
@@ -241,6 +243,7 @@ export default function AdminPage() {
 										key={product.id}
 										product={product}
 										toggleSelection={toggleSelection}
+										refreshCourses={fetchProducts}
 									/>
 								))}
 							</div>
