@@ -124,15 +124,15 @@ class AuthService {
 		email,
 		password,
 		name,
-		phone = "N/A",
+		phone,
 		certification,
-		company = "N/A",
-		address1 = "N/A",
-		address2 = "N/A",
-		city = "N/A",
-		state = "N/A",
-		country = "N/A",
-		zip = "N/A",
+		company,
+		address1,
+		address2,
+		city,
+		state,
+		country,
+		zip,
 	}: RegisterCredentials): Promise<void> {
 		try {
 			const userCredential = await auth.createUserWithEmailAndPassword(
@@ -148,6 +148,9 @@ class AuthService {
 
 			const baseURL = "http://localhost:5001";
 
+			const fallback = (val: string | undefined, fallbackVal = "N/A") =>
+				val && val.trim() !== "" ? val : fallbackVal;
+
 			const response = await axios.post(
 				`${baseURL}/api/login/register`,
 				{
@@ -155,15 +158,15 @@ class AuthService {
 					email,
 					name,
 					role: "foster parent",
-					phone,
+					phone: fallback(phone),
 					certification,
-					company,
-					address1,
-					address2,
-					city,
-					state,
-					country,
-					zip,
+					company: fallback(company),
+					address1: fallback(address1),
+					address2: fallback(address2),
+					city: fallback(city),
+					state: fallback(state),
+					country: fallback(country),
+					zip: fallback(zip),
 					isColorado: state === "Colorado",
 				},
 				{

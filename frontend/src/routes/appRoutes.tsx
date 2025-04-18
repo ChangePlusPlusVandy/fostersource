@@ -114,7 +114,7 @@ function AppRoutes() {
 				}}
 				className="bg-gray-100"
 			>
-				{isAdminRoute ? (
+				{isAdminRoute || isAuthRoute ? (
 					<></>
 				) : (
 					<div>
@@ -164,7 +164,7 @@ function AppRoutes() {
 						display: "flex",
 						flex: 1,
 						overflow: "auto",
-						marginLeft: isCollapsed ? "6rem" : "17rem",
+						marginLeft: isAuthRoute ? "0" : isCollapsed ? "6rem" : "17rem",
 					}}
 				>
 					<Routes>
