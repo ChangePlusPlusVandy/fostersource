@@ -15,7 +15,7 @@ import { Course } from "../../../shared/types/course";
 import { Rating } from "../../../shared/types/rating";
 import { Link } from "react-router-dom";
 import AdminCoursePreview from "../../../components/AdminCoursePreview/AdminCoursePreview";
-import { CustomSelectBar } from "./CustomSelectBar"
+import { CustomSelectBar } from "./CustomSelectBar";
 import AdminCourseDeleteModal from "../../../components/AdminCoursePreview/AdminCourseDeleteModal";
 
 export interface Product {
@@ -35,7 +35,6 @@ export const Pagination = ({
 	totalPages = 1,
 	onPageChange = (page: number) => console.log(page),
 }) => {
-
 	const [showDropdown, setShowDropdown] = useState<number | null>(null);
 
 	const handlePageChange = (page: number) => {
@@ -174,9 +173,6 @@ export const Pagination = ({
 	);
 };
 
-
-
-
 export default function ProductPage() {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [itemsPerPage, setItemsPerPage] = useState(15);
@@ -186,11 +182,11 @@ export default function ProductPage() {
 	const [productLoading, setProductLoading] = useState(false);
 	const [categoryValue, setCategoryValue] = useState<string[]>([]);
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-	const [selectedCredit, setSelectedCredit] = useState<number | null>(null)
-	const [isLive, setIsLive] = useState<string | null>(null)
-	const [categories, setCategories] = useState<string[] | null>(null)
-	const numberOptions = Array.from({ length: 21 }, (_, i) => i);
-	const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false)
+	const [selectedCredit, setSelectedCredit] = useState<number | null>(null);
+	const [isLive, setIsLive] = useState<string | null>(null);
+	const [categories, setCategories] = useState<string[] | null>(null);
+	const numberOptions = Array.from({ length: 10 }, (_, i) => i);
+	const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
 
 	const getOptions = async () => {
 		try {
@@ -264,7 +260,7 @@ export default function ProductPage() {
 					),
 					timeZone: "(CST)",
 					selected: false,
-					categories: categories
+					categories: categories,
 				})
 			);
 
@@ -295,22 +291,20 @@ export default function ProductPage() {
 		const updatedProducts = products.map((c) =>
 			c.course._id === id ? { ...c, selected: !c.selected } : c
 		);
-		setProducts(updatedProducts)
+		setProducts(updatedProducts);
 	};
 
-
-	const setFilter = (filterType: string, filterSpec: string) => { };
+	const setFilter = (filterType: string, filterSpec: string) => {};
 
 	const refreshCourses = async () => {
 		await fetchProducts();
 	};
 
-
 	useEffect(() => {
 		fetchProducts();
 		getOptions();
 	}, []);
-	
+
 	return (
 		<div className="w-full min-h-screen bg-gray-100">
 			<div className="max-w-screen-2xl mx-auto px-8 py-6">
@@ -349,7 +343,6 @@ export default function ProductPage() {
 												setSelectedCategory(val);
 											}
 										}}
-
 									/>
 									<CustomSelectBar
 										options={numberOptions}
@@ -364,7 +357,7 @@ export default function ProductPage() {
 									<button
 										className="flex rounded-lg border px-4 py-2.5 font-medium"
 										style={{ borderColor: "#6C6C6C", color: "#6C6C6C" }}
-										onClick={() => { }}
+										onClick={() => {}}
 									>
 										STATUS
 										<ChevronDown></ChevronDown>
@@ -379,7 +372,7 @@ export default function ProductPage() {
 											}
 										}}
 									/>
-									<button
+									{/* <button
 										className="flex rounded-lg border px-4 py-2.5 font-medium"
 										style={{ borderColor: "#6C6C6C", color: "#6C6C6C" }}
 										onClick={() => { }}
@@ -394,7 +387,7 @@ export default function ProductPage() {
 									>
 										CREATED
 										<ChevronDown></ChevronDown>
-									</button>
+									</button> */}
 								</>
 							) : (
 								<>
@@ -404,11 +397,11 @@ export default function ProductPage() {
 									<button
 										className="text-red-600 font-bold"
 										onClick={() => {
-											setDeleteModalOpen(true)
+											setDeleteModalOpen(true);
 											setCurrentPage((prevPage) => {
 												const totalPages = Math.ceil(
 													products.filter((d) => !d.selected).length /
-													itemsPerPage
+														itemsPerPage
 												);
 												return prevPage > totalPages
 													? Math.max(totalPages, 1)
@@ -426,7 +419,8 @@ export default function ProductPage() {
 										isOpen={deleteModalOpen}
 										id={selectedCourseIds}
 										onClose={handleCloseDeleteModal}
-										refreshCourses={refreshCourses} />
+										refreshCourses={refreshCourses}
+									/>
 								</div>
 							)}
 						</div>
