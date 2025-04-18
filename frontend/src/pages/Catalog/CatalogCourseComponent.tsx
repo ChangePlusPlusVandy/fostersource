@@ -6,11 +6,13 @@ import { addToCart } from "../../services/registrationServices";
 interface CatalogCourseComponentProps {
 	course: Course;
 	setCartItemCount: Dispatch<SetStateAction<number>>;
+	isInCart: boolean;
 }
 
 export default function CatalogCourseComponent({
 	course,
 	setCartItemCount,
+	isInCart,
 }: CatalogCourseComponentProps) {
 	const renderStars = (rating: number) => {
 		const fullStars = Math.floor(rating);
@@ -54,9 +56,9 @@ export default function CatalogCourseComponent({
 						<span className="mr-1">
 							{course.ratings.length > 0
 								? (
-										course.ratings.reduce((sum, r) => sum + r.rating, 0) /
-										course.ratings.length
-									).toFixed(1)
+									course.ratings.reduce((sum, r) => sum + r.rating, 0) /
+									course.ratings.length
+								).toFixed(1)
 								: "No ratings"}
 						</span>
 						<span className="text-yellow-500">
@@ -64,9 +66,9 @@ export default function CatalogCourseComponent({
 								parseInt(
 									course.ratings.length > 0
 										? (
-												course.ratings.reduce((sum, r) => sum + r.rating, 0) /
-												course.ratings.length
-											).toFixed(1)
+											course.ratings.reduce((sum, r) => sum + r.rating, 0) /
+											course.ratings.length
+										).toFixed(1)
 										: "0"
 								)
 							)}
@@ -101,10 +103,14 @@ export default function CatalogCourseComponent({
 
 				<div className="flex items-center gap-4 mt-6">
 					<button
-						className="bg-orange-500 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-orange-600 transition"
-						onClick={() => handleRegister(course)}
+						disabled={isInCart}
+						onClick={() => !isInCart && handleRegister(course)}
+						className={`text-white text-sm font-medium py-2 px-4 rounded-lg transition ${isInCart
+							? "bg-gray-400 cursor-not-allowed"
+							: "bg-orange-500 hover:bg-orange-600"
+							}`}
 					>
-						Register ({course.cost === 0 ? "Free" : `$${course.cost}`})
+						{isInCart ? "Already in Cart" : `Register (${course.cost === 0 ? "Free" : `$${course.cost}`})`}
 					</button>
 					<Link to={`/courseDetails?courseId=${course._id}`}>
 						<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
