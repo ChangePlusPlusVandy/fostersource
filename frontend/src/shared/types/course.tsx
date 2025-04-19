@@ -1,4 +1,4 @@
-import {Rating} from "./rating";
+import { Rating } from "./rating";
 import { User } from "./user";
 
 export type Course = {
@@ -20,7 +20,7 @@ export type Course = {
 	lengthCourse: number;
 	time: Date;
 	isInPerson: Boolean;
-	students: String[]; 
-	regStart: Date; 
-	regEnd: Date; 
+	students: String[];
+	regStart: Date;
+	regEnd: Date;
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Course } from "../../shared/types/course";
 import {
 	Calendar,
@@ -9,10 +9,11 @@ import {
 	Star,
 	Trash2,
 } from "lucide-react";
+import AdminCourseDeleteModal from "./AdminCourseDeleteModal"
 import { Link } from "react-router-dom";
 
 export interface Product {
-	id: number;
+	id: string;
 	course: Course;
 	status: string;
 	avgRating: number;
@@ -20,11 +21,16 @@ export interface Product {
 	endTime: Date;
 	timeZone: string;
 	selected: boolean;
+	categories?: string[]
 }
 
 interface AdminCoursePreviewProps {
 	product: Product;
-	toggleSelection: (id: number) => void;
+	toggleSelection: (id: string) => void;
+	category?: string | null
+	credit?: number | null
+	status?: string | null
+	refreshCourses: () => void;
 }
 
 const elemColors: Record<string, string> = {
@@ -37,10 +43,53 @@ const elemColors: Record<string, string> = {
 function AdminCoursePreview({
 	product,
 	toggleSelection,
+	category,
+	credit,
+	status,
+	refreshCourses
 }: AdminCoursePreviewProps) {
+	const [isLive, setIsLive] = useState<boolean | null>(false)
+	const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false)
+
+	useEffect(() => {
+		if (status !== null) {
+			if (status === "Live") {
+				setIsLive(true)
+			}
+			else {
+				setIsLive(false)
+			}
+		}
+		else {
+			setIsLive(null)
+		}
+	}, [status])
+
+	const handleCloseDeleteModal = () => {
+		setDeleteModalOpen(false);
+	  };	  
+
+	if (credit !== null && product.course.creditNumber !== credit) {
+		return null;
+	}
+
+	if (isLive !== null && product.course.isLive !== isLive) {
+		return null;
+	}
+
+	if (
+		category !== null &&
+		(!product.course.categories || product.course.categories.length === 0 ||
+			!product.course.categories.some(cat => cat === category))
+	) {
+		return null;
+	}
+
+
+
 	return (
 		<div
-			key={product.id}
+			key={product.course._id}
 			className="flex items-center justify-between w-full pr-3 rounded-lg border relative"
 			style={{
 				backgroundColor: product.selected ? "#f5f0f7" : "white",
@@ -55,7 +104,7 @@ function AdminCoursePreview({
 				<input
 					type="checkbox"
 					checked={product.selected}
-					onChange={() => toggleSelection(product.id)}
+					onChange={() => toggleSelection(product.course._id)}
 					className="w-5 h-5"
 					style={{ accentColor: "#8757a3" }}
 				/>
@@ -78,9 +127,18 @@ function AdminCoursePreview({
 					))}
 				</div>
 
-				<span className="text-gray-500 w-16">
-					{product.course.creditNumber} credits
-				</span>
+				{credit !== null ? (
+					product.course.creditNumber === credit && (
+						<span className="text-gray-500 w-16">
+							{product.course.creditNumber} credits
+						</span>
+					)
+				) : (
+					<span className="text-gray-500 w-16">
+						{product.course.creditNumber} credits
+					</span>
+				)}
+
 				<Calendar className="w-12" />
 				<span className="text-gray-500 w-24">
 					{product.course.isLive ? "Live" : "Virtual"} Event{" "}
@@ -131,14 +189,23 @@ function AdminCoursePreview({
 						<Edit2 className="w-4 h-4 text-gray-400" />
 					</Link>
 					<button
-						onClick={() =>
-							// TODO: handle delete Product
-							console.log("hi")
+						onClick={() => {
+							setDeleteModalOpen(true)
+						}
 						}
 					>
 						<Trash2 className="w-4 h-4 text-gray-400" />
 					</button>
 				</div>
+				{deleteModalOpen && (
+					<div>
+						<AdminCourseDeleteModal 
+						isOpen = {deleteModalOpen}
+						id = {product.course._id}
+						onClose = {handleCloseDeleteModal}
+						refreshCourses={refreshCourses}/>
+					</div>
+				)}
 			</div>
 		</div>
 	);

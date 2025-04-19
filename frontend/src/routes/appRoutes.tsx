@@ -29,15 +29,19 @@ import SurveyPage from "../pages/Admin/SurveyPage/Survey";
 import WorkshopCreation from "../pages/Admin/WorkshopCreation/WorkshopCreation";
 import RegistrationPage from "../pages/Admin/RegistrationPage/RegistrationPage";
 import AdminPage from "../pages/Admin/AdminPage";
+import path from "path";
 import EmailPage from "../pages/Admin/EmailPage/EmailPage";
 import apiClient from "../services/apiClient";
 import { AdminSidebar } from "../components/AdminSidebar/AdminSidebar";
 import EditCourse from "../pages/Admin/EditCoursePage/editCoursePage";
 import EditSideBar from "../components/EditCourseSidebar/editCoursePageSideBar";
-import Registrants from "../pages/Admin/NewProductPage/Registrants";
+import Registrants from "../pages/Admin/RegistrantsPage/Registrants";
 import SurveySummary from "../pages/Admin/SurveySummaryPage/SurveySummary";
 import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
+import ProductProgressReport from "../pages/Admin/ProductSummaryPage/ProductProgressReport";
+import FAQPage from "../pages/FAQPage/FAQPage";
+import HandoutPage from "../pages/Admin/HandoutsPage/handoutsPage";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -58,6 +62,11 @@ function AppRoutes() {
 	);
 	const [isAdminRoute, setIsAdminRoute] = useState(
 		window.location.href.indexOf("/admin") > -1
+	);
+
+	const [isAuthRoute, setIsAuthRoute] = useState(
+		window.location.href.indexOf("/register") > -1 ||
+			window.location.href.indexOf("/login") > -1
 	);
 
 	// useEffect(() => {
@@ -109,7 +118,7 @@ function AppRoutes() {
 				}}
 				className="bg-gray-100"
 			>
-				{isAdminRoute ? (
+				{isAdminRoute || isAuthRoute ? (
 					<></>
 				) : (
 					<div>
@@ -137,6 +146,8 @@ function AppRoutes() {
 								setIsLoggedIn={setIsLoggedIn}
 							/>
 						</div>
+					) : isAuthRoute ? (
+						<div></div>
 					) : (
 						<Sidebar
 							isCollapsed={isCollapsed}
@@ -146,18 +157,17 @@ function AppRoutes() {
 							cartItemCount={cartItemCount}
 						/>
 					)}
-					{/* {window.location.href.indexOf("/admin/product/") > -1 ? (
-						<EditSideBar />
-					) : (
-						<></>
-					)} */}
 				</div>
 				<div
 					style={{
 						display: "flex",
 						flex: 1,
 						overflow: "auto",
-						marginLeft: isCollapsed ? "6rem" : "17rem",
+						marginLeft: isAuthRoute
+							? "0"
+							: isCollapsed || isAdminRoute
+								? "6rem"
+								: "17rem",
 					}}
 				>
 					<Routes>
@@ -187,6 +197,7 @@ function AppRoutes() {
 								</PrivateRoute>
 							}
 						/>
+						<Route path="/faqs" element={<FAQPage />} />
 						<Route
 							path="/courseDetails"
 							element={<CoursePage setCartItemCount={setCartItemCount} />}
@@ -216,22 +227,6 @@ function AppRoutes() {
 						<Route path="/admin/components/survey" element={<SurveyPage />} />
 						<Route path="/admin/products" element={<ProductPage />} />
 						<Route
-							path="/admin/create-workshop"
-							element={
-								<WorkshopCreation
-									workshopName={`Workshop | The Inclusive Family Support Model`}
-								/>
-							}
-						/>
-						<Route
-							path="/admin"
-							element={
-								<AdminRoute>
-									<AdminPage />
-								</AdminRoute>
-							}
-						/>
-						<Route
 							path="/admin/discounts"
 							element={
 								<AdminRoute>
@@ -252,6 +247,14 @@ function AppRoutes() {
 							element={
 								<AdminRoute>
 									<EmailPage />
+								</AdminRoute>
+							}
+						/>
+						<Route
+							path="admin/reports/progress"
+							element={
+								<AdminRoute>
+									<ProductProgressReport />
 								</AdminRoute>
 							}
 						/>
@@ -280,42 +283,68 @@ function AppRoutes() {
 							}
 						/>
 						<Route
-							path="/admin/survey/responses"
+							path="/admin/reports/survey"
 							element={
-								<SurveySummary></SurveySummary>
+								<AdminRoute>
+									<SurveySummary />
+								</AdminRoute>
 							}
 						/>
+
 						<Route
 							path="/admin/product/edit/:id"
 							element={
 								<AdminRoute>
-								<EditSideBar />
+									<EditSideBar />
 								</AdminRoute>
 							}
-							>
+						>
 							<Route index element={<Navigate to="details" replace />} />
 							<Route path="details" element={<EditCourse />} />
 							<Route path="pricing" element={<Pricing />} />
 							<Route
 								path="components"
 								element={
-								<ComponentPage
-									workshop={undefined}
-									survey={undefined}
-									certificate={undefined}
-								/>
+									<ComponentPage
+										workshop={undefined}
+										survey={undefined}
+										certificate={undefined}
+									/>
 								}
 							/>
-							<Route
-								path="workshop"
-								element={
-								<WorkshopCreation
-									workshopName={`Workshop | The Inclusive Family Support Model`}
-								/>
-								}
-							/>
+							<Route path="workshop" element={<WorkshopCreation />} />
 							<Route path="speakers" element={<SpeakerPage />} />
 							<Route path="managers" element={<CourseManagerPage />} />
+							<Route path="survey" element={<SurveyPage />} />
+							<Route path="handouts" element={<HandoutPage />} />
+							<Route path="registrants" element={<Registrants />} />
+						</Route>
+						<Route
+							path="/admin/product/create"
+							element={
+								<AdminRoute>
+									<EditSideBar />
+								</AdminRoute>
+							}
+						>
+							<Route index element={<Navigate to="details" replace />} />
+							<Route path="details" element={<EditCourse />} />
+							<Route path="pricing" element={<Pricing />} />
+							<Route
+								path="components"
+								element={
+									<ComponentPage
+										workshop={undefined}
+										survey={undefined}
+										certificate={undefined}
+									/>
+								}
+							/>
+							<Route path="workshop" element={<WorkshopCreation />} />
+							<Route path="speakers" element={<SpeakerPage />} />
+							<Route path="managers" element={<CourseManagerPage />} />
+							<Route path="survey" element={<SurveyPage />} />
+							<Route path="handouts" element={<HandoutPage />} />
 						</Route>
 					</Routes>
 				</div>

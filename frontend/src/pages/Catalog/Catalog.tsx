@@ -24,6 +24,10 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 	const [selectedFormat, setSelectedFormat] = useState<string>("All");
 	const [selectedCost, setSelectedCost] = useState<string>("All");
 	const [loading, setLoading] = useState(false);
+	const [cart, setCart] = useState<Course[]>(() => {
+		const storedUser = localStorage.getItem("user");
+		return storedUser ? JSON.parse(storedUser).cart || [] : [];
+	});
 
 	// Read query parameters from the URL and apply filters
 	useEffect(() => {
@@ -40,6 +44,12 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 		}
 		fetchData();
 	}, []);
+	// Initialize cart state from localStorage when the component mounts
+	useEffect(() => {
+		const storedCart = JSON.parse(localStorage.getItem("user") || "{}").cart || [];
+		setCart(storedCart); // Initialize cart state with stored data
+		setCartItemCount(storedCart.length); // Set cart item count based on localStorage cart
+	}, []); // Empty dependency array means it only runs once when the component mounts
 	useEffect(() => {
 		const params = new URLSearchParams(location.search);
 		const formatFilter = params.get("format");
@@ -69,8 +79,8 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 			filtered = filtered.filter((course) =>
 				course.ratings.length > 0
 					? course.ratings.reduce((sum, r) => sum + r.rating, 0) /
-							course.ratings.length >=
-						parseInt(selectedRating)
+					course.ratings.length >=
+					parseInt(selectedRating)
 					: false
 			);
 		}
@@ -150,9 +160,10 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 					) : filteredCourses.length > 0 ? (
 						filteredCourses.map((course, index) => (
 							<CatalogCourseComponent
-								key={index}
+								key={course._id || index}
 								course={course}
 								setCartItemCount={setCartItemCount}
+								isInCart={cart.some((c) => c._id === course._id)}
 							/>
 						))
 					) : (

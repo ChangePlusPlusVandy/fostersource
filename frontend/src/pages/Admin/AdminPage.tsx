@@ -25,7 +25,6 @@ export default function AdminPage() {
 	const [itemsPerPage, setItemsPerPage] = useState(2);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [products, setProducts] = useState<Product[]>([]);
-	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [productLoading, setProductLoading] = useState(false);
 
 	const elemColors: Record<string, string> = {
@@ -109,11 +108,13 @@ export default function AdminPage() {
 		}
 	};
 
-	const toggleSelection = (id: number) => {
+	const toggleSelection = (id: string) => {
 		setProducts(
-			products.map((c) => (c.id === id ? { ...c, selected: !c.selected } : c))
+		  products.map((c) =>
+			c.course._id === id ? { ...c, selected: !c.selected } : c
+		  )
 		);
-	};
+	  };
 
 	const setFilter = (filterType: string, filterSpec: string) => {};
 
@@ -225,9 +226,6 @@ export default function AdminPage() {
 						<button
 							className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
 							style={{ backgroundColor: "#8757a3" }}
-							onClick={() => {
-								setIsModalOpen(true);
-							}}
 						>
 							Add Course
 						</button>
@@ -245,6 +243,7 @@ export default function AdminPage() {
 										key={product.id}
 										product={product}
 										toggleSelection={toggleSelection}
+										refreshCourses={fetchProducts}
 									/>
 								))}
 							</div>
