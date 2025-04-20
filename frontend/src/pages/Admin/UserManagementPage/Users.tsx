@@ -40,6 +40,7 @@ interface User {
 	timezone?: string;
 	language: "English" | "Spanish";
 	selected?: boolean;
+	certification?: string;
 }
 
 interface UserForm {
@@ -56,6 +57,7 @@ interface UserForm {
 	userType: string;
 	timezone: string;
 	language: "English" | "Spanish";
+	certification?: string;
 }
 
 interface SpeakerProduct {
@@ -113,6 +115,7 @@ const UserManagementPage: React.FC = () => {
 		userType: "",
 		timezone: "",
 		language: "English",
+		certification: "",
 	});
 	const [editingUserId, setEditingUserId] = useState<string | null>(null);
 	const [currentSpeaker, setCurrentSpeaker] = useState<User | null>(null);
@@ -155,6 +158,7 @@ const UserManagementPage: React.FC = () => {
 				country: user.country || "",
 				phoneNumber: user.phone || "",
 				language: user.language || "English",
+				certification: user.certification || "",
 				selected: false,
 			}));
 
@@ -199,6 +203,7 @@ const UserManagementPage: React.FC = () => {
 			country: userData.country,
 			phone: userData.phoneNumber,
 			language: userData.language,
+			certification: userData.certification,
 		};
 	};
 
@@ -229,6 +234,7 @@ const UserManagementPage: React.FC = () => {
 									country: userForm.country,
 									phoneNumber: userForm.phoneNumber,
 									language: userForm.language,
+									certification: userForm.certification,
 								}
 							: user
 					)
@@ -256,6 +262,7 @@ const UserManagementPage: React.FC = () => {
 					country: userForm.country,
 					phoneNumber: userForm.phoneNumber,
 					language: userForm.language,
+					certification: userForm.certification,
 					selected: false,
 				};
 
@@ -286,6 +293,7 @@ const UserManagementPage: React.FC = () => {
 			userType: "",
 			timezone: "",
 			language: "English",
+			certification: "",
 		});
 	};
 
@@ -304,6 +312,7 @@ const UserManagementPage: React.FC = () => {
 			userType: user.userType,
 			timezone: user.timezone || "",
 			language: user.language || "English",
+			certification: user.certification || "",
 		});
 		setEditingUserId(user._id || null);
 		setIsUserModalOpen(true);
@@ -507,6 +516,9 @@ const UserManagementPage: React.FC = () => {
 									Language
 								</th>
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+									Certified Through
+								</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
 									Actions
 								</th>
 							</tr>
@@ -555,6 +567,9 @@ const UserManagementPage: React.FC = () => {
 											>
 												{user.language}
 											</span>
+										</td>
+										<td className="px-6 py-4 text-sm text-gray-900">
+											{user.certification}
 										</td>
 										<td className="px-6 py-4 text-sm">
 											<div className="flex gap-3">
