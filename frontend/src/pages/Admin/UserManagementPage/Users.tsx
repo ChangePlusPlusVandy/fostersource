@@ -142,25 +142,32 @@ const UserManagementPage: React.FC = () => {
 
 			const response = await apiClient.get(`/users?${params.toString()}`);
 
-			const mappedUsers = response.data.users.map((user: any) => ({
-				_id: user._id,
-				id: user._id,
-				firstName: user.name?.split(" ")[0] || "",
-				lastName: user.name?.split(" ")[1] || "",
-				name: user.name,
-				email: user.email,
-				userType: user.userType || "",
-				company: user.company || "",
-				addressLine: user.address1 || "",
-				city: user.city || "",
-				stateProvinceRegion: user.state || "",
-				zipPostalCode: user.zip || "",
-				country: user.country || "",
-				phoneNumber: user.phone || "",
-				language: user.language || "English",
-				certification: user.certification || "",
-				selected: false,
-			}));
+			console.log("Raw API response:", response.data.users);
+
+			const mappedUsers = response.data.users.map((user: any) => {
+				console.log("Individual user data:", user);
+				const mappedUser = {
+					_id: user._id,
+					id: user._id,
+					firstName: user.name?.split(" ")[0] || "",
+					lastName: user.name?.split(" ")[1] || "",
+					name: user.name,
+					email: user.email,
+					userType: user.role || user.userType || "",
+					company: user.company || "",
+					addressLine: user.address1 || "",
+					city: user.city || "",
+					stateProvinceRegion: user.state || "",
+					zipPostalCode: user.zip || "",
+					country: user.country || "",
+					phoneNumber: user.phone || "",
+					language: user.language || "English",
+					certification: user.certification || "",
+					selected: false,
+				};
+				console.log("Mapped user:", mappedUser);
+				return mappedUser;
+			});
 
 			setUsers(mappedUsers);
 			setTotalUsers(response.data.total);
