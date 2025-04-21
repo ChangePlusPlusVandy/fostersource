@@ -7,6 +7,7 @@ import {
 	register,
 	checkAdmin,
 } from "../controllers/userController";
+import { createUserType, getUserTypes } from "../controllers/userTypeController";
 import { verifyFirebaseAuth } from "../middlewares/authMiddleware";
 
 const router = express.Router();

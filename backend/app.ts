@@ -21,6 +21,7 @@ import handoutRoutes from "./routes/handoutRoutes";
 import courseCategoriesRoutes from "./routes/courseCategoriesRoutes"
 import emailRoutes from './routes/emailRoutes';
 import speakerRoutes from "./routes/speakerRoutes";
+import userTypeRoutes from "./routes/userTypeRoutes";
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
@@ -89,6 +90,7 @@ app.use("/api/handout", verifyFirebaseAuth, handoutRoutes);
 app.use('/api/emails', verifyFirebaseAuth, emailRoutes);
 app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
 app.use("/api/upload", verifyFirebaseAuth, uploadRoutes);
+app.use("/api/user-types", userTypeRoutes);
 
 // Error middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {

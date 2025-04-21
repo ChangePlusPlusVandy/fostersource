@@ -38,18 +38,6 @@ const userSchema: Schema = new Schema(
 		isColorado: { type: Boolean, required: true },
 		role: {
 			type: String,
-			enum: [
-				"foster parent",
-				"certified kin",
-				"non-certified kin",
-				"staff",
-				"casa",
-				"teacher",
-				"county/cpa worker",
-				"speaker",
-				"former parent",
-				"caregiver",
-			],
 			required: true,
 		},
 		name: { type: String, required: true },
