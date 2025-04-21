@@ -16,9 +16,6 @@ import {
 } from "lucide-react";
 
 import authService from "../../services/authService";
-import { log } from "console";
-import { User } from "../../shared/types/user";
-import apiClient from "../../services/apiClient";
 
 // User information
 export const userInfo = {
@@ -62,7 +59,7 @@ export const items = [
 	{
 		icon: <MessageCircleQuestion />,
 		description: "FAQs",
-		href: "#",
+		href: "/faqs",
 	},
 	{ icon: <ShoppingCart />, description: "Cart", href: "/cart" },
 	{
@@ -76,7 +73,7 @@ export const items = [
 export const admin = {
 	icon: <KeyRound />,
 	description: "Admin Tools",
-	href: "/admin",
+	href: "/admin/products",
 };
 
 // Logout information for conditional rendering
