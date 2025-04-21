@@ -25,8 +25,8 @@ interface RegistrantDisplayInfo {
 export default function Registrants() {
 	const { students, setField, setAllFields } = useCourseEditStore();
 
-	const courseId = getCleanCourseData(); // Replace with useParams later
-	
+	const courseData = getCleanCourseData();
+
 	const [registrants, setRegistrants] = useState<RegistrantDisplayInfo[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +35,7 @@ export default function Registrants() {
 	useEffect(() => {
 		const fetchRegistrants = async () => {
 			try {
+				const courseId: string = courseData._id || ""; 
 				const query = qs.stringify(
 					{ _id: { $in: students } },
 					{ arrayFormat: "brackets" }
@@ -54,11 +55,11 @@ export default function Registrants() {
 					preRegistered: "N/A",
 				}));
 
-				const numCourseComponents = await fetchCourseData(); 
+				const numCourseComponents = await fetchCourseData(courseId); 
 
 				for (const partialRegInfo of formatted) {
-					const [paymentDate, paymentAmt, paymentId] = await fetchPaymentData(partialRegInfo.id);
-					const [completedCheck, completedStatus] = await fetchProgressData(partialRegInfo.id);  
+					const [paymentDate, paymentAmt, paymentId] = await fetchPaymentData(partialRegInfo.id, courseId);
+					const [completedCheck, completedStatus] = await fetchProgressData(partialRegInfo.id, courseId);  
 
 					if (paymentDate != null) {
 						partialRegInfo.registrationDate = paymentDate; 
@@ -80,22 +81,22 @@ export default function Registrants() {
 			}
 		};
 
-		const fetchCourseData = async () => {
+		const fetchCourseData = async (courseId: string) => {
 			try {
 				const courseQuery = qs.stringify(
 					{ _id: courseId },
 					{ arrayFormat: "brackets" }
 				)
 				const courseRes = await apiClient.get(`/courses?${courseQuery}`)
-				return courseRes.data.components.length; 
+				return courseRes.data.data[0].components.length; 
 			} catch (error) {
 				console.error("Failed to load course data", error); 
-				return null; 
+				return 0; 
 			}
 				
 		}
 
-		const fetchPaymentData = async (userId: string) => {
+		const fetchPaymentData = async (userId: string, courseId: string) => {
 			try {
 				const paymentQuery = qs.stringify(
 					{ 
@@ -116,7 +117,7 @@ export default function Registrants() {
 			}
 		};
 
-		const fetchProgressData = async (userId: string) => {
+		const fetchProgressData = async (userId: string, courseId: string) => {
 			try {
 				const progressQuery = qs.stringify(
 					{userId: userId, courseId: courseId},
@@ -140,7 +141,7 @@ export default function Registrants() {
 		}; 
 
 		fetchRegistrants();
-	}, [courseId]);
+	}, [courseData]);
 
 	const handleDelete = (id: string) => {
 		console.log("Delete user:", id);
