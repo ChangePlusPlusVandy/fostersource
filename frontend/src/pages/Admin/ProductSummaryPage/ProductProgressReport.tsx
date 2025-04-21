@@ -6,6 +6,7 @@ import { Progress } from '../../../shared/types/progress';
 import apiClient from '../../../services/apiClient';
 import { format } from 'date-fns';
 import Select from 'react-select/async';
+import Modal from '../../../components/Modal';
 
 interface UserProgress {
   user: User;
@@ -36,12 +37,9 @@ interface EditProgressModalProps {
 const EditProgressModal: React.FC<EditProgressModalProps> = ({ isOpen, onClose, progress, onSave }) => {
   const [editedProgress, setEditedProgress] = useState<UserProgress>(progress);
 
-  // Update local state when progress prop changes
   useEffect(() => {
     setEditedProgress(progress);
   }, [progress]);
-
-  if (!isOpen) return null;
 
   const handleComponentChange = (component: 'webinar' | 'survey' | 'certificate', checked: boolean) => {
     console.log('Component change:', component, checked);
@@ -53,7 +51,6 @@ const EditProgressModal: React.FC<EditProgressModalProps> = ({ isOpen, onClose, 
       }
     };
     
-    // Check if all components are complete
     const allComplete = Object.values(updatedProgress.completedComponents).every(Boolean);
     updatedProgress.isComplete = allComplete;
     if (allComplete && !updatedProgress.dateCompleted) {
@@ -70,89 +67,85 @@ const EditProgressModal: React.FC<EditProgressModalProps> = ({ isOpen, onClose, 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-[400px]">
-        <div className="flex justify-between items-start mb-6">
-          <div className="space-y-1 flex-1">
-            <h2 className="text-xl font-semibold">Edit User Progress</h2>
-            <div className="space-y-1">
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Product: </span>
-                {progress.course.className}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">User: </span>
-                {progress.user.name}
-              </p>
-            </div>
-          </div>
-          <button 
-            onClick={onClose} 
-            className="text-gray-400 hover:text-gray-600"
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Edit User Progress"
+      showCloseIcon
+      className="w-[400px]"
+      footer={
+        <div className="flex justify-end gap-3">
+          <button
+            className="px-4 py-2 border rounded-md"
+            onClick={onClose}
           >
-            <X size={20} />
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 bg-[#8757a3] text-white rounded-md"
+            onClick={handleSave}
+          >
+            Save
           </button>
         </div>
+      }
+    >
+      <div className="space-y-1 flex-1">
+        <div className="space-y-1">
+          <p className="text-sm text-gray-600">
+            <span className="font-medium">Product: </span>
+            {progress.course.className}
+          </p>
+          <p className="text-sm text-gray-600">
+            <span className="font-medium">User: </span>
+            {progress.user.name}
+          </p>
+        </div>
+      </div>
 
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <div className="flex items-center">
-              <span className="w-20 text-sm">Webinar</span>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={editedProgress.completedComponents.webinar}
-                  onChange={(e) => handleComponentChange('webinar', e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                <span className="text-sm">Done?</span>
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <span className="w-20 text-sm">Survey</span>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={editedProgress.completedComponents.survey}
-                  onChange={(e) => handleComponentChange('survey', e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                <span className="text-sm">Done?</span>
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <span className="w-20 text-sm">Certificate</span>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={editedProgress.completedComponents.certificate}
-                  onChange={(e) => handleComponentChange('certificate', e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                <span className="text-sm">Done?</span>
-              </label>
-            </div>
+      <div className="space-y-4 mt-4">
+        <div className="space-y-3">
+          <div className="flex items-center">
+            <span className="w-20 text-sm">Webinar</span>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={editedProgress.completedComponents.webinar}
+                onChange={(e) => handleComponentChange('webinar', e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              <span className="text-sm">Done?</span>
+            </label>
           </div>
 
-          <div className="flex justify-end space-x-2 mt-6">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-[#8757a3] text-white rounded hover:bg-[#6d4a92]"
-            >
-              Save Changes
-            </button>
+          <div className="flex items-center">
+            <span className="w-20 text-sm">Survey</span>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={editedProgress.completedComponents.survey}
+                onChange={(e) => handleComponentChange('survey', e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              <span className="text-sm">Done?</span>
+            </label>
+          </div>
+
+          <div className="flex items-center">
+            <span className="w-20 text-sm">Certificate</span>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={editedProgress.completedComponents.certificate}
+                onChange={(e) => handleComponentChange('certificate', e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              <span className="text-sm">Done?</span>
+            </label>
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
 

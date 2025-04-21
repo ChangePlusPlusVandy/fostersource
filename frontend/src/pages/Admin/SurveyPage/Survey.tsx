@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { List, Trash2, X } from "lucide-react";
 import apiClient from "../../../services/apiClient";
+import Modal from "../../../components/Modal";
 
 const Survey = () => {
 	const [questions, setQuestions] = useState([
@@ -368,19 +369,13 @@ const Survey = () => {
 
 			{/* Modal */}
 			{isModalOpen && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-					<div className="bg-white w-96 p-6 rounded-lg shadow-lg relative">
-						<button
-							onClick={() => setIsModalOpen(false)}
-							className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-						>
-							<X className="w-6 h-6" />
-						</button>
-						<h2 className="text-xl font-semibold">Unsaved Changes</h2>
-						<p className="mt-2">
-							It looks like you have edits that aren’t saved yet. Are you sure
-							you want to leave?
-						</p>
+				<Modal
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+					title="Unsaved Changes"
+					showCloseIcon
+					className="w-96"
+					footer={
 						<div className="mt-4 flex space-x-4 justify-end">
 							<button
 								onClick={handleStay}
@@ -395,8 +390,13 @@ const Survey = () => {
 								Leave
 							</button>
 						</div>
-					</div>
-				</div>
+					}
+				>
+					<p className="mt-2">
+						It looks like you have edits that aren't saved yet. Are you sure
+						you want to leave?
+					</p>
+				</Modal>
 			)}
 		</div>
 	);

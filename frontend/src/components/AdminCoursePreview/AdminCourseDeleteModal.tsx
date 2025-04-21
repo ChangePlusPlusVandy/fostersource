@@ -3,6 +3,7 @@ import {
     Trash2,
 } from "lucide-react";
 import apiClient from "../../services/apiClient";
+import Modal from "../Modal";
 
 function AdminCourseDeleteModal({
     isOpen,
@@ -45,36 +46,33 @@ function AdminCourseDeleteModal({
     };
 
     return (
-        <div>
-            {modalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => {setModalOpen(false); onClose();}}>
-                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                        <div
-                            className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-white overflow-auto border rounded-md p-5 md:p-6"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <Trash2 className="w-10 h-10 text-red-600" />
-                            <h1 className="mt-3">Confirm Delete?</h1>
-                            <div className="flex flex-row gap-2 mt-3">
-                                <button
-                                    className="border bg-white border-[#8757a3] text-[#8757a3] text-sm w-20 rounded-md"
-                                    onClick={() => {setModalOpen(false); onClose();}}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    className="border bg-[#8757a3] text-white text-sm w-20 rounded-md"
-                                    onClick={() => {handleDelete(); onClose();}}
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Confirm Delete?"
+            showCloseIcon
+            className="w-[200px] h-[200px]"
+            footer={
+                <div className="flex flex-row gap-2 mt-3">
+                    <button
+                        className="border bg-white border-[#8757a3] text-[#8757a3] text-sm w-20 rounded-md"
+                        onClick={onClose}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="border bg-[#8757a3] text-white text-sm w-20 rounded-md"
+                        onClick={handleDelete}
+                    >
+                        Delete
+                    </button>
                 </div>
-            )}
-        </div>
+            }
+        >
+            <div className="flex flex-col items-center justify-center">
+                <Trash2 className="w-10 h-10 text-red-600" />
+            </div>
+        </Modal>
     );
 }
 

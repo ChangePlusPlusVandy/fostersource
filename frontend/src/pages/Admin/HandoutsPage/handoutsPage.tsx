@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import apiClient from "../../../services/apiClient";
 import { useParams } from "react-router-dom";
+import Modal from "../../../components/Modal";
+
 type Row = {
 	id?: number;
 	subject: string;
@@ -339,171 +341,165 @@ const HandoutPage = () => {
 			)}
 
 			{modalOpen && (
-				<div
-					className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-					onClick={() => setModalOpen(false)} // Close modal when clicking background
+				<Modal
+					isOpen={modalOpen}
+					onClose={() => setModalOpen(false)}
+					title="Add Handout"
+					showCloseIcon
+					className="w-96"
+					footer={
+						<div className="flex flex-row ml-auto">
+							<button
+								className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border border-gray-400 bg-gray-white rounded-md mt-5 mr-3"
+								onClick={() => {
+									setModalOpen(false);
+									setSubjectValue("");
+								}}
+							>
+								<p className="text-gray-400 text-sm">Cancel</p>
+							</button>
+							<button
+								className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border bg-purple-500 rounded-md mt-5"
+								onClick={() => {
+									setModalOpen(false);
+									setSubjectValue("");
+									handleSubmit(subjectValue, file);
+								}}
+							>
+								<p className="text-white text-sm">Create Type</p>
+							</button>
+						</div>
+					}
 				>
-					<div
-						className="bg-white p-6 rounded-lg shadow-lg w-96 relative"
-						onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
-					>
-						{/* Modal Content */}
-						<div className="flex flex-col">
-							<h2 className="text-lg font-bold mb-2">Add Handout</h2>
-							<div className="mt-3">
-								<p className="text-sm">Name</p>
+					<div className="flex flex-col w-full">
+						<p className="mt-2 md:mt-3 text-xs md:text-sm">Name</p>
+						<div className="text-xs">
+							<textarea
+								className="w-[330px] h-8 p-2 border rounded-lg focus:ring-2 focus:ring-purple-500 text-xs"
+								placeholder="Enter subject name here..."
+								value={subjectValue}
+								onChange={(e) => setSubjectValue(e.target.value)}
+							/>
+						</div>
+						<div>
+							{/* Option 1 */}
+							<label className="flex items-center space-x-2 cursor-pointer mt-2">
+								<input
+									type="radio"
+									name="choice"
+									value="Upload File"
+									className="hidden"
+									onChange={() => onUploadFile()}
+								/>
+								<div
+									className={`w-6 h-6 border-2 rounded-full flex items-center justify-center ${
+										uploadFile === true
+											? "border-purple-500"
+											: "border-gray-400"
+									}`}
+								>
+									{uploadFile === true && (
+										<div className="w-4 h-4 bg-purple-500 rounded-full"></div>
+									)}
+								</div>
+								<span className="text-gray-700 text-sm">Upload File</span>
+							</label>
+
+							{/* Option 2 */}
+							<label className="flex items-center space-x-2 cursor-pointer mt-2">
+								<input
+									type="radio"
+									name="choice"
+									value="Insert Link"
+									className="hidden"
+									onChange={() => onUploadLink()}
+								/>
+								<div
+									className={`w-6 h-6 border-2 rounded-full flex items-center justify-center ${
+										uploadLink === true
+											? "border-purple-500"
+											: "border-gray-400"
+									}`}
+								>
+									{uploadLink === true && (
+										<div className="w-4 h-4 bg-purple-500 rounded-full"></div>
+									)}
+								</div>
+								<span className="text-gray-700 text-sm">Upload Link</span>
+							</label>
+						</div>
+						{uploadFile && (
+							<div>
+								<h2 className="mt-2">File Upload</h2>
+								<div
+									className="border-2 border-dashed border-gray-400 rounded-lg p-6 w-full max-w-lg mx-auto text-center cursor-pointer"
+									onDragOver={(e) => e.preventDefault()}
+									onDrop={handleDrop}
+								>
+									<div className="flex flex-col items-center">
+										{/* Upload Icon */}
+										<span className="text-gray-500 text-2xl">⬆️</span>
+
+										{/* Upload Text */}
+										<p className="font-semibold mt-2">
+											Choose a file or drag & drop it here
+										</p>
+										<p className="text-gray-400 text-sm">
+											JPEG or PNG format, up to 50MB
+										</p>
+
+										{/* File Input */}
+										<input
+											type="file"
+											accept=".jpeg, .jpg, .png"
+											className="hidden"
+											id="fileInput"
+											onChange={handleFileChange}
+										/>
+										<label
+											htmlFor="fileInput"
+											className="mt-4 bg-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm cursor-pointer"
+										>
+											Browse Files
+										</label>
+
+										{/* Show Selected File */}
+									</div>
+								</div>
+								<div className="relative text-center">
+									{file && (
+										<div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[370px] h-[37px] bg-gray-200 flex flex-row items-center px-3 shadow-md rounded-md">
+											<p className="text-sm text-gray-600 truncate max-w-[80%]">
+												{file.name}
+											</p>
+											<button
+												className="ml-auto text-right"
+												onClick={() => {
+													setFile(null);
+												}}
+											>
+												🗑️
+											</button>
+										</div>
+									)}
+								</div>
+							</div>
+						)}
+						{uploadLink && (
+							<div>
+								<p className="mt-3 text-sm">Link</p>
 								<div className="text-xs">
 									<textarea
 										className="w-[330px] h-8 p-2 border rounded-lg focus:ring-2 focus:ring-purple-500 text-xs"
 										placeholder="Enter subject name here..."
-										value={subjectValue}
-										onChange={(e) => setSubjectValue(e.target.value)}
+										value={link}
+										onChange={(e) => setLink(e.target.value)}
 									/>
 								</div>
-								<div>
-									{/* Option 1 */}
-									<label className="flex items-center space-x-2 cursor-pointer mt-2">
-										<input
-											type="radio"
-											name="choice"
-											value="Upload File"
-											className="hidden"
-											onChange={() => onUploadFile()}
-										/>
-										<div
-											className={`w-6 h-6 border-2 rounded-full flex items-center justify-center ${
-												uploadFile === true
-													? "border-purple-500"
-													: "border-gray-400"
-											}`}
-										>
-											{uploadFile === true && (
-												<div className="w-4 h-4 bg-purple-500 rounded-full"></div>
-											)}
-										</div>
-										<span className="text-gray-700 text-sm">Upload File</span>
-									</label>
-
-									{/* Option 2 */}
-									<label className="flex items-center space-x-2 cursor-pointer mt-2">
-										<input
-											type="radio"
-											name="choice"
-											value="Insert Link"
-											className="hidden"
-											onChange={() => onUploadLink()}
-										/>
-										<div
-											className={`w-6 h-6 border-2 rounded-full flex items-center justify-center ${
-												uploadLink === true
-													? "border-purple-500"
-													: "border-gray-400"
-											}`}
-										>
-											{uploadLink === true && (
-												<div className="w-4 h-4 bg-purple-500 rounded-full"></div>
-											)}
-										</div>
-										<span className="text-gray-700 text-sm">Upload Link</span>
-									</label>
-								</div>
-								{uploadFile && (
-									<div>
-										<h2 className="mt-2">File Upload</h2>
-										<div
-											className="border-2 border-dashed border-gray-400 rounded-lg p-6 w-full max-w-lg mx-auto text-center cursor-pointer"
-											onDragOver={(e) => e.preventDefault()}
-											onDrop={handleDrop}
-										>
-											<div className="flex flex-col items-center">
-												{/* Upload Icon */}
-												<span className="text-gray-500 text-2xl">⬆️</span>
-
-												{/* Upload Text */}
-												<p className="font-semibold mt-2">
-													Choose a file or drag & drop it here
-												</p>
-												<p className="text-gray-400 text-sm">
-													JPEG or PNG format, up to 50MB
-												</p>
-
-												{/* File Input */}
-												<input
-													type="file"
-													accept=".jpeg, .jpg, .png"
-													className="hidden"
-													id="fileInput"
-													onChange={handleFileChange}
-												/>
-												<label
-													htmlFor="fileInput"
-													className="mt-4 bg-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm cursor-pointer"
-												>
-													Browse Files
-												</label>
-
-												{/* Show Selected File */}
-											</div>
-										</div>
-										<div className="relative text-center">
-											{file && (
-												<div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[370px] h-[37px] bg-gray-200 flex flex-row items-center px-3 shadow-md rounded-md">
-													<p className="text-sm text-gray-600 truncate max-w-[80%]">
-														{file.name}
-													</p>
-													<button
-														className="ml-auto text-right"
-														onClick={() => {
-															setFile(null);
-														}}
-													>
-														🗑️
-													</button>
-												</div>
-											)}
-										</div>
-									</div>
-								)}
-								{uploadLink && (
-									<div>
-										<p className="mt-3 text-sm">Link</p>
-										<div className="text-xs">
-											<textarea
-												className="w-[330px] h-8 p-2 border rounded-lg focus:ring-2 focus:ring-purple-500 text-xs"
-												placeholder="Enter subject name here..."
-												value={link}
-												onChange={(e) => setLink(e.target.value)}
-											/>
-										</div>
-									</div>
-								)}
-								<div className="flex flex-row mt-12 ">
-									<button
-										className="w-[124px] h-[34px] bg-purple-500 border rounded-md ml-12"
-										onClick={() => {
-											uploadLink
-												? handleSubmit(subjectValue, link)
-												: handleSubmit(subjectValue, file);
-										}}
-									>
-										<p className="text-white text-xs">Save and Exit</p>
-									</button>
-									<button
-										className="ml-3 w-[124px] h-[34px] bg-white border border-purple-500 rounded-md"
-										onClick={() => {
-											setModalOpen(false);
-											setSubjectValue("");
-											setLink("");
-											setFile(null);
-										}}
-									>
-										<p className="text-purple-500 text-xs">Exit</p>
-									</button>
-								</div>
 							</div>
-						</div>
+						)}
 					</div>
-				</div>
+				</Modal>
 			)}
 
 			<div className="p-4">
