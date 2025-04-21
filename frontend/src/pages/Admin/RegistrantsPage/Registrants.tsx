@@ -26,8 +26,7 @@ export default function Registrants() {
 	const { students, setField, setAllFields } = useCourseEditStore();
 
 	const courseId = getCleanCourseData(); // Replace with useParams later
-	const numCourseComponents = 0; // TODO: make this accurate
-
+	
 	const [registrants, setRegistrants] = useState<RegistrantDisplayInfo[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
@@ -55,6 +54,8 @@ export default function Registrants() {
 					preRegistered: "N/A",
 				}));
 
+				const numCourseComponents = await fetchCourseData(); 
+
 				for (const partialRegInfo of formatted) {
 					const [paymentDate, paymentAmt, paymentId] = await fetchPaymentData(partialRegInfo.id);
 					const [completedCheck, completedStatus] = await fetchProgressData(partialRegInfo.id);  
@@ -78,6 +79,21 @@ export default function Registrants() {
 				setIsLoading(false);
 			}
 		};
+
+		const fetchCourseData = async () => {
+			try {
+				const courseQuery = qs.stringify(
+					{ _id: courseId },
+					{ arrayFormat: "brackets" }
+				)
+				const courseRes = await apiClient.get(`/courses?${courseQuery}`)
+				return courseRes.data.components.length; 
+			} catch (error) {
+				console.error("Failed to load course data", error); 
+				return null; 
+			}
+				
+		}
 
 		const fetchPaymentData = async (userId: string) => {
 			try {
