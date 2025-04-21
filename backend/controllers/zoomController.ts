@@ -108,8 +108,6 @@ export const createMeeting = async (
             message: "Internal service error",
         });
     }
-
-
 };
 
 export const createWebinar = async (
