@@ -488,7 +488,6 @@ const DisplayBar = ({
 					_id: components[0],
 				},
 			});
-			console.log(response.data.data[0].videoUrl);
 			setVideoLink(getYouTubeEmbedUrl(response.data.data[0].videoUrl));
 		} catch (error) {
 			console.error(error);
@@ -502,16 +501,16 @@ const DisplayBar = ({
 	return (
 		<div className="flex min-w-min min-h-min justify-between w-full gap-2">
 			<div className="flex flex-col">
-				{/* Webinar -> Survey -> Certificate */}
+				{/* Workshop -> Survey -> Certificate */}
 				<div className="flex min-w-min h-9 mb-5">
-					{/* Webinar Button */}
+					{/* Workshop Button */}
 					<button
 						className="bg-[#F79518] rounded-l-full text-center cursor-pointer w-48"
 						style={{
 							clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
 						}}
 						onClick={() => {
-							setCurrentPage("Webinar");
+							setCurrentPage("Workshop");
 							setSurveyColor("#FEC781");
 							setCertificateColor("#FEC781");
 						}}

@@ -24,12 +24,9 @@ export const getCourses = async (
 ): Promise<void> => {
 	try {
 		const filters = req.query;
-
-		// Populate ratings and components fields as needed
 		const courseResponses = await Course.find(filters)
-			.populate(["ratings", "components"])
+			.populate(["ratings"])
 			.exec();
-
 		res.status(200).json({
 			success: true,
 			count: courseResponses.length,
@@ -56,7 +53,7 @@ export const getCourseById = async (
 		if (id) {
 			// Find course by ID and populate related fields
 			const course = await Course.findById(id)
-				.populate(["ratings", "components", "managers"])
+				.populate(["ratings", "managers"])
 				.exec();
 
 			if (!course) {

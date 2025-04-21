@@ -35,8 +35,10 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 			try {
 				setLoading(true);
 				const response = await apiClient.get("/courses");
-				setCourses(response.data.data);
-				setFilteredCourses(response.data.data);
+				console.log(response.data.data)
+				let courses = response.data.data.filter((course:Course) => new Date(course.regStart).getTime() < new Date().getTime());
+				setCourses(courses);
+				setFilteredCourses(courses);
 				setLoading(false);
 			} catch (error) {
 				console.error(error);
