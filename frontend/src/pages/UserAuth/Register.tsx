@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import authService from "../../services/authService";
-import familyImage from "./family.png"; 
+import familyImage from "./images/family.png"; 
 import Select from 'react-select'
 import countryList from 'react-select-country-list'
-import fostersourceImage from "./fostersource-logo.png";
+import fostersourceImage from "./images/fostersource-logo.png";
 
 const states = [ //tried using a library like i did for countries and failed miserably so here we go
 	"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",

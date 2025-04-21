@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import authService from "../../services/authService";
-import familyImage from "./family.png"; 
-import fostersourceImage from "./fostersource-logo.png";
+import familyImage from "./images/family.png"; 
+import fostersourceImage from "./images/fostersource-logo.png";
 
 const ResetPassword: React.FC = () => {
 	const [email, setEmail] = useState("");
