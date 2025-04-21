@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { AxiosError } from "axios";
 import { components as selectComponents, OptionProps, GroupBase, Props as SelectProps } from 'react-select';
 import ReactSelect from 'react-select';
-import Modal from "../../components/Modal";
 
 export const SetOptionsContext = createContext<React.Dispatch<React.SetStateAction<OptionType[]>> | null>(null);
 export const useSetOptions = () => useContext(SetOptionsContext);
@@ -488,46 +487,48 @@ const EditCourse = () => {
                     </div>
                 </div>
                 {modalOpen && (
-                    <Modal
-                        isOpen={modalOpen}
-                        onClose={() => setModalopen(false)}
-                        title="Add Category Type"
-                        showCloseIcon
-                        className="md:w-[389px] md:h-[199px] w-[300px] h-[140px]"
-                        footer={
-                            <div className="flex flex-row ml-auto">
-                                <button
-                                    className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border border-gray-400 bg-gray-white rounded-md mt-5 mr-3"
-                                    onClick={() => {
-                                        setModalopen(false);
-                                        setEnteredCategory("");
-                                    }}
-                                >
-                                    <p className="text-gray-400 text-sm">Cancel</p>
-                                </button>
-                                <button
-                                    className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border bg-purple-500 rounded-md mt-5"
-                                    onClick={() => {
-                                        setModalopen(false);
-                                        setEnteredCategory("");
-                                        updateOptionsLocally(enteredCategory);
-                                    }}
-                                >
-                                    <p className="text-white text-sm">Create Type</p>
-                                </button>
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setModalopen(false)}>
+                        <div className="md:w-[389px] md:h-[199px] w-[300px] h-[140px] flex bg-white overflow-auto border rounded-md p-5 md:p-6" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex flex-col w-full">
+                                <div className="flex flex-row">
+                                    <p className="font-medium md:text-2xl text-lg">
+                                        Add Category Type
+                                    </p>
+                                    <button className="flex ml-auto w-7 h-7 border border-gray-500 items-center justify-center rounded-sm"
+                                        onClick={(e) => setModalopen(false)}>
+                                        <p className="text-3xl font-thin">
+                                            ×
+                                        </p>
+                                    </button>
+                                </div>
+                                <p className="mt-2 md:mt-3 text-xs md:text-sm">
+                                    Name
+                                </p>
+                                <input
+                                    className="border w-full"
+                                    type="text"
+                                    value={enteredCategory}
+                                    onChange={(e) => setEnteredCategory(e.target.value)}
+                                />
+                                <div className="flex flex-row ml-auto">
+                                    <button
+                                        className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border border-gray-400 bg-gray-white rounded-md mt-5 mr-3"
+                                        onClick={() => { setModalopen(false); setEnteredCategory("") }}>
+                                        <p className="text-gray-400 text-sm">
+                                            Cancel
+                                        </p>
+                                    </button>
+                                    <button
+                                        className="w-[100px] h-[20px] md:w-[110px] md:h-[35px] border bg-purple-500 rounded-md  mt-5"
+                                        onClick={() => { setModalopen(false); setEnteredCategory(""); updateOptionsLocally(enteredCategory)}}>
+                                        <p className="text-white text-sm">
+                                            Create Type
+                                        </p>
+                                    </button>
+                                </div>
                             </div>
-                        }
-                    >
-                        <div className="flex flex-col w-full">
-                            <p className="mt-2 md:mt-3 text-xs md:text-sm">Name</p>
-                            <input
-                                className="border w-full"
-                                type="text"
-                                value={enteredCategory}
-                                onChange={(e) => setEnteredCategory(e.target.value)}
-                            />
                         </div>
-                    </Modal>
+                    </div>
                 )}
                 <div>
                     <p className="text-sm mt-4">

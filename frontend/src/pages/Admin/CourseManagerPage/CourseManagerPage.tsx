@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Trash2 } from "lucide-react";
 import apiClient from "../../../services/apiClient";
-import Modal from "../../../components/Modal";
 
 interface User {
 	_id: string;
@@ -291,34 +290,31 @@ export default function CourseManagerPage() {
 			</table>
 
 			{/* Confirm Delete Modal */}
-			<Modal
-				isOpen={!!userToDelete}
-				onClose={() => setUserToDelete(null)}
-				title="Confirm Removal"
-				showCloseIcon
-				className="max-w-md w-full"
-				footer={
-					<div className="flex justify-end gap-4">
-						<button
-							onClick={() => setUserToDelete(null)}
-							className="border px-4 py-2 rounded"
-						>
-							Cancel
-						</button>
-						<button
-							onClick={handleConfirmDelete}
-							className="bg-red-600 text-white px-4 py-2 rounded"
-						>
-							Remove
-						</button>
+			{userToDelete && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+					<div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+						<h2 className="text-xl font-bold mb-4">Confirm Removal</h2>
+						<p className="mb-4">
+							Remove <strong>{userToDelete.name}</strong> ({userToDelete.email})
+							from this course's managers?
+						</p>
+						<div className="flex justify-end gap-4">
+							<button
+								onClick={() => setUserToDelete(null)}
+								className="border px-4 py-2 rounded"
+							>
+								Cancel
+							</button>
+							<button
+								onClick={handleConfirmDelete}
+								className="bg-red-600 text-white px-4 py-2 rounded"
+							>
+								Remove
+							</button>
+						</div>
 					</div>
-				}
-			>
-				<p className="mb-4">
-					Remove <strong>{userToDelete?.name}</strong> ({userToDelete?.email})
-					from this course's managers?
-				</p>
-			</Modal>
+				</div>
+			)}
 		</div>
 	);
 }
