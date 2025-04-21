@@ -32,3 +32,34 @@ export const getUserTypes: RequestHandler = async (_req, res, next) => {
     next(err); // Pass errors to Express error handler
   }
 };
+
+export const deleteUserType: RequestHandler = async (req, res, next) => {
+  try {
+    const deleted = await UserType.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      res.status(404).json({ message: "User type not found" });
+      return;
+    }
+    res.status(200).json({ success: true, message: "User type deleted" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateUserType: RequestHandler = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    const updated = await UserType.findByIdAndUpdate(
+      req.params.id,
+      { name },
+      { new: true }
+    );
+    if (!updated) {
+      res.status(404).json({ message: "User type not found" });
+      return;
+    }
+    res.status(200).json({ success: true, data: updated });
+  } catch (err) {
+    next(err);
+  }
+};
