@@ -4,6 +4,7 @@ import { ComponentType } from "react";
 import apiClient from "../../../services/apiClient";
 import qs from "qs";
 import { getCleanCourseData, useCourseEditStore } from "../../../store/useCourseEditStore";
+import { TupleType } from "typescript";
 
 const FaTrashAlt = _FaTrashAlt as ComponentType<{
 	size?: number;
@@ -56,18 +57,24 @@ export default function Registrants() {
 				}));
 
 				const numCourseComponents = await fetchCourseData(courseId); 
+				const paymentData = await fetchPaymentData(students, courseId); 
+				const progressData = await fetchProgressData(students, courseId); 
 
 				for (const partialRegInfo of formatted) {
-					const [paymentDate, paymentAmt, paymentId] = await fetchPaymentData(partialRegInfo.id, courseId);
-					const [completedCheck, completedStatus] = await fetchProgressData(partialRegInfo.id, courseId);  
+					const currUser = partialRegInfo.id; 
+					
+					if (paymentData.has(currUser)) {
+						partialRegInfo.registrationDate = paymentData.get(currUser)![0];
+						partialRegInfo.paid = paymentData.get(currUser)![1]; 
+						partialRegInfo.transactionId = paymentData.get(currUser)![2]; 
+					}
 
-					if (paymentDate != null) {
-						partialRegInfo.registrationDate = paymentDate; 
-						partialRegInfo.paid = `$${paymentAmt}`; 
-						partialRegInfo.transactionId = paymentId; 
-					} 
-					if (completedCheck != null) {
-						partialRegInfo.completed = completedCheck ? completedStatus : `${completedStatus} out of ${numCourseComponents}`; 
+					if (progressData.has(currUser)) {
+						if (progressData.get(currUser)![0]) { // course completed
+							partialRegInfo.completed = progressData.get(currUser)![1]; 
+						} else {
+							partialRegInfo.completed = `${progressData.get(currUser)![1]} out of ${numCourseComponents}`; 
+						}
 					}
 					
 				}
@@ -83,11 +90,7 @@ export default function Registrants() {
 
 		const fetchCourseData = async (courseId: string) => {
 			try {
-				const courseQuery = qs.stringify(
-					{ _id: courseId },
-					{ arrayFormat: "brackets" }
-				)
-				const courseRes = await apiClient.get(`/courses?${courseQuery}`)
+				const courseRes = await apiClient.get(`/courses?${courseId}`)
 				return courseRes.data.data[0].components.length; 
 			} catch (error) {
 				console.error("Failed to load course data", error); 
@@ -96,47 +99,59 @@ export default function Registrants() {
 				
 		}
 
-		const fetchPaymentData = async (userId: string, courseId: string) => {
+		const fetchPaymentData = async (userIds: string[], courseId: string) => {
 			try {
 				const paymentQuery = qs.stringify(
 					{ 
-						userId: userId, 
-						courses: { $in: [courseId] } },
+						userId: { $in: userIds }, 
+						courses: courseId },
 					{ arrayFormat: "brackets" }
 				);
 				const paymentRes = await apiClient.get(`/payments?${paymentQuery}`); 
+
 				const paymentData = paymentRes.data; 
 
-				const paymentDate = paymentData.date; 
-				const paymentAmt = paymentData.amount; 
-				const paymentId = paymentData.transactionId; 
-				return [paymentDate, paymentAmt, paymentId]; 
+				const paymentInfo = new Map<string, string[]>()
+				for (const indivPayment of paymentData) {
+					const paymentUser = indivPayment.userId; 
+					const indivDate = indivPayment.date.toDateString(); 
+					const indivAmt = indivPayment.amount.toString(); 
+					const indivId = indivPayment.transactionId; 
+					paymentInfo.set(paymentUser, [indivDate, indivAmt, indivId]); 
+				}
+
+				return paymentInfo; 
 			} catch (error) {
 				console.error("Failed to load payment data", error);
-				return [null, null, null]; 
+				return new Map<string, string[]>(); 
 			}
 		};
 
-		const fetchProgressData = async (userId: string, courseId: string) => {
+		const fetchProgressData = async (userIds: string[], courseId: string) => {
 			try {
 				const progressQuery = qs.stringify(
-					{userId: userId, courseId: courseId},
+					{
+						userId: { $in: userIds}, 
+						courseId: courseId},
 					{ arrayFormat: "brackets" }
 				); 
 				const progressRes = await apiClient.get(`/progress?${progressQuery}`); 
 				const progressData = progressRes.data; 
 
-				const courseCompleted = progressData.isComplete; 
-				if (courseCompleted) {
-					const courseStatus = progressData.dateCompleted.toDateString(); 
-					return [courseCompleted, courseStatus]; 
-				} else {
-					const courseStatus = progressData.completedCourses == null ? 0 : progressData.completedCourses.length; 
-					return [courseCompleted, courseStatus]; 
+				const progressInfo = new Map<String, [boolean, string]>(); 
+				for (const indivProgress of progressData) {
+					const currUser = indivProgress.user; 
+					const courseCompleted = indivProgress.isComplete; 
+					let courseStatus: string = "0"; 
+					if (courseCompleted) courseStatus = indivProgress.dateCompleted.toDateString(); 
+					else if (indivProgress.completedCourses != null) courseStatus = indivProgress.completedCourses.length.toString(); 
+					progressInfo.set(currUser, [courseCompleted, courseStatus])
 				}
+
+				return progressInfo; 
 			} catch (error) {
 				console.error("Failed to load progress data", error);
-				return [null, null];  
+				return new Map<String, [boolean, string]>();  
 			}
 		}; 
 
