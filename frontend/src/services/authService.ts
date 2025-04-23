@@ -8,6 +8,20 @@ interface AuthState {
 	user: firebase.User | null;
 }
 
+interface RegisterCredentials {
+	email: string;
+	password: string;
+	name: string;
+	phone: string;
+	certification: string;
+	company: string;
+	address1: string;
+	address2: string;
+	city: string;
+	state: string;
+	zip: string;
+	country: string;
+}
 class AuthService {
 	private static instance: AuthService;
 	private authState: AuthState = {
@@ -35,8 +49,8 @@ class AuthService {
 		if (user) {
 			this.authState.user = user;
 			this.authState.isAuthenticated = true;
-			if(user.cart !== ""){
-				user.cart = JSON.parse(user.cart)
+			if (user.cart !== "") {
+				user.cart = JSON.parse(user.cart);
 			}
 			localStorage.setItem("user", JSON.stringify(user));
 			apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -106,7 +120,20 @@ class AuthService {
 		return this.authState.user;
 	}
 
-	async register(email: string, password: string, name: string): Promise<void> {
+	async register({
+		email,
+		password,
+		name,
+		phone,
+		certification,
+		company,
+		address1,
+		address2,
+		city,
+		state,
+		country,
+		zip,
+	}: RegisterCredentials): Promise<void> {
 		try {
 			const userCredential = await auth.createUserWithEmailAndPassword(
 				email,
@@ -121,6 +148,9 @@ class AuthService {
 
 			const baseURL = "http://localhost:5001";
 
+			const fallback = (val: string | undefined, fallbackVal = "N/A") =>
+				val && val.trim() !== "" ? val : fallbackVal;
+
 			const response = await axios.post(
 				`${baseURL}/api/login/register`,
 				{
@@ -128,7 +158,16 @@ class AuthService {
 					email,
 					name,
 					role: "foster parent",
-					isColorado: true,
+					phone: fallback(phone),
+					certification,
+					company: fallback(company),
+					address1: fallback(address1),
+					address2: fallback(address2),
+					city: fallback(city),
+					state: fallback(state),
+					country: fallback(country),
+					zip: fallback(zip),
+					isColorado: state === "Colorado",
 				},
 				{
 					headers: {

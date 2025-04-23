@@ -13,11 +13,13 @@ import {
 import apiClient from "../../../services/apiClient";
 import { Course } from "../../../shared/types/course";
 import { Rating } from "../../../shared/types/rating";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AdminCoursePreview from "../../../components/AdminCoursePreview/AdminCoursePreview";
+import { CustomSelectBar } from "./CustomSelectBar";
+import AdminCourseDeleteModal from "../../../components/AdminCoursePreview/AdminCourseDeleteModal";
 
 export interface Product {
-	id: number;
+	id: string;
 	course: Course;
 	status: string;
 	avgRating: number;
@@ -25,6 +27,7 @@ export interface Product {
 	endTime: Date;
 	timeZone: string;
 	selected: boolean;
+	categories: string[];
 }
 
 export const Pagination = ({
@@ -175,8 +178,32 @@ export default function ProductPage() {
 	const [itemsPerPage, setItemsPerPage] = useState(15);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [products, setProducts] = useState<Product[]>([]);
-	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [productLoading, setProductLoading] = useState(false);
+	const [categoryValue, setCategoryValue] = useState<string[]>([]);
+	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+	const [selectedCredit, setSelectedCredit] = useState<number | null>(null);
+	const [isLive, setIsLive] = useState<string | null>(null);
+	const [categories, setCategories] = useState<string[] | null>(null);
+	const numberOptions = Array.from({ length: 10 }, (_, i) => i);
+	const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+
+	const getOptions = async () => {
+		try {
+			const response = await apiClient.get("/settings/selectedCategories");
+			setCategoryValue(response.data.data);
+		} catch (e) {
+			console.error("Failed to fetch selected categories:", e);
+		}
+	};
+
+	const selectedCourseIds = products
+		.filter((p) => p.selected)
+		.map((p) => p.course._id);
+	const handleCloseDeleteModal = () => {
+		setDeleteModalOpen(false);
+	};
+
+	const navigate = useNavigate();
 
 	const elemColors: Record<string, string> = {
 		Ongoing: "#30CD5A",
@@ -186,6 +213,7 @@ export default function ProductPage() {
 	};
 
 	const selectedCount = products.filter((d) => d.selected).length;
+
 	const displayedProducts = products
 		.filter((product) =>
 			product.course.className.toLowerCase().includes(searchQuery.toLowerCase())
@@ -233,6 +261,7 @@ export default function ProductPage() {
 					),
 					timeZone: "(CST)",
 					selected: false,
+					categories: categories,
 				})
 			);
 
@@ -259,16 +288,22 @@ export default function ProductPage() {
 		}
 	};
 
-	const toggleSelection = (id: number) => {
-		setProducts(
-			products.map((c) => (c.id === id ? { ...c, selected: !c.selected } : c))
+	const toggleSelection = (id: string) => {
+		const updatedProducts = products.map((c) =>
+			c.course._id === id ? { ...c, selected: !c.selected } : c
 		);
+		setProducts(updatedProducts);
 	};
 
 	const setFilter = (filterType: string, filterSpec: string) => {};
 
+	const refreshCourses = async () => {
+		await fetchProducts();
+	};
+
 	useEffect(() => {
 		fetchProducts();
+		getOptions();
 	}, []);
 
 	return (
@@ -300,14 +335,26 @@ export default function ProductPage() {
 						<div className="flex items-center gap-4">
 							{selectedCount === 0 ? (
 								<>
-									<button
-										className="flex rounded-lg border px-4 py-2.5 font-medium"
-										style={{ borderColor: "#6C6C6C", color: "#6C6C6C" }}
-										onClick={() => {}}
-									>
-										CATEGORY
-										<ChevronDown></ChevronDown>
-									</button>
+									<CustomSelectBar
+										options={categoryValue}
+										defaultLabel="CATEGORY"
+										width={160}
+										onChange={(val: string | number | null) => {
+											if (typeof val === "string" || val === null) {
+												setSelectedCategory(val);
+											}
+										}}
+									/>
+									<CustomSelectBar
+										options={numberOptions}
+										defaultLabel="CREDITS"
+										width={160}
+										onChange={(val: string | number | null) => {
+											if (typeof val === "number" || val === null) {
+												setSelectedCredit(val);
+											}
+										}}
+									/>
 									<button
 										className="flex rounded-lg border px-4 py-2.5 font-medium"
 										style={{ borderColor: "#6C6C6C", color: "#6C6C6C" }}
@@ -316,18 +363,20 @@ export default function ProductPage() {
 										STATUS
 										<ChevronDown></ChevronDown>
 									</button>
-									<button
+									<CustomSelectBar
+										options={["Live", "Virtual"]}
+										defaultLabel="TYPE"
+										width={130}
+										onChange={(val: string | number | null) => {
+											if (typeof val === "string" || val === null) {
+												setIsLive(val);
+											}
+										}}
+									/>
+									{/* <button
 										className="flex rounded-lg border px-4 py-2.5 font-medium"
 										style={{ borderColor: "#6C6C6C", color: "#6C6C6C" }}
-										onClick={() => {}}
-									>
-										TYPE
-										<ChevronDown></ChevronDown>
-									</button>
-									<button
-										className="flex rounded-lg border px-4 py-2.5 font-medium"
-										style={{ borderColor: "#6C6C6C", color: "#6C6C6C" }}
-										onClick={() => {}}
+										onClick={() => { }}
 									>
 										FORMAT
 										<ChevronDown></ChevronDown>
@@ -335,11 +384,11 @@ export default function ProductPage() {
 									<button
 										className="flex rounded-lg border px-4 py-2.5 font-medium"
 										style={{ borderColor: "#6C6C6C", color: "#6C6C6C" }}
-										onClick={() => {}}
+										onClick={() => { }}
 									>
 										CREATED
 										<ChevronDown></ChevronDown>
-									</button>
+									</button> */}
 								</>
 							) : (
 								<>
@@ -349,7 +398,7 @@ export default function ProductPage() {
 									<button
 										className="text-red-600 font-bold"
 										onClick={() => {
-											setProducts(products.filter((d) => !d.selected));
+											setDeleteModalOpen(true);
 											setCurrentPage((prevPage) => {
 												const totalPages = Math.ceil(
 													products.filter((d) => !d.selected).length /
@@ -365,12 +414,22 @@ export default function ProductPage() {
 									</button>
 								</>
 							)}
+							{deleteModalOpen && (
+								<div>
+									<AdminCourseDeleteModal
+										isOpen={deleteModalOpen}
+										id={selectedCourseIds}
+										onClose={handleCloseDeleteModal}
+										refreshCourses={refreshCourses}
+									/>
+								</div>
+							)}
 						</div>
 						<button
 							className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
 							style={{ backgroundColor: "#8757a3" }}
 							onClick={() => {
-								setIsModalOpen(true);
+								navigate("/admin/product/create");
 							}}
 						>
 							Add Course
@@ -386,9 +445,13 @@ export default function ProductPage() {
 							<div className="space-y-2 text-sm">
 								{displayedProducts.map((product) => (
 									<AdminCoursePreview
-										key={product.id}
+										key={product.course._id}
 										product={product}
 										toggleSelection={toggleSelection}
+										category={selectedCategory}
+										credit={selectedCredit}
+										status={isLive}
+										refreshCourses={refreshCourses}
 									/>
 								))}
 							</div>

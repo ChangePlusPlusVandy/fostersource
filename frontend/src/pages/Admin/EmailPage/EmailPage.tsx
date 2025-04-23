@@ -1,11 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Edit2, Trash2 } from "lucide-react";
+import EmailModel from "./EmailModal";
+import EmailModal from "./EmailModal";
+import adminApiClient from "../../../services/adminApiClient";
 
 interface Email {
 	id: number;
 	subject: string;
-	product: string;
-	sendTime: string;
+	body: string;
+	course: {
+		id: string;
+		className: string;
+	};
+	sendDate: string;
 	selected: boolean;
 }
 
@@ -13,21 +20,9 @@ export default function EmailPage() {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [itemsPerPage, setItemsPerPage] = useState(20);
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const [emails, setEmails] = useState<Email[]>([
-		...Array(50)
-			.fill(null)
-			.map((_, i) => ({
-				id: i + 1,
-				subject:
-					"Details for Tomorrow #" +
-					(i + 1) +
-					": Please READ: This is going to be AWESOME!",
-				product:
-					"Avoiding Head Trauma and Early Exposure - Live Virtual (01/18/2025)",
-				sendTime: "Scheduled: 02/15/2025 13:00",
-				selected: false,
-			})),
-	]);
+	const [emails, setEmails] = useState<Email[]>([]);
+	const [modalOpen, setModalOpen] = useState<boolean>(false);
+	const [isEdit, setIsEdit] = useState<boolean>(false);
 
 	const selectedCount = emails.filter((e) => e.selected).length;
 
@@ -56,6 +51,23 @@ export default function EmailPage() {
 			setCurrentPage(page);
 		}
 	};
+
+	const fetchEmails = async () => {
+		try {
+			const response = await adminApiClient.get("/emails");
+			setEmails(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	useEffect(() => {
+		fetchEmails();
+	}, []);
+
+	useEffect(() => {
+		console.log(emails);
+	}, [emails]);
 
 	return (
 		<div className="w-full min-h-screen bg-gray-100">
@@ -99,7 +111,10 @@ export default function EmailPage() {
 							<button
 								className="text-sm text-white px-4 py-2 rounded-lg font-medium hover:opacity-90"
 								style={{ backgroundColor: "#8757a3" }}
-								onClick={() => {}}
+								onClick={() => {
+									setModalOpen(true);
+									setIsEdit(false);
+								}}
 							>
 								New Email
 							</button>
@@ -156,10 +171,13 @@ export default function EmailPage() {
 													{email.subject}
 												</td>
 												<td className="px-3 py-2 text-sm font-medium text-gray-900 border-r truncate max-w-[200px] overflow-hidden text-ellipsis h-12">
-													{email.product}
+													{email.course.className}
 												</td>
 												<td className="px-3 py-2 text-sm font-medium text-gray-900 border-r truncate max-w-[140px] overflow-hidden text-ellipsis h-12">
-													{email.sendTime}
+													{new Date(email.sendDate).toLocaleString("en-US", {
+														dateStyle: "long",
+														timeStyle: "short",
+													})}
 												</td>
 												<td className="px-3 py-2 text-sm text-gray-500 w-[100px] h-12">
 													<div className="flex justify-center gap-4">
@@ -216,6 +234,12 @@ export default function EmailPage() {
 					)}
 				</div>
 			</div>
+			<EmailModal
+				modalOpen={modalOpen}
+				onClose={() => setModalOpen(false)}
+				title={isEdit ? "Edit Email" : "Create New Email"}
+				isEdit={isEdit}
+			/>
 		</div>
 	);
 }

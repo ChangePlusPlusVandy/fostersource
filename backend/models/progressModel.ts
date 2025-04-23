@@ -1,16 +1,11 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
-import User from "./userModel";
+import User, { IUser } from "./userModel";
+import { ICourse } from "./courseModel";
 
 // Define an interface for the document (you can replace "ModelName" with the actual model name)
 export interface IProgress extends Document {
-	user: {
-		type: mongoose.Schema.Types.ObjectId;
-		ref: "User";
-	};
-	course: {
-		type: mongoose.Schema.Types.ObjectId;
-		ref: "Course";
-	};
+	user: mongoose.Types.ObjectId | IUser;
+	course: mongoose.Types.ObjectId | ICourse;
 	isComplete: Boolean;
 	completedComponents: any;
 	dateCompleted: Date;
@@ -54,7 +49,7 @@ progressSchema.post("save", async function (doc) {
 	if (doc.user) {
 		try {
 			await User.findByIdAndUpdate(doc.user, {
-				$push: { progress: doc._id },
+				$addToSet: { progress: doc._id },
 			});
 		} catch (error) {
 			console.error("Failed to update user's progress array:", error);

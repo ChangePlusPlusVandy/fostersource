@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import speakerImage from "./images/speaker-image.png";
 import apiClient from "../../../services/apiClient";
+import { useCourseEditStore } from "../../../store/useCourseEditStore";
+import Modal from "../../../components/Modal";
+import Dropdown from "../../../components/dropdown-select";
+import SearchDropdown from "../ComponentPage/DropDownSearch";
+import SaveCourseButton from "../../../components/SaveCourseButtons";
+import adminApiClient from "../../../services/adminApiClient";
 
 interface Speaker {
 	_id?: string;
@@ -16,7 +21,10 @@ interface Speaker {
 type FieldName = "name" | "company" | "title" | "email" | "bio";
 
 export default function SpeakersPage() {
-	const [speakers, setSpeakers] = useState<Speaker[]>([]);
+	const { speakers, setField, setAllFields } = useCourseEditStore();
+
+	const [allSpeakers, setAllSpeakers] = useState<Speaker[]>([]);
+	const [courseSpeakers, setCourseSpeakers] = useState<Speaker[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -30,6 +38,10 @@ export default function SpeakersPage() {
 		company: "",
 		bio: "",
 	});
+	const [showAddNewSpeaker, setShowAddNewSpeaker] = useState<boolean>(false);
+	const [selectedSpeakerNames, setSelectedSpeakerNames] = useState<string[]>(
+		[]
+	);
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const addFileInputRef = useRef<HTMLInputElement>(null);
@@ -87,26 +99,33 @@ export default function SpeakersPage() {
 		}
 	}, [focusedField, newSpeaker, currentSpeaker]);
 
-	// Fetch speakers on component mount
+	const hasHydratedRef = useRef(false);
+
 	useEffect(() => {
-		fetchSpeakers();
-	}, []);
+		if (!hasHydratedRef.current) {
+			hasHydratedRef.current = true;
+			fetchSpeakers(); // only runs after Zustand state is restored
+		}
+	}, [speakers]);
 
 	const fetchSpeakers = async () => {
 		try {
 			setLoading(true);
-			console.log("Fetching speakers from API...");
+			console.log("retrieving");
 			const response = await apiClient.get("/speakers");
-			console.log("API response:", response);
-			console.log("Speakers data:", response.data);
-
+			console.log("retrieved");
 			if (Array.isArray(response.data) && response.data.length > 0) {
-				setSpeakers(response.data);
+				const all = response.data;
+
+				const matched = all.filter((s) => speakers.includes(s._id));
+				const remaining = all.filter((s) => !speakers.includes(s._id));
+
+				setCourseSpeakers(matched);
+				setAllSpeakers(remaining);
 			} else {
 				console.warn("No speakers found or data is not an array");
 				// Add fallback data if needed
 			}
-
 			setLoading(false);
 		} catch (err) {
 			console.error("Error details:", err);
@@ -118,6 +137,7 @@ export default function SpeakersPage() {
 	const handleEditClick = (speaker: Speaker) => {
 		setCurrentSpeaker(speaker);
 		setShowEditModal(true);
+		setShowAddNewSpeaker(true);
 	};
 
 	const handleInputChange = (
@@ -155,28 +175,63 @@ export default function SpeakersPage() {
 		}
 	};
 
-	const handleImageChange = (
-		e: React.ChangeEvent<HTMLInputElement>,
-		isNew = false
+	const handleFileChange = async (
+		event: React.ChangeEvent<HTMLInputElement>
 	) => {
-		if (e.target.files && e.target.files[0]) {
-			if (isNew) {
-				setNewImageFile(e.target.files[0]);
-			} else {
-				setImageFile(e.target.files[0]);
+		if (event.target.files && event.target.files[0]) {
+			const selectedFile = event.target.files[0];
+			// setFilePreview(URL.createObjectURL(selectedFile));
+
+			const uploadedUrl = await uploadImageToCloudinary(selectedFile);
+
+			if (uploadedUrl) {
+				if (showAddModal) {
+					setNewSpeaker((prev) => ({
+						...prev,
+						image: uploadedUrl,
+					}));
+					setNewImageFile(selectedFile);
+				} else if (showEditModal && currentSpeaker) {
+					setCurrentSpeaker((prev) =>
+						prev
+							? {
+									...prev,
+									image: uploadedUrl,
+								}
+							: null
+					);
+					setImageFile(selectedFile);
+				}
 			}
+		}
+	};
+
+	const uploadImageToCloudinary = async (
+		file: File
+	): Promise<string | null> => {
+		const formData = new FormData();
+		formData.append("image", file);
+
+		try {
+			const res = await adminApiClient.post("/upload/image", formData);
+
+			return res.data.imageUrl || null;
+		} catch (error: any) {
+			console.error(
+				"Error uploading image:",
+				error?.response?.data || error.message
+			);
+			return null;
 		}
 	};
 
 	const handleRemoveSpeaker = async (speakerId: string | undefined) => {
 		if (!speakerId) return;
 
-		try {
-			await apiClient.delete(`/speakers/${speakerId}`);
-			setSpeakers(speakers.filter((s) => s._id !== speakerId));
-		} catch (err) {
-			console.error("Error removing speaker:", err);
-		}
+		const updatedSpeakers = speakers.filter((id) => id !== speakerId);
+		setField("speakers", updatedSpeakers);
+
+		setCourseSpeakers((prev) => prev.filter((s) => s._id !== speakerId));
 	};
 
 	const handleUpdateSpeaker = async () => {
@@ -203,14 +258,30 @@ export default function SpeakersPage() {
 				}
 			);
 
-			setSpeakers(
-				speakers.map((s) => (s._id === currentSpeaker._id ? response.data : s))
+			console.log(response.data);
+
+			const updatedSpeaker = response.data;
+
+			if (!updatedSpeaker || !updatedSpeaker._id) {
+				console.error("Invalid update response:", response.data);
+				alert("Update failed: server did not return updated speaker.");
+				return;
+			}
+
+			setCourseSpeakers((prev) =>
+				prev.map((s) => (s._id === updatedSpeaker._id ? updatedSpeaker : s))
 			);
+
+			setAllSpeakers((prev) =>
+				prev.map((s) => (s._id === updatedSpeaker._id ? updatedSpeaker : s))
+			);
+
 			setShowEditModal(false);
 			setCurrentSpeaker(null);
 			setImageFile(null);
 		} catch (err) {
 			console.error("Error updating speaker:", err);
+			alert("An error occurred while updating the speaker.");
 		}
 	};
 
@@ -230,20 +301,27 @@ export default function SpeakersPage() {
 			const formData = new FormData();
 
 			Object.entries(newSpeaker).forEach(([key, value]) => {
-				if (value) {
+				if (value && key !== "image") {
 					formData.append(key, value.toString());
 				}
 			});
 
-			if (newImageFile) {
-				formData.append("image", newImageFile);
+			if (newSpeaker.image) {
+				formData.append("image", newSpeaker.image); // 👈 add URL string
 			}
 
 			const response = await apiClient.post("/speakers", formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			});
 
-			setSpeakers([...speakers, response.data.speaker]);
+			const newId = response.data.speaker._id;
+
+			// 1. Add speaker ID to Zustand storage (speakers array)
+			setField("speakers", [...speakers, newId]);
+
+			// 2. Add speaker object to courseSpeakers (for displaying)
+			setCourseSpeakers((prev) => [...prev, response.data.speaker]);
+
 			setShowAddModal(false);
 			setNewSpeaker({
 				name: "",
@@ -267,164 +345,208 @@ export default function SpeakersPage() {
 		const speaker = isAdd ? newSpeaker : currentSpeaker;
 		if (!speaker) return null;
 
+		const title = isAdd ? "Add Speaker" : "Edit Speaker";
+
+		const speakerNames = allSpeakers.map((s) => s.name);
+
+		const handleExit = () => {
+			if (isAdd) {
+				setShowAddModal(false);
+				setNewSpeaker({
+					name: "",
+					title: "",
+					email: "",
+					company: "",
+					bio: "",
+					disclosures: "",
+				});
+			} else {
+				setShowEditModal(false);
+				setCurrentSpeaker(null);
+			}
+		};
+
+		const handleSubmit = isAdd ? handleAddSpeaker : handleUpdateSpeaker;
+
 		return (
-			<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-				<div className="bg-white rounded-lg p-6 w-full max-w-lg">
-					<h2 className="text-xl font-bold mb-6">
-						{isAdd ? "Add Speaker" : "Edit Speaker"}
-					</h2>
-
-					<div className="mb-4">
-						<label className="block mb-1 font-medium">Name</label>
-						<input
-							ref={inputRefs.name}
-							type="text"
-							name="name"
-							value={speaker.name}
-							onChange={(e) => handleInputChange(e, isAdd)}
-							onFocus={() => setFocusedField("name")}
-							className="w-full px-3 py-2 border rounded-md"
-							required
-						/>
-					</div>
-
-					<div className="mb-4">
-						<label className="block mb-1 font-medium">Company</label>
-						<input
-							ref={inputRefs.company}
-							type="text"
-							name="company"
-							value={speaker.company}
-							onChange={(e) => handleInputChange(e, isAdd)}
-							onFocus={() => setFocusedField("company")}
-							className="w-full px-3 py-2 border rounded-md"
-							required
-						/>
-					</div>
-
-					<div className="mb-4">
-						<label className="block mb-1 font-medium">Title/Position</label>
-						<input
-							ref={inputRefs.title}
-							type="text"
-							name="title"
-							value={speaker.title}
-							onChange={(e) => handleInputChange(e, isAdd)}
-							onFocus={() => setFocusedField("title")}
-							className="w-full px-3 py-2 border rounded-md"
-							required
-						/>
-					</div>
-
-					<div className="mb-4">
-						<label className="block mb-1 font-medium">Email</label>
-						<input
-							ref={inputRefs.email}
-							type="email"
-							name="email"
-							value={speaker.email}
-							onChange={(e) => handleInputChange(e, isAdd)}
-							onFocus={() => setFocusedField("email")}
-							className="w-full px-3 py-2 border rounded-md"
-							required
-						/>
-					</div>
-
-					<div className="mb-4">
-						<label className="block mb-1 font-medium">Bio</label>
-						<textarea
-							ref={textareaRefs.bio}
-							name="bio"
-							value={speaker.bio}
-							onChange={(e) => handleInputChange(e, isAdd)}
-							onFocus={() => setFocusedField("bio")}
-							className="w-full px-3 py-2 border rounded-md h-24"
-							required
-						/>
-					</div>
-
-					<div className="mb-6">
-						<label className="block mb-1 font-medium">Speaker Image</label>
-						<div className="border border-dashed rounded-md p-4 text-center">
-							<div className="flex justify-center">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-									<polyline points="17 8 12 3 7 8"></polyline>
-									<line x1="12" y1="3" x2="12" y2="15"></line>
-								</svg>
-							</div>
-							<p className="text-sm mt-1">
-								Choose a file or drag & drop it here
-							</p>
-							<p className="text-xs text-gray-500">
-								JPEG or PNG format, up to 5MB
-							</p>
-							<input
-								type="file"
-								className="hidden"
-								ref={isAdd ? addFileInputRef : fileInputRef}
-								onChange={(e) => handleImageChange(e, isAdd)}
-								accept="image/jpeg,image/png"
-							/>
-							<button
-								className="text-sm px-4 py-1 mt-2 border rounded-md"
-								onClick={() =>
-									isAdd
-										? addFileInputRef.current?.click()
-										: fileInputRef.current?.click()
-								}
-							>
-								Browse Files
-							</button>
-							{(isAdd ? newImageFile : imageFile) && (
-								<p className="text-sm text-green-600 mt-1">
-									{isAdd ? newImageFile?.name : imageFile?.name} selected
-								</p>
-							)}
-						</div>
-					</div>
-
+			<Modal
+				isOpen={true}
+				onClose={handleExit}
+				title={title}
+				showCloseIcon
+				footer={
 					<div className="flex justify-end gap-3">
 						<button
 							className="px-4 py-2 border rounded-md"
-							onClick={() => {
-								if (isAdd) {
-									setShowAddModal(false);
-									setNewSpeaker({
-										name: "",
-										title: "",
-										email: "",
-										company: "",
-										bio: "",
-										disclosures: "",
-									});
-								} else {
-									setShowEditModal(false);
-									setCurrentSpeaker(null);
-								}
-							}}
+							onClick={handleExit}
 						>
 							Exit
 						</button>
 						<button
 							className="px-4 py-2 bg-[#8757a3] text-white rounded-md"
-							onClick={isAdd ? handleAddSpeaker : handleUpdateSpeaker}
+							onClick={handleSubmit}
 						>
 							Save and Exit
 						</button>
 					</div>
-				</div>
-			</div>
+				}
+			>
+				{!showAddNewSpeaker ? (
+					<div>
+						<SearchDropdown
+							options={speakerNames}
+							selected={selectedSpeakerNames}
+							setSelected={setSelectedSpeakerNames}
+							placeholder="Search for existing speakers"
+							onSelect={(selectedName) => {
+								const matched = allSpeakers.find(
+									(s) => s.name === selectedName
+								);
+								if (matched && matched._id) {
+									setCurrentSpeaker(matched);
+									setField("speakers", [...speakers, matched._id]);
+									setAllSpeakers((prev) =>
+										prev.filter((s) => s._id !== matched._id)
+									);
+									setCourseSpeakers((prev) => [...prev, matched]);
+								}
+								handleExit();
+							}}
+						/>
+						<div className="flex justify-end">
+							<p
+								className="text-white bg-purple2 px-10 py-2 rounded-md cursor-pointer"
+								onClick={() => setShowAddNewSpeaker(true)}
+							>
+								Add New Speaker
+							</p>
+						</div>
+					</div>
+				) : (
+					<div>
+						<div className="mb-4">
+							<label className="block mb-1 font-medium">Name</label>
+							<input
+								ref={inputRefs.name}
+								type="text"
+								name="name"
+								value={speaker.name}
+								onChange={(e) => handleInputChange(e, isAdd)}
+								onFocus={() => setFocusedField("name")}
+								className="w-full px-3 py-2 border rounded-md"
+								required
+							/>
+						</div>
+
+						<div className="mb-4">
+							<label className="block mb-1 font-medium">Company</label>
+							<input
+								ref={inputRefs.company}
+								type="text"
+								name="company"
+								value={speaker.company}
+								onChange={(e) => handleInputChange(e, isAdd)}
+								onFocus={() => setFocusedField("company")}
+								className="w-full px-3 py-2 border rounded-md"
+								required
+							/>
+						</div>
+
+						<div className="mb-4">
+							<label className="block mb-1 font-medium">Title/Position</label>
+							<input
+								ref={inputRefs.title}
+								type="text"
+								name="title"
+								value={speaker.title}
+								onChange={(e) => handleInputChange(e, isAdd)}
+								onFocus={() => setFocusedField("title")}
+								className="w-full px-3 py-2 border rounded-md"
+								required
+							/>
+						</div>
+
+						<div className="mb-4">
+							<label className="block mb-1 font-medium">Email</label>
+							<input
+								ref={inputRefs.email}
+								type="email"
+								name="email"
+								value={speaker.email}
+								onChange={(e) => handleInputChange(e, isAdd)}
+								onFocus={() => setFocusedField("email")}
+								className="w-full px-3 py-2 border rounded-md"
+								required
+							/>
+						</div>
+
+						<div className="mb-4">
+							<label className="block mb-1 font-medium">Bio</label>
+							<textarea
+								ref={textareaRefs.bio}
+								name="bio"
+								value={speaker.bio}
+								onChange={(e) => handleInputChange(e, isAdd)}
+								onFocus={() => setFocusedField("bio")}
+								className="w-full px-3 py-2 border rounded-md h-24"
+								required
+							/>
+						</div>
+
+						<div className="mb-6">
+							<label className="block mb-1 font-medium">Speaker Image</label>
+							<div className="border border-dashed rounded-md p-4 text-center">
+								<div className="flex justify-center">
+									{/* SVG icon */}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									>
+										<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+										<polyline points="17 8 12 3 7 8"></polyline>
+										<line x1="12" y1="3" x2="12" y2="15"></line>
+									</svg>
+								</div>
+								<p className="text-sm mt-1">
+									Choose a file or drag & drop it here
+								</p>
+								<p className="text-xs text-gray-500">
+									JPEG or PNG format, up to 5MB
+								</p>
+								<input
+									type="file"
+									className="hidden"
+									ref={isAdd ? addFileInputRef : fileInputRef}
+									onChange={(e) => handleFileChange(e)}
+									accept="image/jpeg,image/png"
+								/>
+								<button
+									className="text-sm px-4 py-1 mt-2 border rounded-md"
+									onClick={() =>
+										isAdd
+											? addFileInputRef.current?.click()
+											: fileInputRef.current?.click()
+									}
+								>
+									Browse Files
+								</button>
+								{(isAdd ? newImageFile : imageFile) && (
+									<p className="text-sm text-green-600 mt-1">
+										{isAdd ? newImageFile?.name : imageFile?.name} selected
+									</p>
+								)}
+							</div>
+						</div>
+					</div>
+				)}
+			</Modal>
 		);
 	};
 
@@ -447,29 +569,31 @@ export default function SpeakersPage() {
 					<div className="text-center py-8">Loading speakers...</div>
 				) : error ? (
 					<div className="text-center py-8 text-red-500">{error}</div>
-				) : speakers.length === 0 ? (
+				) : courseSpeakers.length === 0 ? (
 					<div className="text-center py-8">
 						No speakers found. Add a speaker to get started.
 					</div>
 				) : (
 					<div className="space-y-4">
-						{speakers.map((speaker) => (
+						{courseSpeakers.map((speaker) => (
 							<div key={speaker._id} className="bg-white rounded-lg border p-6">
 								<div className="flex gap-6">
 									{/* Speaker Image */}
 									<div className="w-48 h-48 flex-shrink-0">
-										<img
-											src={speaker.image ? speaker.image : speakerImage}
-											alt={speaker.name}
-											className="w-full h-full object-cover rounded-lg"
-											onError={(e) => {
-												console.log(
-													"Image failed to load:",
-													e.currentTarget.src
-												);
-												e.currentTarget.src = speakerImage; // Fallback to default image
-											}}
-										/>
+										{speaker.image ? (
+											<img
+												src={speaker.image}
+												alt={speaker.name}
+												className="w-full h-full object-cover rounded-lg"
+												onError={(e) => {
+													console.log(
+														"Image failed to load:",
+														e.currentTarget.src
+													);
+													e.currentTarget.style.display = "none"; // Hide if load fails
+												}}
+											/>
+										) : null}
 									</div>
 
 									{/* Speaker Info */}
@@ -516,6 +640,8 @@ export default function SpeakersPage() {
 
 			{/* Add Speaker Modal */}
 			{showAddModal && <SpeakerFormModal isAdd={true} />}
+
+			<SaveCourseButton prevLink="components" nextLink={"handouts"} />
 		</div>
 	);
 }

@@ -1,11 +1,14 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import User from "./userModel";
+import { ICourse } from "./courseModel";
 
 export interface IPayment extends Document {
 	userId: mongoose.Types.ObjectId;
 	date: Date;
 	amount: number;
 	memo: string;
+	courses: (mongoose.Types.ObjectId | ICourse)[];
+	transactionId: string;
 }
 
 const paymentSchema: Schema = new Schema(
@@ -18,6 +21,14 @@ const paymentSchema: Schema = new Schema(
 		date: { type: Date, required: true },
 		amount: { type: Number, required: true },
 		memo: { type: String, required: true },
+		courses: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Course",
+				required: true,
+			},
+		],
+		transactionId: { type: String, required: true },
 	},
 	{
 		timestamps: true,
