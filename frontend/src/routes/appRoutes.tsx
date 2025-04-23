@@ -42,6 +42,7 @@ import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
 import ProductProgressReport from "../pages/Admin/ProductSummaryPage/ProductProgressReport";
 import FAQPage from "../pages/FAQPage/FAQPage";
 import HandoutPage from "../pages/Admin/HandoutsPage/handoutsPage";
+import EmailTemplates from "../pages/Admin/EmailTemplatePage/EmailTemplates";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
@@ -171,8 +172,16 @@ function AppRoutes() {
 					}}
 				>
 					<Routes>
+						{/* ===== LEARNER ROUTES ===== */}
 						<Route path="/" element={<Home />} />
-						<Route path="/calendar" element={<Calendar />} />
+						<Route
+							path="/dashboard"
+							element={
+								<PrivateRoute>
+									<Dashboard />
+								</PrivateRoute>
+							}
+						/>
 						<Route
 							path="/catalog"
 							element={
@@ -182,10 +191,10 @@ function AppRoutes() {
 							}
 						/>
 						<Route
-							path="/dashboard"
+							path="/calendar"
 							element={
 								<PrivateRoute>
-									<Dashboard />
+									<Calendar />
 								</PrivateRoute>
 							}
 						/>
@@ -200,7 +209,11 @@ function AppRoutes() {
 						<Route path="/faqs" element={<FAQPage />} />
 						<Route
 							path="/courseDetails"
-							element={<CoursePage setCartItemCount={setCartItemCount} />}
+							element={
+								<PrivateRoute>
+									<CoursePage setCartItemCount={setCartItemCount} />
+								</PrivateRoute>
+							}
 						/>
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />
@@ -209,36 +222,21 @@ function AppRoutes() {
 							path="/reset-password/:token"
 							element={<ResetPasswordForm />}
 						/>
-						{/*<Route path="/admin" element={<AdminPage />} />*/}
-						<Route path="/admin/discounts" element={<DiscountPage />} />
-						<Route path="/admin/speakers" element={<SpeakerPage />} />
-						<Route path="/admin/users" element={<UserManagementPage />} />
-						<Route path="/admin/products/pricing" element={<Pricing />} />
+
+						{/* ===== ADMIN PRODUCT ROUTES ===== */}
 						<Route
-							path="/admin/components"
+							path="/admin/products"
 							element={
-								<ComponentPage
-									workshop={undefined}
-									survey={undefined}
-									certificate={undefined}
-								/>
+								<AdminRoute>
+									<ProductPage />
+								</AdminRoute>
 							}
 						/>
-						<Route path="/admin/components/survey" element={<SurveyPage />} />
-						<Route path="/admin/products" element={<ProductPage />} />
 						<Route
 							path="/admin/discounts"
 							element={
 								<AdminRoute>
 									<DiscountPage />
-								</AdminRoute>
-							}
-						/>
-						<Route
-							path="/admin/speakers"
-							element={
-								<AdminRoute>
-									<SpeakerPage />
 								</AdminRoute>
 							}
 						/>
@@ -251,46 +249,15 @@ function AppRoutes() {
 							}
 						/>
 						<Route
-							path="admin/reports/progress"
+							path="admin/templates"
 							element={
 								<AdminRoute>
-									<ProductProgressReport />
-								</AdminRoute>
-							}
-						/>
-						<Route
-							path="admin/registrants"
-							element={
-								<AdminRoute>
-									<Registrants />
-								</AdminRoute>
-							}
-						/>
-						<Route
-							path="admin/content"
-							element={
-								<AdminRoute>
-									<RegistrationPage />
-								</AdminRoute>
-							}
-						/>
-						<Route
-							path="/admin/products"
-							element={
-								<AdminRoute>
-									<ProductPage />
-								</AdminRoute>
-							}
-						/>
-						<Route
-							path="/admin/reports/survey"
-							element={
-								<AdminRoute>
-									<SurveySummary />
+									<EmailTemplates />
 								</AdminRoute>
 							}
 						/>
 
+						{/* ===== create and edit product routes ===== */}
 						<Route
 							path="/admin/product/edit/:id"
 							element={
@@ -345,7 +312,37 @@ function AppRoutes() {
 							<Route path="managers" element={<CourseManagerPage />} />
 							<Route path="survey" element={<SurveyPage />} />
 							<Route path="handouts" element={<HandoutPage />} />
+							<Route path="registrants" element={<Registrants />} />
 						</Route>
+
+						{/* ===== user management routes ===== */}
+						<Route path="/admin/users" element={<UserManagementPage />} />
+
+						{/* ===== report routes ===== */}
+						<Route
+							path="admin/content"
+							element={
+								<AdminRoute>
+									<RegistrationPage />
+								</AdminRoute>
+							}
+						/>
+						<Route
+							path="/admin/reports/survey"
+							element={
+								<AdminRoute>
+									<SurveySummary />
+								</AdminRoute>
+							}
+						/>
+						<Route
+							path="admin/reports/progress"
+							element={
+								<AdminRoute>
+									<ProductProgressReport />
+								</AdminRoute>
+							}
+						/>
 					</Routes>
 				</div>
 				{isHeaderBarOpen && isCollapsed && (

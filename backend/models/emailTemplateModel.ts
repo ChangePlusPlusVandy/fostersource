@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IEmailTemplate extends Document {
-	title: string;
+	subject: string;
 	body: string;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -9,7 +9,7 @@ export interface IEmailTemplate extends Document {
 
 const emailTemplateSchema: Schema = new Schema(
 	{
-		title: { type: String, required: true },
+		subject: { type: String, required: true },
 		body: { type: String, required: true },
 	},
 	{

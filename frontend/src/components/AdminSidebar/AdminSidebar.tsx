@@ -55,8 +55,8 @@ export const mainItems: SidebarItem[] = [
 			{ icon: <Mail />, description: "Emails", href: "/admin/email" },
 			{
 				icon: <ClipboardList />,
-				description: "Registrants",
-				href: "/admin/registrants",
+				description: "Templates",
+				href: "/admin/templates",
 			},
 		],
 	},

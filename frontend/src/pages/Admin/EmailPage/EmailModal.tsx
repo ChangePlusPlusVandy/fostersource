@@ -70,6 +70,17 @@ export default function EmailModal({
 		}
 	};
 
+	const saveAsTemplate = async () => {
+		try {
+			await apiClient.post("/emailTemplates", {
+				subject,
+				body,
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	useEffect(() => {
 		if (modalOpen) getCourses();
 	}, [modalOpen]);
@@ -100,7 +111,10 @@ export default function EmailModal({
 					) : (
 						<button
 							type="button"
-							onClick={onClose}
+							onClick={() => {
+								saveAsTemplate();
+								onClose();
+							}}
 							className="mr-2 text-purple2 underline"
 						>
 							Save as Template
