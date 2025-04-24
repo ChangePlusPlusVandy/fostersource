@@ -21,6 +21,7 @@ interface RegisterCredentials {
 	state: string;
 	zip: string;
 	country: string;
+	userType: string;
 }
 class AuthService {
 	private static instance: AuthService;
@@ -133,6 +134,7 @@ class AuthService {
 		state,
 		country,
 		zip,
+		userType,
 	}: RegisterCredentials): Promise<void> {
 		try {
 			const userCredential = await auth.createUserWithEmailAndPassword(
@@ -157,7 +159,7 @@ class AuthService {
 					firebaseId: userCredential.user.uid,
 					email,
 					name,
-					role: "foster parent",
+					userType,
 					phone: fallback(phone),
 					certification,
 					company: fallback(company),

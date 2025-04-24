@@ -59,6 +59,20 @@ const states = [
 	"Wyoming",
 ];
 
+const USER_TYPES = [
+	'Foster Parent (Colorado)',
+	'CASA',
+	'County/CPA Worker',
+	'Former FP/Adoptive Parent/Not currently fostering',
+	'Teacher',
+	'Speaker',
+	'Foster Parent (Outside Colorado)',
+	'Certified Kin Parent (Colorado)',
+	'Certified Kin Parent (Outside Colorado)',
+	'Non-certified Kin Parent (Colorado)',
+	'Non-certified Kin Parent (Outside Colorado)',
+];
+
 const Register: React.FC = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -86,6 +100,8 @@ const Register: React.FC = () => {
 	const [isLowercaseValid, setIsLowercaseValid] = useState(false);
 	const [isNumberValid, setIsNumberValid] = useState(false);
 	const [isSpecialCharValid, setIsSpecialCharValid] = useState(false);
+
+	const [userType, setUserType] = useState("");
 
 	const handlePasswordChange = (password: string) => {
 		setPassword(password);
@@ -141,6 +157,7 @@ const Register: React.FC = () => {
 				state,
 				zip,
 				country: country?.value || "N/A",
+				userType,
 			});
 			window.location.href = "/catalog";
 		} catch (err: any) {
@@ -302,19 +319,6 @@ const Register: React.FC = () => {
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">
-										Phone Number (optional)
-									</label>
-									<input
-										type="tel"
-										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-										value={phone}
-										onChange={(e) =>
-											setPhone(e.target.value.replace(/[^0-9+]/g, ""))
-										}
-									/>
-								</div>
-								<div>
-									<label className="block mb-1 text-sm font-medium text-black">
 										Who are you certified through?
 									</label>
 									<input
@@ -326,6 +330,35 @@ const Register: React.FC = () => {
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">
+										User Type
+									</label>
+									<Select
+										options={USER_TYPES.map(type => ({ value: type, label: type }))}
+										value={userType ? { value: userType, label: userType } : null}
+										onChange={(selectedOption) => setUserType(selectedOption ? selectedOption.value : "")}
+										placeholder="Choose a User Type"
+										styles={{
+											control: (provided, state) => ({
+												...provided,
+												borderColor: state.isFocused ? 'orange' : provided.borderColor,
+												boxShadow: state.isFocused ? '0 0 0 1px orange' : provided.boxShadow,
+												'&:hover': {
+													borderColor: 'orange',
+												},
+											}),
+											placeholder: (provided) => ({
+												...provided,
+												color: 'gray',
+											}),
+											singleValue: (provided) => ({
+												...provided,
+												color: 'black',
+											}),
+										}}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">
 										Company (optional)
 									</label>
 									<input
@@ -333,6 +366,19 @@ const Register: React.FC = () => {
 										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
 										value={company}
 										onChange={(e) => setCompany(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">
+										Phone Number (optional)
+									</label>
+									<input
+										type="tel"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={phone}
+										onChange={(e) =>
+											setPhone(e.target.value.replace(/[^0-9+]/g, ""))
+										}
 									/>
 								</div>
 								<button
