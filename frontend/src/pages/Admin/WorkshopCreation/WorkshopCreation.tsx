@@ -25,7 +25,7 @@ export default function WorkshopCreation() {
 	});
 
 	const [inPersonData, setInPersonData] = useState({
-		serviceType: "in person",
+		serviceType: "in-person",
 		startTime: null,
 		duration: 0,
 		location: "",
@@ -44,11 +44,30 @@ export default function WorkshopCreation() {
 	};
 
 	const course = getCleanCourseData();
+	console.log(course)
+
+	function getInitialType() {
+		if(course.productType === "Virtual Training - On Demand"){
+			return "on demand"
+		}
+		else if(course.productType === "Virtual Training - Live Meeting"){
+			return "meeting"
+		}
+		else if(course.productType === "Virtual Training - Live Webinar"){
+			return "webinar"
+		}
+		else if(course.productType === "In-Person Training"){
+			return "in-person"
+		}
+		else{
+			return "meeting"
+		}
+	}
 
 	const [formData, setFormData] = useState({
 		className: course.className,
 		courseDescription: course.courseDescription,
-		type: "meeting",
+		type: getInitialType(),
 		markAttendance: false,
 		requireAttendance: false,
 		gradeUser: false,

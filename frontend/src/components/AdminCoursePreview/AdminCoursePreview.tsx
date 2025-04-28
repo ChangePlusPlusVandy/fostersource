@@ -73,10 +73,6 @@ function AdminCoursePreview({
 		return null;
 	}
 
-	if (isLive !== null && product.course.isLive !== isLive) {
-		return null;
-	}
-
 	if (
 		category !== null &&
 		(!product.course.categories || product.course.categories.length === 0 ||
@@ -141,7 +137,6 @@ function AdminCoursePreview({
 
 				<Calendar className="w-12" />
 				<span className="text-gray-500 w-24">
-					{product.course.isLive ? "Live" : "Virtual"} Event{" "}
 					{product.startTime.getMonth() + 1}/{product.startTime.getDate()}/
 					{product.startTime.getFullYear()} at {product.startTime.getHours()}:
 					{product.startTime.getMinutes().toString().padStart(2, "0")}{" "}

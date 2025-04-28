@@ -357,10 +357,9 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							<DisplayBar
 								creditHours={courseDetailsData.creditNumber}
 								time={courseDetailsData.time}
-								lengthCourse={courseDetailsData.lengthCourse}
 								isSurveyModalOpen={isSurveyModalOpen}
 								setIsSurveyModalOpen={setIsSurveyModalOpen}
-								components={courseDetailsData.components}
+								productInfo={courseDetailsData.productInfo}
 							/>
 						</div>
 					</div>
@@ -418,19 +417,16 @@ const CategoryPills = ({ categories }: { categories: string[] }) => {
 
 /* Displays the progress bar of webinar, survey, and certificate */
 const DisplayBar = ({
-	creditHours,
 	time,
-	lengthCourse,
 	isSurveyModalOpen,
 	setIsSurveyModalOpen,
-	components,
+	productInfo,
 }: {
 	creditHours: number;
 	time: Date;
-	lengthCourse: number;
 	isSurveyModalOpen: boolean;
 	setIsSurveyModalOpen: any;
-	components: any[];
+	productInfo: string;
 }) => {
 	const [currentPage, setCurrentPage] = useState("Webinar");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
@@ -485,7 +481,7 @@ const DisplayBar = ({
 		try {
 			const response = await apiClient.get(`/videos`, {
 				params: {
-					_id: components[0],
+					_id: productInfo,
 				},
 			});
 			setVideoLink(getYouTubeEmbedUrl(response.data.data[0].videoUrl));
@@ -496,7 +492,7 @@ const DisplayBar = ({
 
 	useEffect(() => {
 		retrieveVideo();
-	}, [components]);
+	}, [productInfo]);
 
 	return (
 		<div className="flex min-w-min min-h-min justify-between w-full gap-2">
@@ -516,7 +512,7 @@ const DisplayBar = ({
 						}}
 					>
 						<p className="flex justify-center items-center text-xs text-white font-semibold">
-							Webinar
+							Workshop
 						</p>
 					</button>
 					{/* Survey Button */}
@@ -555,7 +551,7 @@ const DisplayBar = ({
 						</p>
 					</button>
 				</div>
-				{currentPage === "Webinar" && (
+				{currentPage === "Workshop" && (
 					<div className="flex justify-between h-[400px]">
 						{/* <div className="text-sm	font-normal flex flex-col gap-1">
 							<div>Date: {new Date(time).toLocaleDateString()}</div>

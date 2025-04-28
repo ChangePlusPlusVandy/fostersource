@@ -95,7 +95,7 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 
 		if (selectedFormat !== "All") {
 			filtered = filtered.filter((course) =>
-				selectedFormat === "Live" ? course.isLive : !course.isLive
+				selectedFormat === "Live" ? course.productType !== "Virtual Training - On Demand" : course.productType === "Virtual Training - On Demand"
 			);
 		}
 
