@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Modal from "../../../components/Modal";
 import adminApiClient from "../../../services/adminApiClient";
 import SearchDropdown from "../ComponentPage/DropDownSearch";
@@ -8,12 +8,18 @@ import Dropdown from "../../../components/dropdown-select";
 import "./EmailModal.css";
 import { ALLOWED_PLACEHOLDERS } from "../../../shared/placeholders";
 import apiClient from "../../../services/apiClient";
+import { Email, MongoEmail } from "../../../shared/types";
+import { create } from "domain";
 
 interface ModalProps {
 	modalOpen: boolean;
 	onClose: () => void;
 	title: string;
 	isEdit: boolean;
+	setEmails: Dispatch<SetStateAction<MongoEmail[]>>;
+	email: MongoEmail | null;
+	courseId: string;
+	setCurrentEmail: Dispatch<SetStateAction<MongoEmail | null>>;
 }
 
 export default function EmailModal({
@@ -21,6 +27,10 @@ export default function EmailModal({
 	onClose,
 	title,
 	isEdit,
+	setEmails,
+	email,
+	courseId,
+	setCurrentEmail,
 }: ModalProps) {
 	const [courseOptions, setCourseOptions] = useState<
 		{ label: string; value: string }[]
@@ -31,29 +41,97 @@ export default function EmailModal({
 	const [sendOption, setSendOption] = useState<"now" | "later">("now");
 	const [scheduledTime, setScheduledTime] = useState<string>(""); // ISO format
 
-	const createEmail = async (e: React.FormEvent) => {
-		e.preventDefault();
+	const resetForm = () => {
+		setSubject("");
+		setBody("");
+		setCourse([]);
+		setSendOption("now");
+		setScheduledTime("");
+		setSelectedCourseId("");
+	};
 
+	const createEmail = async () => {
 		try {
-			console.log("making api request");
-			await apiClient.post("/emails/send", {
-				subject,
-				body,
-				courseId: selectedCourseId,
-			});
-			console.log("finished api request");
+			let response;
+			if (sendOption === "now") {
+				console.log("starting api");
+				response = await apiClient.post("/emails/send", {
+					subject,
+					body,
+					courseId: selectedCourseId,
+				});
+				console.log("finished api call");
+			} else
+				response = await apiClient.post("/emails/send", {
+					subject,
+					body,
+					courseId: selectedCourseId,
+					sendDate: scheduledTime,
+				});
 
-			// await adminApiClient.post("/emails", {
-			// 	subject,
-			// 	body,
-			// 	course: course[0], // assuming only one course selected
-			// 	sendDate:
-			// 		sendOption === "later"
-			// 			? new Date(scheduledTime).toISOString()
-			// 			: new Date().toISOString(),
-			// });
+			const newEmail = response.data;
+			const selectedCourse = courseOptions.find(
+				(opt) => opt.value === selectedCourseId
+			);
+
+			setEmails((prev) => [
+				{
+					...newEmail,
+					course: {
+						_id: selectedCourseId,
+						className: selectedCourse?.label ?? "Unknown Course",
+					},
+				},
+				...prev,
+			]);
+			resetForm();
+			setCurrentEmail({
+				...newEmail,
+				course: {
+					id: selectedCourseId,
+					className: selectedCourse?.label ?? "Unknown Course",
+				},
+			});
 		} catch (error) {
 			console.error(error);
+		}
+	};
+
+	const updateEmail = async () => {
+		console.log("inside update email function");
+
+		if (email) {
+			try {
+				const response = await adminApiClient.put(`/emails/${email.id}`, {
+					subject,
+					body,
+					courseId: selectedCourseId,
+					sendDate: scheduledTime,
+				});
+
+				const updatedEmail = response.data;
+				const selectedCourse = courseOptions.find(
+					(opt) => opt.value === selectedCourseId
+				);
+
+				setEmails((prev) =>
+					prev.map((t) =>
+						t.id === updatedEmail._id
+							? {
+									...updatedEmail,
+									course: {
+										id: selectedCourseId,
+										className: selectedCourse?.label ?? "Unknown Course",
+									},
+								}
+							: t
+					)
+				);
+				resetForm();
+				setCurrentEmail(null);
+			} catch (error) {
+				console.error(error);
+			}
 		}
 	};
 
@@ -76,6 +154,7 @@ export default function EmailModal({
 				subject,
 				body,
 			});
+			window.alert("Template created successfully");
 		} catch (error) {
 			console.error(error);
 		}
@@ -97,6 +176,47 @@ export default function EmailModal({
 			}
 		}
 	}, [course, courseOptions]);
+
+	useEffect(() => {
+		if (email) {
+			setSubject(email.subject);
+			setBody(email.body);
+
+			const now = new Date();
+			const sendDate = new Date(email.sendDate);
+			if (sendDate > now) {
+				setSendOption("later");
+				setScheduledTime(
+					new Date(sendDate.getTime() - new Date().getTimezoneOffset() * 60000)
+						.toISOString()
+						.slice(0, 16)
+				);
+			} else {
+				setSendOption("now");
+				setScheduledTime("");
+			}
+		} else {
+			setSubject("");
+			setBody("");
+			setCourse([]);
+			setSendOption("now");
+			setScheduledTime("");
+			setSelectedCourseId("");
+		}
+	}, [email]);
+
+	useEffect(() => {
+		if (email && courseOptions.length > 0) {
+			console.log("📩 Email course:", email.course);
+			console.log("📩 Email course ID:", courseId);
+			console.log("📚 Available course options:", courseOptions);
+			const courseOption = courseOptions.find((opt) => opt.value === courseId);
+			console.log("🎯 Matched course option:", courseOption);
+			if (courseOption) {
+				setCourse([courseOption.label]); // triggers selectedCourseId logic
+			}
+		}
+	}, [email, courseOptions]);
 
 	return (
 		<Modal
@@ -128,17 +248,19 @@ export default function EmailModal({
 						Exit
 					</button>
 					<button
-						type="submit"
-						form="email-form"
 						className="bg-[#8757a3] text-white px-4 py-2 rounded-lg"
-						onClick={onClose}
+						onClick={() => {
+							if (isEdit) updateEmail();
+							else createEmail();
+							onClose();
+						}}
 					>
 						Save and Exit
 					</button>
 				</div>
 			}
 		>
-			<form id="email-form" onSubmit={createEmail}>
+			<form id="email-form" onSubmit={isEdit ? updateEmail : createEmail}>
 				<SearchDropdown
 					options={courseOptions.map((opt) => opt.label)}
 					selected={course}

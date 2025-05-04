@@ -3,6 +3,7 @@ import apiClient from "../../../services/apiClient";
 import { Edit2, Search, Trash2 } from "lucide-react";
 import EmailTemplateModal from "./EmailTemplateModal";
 import { EmailTemplate } from "../../../shared/types";
+import EmailPreviewModal from "../../../components/EmailPreviewModal";
 
 export default function EmailTemplates() {
 	const [templates, setTemplates] = useState<EmailTemplate[]>([]);
@@ -11,6 +12,7 @@ export default function EmailTemplates() {
 	const [currentTemplate, setCurrentTemplate] = useState<EmailTemplate | null>(
 		null
 	);
+	const [previewOpen, setPreviewOpen] = useState<boolean>(false);
 
 	const getTemplates = async () => {
 		try {
@@ -80,7 +82,12 @@ export default function EmailTemplates() {
 
 										<td className="px-3 py-2 text-sm text-gray-500 w-[100px] h-12">
 											<div className="flex justify-center gap-4">
-												<button>
+												<button
+													onClick={() => {
+														setCurrentTemplate(template);
+														setPreviewOpen(true);
+													}}
+												>
 													<Search className="w-4 h-4 text-gray-400" />
 												</button>
 												<button
@@ -112,6 +119,11 @@ export default function EmailTemplates() {
 				templates={templates}
 				setTemplates={setTemplates}
 				template={currentTemplate}
+			/>
+			<EmailPreviewModal
+				onClose={() => setPreviewOpen(false)}
+				modalOpen={previewOpen}
+				email={currentTemplate}
 			/>
 		</div>
 	);

@@ -7,6 +7,7 @@ export interface IEmail extends Document {
 	subject: string;
 	body: string;
 	sendDate: Date;
+	sent: boolean;
 	// templateVars: Record<string, any>;
 }
 
@@ -29,6 +30,11 @@ const emailSchema: Schema = new Schema(
 		sendDate: {
 			type: Date,
 			required: true,
+		},
+		sent: {
+			type: Boolean,
+			required: true,
+			default: false,
 		},
 		// templateVars: {
 		// 	type: Schema.Types.Mixed, // Allows flexibility for key-value pairs

@@ -6,11 +6,11 @@ import EmailTemplate from "../models/emailTemplateModel";
 // @access  Public
 export const getEmails = async (req: Request, res: Response): Promise<void> => {
 	try {
-		const { title } = req.query;
+		const { subject } = req.query;
 
 		let filters: any = {};
-		if (title) {
-			filters.title = { $regex: title, $options: "i" };
+		if (subject) {
+			filters.subject = { $regex: subject, $options: "i" };
 		}
 
 		const emails = await EmailTemplate.find(filters);
@@ -89,7 +89,7 @@ export const createEmail = async (
 		if (!subject || !body) {
 			res.status(400).json({
 				success: false,
-				message: "Please provide title and body",
+				message: "Please provide subject and body",
 			});
 			return;
 		}
