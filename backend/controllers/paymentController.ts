@@ -201,7 +201,7 @@ export const createPaypalOrder = async (
 		).toString("base64");
 
 		const response = await axios.post(
-			"https://api-m.sandbox.paypal.com/v2/checkout/orders",
+			"https://api-m.paypal.com/v2/checkout/orders",
 			{
 				intent: "CAPTURE",
 				purchase_units: [
@@ -257,7 +257,7 @@ export const capturePaypalOrder = async (
 		).toString("base64");
 
 		const captureResponse = await axios.post(
-			`https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderId}/capture`,
+			`https://api-m.paypal.com/v2/checkout/orders/${orderId}/capture`,
 			{},
 			{
 				headers: {

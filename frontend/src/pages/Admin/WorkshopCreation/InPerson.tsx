@@ -2,11 +2,7 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {WebinarType} from "../../../shared/types/Webinar";
 
 interface InPersonComponentProps {
-    inPersonData:{
-        startTime: Date | null,
-        duration: number,
-        location: string
-    };
+    inPersonData:any;
     setInPersonData: Dispatch<SetStateAction<any>>;
 }
 export default function InPersonComponent({inPersonData, setInPersonData}:InPersonComponentProps) {

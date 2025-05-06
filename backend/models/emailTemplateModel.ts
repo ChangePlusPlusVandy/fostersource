@@ -1,22 +1,25 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-export interface IEmail extends Document {
-  title: string;
-  body: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+export interface IEmailTemplate extends Document {
+	subject: string;
+	body: string;
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
-const emailSchema: Schema = new Schema(
-  {
-    title: { type: String, required: true },
-    body: { type: String, required: true },
-  },
-  {
-    timestamps: true,
-  }
+const emailTemplateSchema: Schema = new Schema(
+	{
+		subject: { type: String, required: true },
+		body: { type: String, required: true },
+	},
+	{
+		timestamps: true,
+	}
 );
 
-const EmailTemplate: Model<IEmail> = mongoose.model<IEmail>("Email", emailSchema);
+const EmailTemplate: Model<IEmailTemplate> = mongoose.model<IEmailTemplate>(
+	"EmailTemplate",
+	emailTemplateSchema
+);
 
 export default EmailTemplate;

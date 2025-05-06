@@ -1,10 +1,21 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import {
+	FaStar as _FaStar,
+	FaStarHalfAlt as _FaStarHalfAlt,
+} from "react-icons/fa";
+import { ComponentType } from "react";
+
 import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
 import SurveyModal from "./SurveyModal";
+
+const FaStar = _FaStar as ComponentType<{ size?: number; color?: string }>;
+const FaStarHalfAlt = _FaStarHalfAlt as ComponentType<{
+	size?: number;
+	color?: string;
+}>;
 
 interface CartItem {
 	className: string;
@@ -27,14 +38,13 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 
 	const user = JSON.parse(localStorage.getItem("user") || "{}");
 	const cartItems: CartItem[] = user?.cart ? user.cart : [];
-	const checkCourseInCart = () =>{
-		if(cartItems){
-			if(cartItems.some(item => item._id === courseId)){
+	const checkCourseInCart = () => {
+		if (cartItems) {
+			if (cartItems.some((item) => item._id === courseId)) {
 				setIsAdded(true);
 			}
 		}
-	}
-
+	};
 
 	const navigate = useNavigate();
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(
@@ -117,7 +127,6 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 			console.error(error);
 		}
 	};
-
 
 	// useEffect(() => {
 	// 	const id = queryParams.get("courseId");
@@ -348,9 +357,9 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							<DisplayBar
 								creditHours={courseDetailsData.creditNumber}
 								time={courseDetailsData.time}
-								lengthCourse={courseDetailsData.lengthCourse}
 								isSurveyModalOpen={isSurveyModalOpen}
 								setIsSurveyModalOpen={setIsSurveyModalOpen}
+								productInfo={courseDetailsData.productInfo}
 							/>
 						</div>
 					</div>
@@ -408,22 +417,22 @@ const CategoryPills = ({ categories }: { categories: string[] }) => {
 
 /* Displays the progress bar of webinar, survey, and certificate */
 const DisplayBar = ({
-	creditHours,
 	time,
-	lengthCourse,
 	isSurveyModalOpen,
 	setIsSurveyModalOpen,
+	productInfo,
 }: {
 	creditHours: number;
 	time: Date;
-	lengthCourse: number;
 	isSurveyModalOpen: boolean;
 	setIsSurveyModalOpen: any;
+	productInfo: string;
 }) => {
 	const [currentPage, setCurrentPage] = useState("Webinar");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
 	const [survey, setSurvey] = useState(false);
+	const [videoLink, setVideoLink] = useState<string | null>("");
 
 	useEffect(() => {
 		const webinarEnd = new Date(time);
@@ -460,25 +469,50 @@ const DisplayBar = ({
 	/* TODO: Needs to be complete once certificate page is out */
 	const handleAccessCertificate = () => {};
 
+	const getYouTubeEmbedUrl = (url: string) => {
+		const match = url.match(
+			/(?:youtube\.com.*(?:\?|&)v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+		);
+		const videoId = match?.[1];
+		return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+	};
+
+	const retrieveVideo = async () => {
+		try {
+			const response = await apiClient.get(`/videos`, {
+				params: {
+					_id: productInfo,
+				},
+			});
+			setVideoLink(getYouTubeEmbedUrl(response.data.data[0].videoUrl));
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	useEffect(() => {
+		retrieveVideo();
+	}, [productInfo]);
+
 	return (
 		<div className="flex min-w-min min-h-min justify-between w-full gap-2">
 			<div className="flex flex-col">
-				{/* Webinar -> Survey -> Certificate */}
+				{/* Workshop -> Survey -> Certificate */}
 				<div className="flex min-w-min h-9 mb-5">
-					{/* Webinar Button */}
+					{/* Workshop Button */}
 					<button
 						className="bg-[#F79518] rounded-l-full text-center cursor-pointer w-48"
 						style={{
 							clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
 						}}
 						onClick={() => {
-							setCurrentPage("Webinar");
+							setCurrentPage("Workshop");
 							setSurveyColor("#FEC781");
 							setCertificateColor("#FEC781");
 						}}
 					>
 						<p className="flex justify-center items-center text-xs text-white font-semibold">
-							Webinar
+							Workshop
 						</p>
 					</button>
 					{/* Survey Button */}
@@ -517,9 +551,9 @@ const DisplayBar = ({
 						</p>
 					</button>
 				</div>
-				{currentPage === "Webinar" && (
-					<div className="flex justify-between">
-						<div className="text-sm	font-normal flex flex-col gap-1">
+				{currentPage === "Workshop" && (
+					<div className="flex justify-between h-[400px]">
+						{/* <div className="text-sm	font-normal flex flex-col gap-1">
 							<div>Date: {new Date(time).toLocaleDateString()}</div>
 							<div>
 								Time:{" "}
@@ -532,7 +566,7 @@ const DisplayBar = ({
 							<div>Length: {lengthCourse} hours</div>
 						</div>
 						<div className="flex flex-col w-max gap-2">
-							{/*Needs to be complete add to calendar button*/}
+
 							<button className="bg-[#F79518] w-full rounded-md text-center text-white text-xs align-middle px-6 py-3">
 								Add Webinar to Calendar
 							</button>
@@ -543,10 +577,19 @@ const DisplayBar = ({
 								Test Network
 							</button>
 							<button className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3">
-								{/*Needs to be complete*/}
+
 								Handout(s)
 							</button>
-						</div>
+						</div> */}
+						<iframe
+							width="100%"
+							height="100%"
+							src={videoLink ? videoLink : ""}
+							title="YouTube Video Player"
+							frameBorder="0"
+							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+							allowFullScreen
+						></iframe>
 					</div>
 				)}
 				{currentPage === "Survey" && (
