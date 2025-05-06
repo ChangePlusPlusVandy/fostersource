@@ -20,6 +20,7 @@ interface ModalProps {
 	email: MongoEmail | null;
 	courseId: string;
 	setCurrentEmail: Dispatch<SetStateAction<MongoEmail | null>>;
+	isSingleCourse: boolean;
 }
 
 export default function EmailModal({
@@ -31,6 +32,7 @@ export default function EmailModal({
 	email,
 	courseId,
 	setCurrentEmail,
+	isSingleCourse,
 }: ModalProps) {
 	const [courseOptions, setCourseOptions] = useState<
 		{ label: string; value: string }[]
@@ -47,7 +49,9 @@ export default function EmailModal({
 		setCourse([]);
 		setSendOption("now");
 		setScheduledTime("");
-		setSelectedCourseId("");
+		if (!isSingleCourse) {
+			setSelectedCourseId("");
+		}
 	};
 
 	const createEmail = async () => {
@@ -99,10 +103,11 @@ export default function EmailModal({
 
 	const updateEmail = async () => {
 		console.log("inside update email function");
+		console.log(email);
 
 		if (email) {
 			try {
-				const response = await adminApiClient.put(`/emails/${email.id}`, {
+				const response = await adminApiClient.put(`/emails/${email._id}`, {
 					subject,
 					body,
 					courseId: selectedCourseId,
@@ -110,13 +115,14 @@ export default function EmailModal({
 				});
 
 				const updatedEmail = response.data;
+				console.log("updated email", updatedEmail);
 				const selectedCourse = courseOptions.find(
 					(opt) => opt.value === selectedCourseId
 				);
 
 				setEmails((prev) =>
 					prev.map((t) =>
-						t.id === updatedEmail._id
+						t._id === updatedEmail._id
 							? {
 									...updatedEmail,
 									course: {
@@ -161,13 +167,19 @@ export default function EmailModal({
 	};
 
 	useEffect(() => {
-		if (modalOpen) getCourses();
+		if (modalOpen) {
+			getCourses().then(() => {
+				if (isSingleCourse) {
+					setSelectedCourseId(courseId);
+				}
+			});
+		}
 	}, [modalOpen]);
 
 	const [selectedCourseId, setSelectedCourseId] = useState<string>("");
 
 	useEffect(() => {
-		if (course.length > 0) {
+		if (!isSingleCourse && course.length > 0) {
 			const selectedOption = courseOptions.find(
 				(opt) => opt.label === course[0]
 			);
@@ -195,13 +207,16 @@ export default function EmailModal({
 				setSendOption("now");
 				setScheduledTime("");
 			}
+
+			if (!isSingleCourse) {
+				setSelectedCourseId(email.course._id);
+				const courseOption = courseOptions.find(
+					(opt) => opt.value === email.course._id
+				);
+				if (courseOption) setCourse([courseOption.label]);
+			}
 		} else {
-			setSubject("");
-			setBody("");
-			setCourse([]);
-			setSendOption("now");
-			setScheduledTime("");
-			setSelectedCourseId("");
+			resetForm();
 		}
 	}, [email]);
 
@@ -261,12 +276,17 @@ export default function EmailModal({
 			}
 		>
 			<form id="email-form" onSubmit={isEdit ? updateEmail : createEmail}>
-				<SearchDropdown
-					options={courseOptions.map((opt) => opt.label)}
-					selected={course}
-					setSelected={setCourse}
-					placeholder="Select course"
-				/>
+				{isSingleCourse ? (
+					<></>
+				) : (
+					<SearchDropdown
+						options={courseOptions.map((opt) => opt.label)}
+						selected={course}
+						setSelected={setCourse}
+						placeholder="Select course"
+					/>
+				)}
+
 				<input
 					type="text"
 					value={subject}

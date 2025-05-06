@@ -17,7 +17,7 @@ export interface Email {
 }
 
 export interface MongoEmail {
-	id: string;
+	_id: string;
 	subject: string;
 	body: string;
 	course: {

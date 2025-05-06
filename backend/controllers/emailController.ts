@@ -92,6 +92,7 @@ export const updateEmail = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
+	console.log(req.params);
 	const { id } = req.params; // Get the ID from the request parameters
 	const { subject, body, courseId, sendDate } = req.body;
 	try {
@@ -131,6 +132,7 @@ export const updateEmail = async (
 
 		res.status(200).json(updatedEmail);
 	} catch (error) {
+		console.error(error);
 		res.status(500);
 	}
 };

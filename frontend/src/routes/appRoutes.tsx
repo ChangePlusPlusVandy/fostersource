@@ -244,7 +244,7 @@ function AppRoutes() {
 							path="admin/email"
 							element={
 								<AdminRoute>
-									<EmailPage />
+									<EmailPage isSingleCourse={false} />
 								</AdminRoute>
 							}
 						/>
@@ -285,6 +285,10 @@ function AppRoutes() {
 							<Route path="survey" element={<SurveyPage />} />
 							<Route path="handouts" element={<HandoutPage />} />
 							<Route path="registrants" element={<Registrants />} />
+							<Route
+								path="email"
+								element={<EmailPage isSingleCourse={true} />}
+							/>
 						</Route>
 						<Route
 							path="/admin/product/create"
@@ -313,6 +317,10 @@ function AppRoutes() {
 							<Route path="survey" element={<SurveyPage />} />
 							<Route path="handouts" element={<HandoutPage />} />
 							<Route path="registrants" element={<Registrants />} />
+							<Route
+								path="email"
+								element={<EmailPage isSingleCourse={true} />}
+							/>
 						</Route>
 
 						{/* ===== user management routes ===== */}

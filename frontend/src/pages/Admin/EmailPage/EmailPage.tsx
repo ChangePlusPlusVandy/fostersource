@@ -6,8 +6,13 @@ import adminApiClient from "../../../services/adminApiClient";
 import { Email, MongoEmail } from "../../../shared/types";
 import apiClient from "../../../services/apiClient";
 import EmailPreviewModal from "../../../components/EmailPreviewModal";
+import { useParams } from "react-router-dom";
 
-export default function EmailPage() {
+export default function EmailPage({
+	isSingleCourse,
+}: {
+	isSingleCourse: boolean;
+}) {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [itemsPerPage, setItemsPerPage] = useState(20);
 	const [searchQuery, setSearchQuery] = useState<string>("");
@@ -30,7 +35,7 @@ export default function EmailPage() {
 			if (!confirmed) return;
 
 			await apiClient.delete(`/emails/${id}`);
-			const updatedEmails = emails.filter((e) => e.id !== id);
+			const updatedEmails = emails.filter((e) => e._id !== id);
 			setEmails(updatedEmails);
 			const totalPages = Math.ceil(updatedEmails.length / itemsPerPage);
 			if (currentPage > totalPages) {
@@ -38,6 +43,39 @@ export default function EmailPage() {
 			}
 		} catch (error) {
 			console.error(error);
+		}
+	};
+
+	const handleBulkDelete = async () => {
+		const selectedEmails = emails.filter((e) => e.selected);
+
+		if (selectedEmails.length === 0) return;
+
+		const hasSentEmails = selectedEmails.some(
+			(e) => new Date(e.sendDate) < new Date()
+		);
+
+		const confirmMessage = hasSentEmails
+			? "Some emails have already been sent. Deleting them will NOT unsend them. Do you still want to delete the selected emails?"
+			: "Are you sure you want to delete the selected emails?";
+
+		const confirmed = window.confirm(confirmMessage);
+		if (!confirmed) return;
+
+		try {
+			await Promise.all(
+				selectedEmails.map((email) => apiClient.delete(`/emails/${email._id}`))
+			);
+
+			const updatedEmails = emails.filter((e) => !e.selected);
+			setEmails(updatedEmails);
+
+			const totalPages = Math.ceil(updatedEmails.length / itemsPerPage);
+			if (currentPage > totalPages) {
+				setCurrentPage(totalPages > 0 ? totalPages : 1);
+			}
+		} catch (error) {
+			console.error("Error deleting selected emails:", error);
 		}
 	};
 
@@ -58,9 +96,18 @@ export default function EmailPage() {
 		}
 	};
 
+	const { id: courseId } = useParams();
+
 	const fetchEmails = async () => {
 		try {
-			const response = await adminApiClient.get("/emails");
+			let response;
+			if (isSingleCourse) {
+				response = await apiClient.get("/emails", {
+					params: { course: courseId },
+				});
+			} else {
+				response = await adminApiClient.get("/emails");
+			}
 
 			const transformed = response.data.map((email: any) => ({
 				...email,
@@ -90,26 +137,22 @@ export default function EmailPage() {
 					</div>
 
 					<div className="flex justify-between items-center mb-3">
-						<div className="flex items-center gap-4">
-							<span className="text-sm" style={{ color: "#8757a3" }}>
-								{selectedCount} Selected
-							</span>
-							<button
-								className="text-sm text-red-600 font-bold"
-								onClick={() => {
-									setEmails(emails.filter((e) => !e.selected));
-									setCurrentPage((prevPage) => {
-										const totalPages = Math.ceil(
-											emails.filter((e) => !e.selected).length / itemsPerPage
-										);
-										return prevPage > totalPages
-											? Math.max(totalPages, 1)
-											: prevPage;
-									});
-								}}
-							>
-								Delete
-							</button>
+						<div>
+							{selectedCount === 0 ? (
+								<></>
+							) : (
+								<div className="flex items-center gap-4">
+									<span className="text-sm" style={{ color: "#8757a3" }}>
+										{selectedCount} Selected
+									</span>
+									<button
+										className="text-sm text-red-600 font-bold"
+										onClick={handleBulkDelete}
+									>
+										Delete
+									</button>
+								</div>
+							)}
 						</div>
 
 						<div className="flex gap-4 items-center">
@@ -160,7 +203,7 @@ export default function EmailPage() {
 									<tbody>
 										{displayedEmails.map((email) => (
 											<tr
-												key={email.id}
+												key={email._id}
 												className={`border-t odd:bg-[#f2f2f2]`}
 											>
 												<td className="px-4 py-2 h-12">
@@ -170,7 +213,7 @@ export default function EmailPage() {
 														onChange={() => {
 															setEmails(
 																emails.map((e) =>
-																	e.id === email.id
+																	e._id === email._id
 																		? { ...e, selected: !e.selected }
 																		: e
 																)
@@ -223,7 +266,7 @@ export default function EmailPage() {
 														<button
 															onClick={() =>
 																handleDelete(
-																	email.id,
+																	email._id,
 																	new Date(email.sendDate) < new Date()
 																)
 															}
@@ -281,8 +324,11 @@ export default function EmailPage() {
 				isEdit={isEdit}
 				setEmails={setEmails}
 				email={currentEmail}
-				courseId={currentEmail?.course._id || ""}
+				courseId={
+					isSingleCourse ? courseId || "" : currentEmail?.course._id || ""
+				}
 				setCurrentEmail={setCurrentEmail}
+				isSingleCourse={isSingleCourse}
 			/>
 			<EmailPreviewModal
 				modalOpen={previewModalOpen}
