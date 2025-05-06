@@ -81,17 +81,6 @@ export default function CatalogCourseComponent({
 					</div>
 				</div>
 
-				<div className="flex flex-wrap mt-3 gap-2">
-					{course.components.map((component, index) => (
-						<span
-							className="bg-orange-200 text-orange-800 text-xs font-semibold px-3 py-1 rounded-full"
-							key={course.className + component}
-						>
-							{component}
-						</span>
-					))}
-				</div>
-
 				{/* Description */}
 				<p className="text-gray-600 mt-4 text-sm">{course.courseDescription}</p>
 

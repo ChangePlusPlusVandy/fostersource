@@ -9,8 +9,6 @@ interface CourseEditState {
 	ratings: string[];
 	className: string;
 	discussion: string;
-	components: any[];
-	isLive: boolean;
 	categories: string[];
 	creditNumber: number;
 	courseDescription: string;
@@ -21,15 +19,13 @@ interface CourseEditState {
 	instructorDescription: string;
 	instructorRole: string;
 	courseType: CourseType;
-	lengthCourse: number;
 	time: Date;
-	isInPerson: boolean;
 	students: string[];
 	managers: string[];
 	speakers: string[];
 	regStart: Date;
 	regEnd?: Date;
-	productType: string[];
+	productType: string;
 	shortUrl?: string;
 	draft: boolean;
 
@@ -63,8 +59,6 @@ const initialState: Omit<
 	ratings: [],
 	className: "",
 	discussion: "",
-	components: [],
-	isLive: false,
 	categories: [],
 	creditNumber: 0,
 	courseDescription: "",
@@ -75,15 +69,13 @@ const initialState: Omit<
 	instructorDescription: "",
 	instructorRole: "",
 	courseType: "course",
-	lengthCourse: 0,
 	time: new Date(),
-	isInPerson: false,
 	students: [],
 	managers: [],
 	speakers: [],
 	regStart: new Date(),
 	regEnd: undefined,
-	productType: [],
+	productType: "",
 	shortUrl: undefined,
 	draft: true,
 };

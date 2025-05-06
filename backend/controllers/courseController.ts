@@ -24,12 +24,9 @@ export const getCourses = async (
 ): Promise<void> => {
 	try {
 		const filters = req.query;
-
-		// Populate ratings and components fields as needed
 		const courseResponses = await Course.find(filters)
-			.populate(["ratings", "components"])
+			.populate(["ratings"])
 			.exec();
-
 		res.status(200).json({
 			success: true,
 			count: courseResponses.length,
@@ -56,7 +53,7 @@ export const getCourseById = async (
 		if (id) {
 			// Find course by ID and populate related fields
 			const course = await Course.findById(id)
-				.populate(["ratings", "components", "managers"])
+				.populate(["ratings", "managers"])
 				.exec();
 
 			if (!course) {
@@ -105,8 +102,6 @@ export const createCourse = async (
 			ratings,
 			className,
 			discussion,
-			components,
-			isLive,
 			categories,
 			creditNumber,
 			courseDescription,
@@ -115,17 +110,14 @@ export const createCourse = async (
 			cost,
 			instructorDescription,
 			instructorRole,
-			lengthCourse,
-			time,
 			instructorName,
-			isInPerson,
 			students,
 			managers,
 			speakers,
-			courseType,
 			regStart,
 			regEnd,
 			productType,
+			productInfo,
 			shortUrl,
 			draft,
 		} = req.body;
@@ -134,23 +126,18 @@ export const createCourse = async (
 		if (!draft)
 			if (
 				!className ||
-				isLive === undefined ||
 				creditNumber === undefined ||
 				!courseDescription ||
 				!thumbnailPath ||
 				cost === undefined ||
-				!lengthCourse ||
-				!time ||
 				!instructorName ||
-				isInPerson === undefined ||
-				!courseType ||
 				!regEnd
 			) {
 				// console.log("[createCourse] Validation failed. Missing required fields");
 				res.status(400).json({
 					success: false,
 					message:
-						"Please provide className, isLive, creditNumber, thumbnailPath, cost, lengthCourse, time, instructorName, isInPerson, courseType, and regStart",
+						"Please provide className, isLive, creditNumber, thumbnailPath, cost, lengthCourse, instructorName, and regStart",
 				});
 				return;
 			}
@@ -172,8 +159,6 @@ export const createCourse = async (
 			ratings,
 			className,
 			discussion,
-			components,
-			isLive,
 			categories,
 			creditNumber,
 			courseDescription,
@@ -182,17 +167,14 @@ export const createCourse = async (
 			cost,
 			instructorDescription,
 			instructorRole,
-			lengthCourse,
-			time,
 			instructorName,
-			isInPerson,
 			students,
 			managers,
 			speakers,
-			courseType,
 			regStart,
 			regEnd,
 			productType,
+			productInfo,
 			shortUrl,
 			draft,
 		});

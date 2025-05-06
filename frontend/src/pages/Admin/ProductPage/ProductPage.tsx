@@ -256,9 +256,6 @@ export default function ProductPage() {
 					status: "Ongoing",
 					avgRating: calculateAverageRating(course.ratings),
 					startTime: new Date(course.time),
-					endTime: new Date(
-						new Date(course.time).getTime() + course.lengthCourse * 60000
-					),
 					timeZone: "(CST)",
 					selected: false,
 					categories: categories,

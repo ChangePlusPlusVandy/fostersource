@@ -25,16 +25,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
                 {title && <h2 className="text-xl font-semibold mb-4">{title}</h2>}
 
                 {/* Content */}
-                <div>{children}</div>
-
-                {/* Footer */}
-                <div className="mt-4 flex justify-end">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                    >
-                        Close
-                    </button>
+                <div className="overflow-y-auto max-h-[70vh] pr-2">
+                    {children}
                 </div>
             </div>
         </div>
