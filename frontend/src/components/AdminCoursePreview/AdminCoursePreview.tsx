@@ -9,7 +9,7 @@ import {
 	Star,
 	Trash2,
 } from "lucide-react";
-import AdminCourseDeleteModal from "./AdminCourseDeleteModal"
+import AdminCourseDeleteModal from "./AdminCourseDeleteModal";
 import { Link } from "react-router-dom";
 
 export interface Product {
@@ -21,15 +21,15 @@ export interface Product {
 	endTime: Date;
 	timeZone: string;
 	selected: boolean;
-	categories?: string[]
+	categories?: string[];
 }
 
 interface AdminCoursePreviewProps {
 	product: Product;
 	toggleSelection: (id: string) => void;
-	category?: string | null
-	credit?: number | null
-	status?: string | null
+	category?: string | null;
+	credit?: number | null;
+	status?: string | null;
 	refreshCourses: () => void;
 }
 
@@ -46,28 +46,26 @@ function AdminCoursePreview({
 	category,
 	credit,
 	status,
-	refreshCourses
+	refreshCourses,
 }: AdminCoursePreviewProps) {
-	const [isLive, setIsLive] = useState<boolean | null>(false)
-	const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false)
+	const [isLive, setIsLive] = useState<boolean | null>(false);
+	const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (status !== null) {
 			if (status === "Live") {
-				setIsLive(true)
+				setIsLive(true);
+			} else {
+				setIsLive(false);
 			}
-			else {
-				setIsLive(false)
-			}
+		} else {
+			setIsLive(null);
 		}
-		else {
-			setIsLive(null)
-		}
-	}, [status])
+	}, [status]);
 
 	const handleCloseDeleteModal = () => {
 		setDeleteModalOpen(false);
-	  };	  
+	};
 
 	if (credit !== null && product.course.creditNumber !== credit) {
 		return null;
@@ -75,13 +73,12 @@ function AdminCoursePreview({
 
 	if (
 		category !== null &&
-		(!product.course.categories || product.course.categories.length === 0 ||
-			!product.course.categories.some(cat => cat === category))
+		(!product.course.categories ||
+			product.course.categories.length === 0 ||
+			!product.course.categories.some((cat) => cat === category))
 	) {
 		return null;
 	}
-
-
 
 	return (
 		<div
@@ -185,20 +182,20 @@ function AdminCoursePreview({
 					</Link>
 					<button
 						onClick={() => {
-							setDeleteModalOpen(true)
-						}
-						}
+							setDeleteModalOpen(true);
+						}}
 					>
 						<Trash2 className="w-4 h-4 text-gray-400" />
 					</button>
 				</div>
 				{deleteModalOpen && (
 					<div>
-						<AdminCourseDeleteModal 
-						isOpen = {deleteModalOpen}
-						id = {product.course._id}
-						onClose = {handleCloseDeleteModal}
-						refreshCourses={refreshCourses}/>
+						<AdminCourseDeleteModal
+							isOpen={deleteModalOpen}
+							id={product.course._id}
+							onClose={handleCloseDeleteModal}
+							refreshCourses={refreshCourses}
+						/>
 					</div>
 				)}
 			</div>

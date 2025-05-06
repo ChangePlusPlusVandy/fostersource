@@ -4,8 +4,6 @@ import cloudinary from "./cloudinary";
 import { Request } from "express";
 import { Options } from "multer-storage-cloudinary";
 
-console.log("cloundaryStorage");
-
 // Explicit type to override the broken one
 interface CustomParams {
 	folder: string;

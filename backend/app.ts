@@ -21,7 +21,9 @@ import handoutRoutes from "./routes/handoutRoutes";
 import courseCategoriesRoutes from "./routes/courseCategoryRoutes";
 import emailRoutes from "./routes/emailRoutes";
 import speakerRoutes from "./routes/speakerRoutes";
-import pdfRoutes from "./routes/pdfRoutes"; 
+import pdfRoutes from "./routes/pdfRoutes";
+import emailTemplateRoutes from "./routes/emailTemplateRoutes";
+import zoomRoutes from "./routes/zoomRoutes";
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
@@ -30,7 +32,7 @@ import upload from "./middlewares/upload";
 import { uploadImage } from "./controllers/uploadController";
 import uploadRoutes from "./routes/uploadRoutes";
 import dotenv from "dotenv";
-import zoomRoutes from "./routes/zoomRoutes";
+
 dotenv.config();
 
 const app: Application = express();
@@ -89,21 +91,12 @@ app.use("/api/certificates", verifyFirebaseAuth, certificateRoutes);
 app.use("/api/courseCategories", verifyFirebaseAuth, courseCategoriesRoutes);
 app.use("/api/handout", verifyFirebaseAuth, handoutRoutes);
 app.use("/api/emails", verifyFirebaseAuth, emailRoutes);
+app.use("/api/emailTemplates", verifyFirebaseAuth, emailTemplateRoutes);
 app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
 app.use("/api/upload", verifyFirebaseAuth, uploadRoutes);
 app.use("/api/zoom", verifyFirebaseAuth, zoomRoutes)
 app.use("/api/certificatePDFs", verifyFirebaseAuth, pdfRoutes);
 
-// Error middleware
-app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
-	if (err instanceof multer.MulterError) {
-		console.error("❌ Multer error:", err.message);
-		res.status(400).json({ message: err.message });
-		return;
-	}
-	console.error("❌ Unknown error:", err);
-	res.status(500).json({ message: "Internal server error" });
-});
 app.use(notFound);
 app.use(errorHandler);
 
