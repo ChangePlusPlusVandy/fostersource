@@ -30,6 +30,14 @@ export default function SearchDropdown({
 		);
 	}, [options, search]);
 
+	useEffect(() => {
+		if (selected.length > 0) {
+			setSearch(selected[0]); // set the input text to match the selected item
+		} else {
+			setSearch(""); // clear if no selection
+		}
+	}, [selected]);
+
 	const handleSearch = (e: any) => {
 		const value = e.target.value;
 		setSearch(value);
@@ -62,7 +70,7 @@ export default function SearchDropdown({
 					className="w-full border p-2 rounded"
 				/>
 				{showDropdown && (
-					<ul className="absolute w-full bg-white border rounded max-h-40 overflow-auto">
+					<ul className="absolute w-full bg-white border rounded max-h-40 overflow-auto z-50">
 						{filteredOptions.length > 0 ? (
 							filteredOptions.map((option) => (
 								<li

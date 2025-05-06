@@ -16,6 +16,7 @@ export default function Dashboard() {
 			try {
 				setLoading(true);
 				const progresses = (await fetchUserProgress()).progresses;
+				console.log(progresses);
 				setIncompleteCourses(
 					progresses.filter((p: any) => !p.course.isComplete)
 				);
