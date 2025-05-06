@@ -51,13 +51,6 @@ export const US_STATES = [
     { value: 'WY', label: 'Wyoming' }
 ];
 
-export const COUNTRIES = [
-    { value: 'US', label: 'United States' },
-    { value: 'CA', label: 'Canada' },
-    { value: 'MX', label: 'Mexico' }
-    // Add more countries as needed
-];
-
 export const TIMEZONES = [
     { value: 'America/New_York', label: 'Eastern Time (ET)' },
     { value: 'America/Chicago', label: 'Central Time (CT)' },

@@ -3,7 +3,7 @@ import QuestionResponse, { IQuestionResponse } from "./questionResponseModel";
 
 export interface ISurveyResponse extends Document {
 	userId: string;
-	answers: IQuestionResponse[];
+	answers: (mongoose.Types.ObjectId | IQuestionResponse)[];
 }
 
 const surveyResponseSchema: Schema = new Schema(

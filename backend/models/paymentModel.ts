@@ -7,7 +7,7 @@ export interface IPayment extends Document {
 	date: Date;
 	amount: number;
 	memo: string;
-	courses: mongoose.Types.ObjectId[];
+	courses: (mongoose.Types.ObjectId | ICourse)[];
 	transactionId: string;
 }
 

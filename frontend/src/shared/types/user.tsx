@@ -2,6 +2,7 @@ import { Payment } from "./payment";
 import { Progress } from "./progress";
 
 export type User = {
+	_id?: string;  // MongoDB ID
 	firebaseId: string;
 	email: string;
 	isColorado: boolean;

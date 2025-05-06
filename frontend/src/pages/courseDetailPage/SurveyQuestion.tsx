@@ -8,10 +8,25 @@ interface SurveyQuestionProps {
 }
 
 export default function SurveyQuestion({ question, selectedAnswer, onAnswerChange }: SurveyQuestionProps) {
+    const selectedValues = selectedAnswer
+        ? selectedAnswer.split(",").map((s) => s.trim()).filter(Boolean)
+        : [];
+
+    const handleMultiSelectChange = (answer: string) => {
+        let updatedValues: string[];
+
+        if (selectedValues.includes(answer)) {
+            updatedValues = selectedValues.filter((val) => val !== answer);
+        } else {
+            updatedValues = [...selectedValues, answer];
+        }
+
+        onAnswerChange(question._id, updatedValues.join(", "));
+    };
     return (
         <div>
             <p className="text-lg font-semibold mb-4">{question.question}</p>
-            {question.isMCQ ? (
+            {question.answerType === "Multiple Choice" ? (
                 <div className="flex flex-col gap-4">
                     {question.answers.length > 0 ? (
                         question.answers.map((answer: string, index: number) => (
@@ -22,6 +37,26 @@ export default function SurveyQuestion({ question, selectedAnswer, onAnswerChang
                                     value={answer}
                                     checked={selectedAnswer === answer}
                                     onChange={() => onAnswerChange(question._id, answer)}
+                                    className="w-4 h-4"
+                                />
+                                <span className="text-gray-700">{answer}</span>
+                            </label>
+                        ))
+                    ) : (
+                        <p className="text-gray-600 text-center">No answers available. Press "Next" to continue.</p>
+                    )}
+                </div>
+            ) : question.answerType === "Multi-select" ? (
+                <div className="flex flex-col gap-4">
+                    {question.answers.length > 0 ? (
+                        question.answers.map((answer: string, index: number) => (
+                            <label key={index} className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    name={`survey-multiselect-${question._id}`}
+                                    value={answer}
+                                    checked={selectedValues.includes(answer)}
+                                    onChange={() => handleMultiSelectChange(answer)}
                                     className="w-4 h-4"
                                 />
                                 <span className="text-gray-700">{answer}</span>
