@@ -2,7 +2,7 @@ import axios from "axios";
 import { auth } from "./firebaseConfig";
 
 const adminApiClient = axios.create({
-	baseURL: "http://localhost:5001/api",
+	baseURL: `${process.env.REACT_APP_SERVER_URL}/api`,
 });
 
 async function getFirebaseToken(): Promise<string | null> {
@@ -25,11 +25,14 @@ async function isUserAdmin(): Promise<boolean> {
 		const token = await getFirebaseToken();
 		if (!token) return false;
 
-		const res = await axios.get("http://localhost:5001/api/users/is-admin", {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		});
+		const res = await axios.get(
+			`${process.env.REACT_APP_SERVER_URL}/api/users/is-admin`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
 		return res.data.isAdmin;
 	} catch (err) {
 		console.error("Failed to check admin status", err);

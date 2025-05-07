@@ -11,6 +11,7 @@ import { Pagination } from "../../../components/Pagination/Pagination";
 import apiClient from "../../../services/apiClient";
 import Select from "react-select";
 import countryList from "react-select-country-list";
+import { UserType } from "../../../shared/types";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
@@ -26,7 +27,7 @@ interface User {
 	lastName: string;
 	name?: string;
 	email: string;
-	userType: string;
+	userType: UserType | null;
 	company: string;
 	addressLine?: string;
 	city?: string;
@@ -37,7 +38,6 @@ interface User {
 	country?: string;
 	phoneNumber?: string;
 	phone?: string;
-	timezone?: string;
 	language: "English" | "Spanish";
 	selected?: boolean;
 	certification?: string;
@@ -54,8 +54,7 @@ interface UserForm {
 	zipPostalCode: string;
 	country: string;
 	phoneNumber: string;
-	userType: string;
-	timezone: string;
+	userType: UserType | null;
 	language: "English" | "Spanish";
 	certification?: string;
 }
@@ -64,24 +63,6 @@ interface SpeakerProduct {
 	title: string;
 	onDemand: boolean;
 }
-
-const USER_TYPES = [
-	"Foster Parent (Colorado)",
-	"CASA",
-	"County/CPA Worker",
-	"Former FP/Adoptive Parent/Not currently fostering",
-	"Foster Source Staff",
-	"Teacher",
-	"Speaker",
-	"Foster Parent (Outside Colorado)",
-	"Certified Kin Parent (Colorado)",
-	"Certified Kin Parent (Outside Colorado)",
-	"Non-certified Kin Parent (Colorado)",
-	"Non-certified Kin Parent (Outside Colorado)",
-	"New Mexico Misc.",
-	"Foster Parent (New Mexico)",
-	"Foster Source Admin",
-];
 
 const SPEAKER_PRODUCTS: SpeakerProduct[] = [
 	{ title: "Connecting with Teens", onDemand: true },
@@ -92,14 +73,14 @@ const SPEAKER_PRODUCTS: SpeakerProduct[] = [
 
 const UserManagementPage: React.FC = () => {
 	const [searchTerm, setSearchTerm] = useState("");
-	const [selectedUserType, setSelectedUserType] = useState("All");
+	const [selectedUserType, setSelectedUserType] = useState<UserType | null>(
+		null
+	);
 	const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 	const [isSpeakerModalOpen, setIsSpeakerModalOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
-	const [itemsPerPage] = useState(10);
+	const [itemsPerPage] = useState(20);
 	const [users, setUsers] = useState<User[]>([]);
-	const [totalUsers, setTotalUsers] = useState(0);
-	const [totalPages, setTotalPages] = useState(1);
 	const [isLoading, setIsLoading] = useState(false);
 	const [userForm, setUserForm] = useState<UserForm>({
 		firstName: "",
@@ -112,66 +93,58 @@ const UserManagementPage: React.FC = () => {
 		zipPostalCode: "",
 		country: "",
 		phoneNumber: "",
-		userType: "",
-		timezone: "",
+		userType: null,
 		language: "English",
 		certification: "",
 	});
 	const [editingUserId, setEditingUserId] = useState<string | null>(null);
 	const [currentSpeaker, setCurrentSpeaker] = useState<User | null>(null);
 
+	const [userType, setUserType] = useState<UserType | null>();
+	const [userTypes, setUserTypes] = useState<UserType[]>([]);
+
+	const fetchUserTypes = async () => {
+		try {
+			const response = await apiClient.get("/user-types");
+			setUserTypes(response.data.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	useEffect(() => {
+		fetchUserTypes();
 		fetchUsers();
-	}, [currentPage, selectedUserType]);
+	}, []);
 
 	const fetchUsers = async () => {
 		setIsLoading(true);
 		try {
-			const params = new URLSearchParams();
+			const response = await apiClient.get(`/users?pagination=false`); // no params
 
-			if (searchTerm) {
-				params.append("search", searchTerm);
-			}
+			console.log(response.data);
 
-			if (selectedUserType !== "All") {
-				params.append("userType", selectedUserType);
-			}
-
-			params.append("page", currentPage.toString());
-			params.append("limit", itemsPerPage.toString());
-
-			const response = await apiClient.get(`/users?${params.toString()}`);
-
-			console.log("Raw API response:", response.data.users);
-
-			const mappedUsers = response.data.users.map((user: any) => {
-				console.log("Individual user data:", user);
-				const mappedUser = {
-					_id: user._id,
-					id: user._id,
-					firstName: user.name?.split(" ")[0] || "",
-					lastName: user.name?.split(" ")[1] || "",
-					name: user.name,
-					email: user.email,
-					userType: user.role || user.userType || "",
-					company: user.company || "",
-					addressLine: user.address1 || "",
-					city: user.city || "",
-					stateProvinceRegion: user.state || "",
-					zipPostalCode: user.zip || "",
-					country: user.country || "",
-					phoneNumber: user.phone || "",
-					language: user.language || "English",
-					certification: user.certification || "",
-					selected: false,
-				};
-				console.log("Mapped user:", mappedUser);
-				return mappedUser;
-			});
+			const mappedUsers = response.data.users.map((user: any) => ({
+				_id: user._id,
+				id: user._id,
+				firstName: user.name?.split(" ")[0] || "",
+				lastName: user.name?.split(" ")[1] || "",
+				name: user.name,
+				email: user.email,
+				userType: user.role || user.userType || "",
+				company: user.company || "",
+				addressLine: user.address1 || "",
+				city: user.city || "",
+				stateProvinceRegion: user.state || "",
+				zipPostalCode: user.zip || "",
+				country: user.country || "",
+				phoneNumber: user.phone || "",
+				language: user.language || "English",
+				certification: user.certification || "",
+				selected: false,
+			}));
 
 			setUsers(mappedUsers);
-			setTotalUsers(response.data.total);
-			setTotalPages(response.data.pages);
 		} catch (error) {
 			console.error("Error fetching users:", error);
 			setUsers([]);
@@ -250,7 +223,7 @@ const UserManagementPage: React.FC = () => {
 				const response = await apiClient.post("/users", {
 					...backendUserData,
 
-					role: userForm.userType.includes("Admin") ? "staff" : "user",
+					// role: userForm.userType.includes("Admin") ? "staff" : "user",
 				});
 
 				const newUser = {
@@ -297,8 +270,7 @@ const UserManagementPage: React.FC = () => {
 			zipPostalCode: "",
 			country: "",
 			phoneNumber: "",
-			userType: "",
-			timezone: "",
+			userType: null,
 			language: "English",
 			certification: "",
 		});
@@ -317,7 +289,6 @@ const UserManagementPage: React.FC = () => {
 			country: user.country || "",
 			phoneNumber: user.phoneNumber || "",
 			userType: user.userType,
-			timezone: user.timezone || "",
 			language: user.language || "English",
 			certification: user.certification || "",
 		});
@@ -378,24 +349,34 @@ const UserManagementPage: React.FC = () => {
 		}
 	};
 
-	const filteredUsers = searchTerm
-		? users.filter((user) => {
-				const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-				return (
-					fullName.includes(searchTerm.toLowerCase()) ||
-					user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-					user.company.toLowerCase().includes(searchTerm.toLowerCase())
-				);
-			})
-		: users;
+	const filteredUsers = users.filter((user) => {
+		const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+		const matchesSearch =
+			searchTerm === "" ||
+			fullName.includes(searchTerm.toLowerCase()) ||
+			user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+			user.company.toLowerCase().includes(searchTerm.toLowerCase());
 
-	const displayedUsers = filteredUsers;
+		const matchesUserType =
+			!selectedUserType || user.userType?.name === selectedUserType.name;
+
+		return matchesSearch && matchesUserType;
+	});
+
+	const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+	const startIdx = (currentPage - 1) * itemsPerPage;
+	const endIdx = startIdx + itemsPerPage;
+	const displayedUsers = filteredUsers.slice(startIdx, endIdx);
 	const selectedCount = users.filter((user) => user.selected).length;
 
 	const handleSearchSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		fetchUsers();
 	};
+
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [searchTerm, selectedUserType]);
 
 	const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({
 		text,
@@ -456,14 +437,20 @@ const UserManagementPage: React.FC = () => {
 
 					<div className="flex gap-4 w-full md:w-auto">
 						<select
-							value={selectedUserType}
-							onChange={(e) => setSelectedUserType(e.target.value)}
+							value={selectedUserType?.name ?? ""}
+							onChange={(e) => {
+								const selected = e.target.value;
+								const foundType = userTypes.find(
+									(type) => type.name === selected
+								);
+								setSelectedUserType(selected === "" ? null : foundType || null);
+							}}
 							className="px-4 py-2 border rounded-md bg-white min-w-[150px]"
 						>
-							<option value="All">All</option>
-							{USER_TYPES.map((type) => (
-								<option key={type} value={type}>
-									{type}
+							<option value="">All</option>
+							{userTypes.map((type) => (
+								<option key={type._id} value={type.name}>
+									{type.name}
 								</option>
 							))}
 						</select>
@@ -562,7 +549,7 @@ const UserManagementPage: React.FC = () => {
 											{user.email}
 										</td>
 										<td className="px-6 py-4 text-sm text-gray-900">
-											{user.userType}
+											{user.userType?.name}
 										</td>
 										<td className="px-6 py-4 text-sm text-gray-900">
 											{user.company}
@@ -872,33 +859,23 @@ const UserManagementPage: React.FC = () => {
 									User Type
 								</label>
 								<Select
-									options={USER_TYPES.map((type) => ({
-										value: type,
-										label: type,
-									}))}
-									value={
-										userForm.userType
-											? { value: userForm.userType, label: userForm.userType }
-											: null
-									}
-									onChange={(selectedOption) =>
-										setUserForm((prev) => ({
-											...prev,
-											userType: selectedOption ? selectedOption.value : "",
-										}))
-									}
-									placeholder="Choose a User Type"
+									options={userTypes}
+									getOptionLabel={(ut) => ut.name}
+									getOptionValue={(ut) => ut._id}
+									value={userType}
+									onChange={(ut) => setUserType(ut)}
+									placeholder="Choose User Type"
 									styles={{
 										control: (provided, state) => ({
 											...provided,
 											borderColor: state.isFocused
-												? "#F79518"
+												? "orange"
 												: provided.borderColor,
 											boxShadow: state.isFocused
-												? "0 0 0 1px #F79518"
+												? "0 0 0 1px orange"
 												: provided.boxShadow,
 											"&:hover": {
-												borderColor: "#F79518",
+												borderColor: "orange",
 											},
 										}),
 										placeholder: (provided) => ({
@@ -913,7 +890,7 @@ const UserManagementPage: React.FC = () => {
 								/>
 							</div>
 
-							<div className="mb-4">
+							{/* <div className="mb-4">
 								<label className="block text-sm text-gray-500 mb-1">
 									Timezone <span>(optional)</span>
 								</label>
@@ -957,7 +934,7 @@ const UserManagementPage: React.FC = () => {
 										}),
 									}}
 								/>
-							</div>
+							</div> */}
 
 							<div>
 								<label className="block text-sm font-semibold mb-1">

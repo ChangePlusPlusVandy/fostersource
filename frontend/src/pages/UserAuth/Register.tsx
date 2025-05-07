@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import authService from "../../services/authService";
-import familyImage from "./family.png";
+import familyImage from "./images//family.png";
 import Select from "react-select";
 import countryList from "react-select-country-list";
-import fostersourceImage from "./fostersource-logo.png";
+import fostersourceImage from "./images/fostersource-logo.png";
 import apiClient from "../../services/apiClient";
 import { UserType } from "../../shared/types";
 
@@ -321,19 +321,6 @@ const Register: React.FC = () => {
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">
-										Phone Number (optional)
-									</label>
-									<input
-										type="tel"
-										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-										value={phone}
-										onChange={(e) =>
-											setPhone(e.target.value.replace(/[^0-9+]/g, ""))
-										}
-									/>
-								</div>
-								<div>
-									<label className="block mb-1 text-sm font-medium text-black">
 										Who are you certified through?
 									</label>
 									<input
@@ -352,6 +339,19 @@ const Register: React.FC = () => {
 										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
 										value={company}
 										onChange={(e) => setCompany(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">
+										Phone Number (optional)
+									</label>
+									<input
+										type="tel"
+										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+										value={phone}
+										onChange={(e) =>
+											setPhone(e.target.value.replace(/[^0-9+]/g, ""))
+										}
 									/>
 								</div>
 								<div>

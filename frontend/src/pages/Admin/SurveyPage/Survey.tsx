@@ -24,9 +24,7 @@ const Survey = () => {
 	useEffect(() => {
 		const fetchSurvey = async () => {
 			try {
-				const response = await apiClient.get(
-					"http://localhost:5001/api/surveys"
-				); // Fetch the existing survey
+				const response = await apiClient.get("/surveys"); // Fetch the existing survey
 				const surveyData = response.data;
 				console.log(response.data);
 
@@ -166,16 +164,13 @@ const Survey = () => {
 				questions.map(async (q) => {
 					if (q.isEdited) {
 						// If question is edited, create a new question
-						const response = await apiClient.post(
-							"http://localhost:5001/api/questions",
-							{
-								question: q.question,
-								explanation: q.explanation,
-								answerType: q.answerType,
-								answers: q.answers || [],
-								isRequired: q.isRequired,
-							}
-						);
+						const response = await apiClient.post("/questions", {
+							question: q.question,
+							explanation: q.explanation,
+							answerType: q.answerType,
+							answers: q.answers || [],
+							isRequired: q.isRequired,
+						});
 						return response.data._id; // Return new question's ID
 					} else {
 						// If question is not edited, return the existing question ID
@@ -192,7 +187,7 @@ const Survey = () => {
 			if (surveyId) {
 				// If surveyId exists, update the existing survey
 				const response = await apiClient.put(
-					`http://localhost:5001/api/surveys/${surveyId}`,
+					`/surveys/${surveyId}`,
 					surveyData
 				);
 				alert("Survey saved successfully!");
