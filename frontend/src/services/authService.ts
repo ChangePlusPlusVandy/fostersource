@@ -159,6 +159,7 @@ class AuthService {
 					firebaseId: userCredential.user.uid,
 					email,
 					name,
+					userType,
 					phone: fallback(phone),
 					certification,
 					company: fallback(company),

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import authService from "../../services/authService";
-import familyImage from "./family.png";
-import fostersourceImage from "./fostersource-logo.png";
+import familyImage from "./images/family.png";
+import fostersourceImage from "./images/fostersource-logo.png";
 
 const Login: React.FC = () => {
 	const [email, setEmail] = useState("");
