@@ -13,7 +13,7 @@ const actionCodeSettings = {
 
 export async function sendResetEmail(email: string) {
 	try {
-		await sendPasswordResetEmail(auth, email);
+		await sendPasswordResetEmail(auth, email, actionCodeSettings);
 		alert("Password reset email sent!");
 	} catch (error: any) {
 		alert(error.message);
