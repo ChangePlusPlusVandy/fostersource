@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "../../../services/apiClient";
 import { Pencil, Trash2 } from "lucide-react";
-
-interface UserType {
-	_id: string;
-	name: string;
-	userCount: number;
-	cost: number;
-}
+import { UserType } from "../../../shared/types";
 
 export default function UserTypesPage() {
 	const [userTypes, setUserTypes] = useState<UserType[]>([]);

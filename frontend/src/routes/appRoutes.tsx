@@ -60,7 +60,7 @@ function AppRoutes() {
 	);
 
 	const [isAdmin, setIsAdmin] = useState(
-		localStorage.user && JSON.parse(localStorage.user).role === "staff"
+		localStorage.user && JSON.parse(localStorage.user).role.name === "Staff"
 	);
 	const [isAdminRoute, setIsAdminRoute] = useState(
 		window.location.href.indexOf("/admin") > -1

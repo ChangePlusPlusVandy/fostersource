@@ -56,9 +56,9 @@ export default function CatalogCourseComponent({
 						<span className="mr-1">
 							{course.ratings.length > 0
 								? (
-									course.ratings.reduce((sum, r) => sum + r.rating, 0) /
-									course.ratings.length
-								).toFixed(1)
+										course.ratings.reduce((sum, r) => sum + r.rating, 0) /
+										course.ratings.length
+									).toFixed(1)
 								: "No ratings"}
 						</span>
 						<span className="text-yellow-500">
@@ -66,9 +66,9 @@ export default function CatalogCourseComponent({
 								parseInt(
 									course.ratings.length > 0
 										? (
-											course.ratings.reduce((sum, r) => sum + r.rating, 0) /
-											course.ratings.length
-										).toFixed(1)
+												course.ratings.reduce((sum, r) => sum + r.rating, 0) /
+												course.ratings.length
+											).toFixed(1)
 										: "0"
 								)
 							)}
@@ -94,12 +94,22 @@ export default function CatalogCourseComponent({
 					<button
 						disabled={isInCart}
 						onClick={() => !isInCart && handleRegister(course)}
-						className={`text-white text-sm font-medium py-2 px-4 rounded-lg transition ${isInCart
-							? "bg-gray-400 cursor-not-allowed"
-							: "bg-orange-500 hover:bg-orange-600"
-							}`}
+						className={`text-white text-sm font-medium py-2 px-4 rounded-lg transition ${
+							isInCart
+								? "bg-gray-400 cursor-not-allowed"
+								: "bg-orange-500 hover:bg-orange-600"
+						}`}
 					>
-						{isInCart ? "Already in Cart" : `Register (${course.cost === 0 ? "Free" : `$${course.cost}`})`}
+						{isInCart
+							? "Already in Cart"
+							: `Register (${
+									JSON.parse(localStorage.user).role.cost === 0
+										? "Free"
+										: `${new Intl.NumberFormat("en-US", {
+												style: "currency",
+												currency: "USD",
+											}).format(JSON.parse(localStorage.user).role.cost)}`
+								})`}
 					</button>
 					<Link to={`/courseDetails?courseId=${course._id}`}>
 						<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
