@@ -55,8 +55,8 @@ export const mainItems: SidebarItem[] = [
 			{ icon: <Mail />, description: "Emails", href: "/admin/email" },
 			{
 				icon: <ClipboardList />,
-				description: "Registrants",
-				href: "/admin/registrants",
+				description: "Templates",
+				href: "/admin/templates",
 			},
 		],
 	},
@@ -108,7 +108,7 @@ interface AdminSidebarProps {
 export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 	// User Info
 	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
-	const role = isLoggedIn ? JSON.parse(localStorage.user).role : "Log In";
+	const role = isLoggedIn ? JSON.parse(localStorage.user).role.name : "Log In";
 
 	// State for tracking the active item (can be parent or sub-item href)
 	const [activeItem, setActiveItem] = useState<string>(
@@ -131,11 +131,6 @@ export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 			setExpandedItem(parentOfActive.description);
 		}
 	});
-
-	useEffect(() => {
-		console.log("isFocused", isFocused);
-		console.log("focusedItem", focusedItem);
-	}, [isFocused, focusedItem]);
 
 	return (
 		<div
@@ -341,7 +336,7 @@ export function AdminSidebarItems({
 				const isExpanded = expandedItem === item.description;
 
 				return (
-					<div>
+					<div key={item.description}>
 						{item.description !== "Home" && (
 							<hr className="border-t border-purple-200 border-2 rounded-full my-2" />
 						)}

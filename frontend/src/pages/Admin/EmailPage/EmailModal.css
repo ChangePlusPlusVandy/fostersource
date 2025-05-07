@@ -1,0 +1,16 @@
+/* ideally in your global CSS (e.g., index.css or tailwind.css) */
+.ql-container {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.ql-toolbar {
+	flex-shrink: 0; /* keeps toolbar visible */
+}
+
+.ql-editor {
+	flex: 1;
+	overflow-y: auto;
+}

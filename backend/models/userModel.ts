@@ -1,23 +1,13 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { IProgress } from "./progressModel";
 import { IPayment } from "./paymentModel";
+import { IUserType } from "./userTypeModel";
 
 export interface IUser extends Document {
 	firebaseId: string;
 	email: string;
 	isColorado: boolean;
-	role:
-		| "foster parent"
-		| "certified kin"
-		| "non-certified kin"
-		| "staff"
-		| "casa"
-		| "teacher"
-		| "county/cpa worker"
-		| "speaker"
-		| "former parent"
-		| "caregiver";
-	// TODO: update after user types can be created in admin
+	role: mongoose.Types.ObjectId | IUserType;
 	name: string;
 	address1: string;
 	address2?: string;
@@ -39,20 +29,8 @@ const userSchema: Schema = new Schema(
 		email: { type: String, required: true },
 		isColorado: { type: Boolean, required: true },
 		role: {
-			type: String,
-			enum: [
-				"foster parent",
-				"certified kin",
-				"non-certified kin",
-				"staff",
-				"casa",
-				"teacher",
-				"county/cpa worker",
-				"speaker",
-				"former parent",
-				"caregiver",
-			],
-			required: true,
+			type: Schema.Types.ObjectId,
+			ref: "UserType",
 		},
 		name: { type: String, required: true },
 		address1: { type: String, required: true },
@@ -63,7 +41,11 @@ const userSchema: Schema = new Schema(
 		certification: { type: String, required: true },
 		company: { type: String, required: true },
 		phone: { type: String, required: true },
-		language: { type: String, enum: ["English", "Spanish"], default: "English" },
+		language: {
+			type: String,
+			enum: ["English", "Spanish"],
+			default: "English",
+		},
 		progress: [
 			{
 				type: Schema.Types.ObjectId,

@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import authService from "../../services/authService";
 import familyImage from "./family.png";
 import Select from "react-select";
 import countryList from "react-select-country-list";
 import fostersourceImage from "./fostersource-logo.png";
+import apiClient from "../../services/apiClient";
+import { UserType } from "../../shared/types";
 
 const states = [
 	"Alabama",
@@ -68,6 +70,7 @@ const Register: React.FC = () => {
 	const [phone, setPhone] = useState("");
 	const [certification, setCertification] = useState("");
 	const [company, setCompany] = useState("");
+	const [userType, setUserType] = useState<UserType | null>(null);
 	const [address1, setAddress1] = useState("");
 	const [address2, setAddress2] = useState("");
 	const [city, setCity] = useState("");
@@ -134,6 +137,7 @@ const Register: React.FC = () => {
 				name: `${firstName} ${lastName}`,
 				phone,
 				certification,
+				userType: userType ? userType._id : "N/A",
 				company,
 				address1,
 				address2,
@@ -148,6 +152,21 @@ const Register: React.FC = () => {
 			setError(err.message || "Registration failed. Please try again.");
 		}
 	};
+
+	const [userTypes, setUserTypes] = useState<UserType[]>([]);
+
+	const fetchUserTypes = async () => {
+		try {
+			const response = await apiClient.get("/user-types");
+			setUserTypes(response.data.data);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	useEffect(() => {
+		fetchUserTypes();
+	}, []);
 
 	return (
 		<div className="flex h-screen w-full bg-white">
@@ -333,6 +352,41 @@ const Register: React.FC = () => {
 										className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
 										value={company}
 										onChange={(e) => setCompany(e.target.value)}
+									/>
+								</div>
+								<div>
+									<label className="block mb-1 text-sm font-medium text-black">
+										User Type
+									</label>
+									<Select
+										options={userTypes}
+										getOptionLabel={(ut) => ut.name}
+										getOptionValue={(ut) => ut._id}
+										value={userType}
+										onChange={(ut) => setUserType(ut)}
+										placeholder="Choose User Type"
+										styles={{
+											control: (provided, state) => ({
+												...provided,
+												borderColor: state.isFocused
+													? "orange"
+													: provided.borderColor,
+												boxShadow: state.isFocused
+													? "0 0 0 1px orange"
+													: provided.boxShadow,
+												"&:hover": {
+													borderColor: "orange",
+												},
+											}),
+											placeholder: (provided) => ({
+												...provided,
+												color: "gray",
+											}),
+											singleValue: (provided) => ({
+												...provided,
+												color: "black",
+											}),
+										}}
 									/>
 								</div>
 								<button

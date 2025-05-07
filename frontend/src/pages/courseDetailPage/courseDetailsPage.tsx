@@ -357,10 +357,9 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							<DisplayBar
 								creditHours={courseDetailsData.creditNumber}
 								time={courseDetailsData.time}
-								lengthCourse={courseDetailsData.lengthCourse}
 								isSurveyModalOpen={isSurveyModalOpen}
 								setIsSurveyModalOpen={setIsSurveyModalOpen}
-								components={courseDetailsData.components}
+								productInfo={courseDetailsData.productInfo}
 							/>
 						</div>
 					</div>
@@ -418,19 +417,16 @@ const CategoryPills = ({ categories }: { categories: string[] }) => {
 
 /* Displays the progress bar of webinar, survey, and certificate */
 const DisplayBar = ({
-	creditHours,
 	time,
-	lengthCourse,
 	isSurveyModalOpen,
 	setIsSurveyModalOpen,
-	components,
+	productInfo,
 }: {
 	creditHours: number;
 	time: Date;
-	lengthCourse: number;
 	isSurveyModalOpen: boolean;
 	setIsSurveyModalOpen: any;
-	components: any[];
+	productInfo: string;
 }) => {
 	const [currentPage, setCurrentPage] = useState("Webinar");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
@@ -485,10 +481,9 @@ const DisplayBar = ({
 		try {
 			const response = await apiClient.get(`/videos`, {
 				params: {
-					_id: components[0],
+					_id: productInfo,
 				},
 			});
-			console.log(response.data.data[0].videoUrl);
 			setVideoLink(getYouTubeEmbedUrl(response.data.data[0].videoUrl));
 		} catch (error) {
 			console.error(error);
@@ -497,27 +492,27 @@ const DisplayBar = ({
 
 	useEffect(() => {
 		retrieveVideo();
-	}, [components]);
+	}, [productInfo]);
 
 	return (
 		<div className="flex min-w-min min-h-min justify-between w-full gap-2">
 			<div className="flex flex-col">
-				{/* Webinar -> Survey -> Certificate */}
+				{/* Workshop -> Survey -> Certificate */}
 				<div className="flex min-w-min h-9 mb-5">
-					{/* Webinar Button */}
+					{/* Workshop Button */}
 					<button
 						className="bg-[#F79518] rounded-l-full text-center cursor-pointer w-48"
 						style={{
 							clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
 						}}
 						onClick={() => {
-							setCurrentPage("Webinar");
+							setCurrentPage("Workshop");
 							setSurveyColor("#FEC781");
 							setCertificateColor("#FEC781");
 						}}
 					>
 						<p className="flex justify-center items-center text-xs text-white font-semibold">
-							Webinar
+							Workshop
 						</p>
 					</button>
 					{/* Survey Button */}
@@ -556,7 +551,7 @@ const DisplayBar = ({
 						</p>
 					</button>
 				</div>
-				{currentPage === "Webinar" && (
+				{currentPage === "Workshop" && (
 					<div className="flex justify-between h-[400px]">
 						{/* <div className="text-sm	font-normal flex flex-col gap-1">
 							<div>Date: {new Date(time).toLocaleDateString()}</div>

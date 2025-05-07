@@ -34,12 +34,10 @@ export const getSpeakers = async (
 		const speakers = await Speaker.find(filters);
 		res.status(200).json(speakers);
 	} catch (error) {
-		res
-			.status(500)
-			.json({
-				message:
-					error instanceof Error ? error.message : "An unknown error occurred",
-			});
+		res.status(500).json({
+			message:
+				error instanceof Error ? error.message : "An unknown error occurred",
+		});
 	}
 };
 
@@ -51,9 +49,6 @@ export const createSpeaker = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		console.log("Request body:", req.body);
-		console.log("Request file:", req.file);
-
 		const { name, title, email, company, bio, disclosures } = req.body;
 
 		// Store image URL if an image is uploaded
@@ -74,12 +69,10 @@ export const createSpeaker = async (
 		await speaker.save();
 		res.status(201).json({ speaker, message: "Speaker created successfully" });
 	} catch (error) {
-		res
-			.status(500)
-			.json({
-				message:
-					error instanceof Error ? error.message : "An unknown error occurred",
-			});
+		res.status(500).json({
+			message:
+				error instanceof Error ? error.message : "An unknown error occurred",
+		});
 	}
 };
 
@@ -110,12 +103,10 @@ export const updateSpeaker = async (
 
 		res.status(200).json(updatedSpeaker);
 	} catch (error) {
-		res
-			.status(500)
-			.json({
-				message:
-					error instanceof Error ? error.message : "An unknown error occurred",
-			});
+		res.status(500).json({
+			message:
+				error instanceof Error ? error.message : "An unknown error occurred",
+		});
 	}
 };
 
@@ -143,11 +134,9 @@ export const deleteSpeaker = async (
 			.status(200)
 			.json({ success: true, message: "Speaker deleted successfully." });
 	} catch (error) {
-		res
-			.status(500)
-			.json({
-				message:
-					error instanceof Error ? error.message : "An unknown error occurred",
-			});
+		res.status(500).json({
+			message:
+				error instanceof Error ? error.message : "An unknown error occurred",
+		});
 	}
 };

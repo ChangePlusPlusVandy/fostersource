@@ -69,7 +69,7 @@ export const createUser = async (
 			company,
 			progress,
 			payments,
-			role = "foster parent", // Default role
+			role,
 			isColorado, // Default value
 		} = req.body;
 
@@ -118,6 +118,7 @@ export const createUser = async (
 		});
 
 		const savedUser = await newUser.save();
+		await savedUser.populate("role");
 
 		// // Generate JWT token
 		// const accessToken = jwt.sign(
@@ -163,7 +164,9 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 		}
 
 		// Find user in database
-		let user = await User.findOne({ firebaseId });
+		let user = await User.findOne({ firebaseId }).populate("role");
+
+		console.log(user);
 
 		if (!user) {
 			res.status(404).json({ message: "User not found" });

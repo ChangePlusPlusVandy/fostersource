@@ -6,8 +6,6 @@ export type Course = {
 	ratings: Rating[];
 	className: string;
 	discussion: string;
-	components: String[];
-	isLive: boolean;
 	categories: string[];
 	creditNumber: number;
 	courseDescription: string;
@@ -17,10 +15,10 @@ export type Course = {
 	instructorName: string;
 	instructorDescription: string;
 	instructorRole: string;
-	lengthCourse: number;
 	time: Date;
-	isInPerson: Boolean;
-	students: String[];
+	students: string[];
 	regStart: Date;
 	regEnd: Date;
+	productType: string;
+	productInfo: string;
 };

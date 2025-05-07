@@ -20,10 +20,10 @@ import authService from "../../services/authService";
 // User information
 export const userInfo = {
 	name: "First L.",
-	role: localStorage.user ? localStorage.user.role : "No role",
+	role: localStorage.user ? JSON.parse(localStorage.user).role.name : "No role",
 	isLoggedIn: false,
 	isAdmin: localStorage.user
-		? localStorage.user.role === "staff"
+		? JSON.parse(localStorage.user).role.name === "Staff"
 			? true
 			: false
 		: false,
@@ -102,7 +102,7 @@ export function Sidebar({
 }: SidebarProps) {
 	// User Info
 	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
-	const role = isLoggedIn ? JSON.parse(localStorage.user).role : "Log In";
+	const role = isLoggedIn ? JSON.parse(localStorage.user).role.name : "Log In";
 	// Automatically collapse sidebar for narrow screens
 	useEffect(() => {
 		const handleResize = () => {
@@ -187,7 +187,7 @@ export function SidebarItems({
 	cartItemCount,
 }: SidebarItemsProps) {
 	const [isAdmin, setIsAdmin] = useState(
-		localStorage.user && JSON.parse(localStorage.user).role === "staff"
+		localStorage.user && JSON.parse(localStorage.user).role.name === "Staff"
 	);
 
 	// const checkAdmin = async () => {

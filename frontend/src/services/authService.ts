@@ -15,6 +15,7 @@ interface RegisterCredentials {
 	phone: string;
 	certification: string;
 	company: string;
+	userType: string;
 	address1: string;
 	address2: string;
 	city: string;
@@ -127,6 +128,7 @@ class AuthService {
 		phone,
 		certification,
 		company,
+		userType,
 		address1,
 		address2,
 		city,
@@ -157,10 +159,10 @@ class AuthService {
 					firebaseId: userCredential.user.uid,
 					email,
 					name,
-					role: "foster parent",
 					phone: fallback(phone),
 					certification,
 					company: fallback(company),
+					role: userType,
 					address1: fallback(address1),
 					address2: fallback(address2),
 					city: fallback(city),

@@ -15,7 +15,7 @@ export async function addToCart(course: Course) {
 
 	let cartCourseInfo = {
 		className: course.className,
-		cost: course.cost,
+		cost: user.role.cost,
 		creditNumber: course.creditNumber,
 		instructor: course.instructorName,
 		_id: course._id,

@@ -230,12 +230,17 @@ export const checkAdmin = async (req: AuthenticatedRequest, res: Response) => {
 				.json({ message: "Unauthorized: No user data found" });
 		}
 
-		const user = await User.findOne({ firebaseId: req.user.uid });
+		const user = await User.findOne({ firebaseId: req.user.uid }).populate(
+			"role"
+		);
 
-		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+		if (!user || !user.role) {
+			return res
+				.status(404)
+				.json({ message: "User not found or role missing" });
 		}
-		const isAdmin = user.role === "staff";
+
+		const isAdmin = (user.role as any).name?.toLowerCase() === "staff";
 
 		return res.status(200).json({ isAdmin });
 	} catch (error) {
