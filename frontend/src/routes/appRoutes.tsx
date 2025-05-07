@@ -39,11 +39,11 @@ import Registrants from "../pages/Admin/RegistrantsPage/Registrants";
 import SurveySummary from "../pages/Admin/SurveySummaryPage/SurveySummary";
 import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
+import UserTypesPage from "../pages/Admin/UserTypesPage/UserTypesPage";
 import ProductProgressReport from "../pages/Admin/ProductSummaryPage/ProductProgressReport";
 import FAQPage from "../pages/FAQPage/FAQPage";
 import HandoutPage from "../pages/Admin/HandoutsPage/handoutsPage";
 import EmailTemplates from "../pages/Admin/EmailTemplatePage/EmailTemplates";
-import UserTypesPage from "../pages/Admin/UserTypesPage/UserTypesPage";
 // import AdminPage from "../pages/Admin/AdminPage";
 
 function AppRoutes() {
