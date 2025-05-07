@@ -77,7 +77,7 @@ class AuthService {
 			const firebaseToken = await userCredential.user?.getIdToken();
 
 			const response = await axios.post(
-				"http://localhost:5001/api/login",
+				`${process.env.REACT_APP_SERVER_URL}/api/login`,
 				{
 					firebaseId: userCredential.user.uid,
 					email: userCredential.user.email,
@@ -148,7 +148,7 @@ class AuthService {
 
 			const firebaseToken = await userCredential.user?.getIdToken();
 
-			const baseURL = "http://localhost:5001";
+			const baseURL = `${process.env.REACT_APP_SERVER_URL}`;
 
 			const fallback = (val: string | undefined, fallbackVal = "N/A") =>
 				val && val.trim() !== "" ? val : fallbackVal;

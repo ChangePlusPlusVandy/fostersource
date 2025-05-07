@@ -18,6 +18,7 @@ import {
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import axios from "axios";
+import apiClient from "../../services/apiClient";
 
 interface CalendarEvent {
 	id: string;
@@ -58,7 +59,7 @@ export default function Calendar() {
 	useEffect(() => {
 		const fetchEvents = async () => {
 			try {
-				const response = await axios.get("http://localhost:5001/api/courses");
+				const response = await apiClient.get("/courses");
 				const courseData = response.data;
 
 				const calendarEvents = courseData.map((course: any) => ({

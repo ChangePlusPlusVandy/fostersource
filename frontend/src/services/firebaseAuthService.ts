@@ -64,7 +64,7 @@ export const signOut = async () => {
 export const sendPasswordResetEmail = async (email: string) => {
 	try {
 		await resetEmail(auth, email, {
-			url: "http://localhost:3000/reset-password",
+			url: `${process.env.REACT_APP_PROJECT_URL}/reset-password`,
 			handleCodeInApp: true,
 		});
 	} catch (error: any) {

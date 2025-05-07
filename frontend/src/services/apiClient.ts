@@ -2,7 +2,7 @@ import axios from "axios";
 import { auth } from "./firebaseConfig";
 
 const apiClient = axios.create({
-	baseURL: "http://localhost:5001/api",
+	baseURL: `${process.env.REACT_APP_SERVER_URL}/api`,
 });
 
 async function getFirebaseToken(): Promise<string | null> {
