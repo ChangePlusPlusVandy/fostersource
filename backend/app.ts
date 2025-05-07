@@ -24,6 +24,7 @@ import speakerRoutes from "./routes/speakerRoutes";
 import pdfRoutes from "./routes/pdfRoutes";
 import emailTemplateRoutes from "./routes/emailTemplateRoutes";
 import zoomRoutes from "./routes/zoomRoutes";
+import userTypeRoutes from "./routes/userTypeRoutes";
 
 // Import middleware
 import { notFound, errorHandler } from "./middlewares/errorMiddleware";
@@ -94,7 +95,8 @@ app.use("/api/emails", verifyFirebaseAuth, emailRoutes);
 app.use("/api/emailTemplates", verifyFirebaseAuth, emailTemplateRoutes);
 app.use("/api/speakers", verifyFirebaseAuth, speakerRoutes);
 app.use("/api/upload", verifyFirebaseAuth, uploadRoutes);
-app.use("/api/zoom", verifyFirebaseAuth, zoomRoutes)
+app.use("/api/user-types", userTypeRoutes);
+app.use("/api/zoom", verifyFirebaseAuth, zoomRoutes);
 app.use("/api/certificatePDFs", verifyFirebaseAuth, pdfRoutes);
 
 app.use(notFound);

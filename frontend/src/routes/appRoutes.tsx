@@ -39,6 +39,7 @@ import Registrants from "../pages/Admin/RegistrantsPage/Registrants";
 import SurveySummary from "../pages/Admin/SurveySummaryPage/SurveySummary";
 import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
+import UserTypesPage from "../pages/Admin/UserTypesPage/UserTypesPage";
 import ProductProgressReport from "../pages/Admin/ProductSummaryPage/ProductProgressReport";
 import FAQPage from "../pages/FAQPage/FAQPage";
 import HandoutPage from "../pages/Admin/HandoutsPage/handoutsPage";
@@ -59,7 +60,7 @@ function AppRoutes() {
 	);
 
 	const [isAdmin, setIsAdmin] = useState(
-		localStorage.user && JSON.parse(localStorage.user).role === "staff"
+		localStorage.user && JSON.parse(localStorage.user).role.name === "Staff"
 	);
 	const [isAdminRoute, setIsAdminRoute] = useState(
 		window.location.href.indexOf("/admin") > -1
@@ -324,7 +325,22 @@ function AppRoutes() {
 						</Route>
 
 						{/* ===== user management routes ===== */}
-						<Route path="/admin/users" element={<UserManagementPage />} />
+						<Route
+							path="/admin/users"
+							element={
+								<AdminRoute>
+									<UserManagementPage />
+								</AdminRoute>
+							}
+						/>
+						<Route
+							path="/admin/user-types"
+							element={
+								<AdminRoute>
+									<UserTypesPage />
+								</AdminRoute>
+							}
+						/>
 
 						{/* ===== report routes ===== */}
 						<Route

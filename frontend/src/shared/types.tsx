@@ -27,3 +27,10 @@ export interface MongoEmail {
 	sendDate: string;
 	selected: boolean;
 }
+
+export interface UserType {
+	_id: string;
+	name: string;
+	userCount: number;
+	cost: number;
+}

@@ -31,13 +31,13 @@ export default function Cart() {
 	};
 
 	return (
-		<div className="p-6">
+		<div className="p-6 w-full">
 			<h1 className="text-2xl font-bold mb-4">Checkout</h1>
 			<div className="space-y-4">
 				{cartItems.map((item, index) => (
 					<div
 						key={index}
-						className="p-4 border border-black rounded-lg flex justify-between items-center"
+						className="p-4 border border-black rounded-lg inline-flex gap-8 items-center"
 					>
 						<div>
 							<h2 className="text-lg font-semibold">{item.className}</h2>
@@ -65,7 +65,7 @@ export default function Cart() {
 			</div>
 			<div className="mt-6 p-4 border-t border-black">
 				<h2 className="text-xl font-semibold mb-2">Summary</h2>
-				<p className="text-lg">
+				<p className="text-lg mb-8">
 					Total Cost: <span className="font-bold">${totalCost.toFixed(2)}</span>
 				</p>
 				{totalCost === 0 ? (

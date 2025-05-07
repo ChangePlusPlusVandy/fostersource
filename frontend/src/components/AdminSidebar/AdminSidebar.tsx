@@ -108,7 +108,7 @@ interface AdminSidebarProps {
 export function AdminSidebar({ isLoggedIn, setIsLoggedIn }: AdminSidebarProps) {
 	// User Info
 	const name = isLoggedIn ? JSON.parse(localStorage.user).name : "Log In";
-	const role = isLoggedIn ? JSON.parse(localStorage.user).role : "Log In";
+	const role = isLoggedIn ? JSON.parse(localStorage.user).role.name : "Log In";
 
 	// State for tracking the active item (can be parent or sub-item href)
 	const [activeItem, setActiveItem] = useState<string>(
