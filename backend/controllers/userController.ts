@@ -8,7 +8,13 @@ import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
 	try {
-		const { search, userType, page = 1, limit = 10 } = req.query;
+		const {
+			search,
+			userType,
+			page = 1,
+			limit = 10,
+			pagination = "true",
+		} = req.query;
 
 		let query: any = {};
 
@@ -23,6 +29,18 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 			query.userType = userType;
 		}
 
+		// If pagination=false, return all matching users
+		if (pagination === "false") {
+			const users = await User.find(query)
+				.select(
+					"name email role company certification address1 city state zip phone language certification"
+				)
+				.populate("role");
+			res.json({ users, total: users.length, pages: 1 });
+			return;
+		}
+
+		// Otherwise paginate
 		const skip = (Number(page) - 1) * Number(limit);
 
 		const users = await User.find(query)
@@ -30,7 +48,8 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 			.limit(Number(limit))
 			.select(
 				"name email role company certification address1 city state zip phone language certification"
-			);
+			)
+			.populate("role");
 
 		const total = await User.countDocuments(query);
 
