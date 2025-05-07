@@ -28,7 +28,9 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 		const users = await User.find(query)
 			.skip(skip)
 			.limit(Number(limit))
-			.select("name email userType company");
+			.select(
+				"name email role company certification address1 city state zip phone language certification"
+			);
 
 		const total = await User.countDocuments(query);
 

@@ -40,6 +40,7 @@ interface User {
 	timezone?: string;
 	language: "English" | "Spanish";
 	selected?: boolean;
+	certification?: string;
 }
 
 interface UserForm {
@@ -56,6 +57,7 @@ interface UserForm {
 	userType: string;
 	timezone: string;
 	language: "English" | "Spanish";
+	certification?: string;
 }
 
 interface SpeakerProduct {
@@ -113,6 +115,7 @@ const UserManagementPage: React.FC = () => {
 		userType: "",
 		timezone: "",
 		language: "English",
+		certification: "",
 	});
 	const [editingUserId, setEditingUserId] = useState<string | null>(null);
 	const [currentSpeaker, setCurrentSpeaker] = useState<User | null>(null);
@@ -139,24 +142,32 @@ const UserManagementPage: React.FC = () => {
 
 			const response = await apiClient.get(`/users?${params.toString()}`);
 
-			const mappedUsers = response.data.users.map((user: any) => ({
-				_id: user._id,
-				id: user._id,
-				firstName: user.name?.split(" ")[0] || "",
-				lastName: user.name?.split(" ")[1] || "",
-				name: user.name,
-				email: user.email,
-				userType: user.userType || "",
-				company: user.company || "",
-				addressLine: user.address1 || "",
-				city: user.city || "",
-				stateProvinceRegion: user.state || "",
-				zipPostalCode: user.zip || "",
-				country: user.country || "",
-				phoneNumber: user.phone || "",
-				language: user.language || "English",
-				selected: false,
-			}));
+			console.log("Raw API response:", response.data.users);
+
+			const mappedUsers = response.data.users.map((user: any) => {
+				console.log("Individual user data:", user);
+				const mappedUser = {
+					_id: user._id,
+					id: user._id,
+					firstName: user.name?.split(" ")[0] || "",
+					lastName: user.name?.split(" ")[1] || "",
+					name: user.name,
+					email: user.email,
+					userType: user.role || user.userType || "",
+					company: user.company || "",
+					addressLine: user.address1 || "",
+					city: user.city || "",
+					stateProvinceRegion: user.state || "",
+					zipPostalCode: user.zip || "",
+					country: user.country || "",
+					phoneNumber: user.phone || "",
+					language: user.language || "English",
+					certification: user.certification || "",
+					selected: false,
+				};
+				console.log("Mapped user:", mappedUser);
+				return mappedUser;
+			});
 
 			setUsers(mappedUsers);
 			setTotalUsers(response.data.total);
@@ -199,6 +210,7 @@ const UserManagementPage: React.FC = () => {
 			country: userData.country,
 			phone: userData.phoneNumber,
 			language: userData.language,
+			certification: userData.certification,
 		};
 	};
 
@@ -229,6 +241,7 @@ const UserManagementPage: React.FC = () => {
 									country: userForm.country,
 									phoneNumber: userForm.phoneNumber,
 									language: userForm.language,
+									certification: userForm.certification,
 								}
 							: user
 					)
@@ -256,6 +269,7 @@ const UserManagementPage: React.FC = () => {
 					country: userForm.country,
 					phoneNumber: userForm.phoneNumber,
 					language: userForm.language,
+					certification: userForm.certification,
 					selected: false,
 				};
 
@@ -286,6 +300,7 @@ const UserManagementPage: React.FC = () => {
 			userType: "",
 			timezone: "",
 			language: "English",
+			certification: "",
 		});
 	};
 
@@ -304,6 +319,7 @@ const UserManagementPage: React.FC = () => {
 			userType: user.userType,
 			timezone: user.timezone || "",
 			language: user.language || "English",
+			certification: user.certification || "",
 		});
 		setEditingUserId(user._id || null);
 		setIsUserModalOpen(true);
@@ -507,6 +523,9 @@ const UserManagementPage: React.FC = () => {
 									Language
 								</th>
 								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
+									Certified Through
+								</th>
+								<th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
 									Actions
 								</th>
 							</tr>
@@ -555,6 +574,9 @@ const UserManagementPage: React.FC = () => {
 											>
 												{user.language}
 											</span>
+										</td>
+										<td className="px-6 py-4 text-sm text-gray-900">
+											{user.certification}
 										</td>
 										<td className="px-6 py-4 text-sm">
 											<div className="flex gap-3">
