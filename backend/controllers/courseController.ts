@@ -605,3 +605,81 @@ export const updateUserProgress = async (
 		});
 	}
 };
+
+// @desc    Batch update user progress in a course
+// @route   PUT /api/courses/:courseId/progress/batch
+// @access  Public
+export const batchUpdateUserProgress = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { courseId } = req.params;
+		const updates = req.body.updates; // Array of updates
+
+		if (!Array.isArray(updates) || updates.length === 0) {
+			res.status(400).json({
+				success: false,
+				message: "No updates provided.",
+			});
+			return;
+		}
+
+		const results: any[] = [];
+
+		for (const update of updates) {
+			const { userId, webinarComplete, surveyComplete, certificateComplete } =
+				update;
+
+			console.log("Processing update for user:", userId);
+
+			const progress = await Progress.findOne({
+				course: courseId,
+				user: userId,
+			});
+
+			if (!progress) {
+				console.warn(`Progress not found for user ${userId}`);
+				results.push({
+					userId,
+					success: false,
+					message: "Progress record not found.",
+				});
+				continue;
+			}
+
+			const completedComponents = {
+				webinar: Boolean(webinarComplete),
+				survey: Boolean(surveyComplete),
+				certificate: Boolean(certificateComplete),
+			};
+
+			progress.completedComponents = completedComponents;
+
+			const allComplete = Object.values(completedComponents).every(Boolean);
+			progress.isComplete = allComplete;
+			if (allComplete && !progress.dateCompleted) {
+				progress.dateCompleted = new Date();
+			}
+
+			await progress.save();
+
+			results.push({
+				userId,
+				success: true,
+			});
+		}
+
+		res.status(200).json({
+			success: true,
+			message: "Batch update complete.",
+			results,
+		});
+	} catch (error: any) {
+		console.error("Error in batchUpdateUserProgress:", error);
+		res.status(500).json({
+			success: false,
+			message: error.message || "Internal server error.",
+		});
+	}
+};

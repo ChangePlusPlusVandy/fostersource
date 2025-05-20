@@ -181,7 +181,7 @@ function AdminCoursePreview({
 					<Link to={`/admin/product/edit/${product.course._id}`}>
 						<Edit2 className="w-4 h-4 text-gray-400" />
 					</Link>
-					<Link to={`/admin/product/edit/${product.course._id}`}>
+					<Link to={`/admin/product/manage/${product.course._id}`}>
 						<LayoutDashboard className="w-4 h-4 text-gray-400" />
 					</Link>
 					<button

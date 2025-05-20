@@ -267,7 +267,7 @@ function RoutesAndLayout({
 						<Route path="survey" element={<SurveyPage />} />
 					</Route>
 					<Route
-						path="/admin/product/manage"
+						path="/admin/product/manage/:id"
 						element={
 							<AdminRoute>
 								<EditSideBar />
@@ -276,9 +276,12 @@ function RoutesAndLayout({
 					>
 						<Route index element={<Navigate to="speakers" replace />} />
 						<Route path="speakers" element={<SpeakerPage />} />
-						<Route path="handouts" element={<HandoutPage />} />
 						<Route path="registrants" element={<Registrants />} />
 						<Route path="email" element={<EmailPage isSingleCourse={true} />} />
+						<Route
+							path="participation"
+							element={<ProductProgressReport fixedCourseId={true} />}
+						/>
 					</Route>
 
 					{/* ===== user management routes ===== */}
@@ -320,7 +323,7 @@ function RoutesAndLayout({
 						path="admin/reports/progress"
 						element={
 							<AdminRoute>
-								<ProductProgressReport />
+								<ProductProgressReport fixedCourseId={false} />
 							</AdminRoute>
 						}
 					/>

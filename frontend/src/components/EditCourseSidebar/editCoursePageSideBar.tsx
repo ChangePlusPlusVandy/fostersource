@@ -17,6 +17,10 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 
 	const location = useLocation();
 
+	const isCreatePage = location.pathname.includes("/create");
+	// const isEditPage = location.pathname.includes("/edit");
+	const isManagePage = location.pathname.includes("/manage");
+
 	const setAllFields = useCourseEditStore((state) => state.setAllFields);
 	const reset = useCourseEditStore((state) => state.reset);
 
@@ -45,9 +49,11 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 		}
 	}, [courseId, hydrated, hasFetchedFromBackend]);
 
-	const basePath = courseId
-		? `/admin/product/edit/${courseId}`
-		: `/admin/product/create`;
+	const basePath = isCreatePage
+		? `/admin/product/create`
+		: isManagePage
+			? `/admin/product/manage/${courseId}`
+			: `/admin/product/edit/${courseId}`;
 
 	const sidebarItems = [
 		{
@@ -92,7 +98,6 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 		},
 	];
 
-	const isManagePage = location.pathname.includes("/manage");
 	const filteredSidebarItems = sidebarItems.filter((item) => {
 		if (isManagePage) {
 			return ["Speakers", "Registrants", "Participation", "Email"].includes(

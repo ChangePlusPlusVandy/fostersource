@@ -8,6 +8,7 @@ import {
 	getCourseUsers,
 	getCourseProgress,
 	updateUserProgress,
+	batchUpdateUserProgress,
 } from "../controllers/courseController";
 
 const router = express.Router();
@@ -34,6 +35,8 @@ router.get("/:courseId/users", getCourseUsers);
 router.get("/:courseId/progress", getCourseProgress);
 
 // PUT update user's progress in a course
-router.put("/:courseId/progress/:userId", updateUserProgress);
+router.put("/:courseId/progress/single/:userId", updateUserProgress);
+
+router.put("/:courseId/progress/batch", batchUpdateUserProgress);
 
 export default router;
