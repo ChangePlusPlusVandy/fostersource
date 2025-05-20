@@ -11,19 +11,11 @@ interface SideBarProps {
 }
 
 const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
-	// const location = useLocation();
-	// const isEditPageRoute = location.pathname === "/editCoursePage";
-	// const isPricePageRoute = location.pathname === "/";
-	// const isComponentsPageRoute = location.pathname === "/";
-	// const isSpeakersPageRoute = location.pathname === "/";
-	// const isHandoutsPageRoute = location.pathname === "/";
-	// const isManagersPageRoute = location.pathname === "/";
-	// const isRegistrantsPageRoute = location.pathname === "/";
-	// const isParticipationPageRoute = location.pathname === "/";
-	// const isEmailPageRoute = location.pathname === "/";
 	const { id: courseId } = useParams();
 
 	const navigate = useNavigate();
+
+	const location = useLocation();
 
 	const setAllFields = useCourseEditStore((state) => state.setAllFields);
 	const reset = useCourseEditStore((state) => state.reset);
@@ -34,7 +26,7 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 
 	useEffect(() => {
 		if (!courseId) {
-			reset(); // New course, reset store
+			reset();
 			return;
 		}
 
@@ -43,7 +35,7 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 				try {
 					const res = await apiClient.get(`/courses/${courseId}`);
 					setAllFields({ ...res.data.data, _id: courseId });
-					setFetchedFromBackend(); // ✅ Prevent future fetches
+					setFetchedFromBackend();
 				} catch (err) {
 					console.error("Failed to fetch course", err);
 				}
@@ -74,19 +66,14 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 			highlightLeftOffset: "13.6px",
 		},
 		{
-			name: "Speakers",
-			path: `${basePath}/speakers`,
-			highlightLeftOffset: "37px",
-		},
-		{
 			name: "Handouts",
 			path: `${basePath}/handouts`,
 			highlightLeftOffset: "34px",
 		},
 		{
-			name: "Managers",
-			path: `${basePath}/managers`,
-			highlightLeftOffset: "31.5px",
+			name: "Speakers",
+			path: `${basePath}/speakers`,
+			highlightLeftOffset: "37px",
 		},
 		{
 			name: "Registrants",
@@ -105,41 +92,16 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 		},
 	];
 
-	// const handleDetailsClick = () => {
-	// 	navigate("/admin/product/edit/details");
-	// };
-
-	// const handlePricingClick = () => {
-	// 	navigate("/admin/product/edit/pricing");
-	// };
-
-	// const handleComponentClick = () => {
-	// 	navigate("/admin/product/edit/components");
-	// };
-
-	// const handleSpeakersClick = () => {
-	// 	navigate("/admin/product/edit/speakers");
-	// };
-
-	// const handleHandoutsClick = () => {
-	// 	navigate("/");
-	// };
-
-	// const handleManagersClick = () => {
-	// 	navigate("/");
-	// };
-
-	// const handleRegistrantsClick = () => {
-	// 	navigate("/");
-	// };
-
-	// const handleParticipationClick = () => {
-	// 	navigate("/");
-	// };
-
-	// const handleEmailClick = () => {
-	// 	navigate("/");
-	// };
+	const isManagePage = location.pathname.includes("/manage");
+	const filteredSidebarItems = sidebarItems.filter((item) => {
+		if (isManagePage) {
+			return ["Speakers", "Registrants", "Participation", "Email"].includes(
+				item.name
+			);
+		} else {
+			return !["Registrants", "Participation", "Email"].includes(item.name);
+		}
+	});
 
 	const handleExitClick = () => {
 		navigate("/");
@@ -158,7 +120,7 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 			</div>
 			<div className="grid grid-cols-10">
 				<div className="flex flex-col col-span-1 w-full gap-6 pt-12 border-r-4 border-gray-100">
-					{sidebarItems.map((item) => (
+					{filteredSidebarItems.map((item) => (
 						<div key={item.name} className="flex flex-row w-full pl-6 text-sm">
 							<NavLink
 								to={item.path}

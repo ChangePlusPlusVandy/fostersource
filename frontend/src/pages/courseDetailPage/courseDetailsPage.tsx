@@ -49,51 +49,14 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const navigate = useNavigate();
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(
 		null
-		// 		{
-		// 		_id: "",
-		// 		className: "Introduction to Computer Science",
-		// 		courseDescription: `When it comes to your child's case closing, are you hearing terms or phrases like, "least drastic alternative", APR, RGAP, intervention, etc. and feeling lost in the acronyms and language? Are you facing an APR and worried about ongoing support or post-permanency legal ramifications? Do you find yourself feeling unsure about how to advocate for your rights or desires in a potential APR? Are you wondering if you have to accept an APR? Has your county told you the requirements to qualify for RGAP (post-APR financial assistance)? If you answered yes to any of these questions, join us as attorney, Tim Eirich, helps us make sense of all things APR and RGAP!
-		//
-		// Hours earned: 2.0
-		//
-		// Feedback from this class:
-		//
-		// "Incredibly helpful information. This should be required so that all foster parents are informed and not taken advantage of."
-		//
-		// "Tim was EXCELLENT and provided insight into complicated legal matters."
-		//
-		// "All of Tim's trainings are excellent, and I'm grateful that he partners with Foster Source to equip foster and kinship parents with the knowledge that they need to advocate for themselves and the children in their care."`,
-		// 		instructorName: "Dr. Alice Johnson",
-		// 		creditNumber: 3,
-		// 		discussion: "An interactive discussion about computational thinking.",
-		// 		components: ["Lectures", "Labs", "Quizzes"],
-		// 		handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-		// 		ratings: [],
-		// 		isLive: false,
-		// 		cost: 100,
-		// 		categories: ["Technology", "Category", "Misc"],
-		// 		thumbnailPath: "",
-		// 		instructorDescription: `Sarah has her degree in social work from Metropolitan State University with an emphasis in child and adolescent mental health.
-		//
-		// She has worked for Denver Department of Human Services Child Welfare for over 3 years as an ongoing social caseworker and currently holds a senior caseworker position in placement navigation. She has worked as a counselor at a residential treatment program for youth corrections, as a counselor for dual diagnosis adult men at a halfway house, and an independent living specialist for the disabled community/outreach specialist for individuals experiencing homelessness.
-		//
-		// Sarah writes:
-		//
-		// In my spare time, I spend most of my time with my two teenage daughters. I am a huge advocate for social justice issues which I spend a lot of my time supporting through peaceful protests, education, volunteer work, etc. I love camping, crafting, karaoke, road trip adventures, and dancing in my living room. My favorite place in the entire world is the Mojave Desert.`,
-		// 		instructorRole: "Moderator",
-		// 		lengthCourse: 2,
-		// 		time: new Date("2025-10-15T00:00:00.000Z"),
-		// 		isInPerson: true,
-		// 		students: [],
-		// 		regStart: new Date("2025-10-10T00:00:00.000Z"),
-		// 		regEnd: new Date("2025-10-12T00:00:00.000Z"),
-		// 	}
 	);
 	const [starRating, setStarRating] = useState(-1);
 	const [isAdded, setIsAdded] = useState(false);
 	const [ratingsPageOpen, setRatingsPageOpen] = useState(false);
 	const [numStarsRatingPage, setNumStarsRatingpage] = useState(0);
 	const [isAdmin, setIsAdmin] = useState(false);
+
+	const productType = courseDetailsData?.productType;
 
 	useEffect(() => {
 		const checkAdminStatus = async () => {
@@ -113,10 +76,9 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	}, []);
 
 	const navigateToCourseEdit = () => {
-		navigate(`/courses/edit`); // Change to the desired route
+		navigate(`/courses/edit`);
 	};
 
-	//================ Working axios request ======================
 	const fetchCourse = async () => {
 		if (!courseId) return;
 		try {
@@ -127,11 +89,6 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 			console.error(error);
 		}
 	};
-
-	// useEffect(() => {
-	// 	const id = queryParams.get("courseId");
-	// 	setCourseId(id || "");
-	// }, [location.search]);
 
 	useEffect(() => {
 		fetchCourse();
@@ -360,6 +317,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 								isSurveyModalOpen={isSurveyModalOpen}
 								setIsSurveyModalOpen={setIsSurveyModalOpen}
 								productInfo={courseDetailsData.productInfo}
+								productType={courseDetailsData.productType}
 							/>
 						</div>
 					</div>
@@ -421,12 +379,14 @@ const DisplayBar = ({
 	isSurveyModalOpen,
 	setIsSurveyModalOpen,
 	productInfo,
+	productType,
 }: {
 	creditHours: number;
 	time: Date;
 	isSurveyModalOpen: boolean;
 	setIsSurveyModalOpen: any;
 	productInfo: string;
+	productType: string;
 }) => {
 	const [currentPage, setCurrentPage] = useState("Webinar");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
@@ -477,14 +437,9 @@ const DisplayBar = ({
 		return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
 	};
 
-	const retrieveVideo = async () => {
+	const retrieveVideo = () => {
 		try {
-			const response = await apiClient.get(`/videos`, {
-				params: {
-					_id: productInfo,
-				},
-			});
-			setVideoLink(getYouTubeEmbedUrl(response.data.data[0].videoUrl));
+			setVideoLink(getYouTubeEmbedUrl(productInfo));
 		} catch (error) {
 			console.error(error);
 		}
@@ -492,6 +447,10 @@ const DisplayBar = ({
 
 	useEffect(() => {
 		retrieveVideo();
+	}, [productInfo]);
+
+	useEffect(() => {
+		console.log(productInfo);
 	}, [productInfo]);
 
 	return (
@@ -552,44 +511,76 @@ const DisplayBar = ({
 					</button>
 				</div>
 				{currentPage === "Workshop" && (
-					<div className="flex justify-between h-[400px]">
-						{/* <div className="text-sm	font-normal flex flex-col gap-1">
-							<div>Date: {new Date(time).toLocaleDateString()}</div>
-							<div>
-								Time:{" "}
-								{new Date(time).toLocaleTimeString("en-US", {
-									hour: "numeric",
-									minute: "2-digit",
-									hour12: true,
-								})}
+					<div className="flex justify-between h-[400px] w-full">
+						{productType === "Virtual Training - On Demand" ? (
+							<iframe
+								width="100%"
+								height="100%"
+								src={getYouTubeEmbedUrl(productInfo) || ""}
+								title="On Demand Video"
+								frameBorder="0"
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowFullScreen
+							></iframe>
+						) : productType === "Virtual Training - Live Meeting" ? (
+							<div className="flex flex-col gap-2 text-sm">
+								<p>Meeting ID: {productInfo}</p>
+								<a
+									href={`https://zoom.us/j/${productInfo}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-blue-600 underline"
+								>
+									Join Zoom Meeting
+								</a>
 							</div>
-							<div>Length: {lengthCourse} hours</div>
-						</div>
-						<div className="flex flex-col w-max gap-2">
-
-							<button className="bg-[#F79518] w-full rounded-md text-center text-white text-xs align-middle px-6 py-3">
-								Add Webinar to Calendar
-							</button>
-							<button
-								onClick={testNetwork}
-								className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3"
-							>
-								Test Network
-							</button>
-							<button className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3">
-
-								Handout(s)
-							</button>
-						</div> */}
-						<iframe
-							width="100%"
-							height="100%"
-							src={videoLink ? videoLink : ""}
-							title="YouTube Video Player"
-							frameBorder="0"
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-							allowFullScreen
-						></iframe>
+						) : productType === "Virtual Training - Live Webinar" ? (
+							<div className="flex flex-col gap-2 text-sm">
+								<p>Webinar URL: </p>
+								<a
+									href={productInfo}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-blue-600 underline"
+								>
+									Join Webinar
+								</a>
+							</div>
+						) : productType === "In-Person Training" ? (
+							(() => {
+								try {
+									const parsed = JSON.parse(productInfo);
+									return (
+										<div className="flex flex-col text-sm gap-1">
+											<p>
+												Location:{" "}
+												<a
+													href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsed.location)}`}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="text-blue-600 underline"
+												>
+													{parsed.location}
+												</a>
+											</p>
+											<p>
+												Start Time:{" "}
+												{new Date(parsed.startTime).toLocaleString()}
+											</p>
+											<p>Duration: {parsed.duration} minutes</p>
+										</div>
+									);
+								} catch (e) {
+									return (
+										<p className="text-red-600">
+											Invalid in-person course info.
+										</p>
+									);
+								}
+							})()
+						) : (
+							<p className="text-red-600">Unknown course type.</p>
+						)}
 					</div>
 				)}
 				{currentPage === "Survey" && (

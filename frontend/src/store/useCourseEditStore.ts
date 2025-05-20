@@ -26,6 +26,7 @@ interface CourseEditState {
 	regStart: Date;
 	regEnd?: Date;
 	productType: string;
+	productInfo: string;
 	shortUrl?: string;
 	draft: boolean;
 
@@ -76,6 +77,7 @@ const initialState: Omit<
 	regStart: new Date(),
 	regEnd: undefined,
 	productType: "",
+	productInfo: "",
 	shortUrl: undefined,
 	draft: true,
 };
@@ -114,7 +116,6 @@ export const useCourseEditStore = create<CourseEditState>()(
 			name: "course-edit-store",
 			storage: createJSONStorage(() => sessionStorage),
 
-			// ✅ Correct usage here
 			onRehydrateStorage: (state) => {
 				return () => {
 					state?.setHydrated(); // this is how Zustand recommends setting hydration flag

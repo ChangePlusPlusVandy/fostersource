@@ -18,9 +18,10 @@ export default function Dashboard() {
 				const progresses = (await fetchUserProgress()).progresses;
 				console.log(progresses);
 				setIncompleteCourses(
-					progresses.filter((p: any) => !p.course.isComplete)
+					progresses
+					// .filter((p: any) => !p.course.isComplete)
 				);
-				setCompletedCourses(progresses.filter((p: any) => p.course.isComplete));
+				// setCompletedCourses(progresses.filter((p: any) => p.course.isComplete));
 				setLoading(false);
 			} catch (error) {
 				console.error(error);
