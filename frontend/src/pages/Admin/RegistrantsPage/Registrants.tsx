@@ -3,7 +3,8 @@ import { FaTrashAlt as _FaTrashAlt } from "react-icons/fa";
 import { ComponentType } from "react";
 import apiClient from "../../../services/apiClient";
 import qs from "qs";
-import { useCourseEditStore } from "../../../store/useCourseEditStore";
+import { getCleanCourseData, useCourseEditStore } from "../../../store/useCourseEditStore";
+import { TupleType } from "typescript";
 
 const FaTrashAlt = _FaTrashAlt as ComponentType<{
 	size?: number;
@@ -25,7 +26,7 @@ interface RegistrantDisplayInfo {
 export default function Registrants() {
 	const { students, setField, setAllFields } = useCourseEditStore();
 
-	const courseId = "67acf95247f5d8867107e881"; // Replace with useParams later
+	const courseData = getCleanCourseData();
 
 	const [registrants, setRegistrants] = useState<RegistrantDisplayInfo[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -35,6 +36,7 @@ export default function Registrants() {
 	useEffect(() => {
 		const fetchRegistrants = async () => {
 			try {
+				const courseId: string = courseData._id || ""; 
 				const query = qs.stringify(
 					{ _id: { $in: students } },
 					{ arrayFormat: "brackets" }
@@ -54,7 +56,28 @@ export default function Registrants() {
 					preRegistered: "N/A",
 				}));
 
-				// TODO: fix this
+				const numCourseComponents = await fetchCourseData(courseId); 
+				const paymentData = await fetchPaymentData(students, courseId); 
+				const progressData = await fetchProgressData(students, courseId); 
+
+				for (const partialRegInfo of formatted) {
+					const currUser = partialRegInfo.id; 
+					
+					if (paymentData.has(currUser)) {
+						partialRegInfo.registrationDate = paymentData.get(currUser)![0];
+						partialRegInfo.paid = paymentData.get(currUser)![1]; 
+						partialRegInfo.transactionId = paymentData.get(currUser)![2]; 
+					}
+
+					if (progressData.has(currUser)) {
+						if (progressData.get(currUser)![0]) { // course completed
+							partialRegInfo.completed = progressData.get(currUser)![1]; 
+						} else {
+							partialRegInfo.completed = `${progressData.get(currUser)![1]} out of ${numCourseComponents}`; 
+						}
+					}
+					
+				}
 
 				setRegistrants(formatted);
 			} catch (err: any) {
@@ -65,8 +88,75 @@ export default function Registrants() {
 			}
 		};
 
+		const fetchCourseData = async (courseId: string) => {
+			try {
+				const courseRes = await apiClient.get(`/courses?${courseId}`)
+				return courseRes.data.data[0].components.length; 
+			} catch (error) {
+				console.error("Failed to load course data", error); 
+				return 0; 
+			}
+				
+		}
+
+		const fetchPaymentData = async (userIds: string[], courseId: string) => {
+			try {
+				const paymentQuery = qs.stringify(
+					{ 
+						userId: { $in: userIds }, 
+						courses: courseId },
+					{ arrayFormat: "brackets" }
+				);
+				const paymentRes = await apiClient.get(`/payments?${paymentQuery}`); 
+
+				const paymentData = paymentRes.data; 
+
+				const paymentInfo = new Map<string, string[]>()
+				for (const indivPayment of paymentData) {
+					const paymentUser = indivPayment.userId; 
+					const indivDate = indivPayment.date.toDateString(); 
+					const indivAmt = indivPayment.amount.toString(); 
+					const indivId = indivPayment.transactionId; 
+					paymentInfo.set(paymentUser, [indivDate, indivAmt, indivId]); 
+				}
+
+				return paymentInfo; 
+			} catch (error) {
+				console.error("Failed to load payment data", error);
+				return new Map<string, string[]>(); 
+			}
+		};
+
+		const fetchProgressData = async (userIds: string[], courseId: string) => {
+			try {
+				const progressQuery = qs.stringify(
+					{
+						userId: { $in: userIds}, 
+						courseId: courseId},
+					{ arrayFormat: "brackets" }
+				); 
+				const progressRes = await apiClient.get(`/progress?${progressQuery}`); 
+				const progressData = progressRes.data; 
+
+				const progressInfo = new Map<String, [boolean, string]>(); 
+				for (const indivProgress of progressData) {
+					const currUser = indivProgress.user; 
+					const courseCompleted = indivProgress.isComplete; 
+					let courseStatus: string = "0"; 
+					if (courseCompleted) courseStatus = indivProgress.dateCompleted.toDateString(); 
+					else if (indivProgress.completedCourses != null) courseStatus = indivProgress.completedCourses.length.toString(); 
+					progressInfo.set(currUser, [courseCompleted, courseStatus])
+				}
+
+				return progressInfo; 
+			} catch (error) {
+				console.error("Failed to load progress data", error);
+				return new Map<String, [boolean, string]>();  
+			}
+		}; 
+
 		fetchRegistrants();
-	}, [courseId]);
+	}, [courseData]);
 
 	const handleDelete = (id: string) => {
 		console.log("Delete user:", id);
