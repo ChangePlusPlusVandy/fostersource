@@ -39,33 +39,21 @@ const app = express();
 app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
 
 // CORS configuration - must be before any routes
+const allowedOrigins = [
+	"https://fostersource.onrender.com",
+	"http://localhost:3000",
+];
+
 app.use(
 	cors({
 		origin: (origin: any, callback: any) => {
-			const regex = /^http:\/\/localhost:\d+$/;
-			if (!origin || regex.test(origin)) {
+			if (!origin || allowedOrigins.includes(origin)) {
 				callback(null, true);
 			} else {
 				callback(new Error("Not allowed by CORS"));
 			}
 		},
-		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed HTTP methods
-		allowedHeaders: [
-			"Content-Type",
-			"Authorization",
-			"X-Requested-With",
-			"refresh-token",
-			"new-access-token",
-			"new-refresh-token",
-		], // Headers frontend can send
-		exposedHeaders: [
-			"Content-Type",
-			"Authorization",
-			"refresh-token",
-			"new-access-token",
-			"new-refresh-token",
-		], // Headers frontend can access
-		credentials: true, // Allows cookies or credentials to be sent
+		credentials: true,
 	})
 );
 
