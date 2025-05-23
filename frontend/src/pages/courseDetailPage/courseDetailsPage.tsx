@@ -12,6 +12,7 @@ import apiClient from "../../services/apiClient";
 import SurveyModal from "./SurveyModal";
 import YouTube from "react-youtube";
 import { Progress } from "../../shared/types/progress";
+import { ZoomMeeting } from "../../shared/types";
 
 const FaStar = _FaStar as ComponentType<{ size?: number; color?: string }>;
 const FaStarHalfAlt = _FaStarHalfAlt as ComponentType<{
@@ -196,7 +197,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 								<p className="w-max min-w-max">
 									{courseDetailsData.creditNumber} Credits
 								</p>
-								<p className="w-max min-w-max">
+								{/* <p className="w-max min-w-max">
 									Live Web Event{" "}
 									{new Date(courseDetailsData.time).toLocaleDateString()} at{" "}
 									{new Date(courseDetailsData.time).toLocaleTimeString(
@@ -207,7 +208,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 											hour12: true,
 										}
 									)}
-								</p>
+								</p> */}
 								<div className="w-max min-w-max">
 									<CategoryPills categories={courseDetailsData.categories} />
 								</div>
@@ -445,10 +446,13 @@ const DisplayBar = ({
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
 	const [videoLink, setVideoLink] = useState<string | null>("");
 	const [videoCompleted, setVideoCompleted] = useState(false);
+	const [meeting, setMeeting] = useState<ZoomMeeting | null>(null);
 
 	const location = useLocation();
 	const searchParams = new URLSearchParams(location.search);
 	const courseId = searchParams.get("courseId");
+
+	const user = JSON.parse(localStorage.getItem("user") || "{}");
 
 	const onPlayerReady = (event: any) => {
 		event.target.playVideo();
@@ -460,7 +464,6 @@ const DisplayBar = ({
 			setVideoCompleted(true);
 
 			try {
-				const user = JSON.parse(localStorage.getItem("user") || "{}");
 				const response = await apiClient.put(
 					`/courses/${courseId}/progress/single/${user._id}`,
 					{
@@ -509,8 +512,6 @@ const DisplayBar = ({
 
 	/* TODO: Needs to be complete once certificate page is out */
 	const handleAccessCertificate = async () => {
-		const user = JSON.parse(localStorage.getItem("user") || "{}");
-
 		if (!certificate) {
 			setCertificateCompleted(true);
 
@@ -583,13 +584,88 @@ const DisplayBar = ({
 		}
 	};
 
-	useEffect(() => {
-		retrieveVideo();
-	}, [productInfo]);
+	const retrieveMeeting = async () => {
+		if (
+			productType === "Virtual Training - Live Meeting" ||
+			productType === "Virtual Training - Live Webinar"
+		)
+			try {
+				const response = await apiClient.get("zoom/meetings");
+				const meetings = response.data.meetings;
+
+				const matchingMeeting = meetings.find(
+					(meeting: any) => String(meeting.id) === String(productInfo)
+				);
+
+				if (matchingMeeting) {
+					setMeeting(matchingMeeting);
+				} else {
+					console.warn("No matching meeting found for ID:", productInfo);
+				}
+			} catch (error) {
+				console.error(error);
+			}
+	};
+
+	function formatMeetingTime(dateStr: string, timezone: string) {
+		try {
+			const formatter = new Intl.DateTimeFormat("en-US", {
+				timeZone: timezone,
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+				hour: "numeric",
+				minute: "2-digit",
+				hour12: true,
+			});
+			return formatter.format(new Date(dateStr));
+		} catch (error) {
+			console.error("Invalid time zone:", timezone, error);
+			// Fallback to local time
+			return new Date(dateStr).toLocaleString("en-US", {
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+				hour: "numeric",
+				minute: "2-digit",
+				hour12: true,
+			});
+		}
+	}
 
 	useEffect(() => {
-		console.log(productInfo);
+		retrieveVideo();
+		retrieveMeeting();
 	}, [productInfo]);
+
+	const handleMeetingProgress = async () => {
+		try {
+			const now = new Date();
+
+			const meetingStart = new Date(meeting?.start_time || "");
+			const meetingEnd = new Date(
+				meetingStart.getTime() + (meeting?.duration || 0) * 60000
+			);
+			const windowStart = new Date(meetingStart.getTime() - 15 * 60000); // 15 minutes before start
+
+			// Check if current time is within allowed window
+			const isWithinWindow = now >= windowStart && now <= meetingEnd;
+
+			if (isWithinWindow) {
+				await apiClient.put(
+					`/courses/${courseId}/progress/single/${user._id}`,
+					{
+						webinarComplete: true,
+					}
+				);
+				console.log("✅ Meeting progress updated");
+			} else {
+				console.warn("⏳ Not within the valid time window to mark progress.");
+			}
+		} catch (error) {
+			console.error("❌ Error updating meeting progress:", error);
+		}
+	};
 
 	if (hasProgress)
 		return (
@@ -679,23 +755,41 @@ const DisplayBar = ({
 							) : productType === "Virtual Training - Live Meeting" ? (
 								<div className="flex flex-col gap-2 text-sm">
 									<p>Meeting ID: {productInfo}</p>
+									<p>
+										Meeting Date & Time:{" "}
+										{formatMeetingTime(
+											meeting?.start_time || "",
+											meeting?.timezone || ""
+										)}
+										, Timezone: {meeting?.timezone}
+									</p>
 									<a
-										href={`https://zoom.us/j/${productInfo}`}
+										href={meeting?.join_url}
 										target="_blank"
 										rel="noopener noreferrer"
 										className="text-blue-600 underline"
+										onClick={handleMeetingProgress}
 									>
 										Join Zoom Meeting
 									</a>
 								</div>
 							) : productType === "Virtual Training - Live Webinar" ? (
 								<div className="flex flex-col gap-2 text-sm">
+									<p>
+										Meeting Date & Time:{" "}
+										{formatMeetingTime(
+											meeting?.start_time || "",
+											meeting?.timezone || ""
+										)}
+										, Timezone: {meeting?.timezone}
+									</p>
 									<p>Webinar URL: </p>
 									<a
-										href={productInfo}
+										href={meeting?.join_url}
 										target="_blank"
 										rel="noopener noreferrer"
 										className="text-blue-600 underline"
+										onClick={handleMeetingProgress}
 									>
 										Join Webinar
 									</a>
@@ -754,7 +848,7 @@ const DisplayBar = ({
 									this may take a couple of days to update.)
 								</p>
 								<button
-									className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 disabled:bg-gray-400 disabled:cursor-not-allowed bg-[#F79518]}`}
+									className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 bg-orange-400 disabled:bg-gray-400 disabled:cursor-not-allowed bg-[#F79518]}`}
 									disabled={!workshop || survey}
 									onClick={() => setIsSurveyModalOpen(true)}
 								>

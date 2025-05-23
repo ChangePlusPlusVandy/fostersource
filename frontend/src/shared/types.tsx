@@ -34,3 +34,12 @@ export interface UserType {
 	userCount: number;
 	cost: number;
 }
+
+export interface ZoomMeeting {
+	duration: number; // in minutes
+	id: number; // Zoom meeting ID (integer)
+	join_url: string;
+	start_time: string; // ISO timestamp
+	timezone: string; // e.g., "America/Denver"
+	topic: string;
+}

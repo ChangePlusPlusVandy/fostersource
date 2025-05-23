@@ -28,26 +28,29 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 
 	const { hasFetchedFromBackend, setFetchedFromBackend } = useCourseEditStore();
 
+	const className = useCourseEditStore((state) => state.className);
+
 	useEffect(() => {
 		if (!courseId) {
 			reset();
 			return;
 		}
 
-		if (hydrated && !hasFetchedFromBackend) {
-			const loadCourse = async () => {
-				try {
-					const res = await apiClient.get(`/courses/${courseId}`);
-					setAllFields({ ...res.data.data, _id: courseId });
-					setFetchedFromBackend();
-				} catch (err) {
-					console.error("Failed to fetch course", err);
-				}
-			};
+		const loadCourse = async () => {
+			try {
+				const res = await apiClient.get(`/courses/${courseId}`);
+				setAllFields({ ...res.data.data, _id: courseId });
+				setFetchedFromBackend();
+			} catch (err) {
+				console.error("Failed to fetch course", err);
+			}
+		};
 
+		// Always load course if courseId changes
+		if (hydrated) {
 			loadCourse();
 		}
-	}, [courseId, hydrated, hasFetchedFromBackend]);
+	}, [courseId, hydrated]);
 
 	const basePath = isCreatePage
 		? `/admin/product/create`
@@ -109,13 +112,15 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 	});
 
 	const handleExitClick = () => {
-		navigate("/");
+		navigate("/admin/products");
 	};
 
 	return (
 		<div className="bg-white border rounded-md mt-5 ml-2 w-full mr-4">
 			<div className="navheading py-4 flex flex-row border items-center rounded-t-md">
-				<h1 className="text-white font-semibold ml-5">New Product</h1>
+				<h1 className="text-white font-semibold ml-5">
+					{className?.trim() ? className : "New Product"}
+				</h1>
 				<button
 					className="mr-5 ml-auto border border-white w-7 h-7 rounded-sm"
 					onClick={handleExitClick}

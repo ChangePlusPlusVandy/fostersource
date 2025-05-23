@@ -13,7 +13,7 @@ type Handout = {
 
 const HandoutPage = () => {
 	const [modalOpen, setModalOpen] = useState(false);
-	const [uploadFile, setUploadFile] = useState(true);
+	const [uploadFile, setUploadFile] = useState(false);
 	const [uploadLink, setUploadLink] = useState(false);
 	const [file, setFile] = useState<File | null>(null);
 	const [link, setLink] = useState("");
@@ -158,7 +158,6 @@ const HandoutPage = () => {
 
 	return (
 		<div className="flex flex-col w-full">
-			<h1 className="text-lg">Handouts</h1>
 			<div className="flex w-full justify-end">
 				<button
 					className="w-[146px] h-[32px] mr-[290px] border bg-purple-500 rounded-md"
@@ -194,7 +193,7 @@ const HandoutPage = () => {
 								</div>
 								<div>
 									{/* Option 1 */}
-									<label className="flex items-center space-x-2 cursor-pointer mt-2">
+									{/* <label className="flex items-center space-x-2 cursor-pointer mt-2">
 										<input
 											type="radio"
 											name="choice"
@@ -214,7 +213,7 @@ const HandoutPage = () => {
 											)}
 										</div>
 										<span className="text-gray-700 text-sm">Upload File</span>
-									</label>
+									</label> */}
 
 									{/* Option 2 */}
 									<label className="flex items-center space-x-2 cursor-pointer mt-2">
@@ -362,7 +361,7 @@ const HandoutPage = () => {
 								</div>
 								<div>
 									{/* Option 1 */}
-									<label className="flex items-center space-x-2 cursor-pointer mt-2">
+									{/* <label className="flex items-center space-x-2 cursor-pointer mt-2">
 										<input
 											type="radio"
 											name="choice"
@@ -382,7 +381,7 @@ const HandoutPage = () => {
 											)}
 										</div>
 										<span className="text-gray-700 text-sm">Upload File</span>
-									</label>
+									</label> */}
 
 									{/* Option 2 */}
 									<label className="flex items-center space-x-2 cursor-pointer mt-2">

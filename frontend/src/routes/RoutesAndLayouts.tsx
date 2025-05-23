@@ -240,6 +240,7 @@ function RoutesAndLayout({
 						<Route path="workshop" element={<WorkshopCreation />} />
 						<Route path="speakers" element={<SpeakerPage />} />
 						<Route path="survey" element={<SurveyPage />} />
+						<Route path="handouts" element={<HandoutPage />} />
 					</Route>
 					<Route
 						path="/admin/product/create"
@@ -265,6 +266,7 @@ function RoutesAndLayout({
 						<Route path="workshop" element={<WorkshopCreation />} />
 						<Route path="speakers" element={<SpeakerPage />} />
 						<Route path="survey" element={<SurveyPage />} />
+						<Route path="handouts" element={<HandoutPage />} />
 					</Route>
 					<Route
 						path="/admin/product/manage/:id"

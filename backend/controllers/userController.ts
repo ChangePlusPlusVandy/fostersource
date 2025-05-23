@@ -212,10 +212,16 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 				user: new mongoose.Types.ObjectId(userId),
 				course: new mongoose.Types.ObjectId(courseId),
 				isComplete: false,
-				completedComponents: {},
+				completedComponents: {
+					webinar: false,
+					survey: false,
+					certificate: false,
+				},
 				dateCompleted: null,
 			});
 			await progress.save();
+
+			console.log("progress", progress);
 
 			if (!course.students.includes(new mongoose.Types.ObjectId(userId))) {
 				course.students.push(new mongoose.Types.ObjectId(userId));
