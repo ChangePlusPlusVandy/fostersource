@@ -90,6 +90,7 @@ const CourseSchema: Schema = new Schema(
 				"In-Person Training",
 				"Virtual Training - On Demand",
 				"Virtual Training - Live Webinar",
+				"",
 			],
 		},
 		productInfo: { type: String, required: false },

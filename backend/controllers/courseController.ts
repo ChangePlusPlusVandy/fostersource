@@ -25,7 +25,7 @@ export const getCourses = async (
 	try {
 		const filters = req.query;
 		const courseResponses = await Course.find(filters)
-			.populate(["ratings"])
+			.populate(["speakers"])
 			.exec();
 		res.status(200).json({
 			success: true,
@@ -52,9 +52,7 @@ export const getCourseById = async (
 
 		if (id) {
 			// Find course by ID and populate related fields
-			const course = await Course.findById(id)
-				.populate(["ratings", "managers"])
-				.exec();
+			const course = await Course.findById(id).populate(["speakers"]).exec();
 
 			if (!course) {
 				res.status(404).json({
@@ -517,6 +515,84 @@ export const getCourseProgress = async (
 		res.status(200).json({
 			success: true,
 			progress: populatedProgress,
+		});
+	} catch (error: any) {
+		res.status(500).json({
+			success: false,
+			message: error.message || "Internal server error.",
+		});
+	}
+};
+
+// @desc    Get progress for a single user in a course
+// @route   GET /api/courses/:courseId/progress/:userId
+// @access  Public
+export const getUserCourseProgress = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { courseId, userId } = req.params;
+
+		// Validate input
+		if (!courseId || !userId) {
+			res.status(400).json({
+				success: false,
+				message: "Course ID and User ID are required.",
+			});
+			return;
+		}
+
+		// Check if the course exists
+		const course = await Course.findById(courseId);
+		if (!course) {
+			res.status(404).json({
+				success: false,
+				message: "Course not found.",
+			});
+			return;
+		}
+
+		// Check if the user is enrolled in the course
+		const isEnrolled = course.students.some(
+			(id) => id.toString() === userId.toString()
+		);
+		if (!isEnrolled) {
+			res.status(403).json({
+				success: false,
+				message: "User is not enrolled in this course.",
+			});
+			return;
+		}
+
+		// Check for existing progress
+		let progress = await Progress.findOne({ course: courseId, user: userId })
+			.populate("user")
+			.populate("course");
+
+		// If no progress exists, create one
+		if (!progress) {
+			progress = await new Progress({
+				user: userId,
+				course: courseId,
+				isComplete: false,
+				completedComponents: {
+					webinar: false,
+					survey: false,
+					certificate: false,
+				},
+				dateCompleted: null,
+			}).save();
+
+			// repopulate after save
+			progress = await Progress.findById(progress._id)
+				.populate("user")
+				.populate("course");
+		}
+
+		res.status(200).json({
+			success: true,
+			progress,
 		});
 	} catch (error: any) {
 		res.status(500).json({

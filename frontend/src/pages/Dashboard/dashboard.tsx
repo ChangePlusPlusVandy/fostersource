@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Course } from "../../shared/types/course";
 import { fetchUserProgress } from "../../services/progressService";
 import DashboardItem from "./dashboard-item";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
 	const [courses, setCourses] = useState<Course[]>([]);
@@ -17,11 +18,9 @@ export default function Dashboard() {
 				setLoading(true);
 				const progresses = (await fetchUserProgress()).progresses;
 				console.log(progresses);
-				setIncompleteCourses(
-					progresses
-					// .filter((p: any) => !p.course.isComplete)
-				);
-				// setCompletedCourses(progresses.filter((p: any) => p.course.isComplete));
+				setIncompleteCourses(progresses.filter((p: any) => !p.isComplete));
+				setCompletedCourses(progresses.filter((p: any) => p.isComplete));
+				console.log(progresses);
 				setLoading(false);
 			} catch (error) {
 				console.error(error);
@@ -58,16 +57,23 @@ export default function Dashboard() {
 				{!loading ? (
 					completedCourses.length > 0 ? (
 						<ul className="space-y-4">
-							{completedCourses.map((course) => (
+							{completedCourses.map((progress) => (
 								<li
-									key={course._id}
-									className="p-4 border rounded-lg shadow bg-green-100"
+									key={progress._id}
+									className="p-4 border rounded-lg shadow bg-white"
 								>
-									<h4 className="text-lg font-medium">{course.className}</h4>
-									<p className="text-gray-600">{course.description}</p>
-									<p className="text-sm text-gray-500">
-										Instructor: {course.instructor}
+									<h4 className="text-lg font-medium">
+										{progress.course.className}
+									</h4>
+									<p className="text-sm text-gray-500 my-2">
+										Instructor: {progress.course.instructor}
 									</p>
+									<Link
+										to={`/courseDetails?courseId=${progress.course._id}`}
+										className="bg-orange-500 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-orange-600 transition mb-2"
+									>
+										Enter Course
+									</Link>
 								</li>
 							))}
 						</ul>

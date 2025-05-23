@@ -82,12 +82,12 @@ function RoutesAndLayout({
 			) : (
 				<div>
 					<GlobalBlackBar />
-					<div style={{ width: "100%" }}>
+					{/* <div style={{ width: "100%" }}>
 						<HeaderBar
 							isOpen={isHeaderBarOpen}
 							setIsOpen={setIsHeaderBarOpen}
 						/>
-					</div>
+					</div> */}
 				</div>
 			)}
 			<div

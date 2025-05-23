@@ -14,7 +14,6 @@ interface Speaker {
 	email: string;
 	company: string;
 	bio: string;
-	disclosures?: string;
 	image?: any;
 }
 
@@ -111,11 +110,11 @@ export default function SpeakersPage() {
 	const fetchSpeakers = async () => {
 		try {
 			setLoading(true);
-			console.log("retrieving");
 			const response = await apiClient.get("/speakers");
-			console.log("retrieved");
 			if (Array.isArray(response.data) && response.data.length > 0) {
 				const all = response.data;
+
+				console.log(all);
 
 				const matched = all.filter((s) => speakers.includes(s._id));
 				const remaining = all.filter((s) => !speakers.includes(s._id));
@@ -252,10 +251,7 @@ export default function SpeakersPage() {
 
 			const response = await apiClient.put(
 				`/speakers/${currentSpeaker._id}`,
-				formData,
-				{
-					headers: { "Content-Type": "multipart/form-data" },
-				}
+				currentSpeaker
 			);
 
 			console.log(response.data);
@@ -310,9 +306,9 @@ export default function SpeakersPage() {
 				formData.append("image", newSpeaker.image); // 👈 add URL string
 			}
 
-			const response = await apiClient.post("/speakers", formData, {
-				headers: { "Content-Type": "multipart/form-data" },
-			});
+			const response = await apiClient.post("/speakers", newSpeaker);
+
+			console.log(response.data.speaker);
 
 			const newId = response.data.speaker._id;
 
@@ -329,7 +325,7 @@ export default function SpeakersPage() {
 				email: "",
 				company: "",
 				bio: "",
-				disclosures: "",
+				image: "",
 			});
 			setNewImageFile(null);
 		} catch (err) {
@@ -350,6 +346,8 @@ export default function SpeakersPage() {
 		const speakerNames = allSpeakers.map((s) => s.name);
 
 		const handleExit = () => {
+			setShowAddNewSpeaker(false);
+
 			if (isAdd) {
 				setShowAddModal(false);
 				setNewSpeaker({
@@ -358,7 +356,7 @@ export default function SpeakersPage() {
 					email: "",
 					company: "",
 					bio: "",
-					disclosures: "",
+					image: "",
 				});
 			} else {
 				setShowEditModal(false);
@@ -380,7 +378,7 @@ export default function SpeakersPage() {
 							className="px-4 py-2 border rounded-md"
 							onClick={handleExit}
 						>
-							Exit
+							Cancel
 						</button>
 						<button
 							className="px-4 py-2 bg-[#8757a3] text-white rounded-md"
@@ -614,12 +612,12 @@ export default function SpeakersPage() {
 											>
 												Edit Speaker Info
 											</button>
-											<button
+											{/* <button
 												className="border border-[#8757a3] text-[#8757a3] px-6 py-2 rounded-lg hover:bg-gray-50"
 												onClick={() => handleEmailSpeaker(speaker.email)}
 											>
 												Email Speaker
-											</button>
+											</button> */}
 											<button
 												className="text-[#8757a3] hover:underline"
 												onClick={() => handleRemoveSpeaker(speaker._id)}
