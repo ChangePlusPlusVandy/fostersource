@@ -1,8 +1,6 @@
-import express, { Request, Response, NextFunction, Application } from "express";
+import express from "express";
 import cors from "cors";
 import path from "path";
-import multer from "multer";
-import cloudinary from "./config/cloudinary";
 
 // Import route files
 import userRoutes from "./routes/userRoutes";
@@ -36,14 +34,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const app: Application = express();
+const app = express();
 
 app.use("/uploads", express.static(path.join(__dirname, "./uploads")));
 
 // CORS configuration - must be before any routes
 app.use(
 	cors({
-		origin: (origin, callback) => {
+		origin: (origin: any, callback: any) => {
 			const regex = /^http:\/\/localhost:\d+$/;
 			if (!origin || regex.test(origin)) {
 				callback(null, true);
