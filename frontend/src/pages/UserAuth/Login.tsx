@@ -32,8 +32,11 @@ const Login: React.FC = () => {
 	return (
 		<div className="flex h-screen w-full bg-white">
 			<div
-				className="w-1/2 bg-cover bg-center"
-				style={{ backgroundImage: `url(${familyImage})` }}
+				className="w-1/2 bg-cover"
+				style={{
+					backgroundImage: `url(${familyImage})`,
+					backgroundPosition: "center 20%", // adjust this value to control how far down it shifts
+				}}
 			></div>
 			<div className="w-1/2 flex items-center justify-center">
 				<div className="w-full max-w-md p-8 space-y-6 bg-white">
