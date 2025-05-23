@@ -11,19 +11,15 @@ interface SideBarProps {
 }
 
 const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
-	// const location = useLocation();
-	// const isEditPageRoute = location.pathname === "/editCoursePage";
-	// const isPricePageRoute = location.pathname === "/";
-	// const isComponentsPageRoute = location.pathname === "/";
-	// const isSpeakersPageRoute = location.pathname === "/";
-	// const isHandoutsPageRoute = location.pathname === "/";
-	// const isManagersPageRoute = location.pathname === "/";
-	// const isRegistrantsPageRoute = location.pathname === "/";
-	// const isParticipationPageRoute = location.pathname === "/";
-	// const isEmailPageRoute = location.pathname === "/";
 	const { id: courseId } = useParams();
 
 	const navigate = useNavigate();
+
+	const location = useLocation();
+
+	const isCreatePage = location.pathname.includes("/create");
+	// const isEditPage = location.pathname.includes("/edit");
+	const isManagePage = location.pathname.includes("/manage");
 
 	const setAllFields = useCourseEditStore((state) => state.setAllFields);
 	const reset = useCourseEditStore((state) => state.reset);
@@ -32,30 +28,35 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 
 	const { hasFetchedFromBackend, setFetchedFromBackend } = useCourseEditStore();
 
+	const className = useCourseEditStore((state) => state.className);
+
 	useEffect(() => {
 		if (!courseId) {
-			reset(); // New course, reset store
+			reset();
 			return;
 		}
 
-		if (hydrated && !hasFetchedFromBackend) {
-			const loadCourse = async () => {
-				try {
-					const res = await apiClient.get(`/courses/${courseId}`);
-					setAllFields({ ...res.data.data, _id: courseId });
-					setFetchedFromBackend(); // ✅ Prevent future fetches
-				} catch (err) {
-					console.error("Failed to fetch course", err);
-				}
-			};
+		const loadCourse = async () => {
+			try {
+				const res = await apiClient.get(`/courses/${courseId}`);
+				setAllFields({ ...res.data.data, _id: courseId });
+				setFetchedFromBackend();
+			} catch (err) {
+				console.error("Failed to fetch course", err);
+			}
+		};
 
+		// Always load course if courseId changes
+		if (hydrated) {
 			loadCourse();
 		}
-	}, [courseId, hydrated, hasFetchedFromBackend]);
+	}, [courseId, hydrated]);
 
-	const basePath = courseId
-		? `/admin/product/edit/${courseId}`
-		: `/admin/product/create`;
+	const basePath = isCreatePage
+		? `/admin/product/create`
+		: isManagePage
+			? `/admin/product/manage/${courseId}`
+			: `/admin/product/edit/${courseId}`;
 
 	const sidebarItems = [
 		{
@@ -74,19 +75,14 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 			highlightLeftOffset: "13.6px",
 		},
 		{
-			name: "Speakers",
-			path: `${basePath}/speakers`,
-			highlightLeftOffset: "37px",
-		},
-		{
 			name: "Handouts",
 			path: `${basePath}/handouts`,
 			highlightLeftOffset: "34px",
 		},
 		{
-			name: "Managers",
-			path: `${basePath}/managers`,
-			highlightLeftOffset: "31.5px",
+			name: "Speakers",
+			path: `${basePath}/speakers`,
+			highlightLeftOffset: "37px",
 		},
 		{
 			name: "Registrants",
@@ -105,50 +101,26 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 		},
 	];
 
-	// const handleDetailsClick = () => {
-	// 	navigate("/admin/product/edit/details");
-	// };
-
-	// const handlePricingClick = () => {
-	// 	navigate("/admin/product/edit/pricing");
-	// };
-
-	// const handleComponentClick = () => {
-	// 	navigate("/admin/product/edit/components");
-	// };
-
-	// const handleSpeakersClick = () => {
-	// 	navigate("/admin/product/edit/speakers");
-	// };
-
-	// const handleHandoutsClick = () => {
-	// 	navigate("/");
-	// };
-
-	// const handleManagersClick = () => {
-	// 	navigate("/");
-	// };
-
-	// const handleRegistrantsClick = () => {
-	// 	navigate("/");
-	// };
-
-	// const handleParticipationClick = () => {
-	// 	navigate("/");
-	// };
-
-	// const handleEmailClick = () => {
-	// 	navigate("/");
-	// };
+	const filteredSidebarItems = sidebarItems.filter((item) => {
+		if (isManagePage) {
+			return ["Speakers", "Registrants", "Participation", "Email"].includes(
+				item.name
+			);
+		} else {
+			return !["Registrants", "Participation", "Email"].includes(item.name);
+		}
+	});
 
 	const handleExitClick = () => {
-		navigate("/");
+		navigate("/admin/products");
 	};
 
 	return (
 		<div className="bg-white border rounded-md mt-5 ml-2 w-full mr-4">
 			<div className="navheading py-4 flex flex-row border items-center rounded-t-md">
-				<h1 className="text-white font-semibold ml-5">New Product</h1>
+				<h1 className="text-white font-semibold ml-5">
+					{className?.trim() ? className : "New Product"}
+				</h1>
 				<button
 					className="mr-5 ml-auto border border-white w-7 h-7 rounded-sm"
 					onClick={handleExitClick}
@@ -158,7 +130,7 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 			</div>
 			<div className="grid grid-cols-10">
 				<div className="flex flex-col col-span-1 w-full gap-6 pt-12 border-r-4 border-gray-100">
-					{sidebarItems.map((item) => (
+					{filteredSidebarItems.map((item) => (
 						<div key={item.name} className="flex flex-row w-full pl-6 text-sm">
 							<NavLink
 								to={item.path}

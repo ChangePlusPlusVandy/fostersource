@@ -8,6 +8,7 @@ import {
 	ShieldCheck,
 	Star,
 	Trash2,
+	LayoutDashboard,
 } from "lucide-react";
 import AdminCourseDeleteModal from "./AdminCourseDeleteModal";
 import { Link } from "react-router-dom";
@@ -179,6 +180,9 @@ function AdminCoursePreview({
 				<div className="flex gap-4">
 					<Link to={`/admin/product/edit/${product.course._id}`}>
 						<Edit2 className="w-4 h-4 text-gray-400" />
+					</Link>
+					<Link to={`/admin/product/manage/${product.course._id}`}>
+						<LayoutDashboard className="w-4 h-4 text-gray-400" />
 					</Link>
 					<button
 						onClick={() => {

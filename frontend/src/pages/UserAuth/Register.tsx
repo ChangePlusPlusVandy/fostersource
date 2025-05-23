@@ -155,10 +155,22 @@ const Register: React.FC = () => {
 
 	const [userTypes, setUserTypes] = useState<UserType[]>([]);
 
+	// const fetchUserTypes = async () => {
+	// 	try {
+	// 		const response = await apiClient.get("/user-types");
+	// 		setUserTypes(response.data.data);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// };
+
 	const fetchUserTypes = async () => {
 		try {
 			const response = await apiClient.get("/user-types");
-			setUserTypes(response.data.data);
+			const filtered = response.data.data.filter(
+				(ut: UserType) => ut.name !== "Staff"
+			);
+			setUserTypes(filtered);
 		} catch (error) {
 			console.error(error);
 		}

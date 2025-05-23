@@ -29,26 +29,50 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 		return storedUser ? JSON.parse(storedUser).cart || [] : [];
 	});
 
-	// Read query parameters from the URL and apply filters
 	useEffect(() => {
-		async function fetchData() {
+		const fetchData = async () => {
 			try {
 				setLoading(true);
-				const response = await apiClient.get("/courses");
-				console.log(response.data.data)
-				let courses = response.data.data.filter((course:Course) => new Date(course.regStart).getTime() < new Date().getTime());
-				setCourses(courses);
-				setFilteredCourses(courses);
-				setLoading(false);
+
+				const user = JSON.parse(localStorage.getItem("user") || "{}");
+				const userId = user._id;
+
+				// Get all open courses
+				const courseResponse = await apiClient.get("/courses");
+				const openCourses: Course[] = courseResponse.data.data.filter(
+					(course: Course) =>
+						new Date(course.regStart).getTime() < new Date().getTime()
+				);
+
+				// Get user's progresses (i.e. registered courses)
+				const progressResponse = await apiClient.get(
+					`/progress/progress/${userId}`
+				);
+				const registeredCourseIds = new Set(
+					progressResponse.data.progresses.map((p: any) => p.course._id)
+				);
+
+				// Filter out courses the user is already registered for
+				const unregisteredCourses = openCourses.filter(
+					(course) => !registeredCourseIds.has(course._id)
+				);
+
+				setCourses(unregisteredCourses);
+				setFilteredCourses(unregisteredCourses);
 			} catch (error) {
-				console.error(error);
+				console.error("Error loading catalog:", error);
+			} finally {
+				setLoading(false);
 			}
-		}
+		};
+
 		fetchData();
 	}, []);
+
 	// Initialize cart state from localStorage when the component mounts
 	useEffect(() => {
-		const storedCart = JSON.parse(localStorage.getItem("user") || "{}").cart || [];
+		const storedCart =
+			JSON.parse(localStorage.getItem("user") || "{}").cart || [];
 		setCart(storedCart); // Initialize cart state with stored data
 		setCartItemCount(storedCart.length); // Set cart item count based on localStorage cart
 	}, []); // Empty dependency array means it only runs once when the component mounts
@@ -81,8 +105,8 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 			filtered = filtered.filter((course) =>
 				course.ratings.length > 0
 					? course.ratings.reduce((sum, r) => sum + r.rating, 0) /
-					course.ratings.length >=
-					parseInt(selectedRating)
+							course.ratings.length >=
+						parseInt(selectedRating)
 					: false
 			);
 		}
@@ -95,7 +119,9 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 
 		if (selectedFormat !== "All") {
 			filtered = filtered.filter((course) =>
-				selectedFormat === "Live" ? course.productType !== "Virtual Training - On Demand" : course.productType === "Virtual Training - On Demand"
+				selectedFormat === "Live"
+					? course.productType !== "Virtual Training - On Demand"
+					: course.productType === "Virtual Training - On Demand"
 			);
 		}
 

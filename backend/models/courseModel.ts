@@ -25,8 +25,12 @@ export interface ICourse extends Document {
 	regStart: Date;
 	regEnd: Date;
 	//Virtual Training - Live Meeting, In-Person Training, Virtual Training - On Demand, Virtual Training - Live Webinar
-	productType: string;
-	productInfo: string
+	productType:
+		| "Virtual Training - Live Meeting"
+		| "In-Person Training"
+		| "Virtual Training - On Demand"
+		| "Virtual Training - Live Webinar";
+	productInfo: string;
 	shortUrl: string;
 	draft: boolean;
 }
@@ -78,8 +82,18 @@ const CourseSchema: Schema = new Schema(
 		],
 		regStart: { type: Date, required: false },
 		regEnd: { type: Date, required: false },
-		productType: { type: String, required: false },
-		productInfo: {type:String, required: false},
+		productType: {
+			type: String,
+			required: false,
+			enum: [
+				"Virtual Training - Live Meeting",
+				"In-Person Training",
+				"Virtual Training - On Demand",
+				"Virtual Training - Live Webinar",
+				"",
+			],
+		},
+		productInfo: { type: String, required: false },
 		shortUrl: { type: String, required: false },
 		draft: { type: Boolean, required: true, default: true },
 	},

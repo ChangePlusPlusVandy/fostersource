@@ -9,11 +9,12 @@ import NewMeeting from "./ModalComponents/NewMeeting";
 import ExistingWebinarList from "./ModalComponents/ExistingWebinarList";
 import NewWebinar from "./ModalComponents/NewWebinar";
 import SaveCourseButton from "../../../components/SaveCourseButtons";
-import apiClient from "../../../services/apiClient";
-import { getCleanCourseData } from "../../../store/useCourseEditStore";
+import {
+	getCleanCourseData,
+	useCourseEditStore,
+} from "../../../store/useCourseEditStore";
 
 export default function WorkshopCreation() {
-
 	const [webinarData, setWebinarData] = useState({
 		serviceType: "webinar",
 		meetingURL: "string",
@@ -27,7 +28,7 @@ export default function WorkshopCreation() {
 	const [inPersonData, setInPersonData] = useState({
 		serviceType: "in-person",
 		startTime: null,
-		duration: 0,
+		duration: "",
 		location: "",
 	});
 
@@ -36,7 +37,9 @@ export default function WorkshopCreation() {
 		embeddingLink: "",
 	});
 
-	const [openModal, setOpenModal] = useState<"NewWebinar" | "ExistingWebinar" | "NewMeeting" | "ExistingMeeting" | null>(null);
+	const [openModal, setOpenModal] = useState<
+		"NewWebinar" | "ExistingWebinar" | "NewMeeting" | "ExistingMeeting" | null
+	>(null);
 
 	const handleChange = (e: any) => {
 		const { name, value } = e.target;
@@ -44,23 +47,18 @@ export default function WorkshopCreation() {
 	};
 
 	const course = getCleanCourseData();
-	console.log(course)
 
 	function getInitialType() {
-		if(course.productType === "Virtual Training - On Demand"){
-			return "on demand"
-		}
-		else if(course.productType === "Virtual Training - Live Meeting"){
-			return "meeting"
-		}
-		else if(course.productType === "Virtual Training - Live Webinar"){
-			return "webinar"
-		}
-		else if(course.productType === "In-Person Training"){
-			return "in-person"
-		}
-		else{
-			return "meeting"
+		if (course.productType === "Virtual Training - On Demand") {
+			return "on demand";
+		} else if (course.productType === "Virtual Training - Live Meeting") {
+			return "meeting";
+		} else if (course.productType === "Virtual Training - Live Webinar") {
+			return "webinar";
+		} else if (course.productType === "In-Person Training") {
+			return "in-person";
+		} else {
+			return "meeting";
 		}
 	}
 
@@ -76,10 +74,155 @@ export default function WorkshopCreation() {
 		minTime: 0,
 	});
 
+	useEffect(() => {
+		const mappedType = (() => {
+			switch (course.productType) {
+				case "Virtual Training - On Demand":
+					return "on-demand";
+				case "Virtual Training - Live Meeting":
+					return "meeting";
+				case "Virtual Training - Live Webinar":
+					return "webinar";
+				case "In-Person Training":
+					return "in-person";
+				default:
+					return "meeting";
+			}
+		})();
+
+		// Only update type if it's not already set (prevents override if user changes it)
+		if (!formData.type) {
+			setFormData((prev) => ({
+				...prev,
+				type: mappedType,
+			}));
+		}
+	}, [course.productType]);
+
 	const handleSubmit = (event: any) => {
 		event.preventDefault();
 		console.log("Form submitted:", formData);
 	};
+
+	const setField = useCourseEditStore((state) => state.setField);
+
+	const [hasHydratedFormData, setHasHydratedFormData] = useState(false);
+
+	useEffect(() => {
+		if (!hasHydratedFormData) {
+			// Hydrate formData type
+			const mappedType = (() => {
+				switch (course.productType) {
+					case "Virtual Training - On Demand":
+						return "on-demand";
+					case "Virtual Training - Live Meeting":
+						return "meeting";
+					case "Virtual Training - Live Webinar":
+						return "webinar";
+					case "In-Person Training":
+						return "in-person";
+					default:
+						return "meeting";
+				}
+			})();
+
+			setFormData((prev) => ({
+				...prev,
+				type: mappedType,
+			}));
+
+			// Hydrate type-specific data
+			if (
+				mappedType === "in-person" &&
+				typeof course.productInfo === "string"
+			) {
+				try {
+					const parsed = JSON.parse(course.productInfo);
+					setInPersonData({
+						serviceType: "in-person",
+						startTime: parsed.startTime || "",
+						duration:
+							parsed.duration !== undefined ? parsed.duration.toString() : "",
+						location: parsed.location || "",
+					});
+				} catch (e) {
+					console.error("Failed to parse in-person data", e);
+				}
+			}
+
+			if (
+				mappedType === "on-demand" &&
+				typeof course.productInfo === "string"
+			) {
+				setOnDemandData({
+					serviceType: "on demand",
+					embeddingLink: course.productInfo || "",
+				});
+			}
+
+			if (mappedType === "meeting") {
+				setMeetingData({
+					serviceType: "meeting",
+					meetingID: course.productInfo || "",
+				});
+			}
+
+			if (mappedType === "webinar") {
+				setWebinarData({
+					serviceType: "webinar",
+					meetingURL: course.productInfo || "",
+				});
+			}
+
+			setHasHydratedFormData(true); // ✅ lock hydration
+		}
+	}, [hasHydratedFormData, course]);
+
+	// Watch onDemandData
+	useEffect(() => {
+		if (formData.type === "on-demand") {
+			setField("productType", "Virtual Training - On Demand");
+			setField("productInfo", onDemandData.embeddingLink || "");
+		}
+	}, [onDemandData, formData.type]);
+
+	// Watch meetingData
+	useEffect(() => {
+		if (formData.type === "meeting") {
+			setField("productType", "Virtual Training - Live Meeting");
+			setField("productInfo", meetingData.meetingID || "");
+		}
+	}, [meetingData, formData.type]);
+
+	// Watch webinarData
+	useEffect(() => {
+		if (formData.type === "webinar") {
+			setField("productType", "Virtual Training - Live Webinar");
+			setField("productInfo", webinarData.meetingURL || "");
+		}
+	}, [webinarData, formData.type]);
+
+	// Watch inPersonData
+	useEffect(() => {
+		console.log("formData.type:", JSON.stringify(inPersonData));
+		if (formData.type === "in-person") {
+			setField("productType", "In-Person Training");
+			setField(
+				"productInfo",
+				JSON.stringify(inPersonData) // duration stays string
+			);
+		}
+	}, [inPersonData, formData.type]);
+
+	const productType = useCourseEditStore((state) => state.productType);
+	const productInfo = useCourseEditStore((state) => state.productInfo);
+
+	useEffect(() => {
+		console.log("🧠 Zustand updated:", {
+			productType,
+			productInfo,
+		});
+	}, [productType, productInfo]);
 
 	return (
 		<div>
@@ -115,8 +258,7 @@ export default function WorkshopCreation() {
 								value="meeting"
 								checked={formData.type === "meeting"}
 								onChange={handleChange}
-								required
-							/>{" "}
+							/>
 							Meeting
 						</label>
 						<label className="flex items-center gap-2">
@@ -126,8 +268,7 @@ export default function WorkshopCreation() {
 								value="webinar"
 								checked={formData.type === "webinar"}
 								onChange={handleChange}
-								required
-							/>{" "}
+							/>
 							Webinar
 						</label>
 						<label className="flex items-center gap-2">
@@ -135,8 +276,9 @@ export default function WorkshopCreation() {
 								type="radio"
 								name="type"
 								value="in-person"
+								checked={formData.type === "in-person"}
 								onChange={handleChange}
-							/>{" "}
+							/>
 							In-Person
 						</label>
 						<label className="flex items-center gap-2">
@@ -144,8 +286,9 @@ export default function WorkshopCreation() {
 								type="radio"
 								name="type"
 								value="on-demand"
+								checked={formData.type === "on-demand"}
 								onChange={handleChange}
-							/>{" "}
+							/>
 							On-Demand
 						</label>
 					</div>
@@ -163,7 +306,7 @@ export default function WorkshopCreation() {
 							inPersonData={inPersonData}
 							setInPersonData={setInPersonData}
 						/>
-					): formData.type === "meeting" ? (
+					) : formData.type === "meeting" ? (
 						<MeetingComponent
 							meetingData={meetingData}
 							setMeetingData={setMeetingData}
@@ -177,7 +320,10 @@ export default function WorkshopCreation() {
 						/>
 					)}
 				</div>
-				<SaveCourseButton prevLink="pricing" nextLink="speakers"></SaveCourseButton>
+				<SaveCourseButton
+					prevLink="pricing"
+					nextLink="speakers"
+				></SaveCourseButton>
 			</form>
 
 			{/* New Meeting Modal */}

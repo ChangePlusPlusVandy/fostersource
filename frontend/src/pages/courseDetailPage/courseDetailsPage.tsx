@@ -10,6 +10,9 @@ import { Course } from "../../shared/types/course";
 import { Rating } from "../../shared/types/rating";
 import apiClient from "../../services/apiClient";
 import SurveyModal from "./SurveyModal";
+import YouTube from "react-youtube";
+import { Progress } from "../../shared/types/progress";
+import { ZoomMeeting } from "../../shared/types";
 
 const FaStar = _FaStar as ComponentType<{ size?: number; color?: string }>;
 const FaStarHalfAlt = _FaStarHalfAlt as ComponentType<{
@@ -49,94 +52,64 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const navigate = useNavigate();
 	const [courseDetailsData, setCourseDetailsData] = useState<Course | null>(
 		null
-		// 		{
-		// 		_id: "",
-		// 		className: "Introduction to Computer Science",
-		// 		courseDescription: `When it comes to your child's case closing, are you hearing terms or phrases like, "least drastic alternative", APR, RGAP, intervention, etc. and feeling lost in the acronyms and language? Are you facing an APR and worried about ongoing support or post-permanency legal ramifications? Do you find yourself feeling unsure about how to advocate for your rights or desires in a potential APR? Are you wondering if you have to accept an APR? Has your county told you the requirements to qualify for RGAP (post-APR financial assistance)? If you answered yes to any of these questions, join us as attorney, Tim Eirich, helps us make sense of all things APR and RGAP!
-		//
-		// Hours earned: 2.0
-		//
-		// Feedback from this class:
-		//
-		// "Incredibly helpful information. This should be required so that all foster parents are informed and not taken advantage of."
-		//
-		// "Tim was EXCELLENT and provided insight into complicated legal matters."
-		//
-		// "All of Tim's trainings are excellent, and I'm grateful that he partners with Foster Source to equip foster and kinship parents with the knowledge that they need to advocate for themselves and the children in their care."`,
-		// 		instructorName: "Dr. Alice Johnson",
-		// 		creditNumber: 3,
-		// 		discussion: "An interactive discussion about computational thinking.",
-		// 		components: ["Lectures", "Labs", "Quizzes"],
-		// 		handouts: ["syllabus.pdf", "lecture1.pdf", "assignment1.pdf"],
-		// 		ratings: [],
-		// 		isLive: false,
-		// 		cost: 100,
-		// 		categories: ["Technology", "Category", "Misc"],
-		// 		thumbnailPath: "",
-		// 		instructorDescription: `Sarah has her degree in social work from Metropolitan State University with an emphasis in child and adolescent mental health.
-		//
-		// She has worked for Denver Department of Human Services Child Welfare for over 3 years as an ongoing social caseworker and currently holds a senior caseworker position in placement navigation. She has worked as a counselor at a residential treatment program for youth corrections, as a counselor for dual diagnosis adult men at a halfway house, and an independent living specialist for the disabled community/outreach specialist for individuals experiencing homelessness.
-		//
-		// Sarah writes:
-		//
-		// In my spare time, I spend most of my time with my two teenage daughters. I am a huge advocate for social justice issues which I spend a lot of my time supporting through peaceful protests, education, volunteer work, etc. I love camping, crafting, karaoke, road trip adventures, and dancing in my living room. My favorite place in the entire world is the Mojave Desert.`,
-		// 		instructorRole: "Moderator",
-		// 		lengthCourse: 2,
-		// 		time: new Date("2025-10-15T00:00:00.000Z"),
-		// 		isInPerson: true,
-		// 		students: [],
-		// 		regStart: new Date("2025-10-10T00:00:00.000Z"),
-		// 		regEnd: new Date("2025-10-12T00:00:00.000Z"),
-		// 	}
 	);
 	const [starRating, setStarRating] = useState(-1);
 	const [isAdded, setIsAdded] = useState(false);
 	const [ratingsPageOpen, setRatingsPageOpen] = useState(false);
 	const [numStarsRatingPage, setNumStarsRatingpage] = useState(0);
-	const [isAdmin, setIsAdmin] = useState(false);
+	const [hasProgress, setHasProgress] = useState<boolean | null>(null);
+	const [progress, setProgress] = useState<Progress | null>(null);
+	const [workshopCompleted, setWorkshopCompleted] = useState<boolean>(false);
+	const [surveyCompleted, setSurveyCompleted] = useState<boolean>(false);
+	const [certificateCompleted, setCertificateCompleted] =
+		useState<boolean>(false);
 
 	useEffect(() => {
-		const checkAdminStatus = async () => {
+		const fetchProgress = async () => {
+			if (!courseId || !user?._id) return;
 			try {
-				const response = await apiClient.get("users/is-admin", {
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem("token")}`,
-					},
-				});
-				setIsAdmin(response.data.isAdmin);
+				const response = await apiClient.get(
+					`/courses/${courseId}/progress/single/${user._id}`
+				);
+				const progress = response.data.progress;
+				if (!response.data.progress) {
+					setHasProgress(false);
+				} else {
+					setHasProgress(true);
+					setProgress(progress);
+					setWorkshopCompleted(progress.completedComponents.webinar);
+					setSurveyCompleted(progress.completedComponents.survey);
+					setCertificateCompleted(progress.completedComponents.certificate);
+					console.log("progress", response.data);
+				}
 			} catch (error) {
-				console.error("Failed to check admin status", error);
+				setHasProgress(false);
+				console.error("Error checking progress:", error);
 			}
 		};
 
-		checkAdminStatus();
-	}, []);
+		fetchCourse();
+		checkCourseInCart();
+		fetchProgress();
+	}, [courseId]);
+
+	const productType = courseDetailsData?.productType;
 
 	const navigateToCourseEdit = () => {
-		navigate(`/courses/edit`); // Change to the desired route
+		navigate(`/courses/edit`);
 	};
 
-	//================ Working axios request ======================
 	const fetchCourse = async () => {
 		if (!courseId) return;
 		try {
 			const response = await apiClient.get(`courses/${courseId}`);
 			response.data.data.time = new Date(response.data.data.time);
+			console.log(response.data.data);
 			setCourseDetailsData(response.data.data);
 		} catch (error) {
 			console.error(error);
 		}
 	};
-
-	// useEffect(() => {
-	// 	const id = queryParams.get("courseId");
-	// 	setCourseId(id || "");
-	// }, [location.search]);
-
-	useEffect(() => {
-		fetchCourse();
-		checkCourseInCart();
-	}, [courseId]);
 
 	useEffect(() => {
 		if (courseDetailsData) {
@@ -193,12 +166,17 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 		<div className="w-full h-max m-0 p-0 md:text-lg xl:text-2xl">
 			<div className="mr-4 mb-3">
 				<div className="bg-gray-100 sticky top-0 z-50">
-					<button
-						className="w-40 h-9 bg-[#D9D9D9] rounded-md text-xs mt-8"
-						onClick={() => navigate("/catalog")}
-					>
-						Back to Catalog
-					</button>
+					{!hasProgress ? (
+						<button
+							className="w-40 h-9 bg-[#D9D9D9] rounded-md text-xs mt-8"
+							onClick={() => navigate("/catalog")}
+						>
+							Back to Catalog
+						</button>
+					) : (
+						<div className="h-[50px]"></div>
+					)}
+
 					<div className="m-0 my-5 flex w-full gap-2 flex-col xl:flex-row xl:gap-20">
 						<div className="flex flex-col text-xs w-auto gap-1">
 							<p className="text-3xl font-bold">
@@ -206,20 +184,20 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 							</p>
 
 							{/* Course Details + Rating */}
-							<div className="flex flex-row min-w-fit w-fit gap-4 items-center text-xs mt-1 content-start">
+							<div className="flex flex-row min-w-fit w-fit gap-4 items-center text-xl mt-1 content-start">
 								{/* Stars */}
-								<p className="font-bold w-max min-w-max">
+								{/* <p className="font-bold w-max min-w-max">
 									{starRating === -1 ? (
 										"No ratings yet"
 									) : (
 										<StarDisplay rating={starRating} />
 									)}
-								</p>
+								</p> */}
 
 								<p className="w-max min-w-max">
 									{courseDetailsData.creditNumber} Credits
 								</p>
-								<p className="w-max min-w-max">
+								{/* <p className="w-max min-w-max">
 									Live Web Event{" "}
 									{new Date(courseDetailsData.time).toLocaleDateString()} at{" "}
 									{new Date(courseDetailsData.time).toLocaleTimeString(
@@ -230,7 +208,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 											hour12: true,
 										}
 									)}
-								</p>
+								</p> */}
 								<div className="w-max min-w-max">
 									<CategoryPills categories={courseDetailsData.categories} />
 								</div>
@@ -238,27 +216,36 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 						</div>
 
 						<div className="text-sm md:text-lg xl:text-2xl h-auto flex flex-row content-end gap-2 w-min xl:flex-col">
-							<button
-								onClick={() => {
-									setIsAdded(!isAdded);
-								}}
-								style={{ width: "168px", height: "38px" }}
-								className={`h-9 rounded-md text-white text-xs ${
-									isAdded
-										? "bg-gray-400 cursor-not-allowed"
-										: "bg-orange-400 hover:bg-orange-500 cursor-pointer transition-colors duration-300"
-								}`}
-								disabled={isAdded}
-							>
-								{isAdded ? "Remove from Cart" : "Add to Cart"}
-							</button>
+							{/* {!hasProgress ? (
+								<button
+									onClick={() => {
+										setIsAdded(!isAdded);
+									}}
+									style={{ width: "168px", height: "38px" }}
+									className={`h-9 rounded-md text-white text-xs ${
+										isAdded
+											? "bg-gray-400 cursor-not-allowed"
+											: "bg-orange-400 hover:bg-orange-500 cursor-pointer transition-colors duration-300"
+									}`}
+									disabled={isAdded}
+								>
+									{isAdded ? "Remove from Cart" : "Add to Cart"}
+								</button>
+							) : (
+								<></>
+							)} */}
 
-							<button
-								onClick={openRatingsPage}
-								className="w-[168px] h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300"
-							>
-								Rate This Course
-							</button>
+							{/* {hasProgress ? (
+								<button
+									onClick={openRatingsPage}
+									className="w-[168px] h-9 bg-orange-400 text-white text-xs rounded-md cursor-pointer transition-colors duration-300"
+								>
+									Rate This Course
+								</button>
+							) : (
+								<></>
+							)} */}
+
 							{/* Pop-Up Modal */}
 							{ratingsPageOpen && (
 								<div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
@@ -323,26 +310,19 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 									</div>
 								</div>
 							)}
-							{isAdmin && (
-								<button
-									onClick={navigateToCourseEdit}
-									style={{ width: "168px", height: "38px" }}
-									className={`w-42 h-9 rounded-md text-white text-xs bg-[#7B4899]`}
-								>
-									Edit Course
-								</button>
-							)}
 						</div>
 					</div>
 					<hr className="w-full my-4 border-t-4 border-gray-200 pb-1" />
 				</div>
 
 				<div className="flex gap-4 max-w-7xl w-full min-h-full flex-col xl:flex-row">
-					<div className="flex flex-col gap-3 w-fit">
+					<div
+						className={`flex gap-3 w-fit ${hasProgress ? `flex-col-reverse` : `flex-col`}`}
+					>
 						{/*Overview Rectangle*/}
 						<div className="bg-white rounded-2xl flex flex-col items-start justify-start p-3 text-sm gap-1">
-							<p className="text-md font-semibold">Overview</p>
-							<p className="flex flex-col gap-1">
+							<p className="text-lg font-semibold">Overview</p>
+							<p className="flex flex-col gap-1 text-lg">
 								{courseDetailsData.courseDescription
 									.split("\n")
 									.map((line, index) => (
@@ -353,37 +333,51 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 
 						{/* Content overview */}
 						<div className="p-3 flex flex-col rounded-2xl bg-white min-w-min w-full gap-1 h-full">
-							<p className="text-sm font-semibold"> Content(s) </p>
+							<p className="text-xl font-semibold"> Content </p>
 							<DisplayBar
 								creditHours={courseDetailsData.creditNumber}
 								time={courseDetailsData.time}
 								isSurveyModalOpen={isSurveyModalOpen}
 								setIsSurveyModalOpen={setIsSurveyModalOpen}
 								productInfo={courseDetailsData.productInfo}
+								productType={courseDetailsData.productType}
+								hasProgress={hasProgress}
+								workshop={workshopCompleted}
+								survey={surveyCompleted}
+								setWorkshopCompleted={setWorkshopCompleted}
+								setSurveyCompleted={setSurveyCompleted}
+								setCertificateCompleted={setCertificateCompleted}
+								courseName={courseDetailsData.className}
+								certificate={certificateCompleted}
 							/>
 						</div>
 					</div>
 					{/*Speaker discription rectangle*/}
 					<div className="bg-white rounded-2xl p-3 gap-2 flex h-stretch text-sm w-fit flex-col">
-						<div className="font-semibold text-sm">Speaker(s)</div>
+						<div className="font-semibold text-lg">Speaker(s)</div>
 						<div className="flex gap-2">
-							<div className="flex flex-col min-w-24 flex-wrap gap-3">
-								<div className="bg-stone-100 min-h-28">
-									<img
-										src={courseDetailsData.thumbnailPath}
-										alt={`A profile picture of ${courseDetailsData.instructorName}`}
-									/>
+							{courseDetailsData.speakers.map((speaker, index) => (
+								<div
+									key={index}
+									className="flex flex-col min-w-24 flex-wrap gap-3 w-[400px]"
+								>
+									<div className="bg-stone-100 min-h-28 w-[300px]">
+										<img
+											src={(speaker as any).image} // adjust if you have a type
+											alt={`A profile picture of ${(speaker as any).name}`}
+										/>
+									</div>
+									<div className="text-base text-lg font-medium">
+										{(speaker as any).name}
+									</div>
+									<div className="text-md font-medium italic">
+										{(speaker as any).title}
+									</div>
+									<div className="text-md font-medium">
+										{(speaker as any).bio}
+									</div>
 								</div>
-								<div className="text-base font-medium">
-									{courseDetailsData.instructorName}
-								</div>
-
-								{/*Needs to be complete*/}
-								<div className="text-xs font-medium">
-									{courseDetailsData.instructorRole}
-								</div>
-								<CategoryPills categories={courseDetailsData.categories} />
-							</div>
+							))}
 							<p className="flex flex-col gap-1">
 								{courseDetailsData.instructorDescription
 									.split("\n")
@@ -404,8 +398,8 @@ const CategoryPills = ({ categories }: { categories: string[] }) => {
 		<ul className="flex flex-wrap gap-1">
 			{categories.map((category, index) => (
 				<li key={index}>
-					<div className="flex rounded-xl bg-[#F79518]">
-						<p className="p-1 px-2 text-white leading-[15px] text-[10px]">
+					<div className="flex rounded-full bg-[#F79518]">
+						<p className="px-4 py-2 text-white leading-[15px] text-sm">
 							{category}
 						</p>
 					</div>
@@ -421,35 +415,85 @@ const DisplayBar = ({
 	isSurveyModalOpen,
 	setIsSurveyModalOpen,
 	productInfo,
+	productType,
+	hasProgress,
+	workshop,
+	survey,
+	setWorkshopCompleted,
+	setSurveyCompleted,
+	setCertificateCompleted,
+	certificate,
+	courseName,
+	creditHours,
 }: {
 	creditHours: number;
 	time: Date;
 	isSurveyModalOpen: boolean;
 	setIsSurveyModalOpen: any;
 	productInfo: string;
+	productType: string;
+	hasProgress: boolean | null;
+	workshop: boolean;
+	survey: boolean;
+	certificate: boolean;
+	setWorkshopCompleted: any;
+	setSurveyCompleted: any;
+	setCertificateCompleted: any;
+	courseName: string;
 }) => {
-	const [currentPage, setCurrentPage] = useState("Webinar");
+	const [currentPage, setCurrentPage] = useState("Workshop");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
-	const [survey, setSurvey] = useState(false);
 	const [videoLink, setVideoLink] = useState<string | null>("");
+	const [videoCompleted, setVideoCompleted] = useState(false);
+	const [meeting, setMeeting] = useState<ZoomMeeting | null>(null);
 
-	useEffect(() => {
-		const webinarEnd = new Date(time);
-		webinarEnd.setHours(webinarEnd.getHours() + 2); // 2 hours after the current time
-		const checkTime = () => {
-			const currentTime = new Date();
-			if (currentTime.getTime() > webinarEnd.getTime()) {
-				setSurvey(true);
+	const location = useLocation();
+	const searchParams = new URLSearchParams(location.search);
+	const courseId = searchParams.get("courseId");
+
+	const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+	const onPlayerReady = (event: any) => {
+		event.target.playVideo();
+	};
+
+	const onStateChange = async (event: any) => {
+		console.log(event.data);
+		if (event.data === 0) {
+			setVideoCompleted(true);
+
+			try {
+				const response = await apiClient.put(
+					`/courses/${courseId}/progress/single/${user._id}`,
+					{
+						webinarComplete: true,
+					}
+				);
+				console.log("✅ Webinar completion updated:", response.data);
+				setWorkshopCompleted(true);
+			} catch (err) {
+				console.error("❌ Failed to update webinar progress:", err);
 			}
-		};
+		}
+	};
 
-		checkTime(); // Run immediately when component mounts
+	// useEffect(() => {
+	// 	const webinarEnd = new Date(time);
+	// 	webinarEnd.setHours(webinarEnd.getHours() + 2); // 2 hours after the current time
+	// 	const checkTime = () => {
+	// 		const currentTime = new Date();
+	// 		if (currentTime.getTime() > webinarEnd.getTime()) {
+	// 			setSurvey(true);
+	// 		}
+	// 	};
 
-		const interval = setInterval(checkTime, 1000 * 60); // Run every 1 minute
+	// 	checkTime(); // Run immediately when component mounts
 
-		return () => clearInterval(interval); // Cleanup when component unmounts
-	}, []);
+	// 	const interval = setInterval(checkTime, 1000 * 60); // Run every 1 minute
+
+	// 	return () => clearInterval(interval); // Cleanup when component unmounts
+	// }, []);
 
 	const testNetwork = async () => {
 		try {
@@ -467,7 +511,53 @@ const DisplayBar = ({
 	};
 
 	/* TODO: Needs to be complete once certificate page is out */
-	const handleAccessCertificate = () => {};
+	const handleAccessCertificate = async () => {
+		if (!certificate) {
+			setCertificateCompleted(true);
+
+			try {
+				await apiClient.put(
+					`/courses/${courseId}/progress/single/${user._id}`,
+					{
+						webinarComplete: true,
+						surveyComplete: true,
+						certificateComplete: true,
+					}
+				);
+			} catch (error) {
+				console.error("Error updating progress after certificate:", error);
+			}
+		}
+
+		try {
+			const response = await apiClient.post(
+				"/certificatePDFs",
+				{
+					certificateType: "completion", // or "attendance"
+					participantName: user.name,
+					courseInfo: `${courseName} (${creditHours} credits)`,
+					completionDate: new Date().toLocaleDateString("en-US", {
+						year: "numeric",
+						month: "long",
+						day: "numeric",
+					}),
+				},
+				{
+					responseType: "blob", // IMPORTANT for binary PDF data
+				}
+			);
+
+			// Create a blob URL and trigger download
+			const blob = new Blob([response.data], { type: "application/pdf" });
+			const link = document.createElement("a");
+			link.href = window.URL.createObjectURL(blob);
+			link.download = "certificate.pdf";
+			link.click();
+		} catch (error) {
+			console.error("Error generating certificate:", error);
+			alert("Failed to generate certificate. Please try again.");
+		}
+	};
 
 	const getYouTubeEmbedUrl = (url: string) => {
 		const match = url.match(
@@ -477,162 +567,324 @@ const DisplayBar = ({
 		return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
 	};
 
-	const retrieveVideo = async () => {
+	const getYoutubeVideoId = (url: string): string => {
+		if (!url) return "";
+
+		const regex =
+			/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+		const match = url.match(regex);
+		return match ? match[1] : "";
+	};
+
+	const retrieveVideo = () => {
 		try {
-			const response = await apiClient.get(`/videos`, {
-				params: {
-					_id: productInfo,
-				},
-			});
-			setVideoLink(getYouTubeEmbedUrl(response.data.data[0].videoUrl));
+			setVideoLink(getYouTubeEmbedUrl(productInfo));
 		} catch (error) {
 			console.error(error);
 		}
 	};
 
+	const retrieveMeeting = async () => {
+		if (
+			productType === "Virtual Training - Live Meeting" ||
+			productType === "Virtual Training - Live Webinar"
+		)
+			try {
+				const response = await apiClient.get("zoom/meetings");
+				const meetings = response.data.meetings;
+
+				const matchingMeeting = meetings.find(
+					(meeting: any) => String(meeting.id) === String(productInfo)
+				);
+
+				if (matchingMeeting) {
+					setMeeting(matchingMeeting);
+				} else {
+					console.warn("No matching meeting found for ID:", productInfo);
+				}
+			} catch (error) {
+				console.error(error);
+			}
+	};
+
+	function formatMeetingTime(dateStr: string, timezone: string) {
+		try {
+			const formatter = new Intl.DateTimeFormat("en-US", {
+				timeZone: timezone,
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+				hour: "numeric",
+				minute: "2-digit",
+				hour12: true,
+			});
+			return formatter.format(new Date(dateStr));
+		} catch (error) {
+			console.error("Invalid time zone:", timezone, error);
+			// Fallback to local time
+			return new Date(dateStr).toLocaleString("en-US", {
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+				hour: "numeric",
+				minute: "2-digit",
+				hour12: true,
+			});
+		}
+	}
+
 	useEffect(() => {
 		retrieveVideo();
+		retrieveMeeting();
 	}, [productInfo]);
 
-	return (
-		<div className="flex min-w-min min-h-min justify-between w-full gap-2">
-			<div className="flex flex-col">
-				{/* Workshop -> Survey -> Certificate */}
-				<div className="flex min-w-min h-9 mb-5">
-					{/* Workshop Button */}
-					<button
-						className="bg-[#F79518] rounded-l-full text-center cursor-pointer w-48"
-						style={{
-							clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
-						}}
-						onClick={() => {
-							setCurrentPage("Workshop");
-							setSurveyColor("#FEC781");
-							setCertificateColor("#FEC781");
-						}}
-					>
-						<p className="flex justify-center items-center text-xs text-white font-semibold">
-							Workshop
-						</p>
-					</button>
-					{/* Survey Button */}
-					<button
-						className="text-center cursor-pointer w-48 -ml-6 text-xs text-white font-semibold"
-						style={{
-							backgroundColor: surveyColor,
-							clipPath:
-								"polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
-						}}
-						onClick={() => {
-							setSurveyColor("#F79518");
-							setCertificateColor("#FEC781");
-							setCurrentPage("Survey");
-						}}
-					>
-						Survey
-					</button>
-					{/* Certificate Button */}
-					<button
-						className="text-center cursor-pointer w-48 rounded-r-full -ml-6"
-						style={{
-							clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 15% 50%)",
-							backgroundColor: certificateColor,
-						}}
-					>
-						<p
-							className="flex justify-center items-center text-xs text-white font-semibold"
+	const handleMeetingProgress = async () => {
+		try {
+			const now = new Date();
+
+			const meetingStart = new Date(meeting?.start_time || "");
+			const meetingEnd = new Date(
+				meetingStart.getTime() + (meeting?.duration || 0) * 60000
+			);
+			const windowStart = new Date(meetingStart.getTime() - 15 * 60000); // 15 minutes before start
+
+			// Check if current time is within allowed window
+			const isWithinWindow = now >= windowStart && now <= meetingEnd;
+
+			if (isWithinWindow) {
+				await apiClient.put(
+					`/courses/${courseId}/progress/single/${user._id}`,
+					{
+						webinarComplete: true,
+					}
+				);
+				console.log("✅ Meeting progress updated");
+			} else {
+				console.warn("⏳ Not within the valid time window to mark progress.");
+			}
+		} catch (error) {
+			console.error("❌ Error updating meeting progress:", error);
+		}
+	};
+
+	if (hasProgress)
+		return (
+			<div className="flex min-w-min min-h-min justify-between w-full gap-2">
+				<div className="flex flex-col w-full">
+					{/* Workshop -> Survey -> Certificate */}
+					<div className="flex min-w-min h-9 mb-5">
+						{/* Workshop Button */}
+						<button
+							className="bg-[#F79518] rounded-l-full text-center cursor-pointer w-48"
+							style={{
+								clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
+							}}
 							onClick={() => {
-								setSurveyColor("#F79518");
-								setCertificateColor("#F79518");
-								setCurrentPage("Certificate");
+								setCurrentPage("Workshop");
+								setSurveyColor("#FEC781");
+								setCertificateColor("#FEC781");
 							}}
 						>
-							Certificate
-						</p>
-					</button>
-				</div>
-				{currentPage === "Workshop" && (
-					<div className="flex justify-between h-[400px]">
-						{/* <div className="text-sm	font-normal flex flex-col gap-1">
-							<div>Date: {new Date(time).toLocaleDateString()}</div>
-							<div>
-								Time:{" "}
-								{new Date(time).toLocaleTimeString("en-US", {
-									hour: "numeric",
-									minute: "2-digit",
-									hour12: true,
-								})}
+							<p className="flex justify-center items-center text-xs text-white font-semibold">
+								Workshop
+							</p>
+						</button>
+						{/* Survey Button */}
+						<button
+							className="text-center cursor-pointer w-48 -ml-6 text-xs text-white font-semibold"
+							style={{
+								backgroundColor: surveyColor,
+								clipPath:
+									"polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
+							}}
+							onClick={() => {
+								setSurveyColor("#F79518");
+								setCertificateColor("#FEC781");
+								setCurrentPage("Survey");
+							}}
+						>
+							Survey
+						</button>
+						{/* Certificate Button */}
+						<button
+							className="text-center cursor-pointer w-48 rounded-r-full -ml-6"
+							style={{
+								clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 15% 50%)",
+								backgroundColor: certificateColor,
+							}}
+						>
+							<p
+								className="flex justify-center items-center text-xs text-white font-semibold"
+								onClick={() => {
+									setSurveyColor("#F79518");
+									setCertificateColor("#F79518");
+									setCurrentPage("Certificate");
+								}}
+							>
+								Certificate
+							</p>
+						</button>
+					</div>
+					{currentPage === "Workshop" && (
+						<div className="flex flex-col justify-between w-full">
+							{productType === "Virtual Training - On Demand" ? (
+								<div className="relative w-full pb-[56.25%] h-0 overflow-hidden">
+									{/* <iframe
+										className="absolute top-0 left-0 w-full h-full"
+										src={getYouTubeEmbedUrl(productInfo) || ""}
+										title="On Demand Video"
+										frameBorder="0"
+										allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+										allowFullScreen
+									></iframe> */}
+									<YouTube
+										videoId={getYoutubeVideoId(productInfo)}
+										onReady={onPlayerReady}
+										onStateChange={onStateChange}
+										opts={{
+											width: "100%",
+											playerVars: {
+												autoplay: 0,
+												controls: 1,
+												rel: 0,
+												modestbranding: 1,
+											},
+										}}
+									/>
+								</div>
+							) : productType === "Virtual Training - Live Meeting" ? (
+								<div className="flex flex-col gap-2 text-sm">
+									<p>Meeting ID: {productInfo}</p>
+									<p>
+										Meeting Date & Time:{" "}
+										{formatMeetingTime(
+											meeting?.start_time || "",
+											meeting?.timezone || ""
+										)}
+										, Timezone: {meeting?.timezone}
+									</p>
+									<a
+										href={meeting?.join_url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-blue-600 underline"
+										onClick={handleMeetingProgress}
+									>
+										Join Zoom Meeting
+									</a>
+								</div>
+							) : productType === "Virtual Training - Live Webinar" ? (
+								<div className="flex flex-col gap-2 text-sm">
+									<p>
+										Meeting Date & Time:{" "}
+										{formatMeetingTime(
+											meeting?.start_time || "",
+											meeting?.timezone || ""
+										)}
+										, Timezone: {meeting?.timezone}
+									</p>
+									<p>Webinar URL: </p>
+									<a
+										href={meeting?.join_url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-blue-600 underline"
+										onClick={handleMeetingProgress}
+									>
+										Join Webinar
+									</a>
+								</div>
+							) : productType === "In-Person Training" ? (
+								(() => {
+									try {
+										const parsed = JSON.parse(productInfo);
+										return (
+											<div className="flex flex-col text-sm gap-1">
+												<p>
+													Location:{" "}
+													<a
+														href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsed.location)}`}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="text-blue-600 underline"
+													>
+														{parsed.location}
+													</a>
+												</p>
+												<p>
+													Start Time:{" "}
+													{new Date(parsed.startTime).toLocaleString()}
+												</p>
+												<p>Duration: {parsed.duration} minutes</p>
+											</div>
+										);
+									} catch (e) {
+										return (
+											<p className="text-red-600">
+												Invalid in-person course info.
+											</p>
+										);
+									}
+								})()
+							) : (
+								<p className="text-red-600">Unknown course type.</p>
+							)}
+							{workshop ? (
+								<p className="text-green-500 text-sm">
+									Completed! Please proceed to survey
+								</p>
+							) : (
+								<></>
+							)}
+						</div>
+					)}
+					{currentPage === "Survey" && (
+						<div className="text-sm font-normal flex flex-col gap-3">
+							<div className="flex flex-col text-xs">
+								<p
+									className={workshop ? "hidden text-red-600" : "text-red-600"}
+								>
+									Complete workshop to access survey. (For in person events,
+									this may take a couple of days to update.)
+								</p>
+								<button
+									className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 bg-orange-400 disabled:bg-gray-400 disabled:cursor-not-allowed bg-[#F79518]}`}
+									disabled={!workshop || survey}
+									onClick={() => setIsSurveyModalOpen(true)}
+								>
+									{survey ? "Already Completed Survey" : "Begin Survey"}
+								</button>
+								<SurveyModal
+									isOpen={isSurveyModalOpen}
+									onClose={() => setIsSurveyModalOpen(false)}
+									courseId={courseId}
+									setSurveyCompleted={setSurveyCompleted}
+								></SurveyModal>
 							</div>
-							<div>Length: {lengthCourse} hours</div>
 						</div>
-						<div className="flex flex-col w-max gap-2">
-
-							<button className="bg-[#F79518] w-full rounded-md text-center text-white text-xs align-middle px-6 py-3">
-								Add Webinar to Calendar
-							</button>
-							<button
-								onClick={testNetwork}
-								className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3"
-							>
-								Test Network
-							</button>
-							<button className="bg-[#F79518] rounded-md text-center text-white text-xs align-middle px-6 py-3">
-
-								Handout(s)
-							</button>
-						</div> */}
-						<iframe
-							width="100%"
-							height="100%"
-							src={videoLink ? videoLink : ""}
-							title="YouTube Video Player"
-							frameBorder="0"
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-							allowFullScreen
-						></iframe>
-					</div>
-				)}
-				{currentPage === "Survey" && (
-					<div className="text-sm font-normal flex flex-col gap-3">
-						<div className="flex flex-col text-xs">
-							<p className={survey ? "hidden text-red-600" : "text-red-600"}>
-								Complete webinar to access survey
-							</p>
-							<button
-								className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 ${!survey ? "bg-gray-400 cursor-not-allowed" : "bg-[#F79518]"}`}
-								disabled={!survey}
-								onClick={() => setIsSurveyModalOpen(true)}
-							>
-								Begin Survey
-							</button>
-							<SurveyModal
-								isOpen={isSurveyModalOpen}
-								onClose={() => setIsSurveyModalOpen(false)}
-								surveyId={"67d79d830a42d191ebb55049"}
-							></SurveyModal>
+					)}
+					{currentPage === "Certificate" && (
+						<div className="text-sm	font-normal flex flex-col gap-3">
+							Once you have completed the course, your certificate will be
+							accessible here.
+							<div className="flex flex-col text-xs text-red-600">
+								<p className={survey ? "hidden" : ""}>
+									Complete webinar to access certificate
+								</p>
+								<button
+									className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 cursor-pointer hover:bg-orange-500 transition ${!survey ? "bg-gray-400 cursor-not-allowed" : "bg-[#F79518]"}`}
+									disabled={!survey}
+									onClick={handleAccessCertificate}
+								>
+									Print Certificate
+								</button>
+							</div>
 						</div>
-					</div>
-				)}
-				{currentPage === "Certificate" && (
-					<div className="text-sm	font-normal flex flex-col gap-3">
-						Once you have completed the course, your certificate will be
-						accessible here.
-						<div className="flex flex-col text-xs text-red-600">
-							<p className={survey ? "hidden" : ""}>
-								Complete webinar to access certificate
-							</p>
-							<button
-								className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 ${!survey ? "bg-gray-400 cursor-not-allowed" : "bg-[#F79518]"}`}
-								disabled={!survey}
-							>
-								Print Certificate
-							</button>
-						</div>
-					</div>
-				)}
+					)}
+				</div>
 			</div>
-		</div>
-	);
+		);
+	else return <div></div>;
 };
 
 /* Displays the stars, credit numbers, and live event time */

@@ -214,7 +214,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 						</div>
 					</div>
 
-					<div className="w-2/3">
+					{/* <div className="w-2/3">
 						<h3 className="text-sm font-medium mb-2">Individual Pricing</h3>
 						<div className="border rounded-lg overflow-hidden border-gray-300">
 							<table className="w-full">
@@ -290,7 +290,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 								</tbody>
 							</table>
 						</div>
-					</div>
+					</div> */}
 				</div>
 			</div>
 			<SaveCourseButton prevLink="details" nextLink="components" />

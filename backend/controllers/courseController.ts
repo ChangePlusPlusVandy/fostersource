@@ -25,7 +25,7 @@ export const getCourses = async (
 	try {
 		const filters = req.query;
 		const courseResponses = await Course.find(filters)
-			.populate(["ratings"])
+			.populate(["speakers"])
 			.exec();
 		res.status(200).json({
 			success: true,
@@ -52,9 +52,7 @@ export const getCourseById = async (
 
 		if (id) {
 			// Find course by ID and populate related fields
-			const course = await Course.findById(id)
-				.populate(["ratings", "managers"])
-				.exec();
+			const course = await Course.findById(id).populate(["speakers"]).exec();
 
 			if (!course) {
 				res.status(404).json({
@@ -526,6 +524,84 @@ export const getCourseProgress = async (
 	}
 };
 
+// @desc    Get progress for a single user in a course
+// @route   GET /api/courses/:courseId/progress/:userId
+// @access  Public
+export const getUserCourseProgress = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { courseId, userId } = req.params;
+
+		// Validate input
+		if (!courseId || !userId) {
+			res.status(400).json({
+				success: false,
+				message: "Course ID and User ID are required.",
+			});
+			return;
+		}
+
+		// Check if the course exists
+		const course = await Course.findById(courseId);
+		if (!course) {
+			res.status(404).json({
+				success: false,
+				message: "Course not found.",
+			});
+			return;
+		}
+
+		// Check if the user is enrolled in the course
+		const isEnrolled = course.students.some(
+			(id) => id.toString() === userId.toString()
+		);
+		if (!isEnrolled) {
+			res.status(403).json({
+				success: false,
+				message: "User is not enrolled in this course.",
+			});
+			return;
+		}
+
+		// Check for existing progress
+		let progress = await Progress.findOne({ course: courseId, user: userId })
+			.populate("user")
+			.populate("course");
+
+		// If no progress exists, create one
+		if (!progress) {
+			progress = await new Progress({
+				user: userId,
+				course: courseId,
+				isComplete: false,
+				completedComponents: {
+					webinar: false,
+					survey: false,
+					certificate: false,
+				},
+				dateCompleted: null,
+			}).save();
+
+			// repopulate after save
+			progress = await Progress.findById(progress._id)
+				.populate("user")
+				.populate("course");
+		}
+
+		res.status(200).json({
+			success: true,
+			progress,
+		});
+	} catch (error: any) {
+		res.status(500).json({
+			success: false,
+			message: error.message || "Internal server error.",
+		});
+	}
+};
+
 // @desc    Update user's progress in a course
 // @route   PUT /api/courses/:courseId/progress/:userId
 // @access  Public
@@ -599,6 +675,84 @@ export const updateUserProgress = async (
 		});
 	} catch (error: any) {
 		console.error("Error in updateUserProgress:", error);
+		res.status(500).json({
+			success: false,
+			message: error.message || "Internal server error.",
+		});
+	}
+};
+
+// @desc    Batch update user progress in a course
+// @route   PUT /api/courses/:courseId/progress/batch
+// @access  Public
+export const batchUpdateUserProgress = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { courseId } = req.params;
+		const updates = req.body.updates; // Array of updates
+
+		if (!Array.isArray(updates) || updates.length === 0) {
+			res.status(400).json({
+				success: false,
+				message: "No updates provided.",
+			});
+			return;
+		}
+
+		const results: any[] = [];
+
+		for (const update of updates) {
+			const { userId, webinarComplete, surveyComplete, certificateComplete } =
+				update;
+
+			console.log("Processing update for user:", userId);
+
+			const progress = await Progress.findOne({
+				course: courseId,
+				user: userId,
+			});
+
+			if (!progress) {
+				console.warn(`Progress not found for user ${userId}`);
+				results.push({
+					userId,
+					success: false,
+					message: "Progress record not found.",
+				});
+				continue;
+			}
+
+			const completedComponents = {
+				webinar: Boolean(webinarComplete),
+				survey: Boolean(surveyComplete),
+				certificate: Boolean(certificateComplete),
+			};
+
+			progress.completedComponents = completedComponents;
+
+			const allComplete = Object.values(completedComponents).every(Boolean);
+			progress.isComplete = allComplete;
+			if (allComplete && !progress.dateCompleted) {
+				progress.dateCompleted = new Date();
+			}
+
+			await progress.save();
+
+			results.push({
+				userId,
+				success: true,
+			});
+		}
+
+		res.status(200).json({
+			success: true,
+			message: "Batch update complete.",
+			results,
+		});
+	} catch (error: any) {
+		console.error("Error in batchUpdateUserProgress:", error);
 		res.status(500).json({
 			success: false,
 			message: error.message || "Internal server error.",

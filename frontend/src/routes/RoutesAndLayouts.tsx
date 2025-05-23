@@ -9,7 +9,6 @@ import Login from "../pages/UserAuth/Login";
 import Register from "../pages/UserAuth/Register";
 import ResetPassword from "../pages/UserAuth/resetPassword";
 import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
-import authService from "../services/authService";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 import DiscountPage from "../pages/Admin/DiscountPage/Discount";
 import SpeakerPage from "../pages/Admin/SpeakerPage/Speaker";
@@ -21,16 +20,12 @@ import ComponentPage from "../pages/Admin/ComponentPage/Component";
 import SurveyPage from "../pages/Admin/SurveyPage/Survey";
 import WorkshopCreation from "../pages/Admin/WorkshopCreation/WorkshopCreation";
 import RegistrationPage from "../pages/Admin/RegistrationPage/RegistrationPage";
-import AdminPage from "../pages/Admin/AdminPage";
-import path from "path";
 import EmailPage from "../pages/Admin/EmailPage/EmailPage";
-import apiClient from "../services/apiClient";
 import { AdminSidebar } from "../components/AdminSidebar/AdminSidebar";
 import EditCourse from "../pages/Admin/EditCoursePage/editCoursePage";
 import EditSideBar from "../components/EditCourseSidebar/editCoursePageSideBar";
 import Registrants from "../pages/Admin/RegistrantsPage/Registrants";
 import SurveySummary from "../pages/Admin/SurveySummaryPage/SurveySummary";
-import CourseManagerPage from "../pages/Admin/CourseManagerPage/CourseManagerPage";
 import UserManagementPage from "../pages/Admin/UserManagementPage/Users";
 import UserTypesPage from "../pages/Admin/UserTypesPage/UserTypesPage";
 import ProductProgressReport from "../pages/Admin/ProductSummaryPage/ProductProgressReport";
@@ -63,7 +58,7 @@ function RoutesAndLayout({
 	PrivateRoute: any;
 	AdminRoute: any;
 }) {
-	const location = useLocation(); // ✅ safe now
+	const location = useLocation();
 
 	const isAuthRoute =
 		location.pathname.startsWith("/login") ||
@@ -87,12 +82,12 @@ function RoutesAndLayout({
 			) : (
 				<div>
 					<GlobalBlackBar />
-					<div style={{ width: "100%" }}>
+					{/* <div style={{ width: "100%" }}>
 						<HeaderBar
 							isOpen={isHeaderBarOpen}
 							setIsOpen={setIsHeaderBarOpen}
 						/>
-					</div>
+					</div> */}
 				</div>
 			)}
 			<div
@@ -244,11 +239,8 @@ function RoutesAndLayout({
 						/>
 						<Route path="workshop" element={<WorkshopCreation />} />
 						<Route path="speakers" element={<SpeakerPage />} />
-						<Route path="managers" element={<CourseManagerPage />} />
 						<Route path="survey" element={<SurveyPage />} />
 						<Route path="handouts" element={<HandoutPage />} />
-						<Route path="registrants" element={<Registrants />} />
-						<Route path="email" element={<EmailPage isSingleCourse={true} />} />
 					</Route>
 					<Route
 						path="/admin/product/create"
@@ -273,11 +265,25 @@ function RoutesAndLayout({
 						/>
 						<Route path="workshop" element={<WorkshopCreation />} />
 						<Route path="speakers" element={<SpeakerPage />} />
-						<Route path="managers" element={<CourseManagerPage />} />
 						<Route path="survey" element={<SurveyPage />} />
 						<Route path="handouts" element={<HandoutPage />} />
+					</Route>
+					<Route
+						path="/admin/product/manage/:id"
+						element={
+							<AdminRoute>
+								<EditSideBar />
+							</AdminRoute>
+						}
+					>
+						<Route index element={<Navigate to="speakers" replace />} />
+						<Route path="speakers" element={<SpeakerPage />} />
 						<Route path="registrants" element={<Registrants />} />
 						<Route path="email" element={<EmailPage isSingleCourse={true} />} />
+						<Route
+							path="participation"
+							element={<ProductProgressReport fixedCourseId={true} />}
+						/>
 					</Route>
 
 					{/* ===== user management routes ===== */}
@@ -319,7 +325,7 @@ function RoutesAndLayout({
 						path="admin/reports/progress"
 						element={
 							<AdminRoute>
-								<ProductProgressReport />
+								<ProductProgressReport fixedCourseId={false} />
 							</AdminRoute>
 						}
 					/>

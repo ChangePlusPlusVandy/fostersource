@@ -31,7 +31,7 @@ export default function Cart() {
 	};
 
 	return (
-		<div className="p-6 w-full">
+		<div className="p-6 w-full mt-20">
 			<h1 className="text-2xl font-bold mb-4">Checkout</h1>
 			<div className="space-y-4">
 				{cartItems.map((item, index) => (

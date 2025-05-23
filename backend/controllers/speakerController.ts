@@ -49,12 +49,8 @@ export const createSpeaker = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		const { name, title, email, company, bio, disclosures } = req.body;
-
-		// Store image URL if an image is uploaded
-		const imageUrl = req.file
-			? `http://localhost:5001/uploads/${req.file.filename}`
-			: null;
+		console.log(req.body);
+		const { name, title, email, company, bio, image } = req.body;
 
 		const speaker = new Speaker({
 			name,
@@ -62,13 +58,13 @@ export const createSpeaker = async (
 			email,
 			company,
 			bio,
-			disclosures: disclosures ? disclosures.split(",") : [],
-			image: imageUrl,
+			image,
 		});
 
 		await speaker.save();
 		res.status(201).json({ speaker, message: "Speaker created successfully" });
 	} catch (error) {
+		console.error(error);
 		res.status(500).json({
 			message:
 				error instanceof Error ? error.message : "An unknown error occurred",
@@ -86,11 +82,6 @@ export const updateSpeaker = async (
 	try {
 		const { id: speakerId } = req.params;
 		const updates = req.body;
-
-		// If a new image is uploaded, store its URL
-		if (req.file) {
-			updates.image = `http://localhost:5001/uploads/${req.file.filename}`;
-		}
 
 		const updatedSpeaker = await Speaker.findByIdAndUpdate(speakerId, updates, {
 			new: true,

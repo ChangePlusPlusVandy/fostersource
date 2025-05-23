@@ -21,6 +21,7 @@ const SaveCourseButton = ({ prevLink, nextLink }: SaveCourseButtonProps) => {
 	const handleSave = async () => {
 		try {
 			if (course._id) {
+				console.log("course:", course);
 				await apiClient.put(`/courses/${course._id}`, course);
 				alert("Course updated!");
 			} else {
