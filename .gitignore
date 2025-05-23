@@ -2,6 +2,7 @@
 node_modules/
 .env
 serviceAccountKey.json
+dist/
 
 # React
 frontend/node_modules/
