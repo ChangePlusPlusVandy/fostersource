@@ -7,7 +7,9 @@
 		"dev": "ts-node server.ts",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"worker": "ts-node workers/emailWorker.ts"
+		"worker": "ts-node workers/emailWorker.ts",
+		"build": "tsc",
+  		"start": "node dist/server.js"
 	},
 	"dependencies": {
 		"@sendgrid/mail": "^8.1.4",
