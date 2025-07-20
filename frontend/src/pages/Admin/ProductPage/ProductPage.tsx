@@ -303,6 +303,21 @@ export default function ProductPage() {
 		getOptions();
 	}, []);
 
+	const handleAddCourse = async () => {
+		try {
+			const res = await apiClient.post("/courses", {
+				className: "Untitled",
+				draft: true,
+			});
+
+			const createdCourse = res.data.data;
+			navigate(`/admin/product/edit/${createdCourse._id}`);
+		} catch (error) {
+			console.error("Failed to create course", error);
+			// Optional: toast or error message
+		}
+	};
+
 	return (
 		<div className="w-full min-h-screen bg-gray-100">
 			<div className="max-w-screen-2xl mx-auto px-8 py-6">
@@ -425,9 +440,7 @@ export default function ProductPage() {
 						<button
 							className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
 							style={{ backgroundColor: "#8757a3" }}
-							onClick={() => {
-								navigate("/admin/product/create");
-							}}
+							onClick={handleAddCourse}
 						>
 							Add Course
 						</button>

@@ -134,6 +134,7 @@ const HandoutPage = () => {
 			setFile(null); // Clear the file state if needed
 			setLink("");
 			setSubjectValue("");
+			updateHandouts();
 		} else {
 			alert("Enter link/file");
 		}
@@ -149,11 +150,13 @@ const HandoutPage = () => {
 		} else {
 			setFile(fileType);
 		}
+		updateHandouts();
 	};
 
 	const handleDelete = (index: number) => {
 		const updatedRows = rows.filter((_, i) => i !== index); // Remove the row at the specified index
 		setRows(updatedRows); // Update the state with the new array
+		updateHandouts();
 	};
 
 	return (

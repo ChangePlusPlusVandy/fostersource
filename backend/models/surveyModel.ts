@@ -5,7 +5,7 @@ import { IQuestion } from "./questionModel";
 export interface ISurvey extends Document {
 	// Define fields here:
 	id: string;
-	question: mongoose.Types.ObjectId[];
+	questions: mongoose.Types.ObjectId[];
 	courseId: mongoose.Types.ObjectId;
 }
 

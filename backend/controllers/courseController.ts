@@ -118,6 +118,7 @@ export const createCourse = async (
 			productInfo,
 			shortUrl,
 			draft,
+			registrationLimit,
 		} = req.body;
 
 		// Validate required fields
@@ -175,6 +176,7 @@ export const createCourse = async (
 			productInfo,
 			shortUrl,
 			draft,
+			registrationLimit,
 		});
 
 		const savedCourseResponse = await newCourseResponse.save();

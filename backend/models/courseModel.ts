@@ -33,6 +33,7 @@ export interface ICourse extends Document {
 	productInfo: string;
 	shortUrl: string;
 	draft: boolean;
+	registrationLimit: number;
 }
 
 const CourseSchema: Schema = new Schema(
@@ -49,7 +50,7 @@ const CourseSchema: Schema = new Schema(
 				ref: "Rating",
 			},
 		],
-		className: { type: String, required: true },
+		className: { type: String, required: false },
 		discussion: { type: String, required: false },
 		categories: [{ type: String, required: false }],
 		creditNumber: { type: Number, required: false },
@@ -96,6 +97,7 @@ const CourseSchema: Schema = new Schema(
 		productInfo: { type: String, required: false },
 		shortUrl: { type: String, required: false },
 		draft: { type: Boolean, required: true, default: true },
+		registrationLimit: { type: Number, required: false, default: 0 },
 	},
 	{
 		timestamps: true,

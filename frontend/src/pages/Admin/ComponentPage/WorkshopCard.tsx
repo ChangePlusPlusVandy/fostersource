@@ -158,7 +158,7 @@ export default function WorkshopCard({
 				<p className="text-sm text-gray-500 mb-5">
 					Live Event {formatWebinarDate(webinar.startTime)}
 				</p>
-				<p className="text-sm font-medium">Prerequisites</p>
+				{/* <p className="text-sm font-medium">Prerequisites</p>
 
 				<Dropdown
 					buttonLabel={`None Selected: ${prerequisites.survey}`}
@@ -179,7 +179,7 @@ export default function WorkshopCard({
 							throw new Error("Function not implemented.");
 						}}
 					/>
-				</div>
+				</div> */}
 
 				<div className="mt-8 text-xs font-bold">Preview</div>
 				<div className="mt-2 border p-3 rounded-lg border-black h-[350px] relative flex items-center flex-col">
@@ -211,11 +211,11 @@ export default function WorkshopCard({
 					Edit Component
 				</button>
 
-				<div className="flex justify-center mt-2">
+				{/* <div className="flex justify-center mt-2">
 					<button className="text-purple-600 underline transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95">
 						Hide Component
 					</button>
-				</div>
+				</div> */}
 			</div>
 		</div>
 	);

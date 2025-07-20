@@ -29,6 +29,7 @@ interface CourseEditState {
 	productInfo: string;
 	shortUrl?: string;
 	draft: boolean;
+	registrationLimit: number;
 
 	// Hydration & data control
 	hasHydrated: boolean;
@@ -80,6 +81,7 @@ const initialState: Omit<
 	productInfo: "",
 	shortUrl: undefined,
 	draft: true,
+	registrationLimit: 0,
 };
 
 export const useCourseEditStore = create<CourseEditState>()(

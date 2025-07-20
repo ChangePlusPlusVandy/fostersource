@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { X as XIcon } from "lucide-react";
 import SaveCourseButton from "../../../components/SaveCourseButtons";
+import { useCourseEditStore } from "../../../store/useCourseEditStore";
+import DatePicker from "react-datepicker";
 
 interface UserType {
 	type: string;
@@ -16,46 +18,72 @@ interface PricingProps {
 }
 
 const Pricing: React.FC<PricingProps> = ({ onClose }) => {
-	const [registrationLimit, setRegistrationLimit] = useState("none");
-	const [privateRegistration, setPrivateRegistration] = useState(false);
-	const [earlyBirdPricing, setEarlyBirdPricing] = useState(false);
-	const [noEndSales, setNoEndSales] = useState(false);
-	const [autoCloseAccess, setAutoCloseAccess] = useState(false);
-	const [delayedOpening, setDelayedOpening] = useState(false);
-	const [emailManagers, setEmailManagers] = useState(false);
-	const [emailRegistrants, setEmailRegistrants] = useState(false);
-	const [expirationDays, setExpirationDays] = useState("0");
+	const [registrationLimitEnabled, setRegistrationLimitEnabled] =
+		useState(false);
+	const [registrationLimitInput, setRegistrationLimitInput] = useState("0");
+	const [isInvalidLimit, setIsInvalidLimit] = useState(false);
 
-	const [userTypes, setUserTypes] = useState<UserType[]>(
-		Array(15).fill({
-			type: "Former FP/Adoptive Parent",
-			view: false,
-			register: false,
-			instantRegister: false,
-			price: "",
-			earlyBirdPrice: "",
-		})
-	);
+	// Format Date → datetime-local string
+	const formatDateForInput = (date: Date | null | undefined) => {
+		if (!date) return "";
+		return date.toISOString().slice(0, 16);
+	};
 
-	const DisabledDateInput = ({
-		label,
-		enabled,
-	}: {
-		label: string;
-		enabled: boolean;
-	}) => (
-		<div className="ml-6 mt-1">
-			<div className={`text-sm ${enabled ? "text-gray-900" : "text-gray-400"}`}>
-				{label}
-			</div>
-			<input
-				type="datetime-local"
-				disabled={!enabled}
-				className={`w-64 p-2 border rounded-lg text-sm ${!enabled ? "bg-gray-100 text-gray-400" : "bg-white text-gray-900"}`}
-				placeholder="__/__/____ __:__"
-			/>
-		</div>
-	);
+	// Parse string → Date
+	const parseDateFromInput = (val: string): Date | null => {
+		const parsed = new Date(val);
+		return isNaN(parsed.getTime()) ? null : parsed;
+	};
+
+	// Validate input string is a clean integer
+	const isStringInt = (val: string) => {
+		if (val.trim() === "") return false;
+		const parsed = parseInt(val, 10);
+		return !isNaN(parsed) && parsed.toString() === val.trim();
+	};
+
+	const { registrationLimit, regStart, regEnd, setField } =
+		useCourseEditStore();
+
+	// const [privateRegistration, setPrivateRegistration] = useState(false);
+	// const [earlyBirdPricing, setEarlyBirdPricing] = useState(false);
+	// const [noEndSales, setNoEndSales] = useState(false);
+	// const [autoCloseAccess, setAutoCloseAccess] = useState(false);
+	// const [delayedOpening, setDelayedOpening] = useState(false);
+	// const [emailManagers, setEmailManagers] = useState(false);
+	// const [emailRegistrants, setEmailRegistrants] = useState(false);
+	// const [expirationDays, setExpirationDays] = useState("0");
+
+	// const [userTypes, setUserTypes] = useState<UserType[]>(
+	// 	Array(15).fill({
+	// 		type: "Former FP/Adoptive Parent",
+	// 		view: false,
+	// 		register: false,
+	// 		instantRegister: false,
+	// 		price: "",
+	// 		earlyBirdPrice: "",
+	// 	})
+	// );
+
+	// const DisabledDateInput = ({
+	// 	label,
+	// 	enabled,
+	// }: {
+	// 	label: string;
+	// 	enabled: boolean;
+	// }) => (
+	// 	<div className="ml-6 mt-1">
+	// 		<div className={`text-sm ${enabled ? "text-gray-900" : "text-gray-400"}`}>
+	// 			{label}
+	// 		</div>
+	// 		<input
+	// 			type="datetime-local"
+	// 			disabled={!enabled}
+	// 			className={`w-64 p-2 border rounded-lg text-sm ${!enabled ? "bg-gray-100 text-gray-400" : "bg-white text-gray-900"}`}
+	// 			placeholder="__/__/____ __:__"
+	// 		/>
+	// 	</div>
+	// );
 
 	return (
 		<div className="bg-white w-full">
@@ -73,23 +101,57 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
           </div> */}
 
 			<div className="p-6">
-				<h2 className="text-xl font-bold mb-6"></h2>
-
 				<div className="flex gap-8">
 					<div className="w-1/3">
-						<h3 className="text-sm font-medium mb-2">Registration Limit</h3>
-						<select
-							value={registrationLimit}
-							onChange={(e) => setRegistrationLimit(e.target.value)}
-							className="w-full p-2 border rounded-lg text-sm mb-6"
-						>
-							<option value="none">none</option>
-							<option value="10">10</option>
-							<option value="20">20</option>
-							<option value="30">30</option>
-						</select>
+						<div className="mt-3 gap-2 flex flex-col text-md w-[250px] mb-4">
+							<label className="flex items-center gap-2">
+								<input
+									type="checkbox"
+									className="accent-[#8757a3]"
+									checked={registrationLimitEnabled}
+									onChange={(e) => {
+										setRegistrationLimitEnabled(e.target.checked);
+										if (!e.target.checked) {
+											setIsInvalidLimit(false);
+										}
+									}}
+								/>
+								Set Registration Limit
+							</label>
 
-						<div className="space-y-2 mb-6">
+							<input
+								type="text"
+								disabled={!registrationLimitEnabled}
+								className={`rounded px-2 py-1 focus:outline-none border ${
+									registrationLimitEnabled
+										? isInvalidLimit
+											? "border-red-500"
+											: "border-gray-300"
+										: "bg-gray-100 text-gray-400 border-gray-200"
+								}`}
+								value={registrationLimitInput}
+								onChange={(e) => {
+									const val = e.target.value;
+									setRegistrationLimitInput(val);
+
+									if (isStringInt(val)) {
+										setIsInvalidLimit(false);
+										setField("registrationLimit", parseInt(val, 10));
+									} else {
+										setIsInvalidLimit(true);
+									}
+								}}
+								placeholder="Enter a number"
+							/>
+
+							{registrationLimitEnabled && isInvalidLimit && (
+								<span className="text-red-500 text-sm mt-1">
+									Please enter a valid number
+								</span>
+							)}
+						</div>
+
+						{/* <div className="space-y-2 mb-6">
 							<label className="flex items-center gap-2 text-sm">
 								<input
 									type="checkbox"
@@ -113,29 +175,32 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 								label="Expiration"
 								enabled={earlyBirdPricing}
 							/>
-						</div>
+						</div> */}
 
 						<div className="space-y-4 mb-6">
 							<div>
-								<h3 className="text-sm font-medium mb-2">Start Sales</h3>
-								<input
-									type="datetime-local"
+								<h3 className="text-sm font-medium mb-2">Start Registration</h3>
+								<DatePicker
+									selected={regStart}
+									onChange={(date) => date && setField("regStart", date)}
+									showTimeSelect
+									dateFormat="Pp"
 									className="w-64 p-2 border rounded-lg text-sm"
-									placeholder="__/__/____ __:__"
 								/>
 							</div>
 
 							<div>
-								<h3 className="text-sm font-medium mb-2">End Sales</h3>
-								<input
-									type="datetime-local"
+								<h3 className="text-sm font-medium mb-2">End Registration</h3>
+								<DatePicker
+									selected={regEnd}
+									onChange={(date) => date && setField("regEnd", date)}
+									showTimeSelect
+									dateFormat="Pp"
 									className="w-64 p-2 border rounded-lg text-sm"
-									placeholder="__/__/____ __:__"
 								/>
 							</div>
 						</div>
-
-						<div className="space-y-2 mb-6">
+						{/* <div className="space-y-2 mb-6">
 							<label className="flex items-center gap-2 text-sm">
 								<input
 									type="checkbox"
@@ -173,9 +238,9 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 								label="Open For Access Date"
 								enabled={delayedOpening}
 							/>
-						</div>
+						</div> */}
 
-						<div className="space-y-4 mb-6">
+						{/* <div className="space-y-4 mb-6">
 							<h3 className="text-sm font-medium">Expire Registrations</h3>
 							<div className="flex gap-2">
 								<input
@@ -189,9 +254,9 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 									<option>Days from Registration</option>
 								</select>
 							</div>
-						</div>
+						</div> */}
 
-						<div className="space-y-2">
+						{/* <div className="space-y-2">
 							<label className="flex items-center gap-2 text-sm">
 								<input
 									type="checkbox"
@@ -211,7 +276,7 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 								/>
 								<span>Email Registrants on Completion</span>
 							</label>
-						</div>
+						</div> */}
 					</div>
 
 					{/* <div className="w-2/3">
