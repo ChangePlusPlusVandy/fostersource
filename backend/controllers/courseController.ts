@@ -52,7 +52,9 @@ export const getCourseById = async (
 
 		if (id) {
 			// Find course by ID and populate related fields
-			const course = await Course.findById(id).populate(["speakers"]).exec();
+			const course = await Course.findById(id)
+				.populate(["speakers", "handouts"])
+				.exec();
 
 			if (!course) {
 				res.status(404).json({
