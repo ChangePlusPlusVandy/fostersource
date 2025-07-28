@@ -39,7 +39,17 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 		const loadCourse = async () => {
 			try {
 				const res = await apiClient.get(`/courses/${courseId}`);
-				setAllFields({ ...res.data.data, _id: courseId });
+				const course = res.data.data;
+
+				const cleanedCourse = {
+					...course,
+					speakers: Array.isArray(course.speakers)
+						? course.speakers.map((s: any) => s._id.toString())
+						: [],
+					_id: courseId,
+				};
+
+				setAllFields(cleanedCourse);
 				setFetchedFromBackend();
 			} catch (err) {
 				console.error("Failed to fetch course", err);
@@ -65,7 +75,7 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 			highlightLeftOffset: "51.4px",
 		},
 		{
-			name: "Pricing",
+			name: "Settings",
 			path: `${basePath}/pricing`,
 			highlightLeftOffset: "51.4px",
 		},

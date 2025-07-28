@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import apiClient from "../../../services/apiClient";
 import { useParams } from "react-router-dom";
+import SaveCourseButton from "../../../components/SaveCourseButtons";
 type Row = {
 	id?: string;
 	subject: string;
@@ -32,7 +33,6 @@ const HandoutPage = () => {
 		try {
 			const response = await apiClient.get(`/courses/${id}`);
 			const course = response.data.data;
-			console.log("course: ", course);
 			const formattedHandouts = course.handouts.map(
 				(
 					handout: { fileType: string; fileUrl: string; _id: string },
@@ -614,6 +614,7 @@ const HandoutPage = () => {
 					</tbody>
 				</table>
 			</div>
+			<SaveCourseButton prevLink="components" nextLink="speakers" />
 		</div>
 	);
 };

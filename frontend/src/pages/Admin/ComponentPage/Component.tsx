@@ -3,6 +3,7 @@ import Dropdown from "../../../components/dropdown-select";
 import WorkshopCard from "./WorkshopCard";
 import SurveyCard from "./SurveyCard";
 import CertificateCard from "./CertificateCard";
+import SaveCourseButton from "../../../components/SaveCourseButtons";
 
 // Card Component
 interface CardProps {
@@ -42,41 +43,44 @@ export default function Component({
 	certificate,
 }: InclusiveSupportPageProps) {
 	return (
-		<div className="flex flex-row w-full gap-4 p-4">
-			<WorkshopCard
-				prerequisites={{
-					survey: "",
-					certificate: "",
-				}}
-				setPrerequisites={function (
-					value: SetStateAction<{ survey: string; certificate: string }>
-				): void {
-					throw new Error("Function not implemented.");
-				}}
-			/>
-			<SurveyCard
-				prerequisites={{
-					survey: "",
-					certificate: "",
-				}}
-				setPrerequisites={function (
-					value: SetStateAction<{ survey: string; certificate: string }>
-				): void {
-					throw new Error("Function not implemented.");
-				}}
-			/>
-			<CertificateCard
-				workshop={undefined}
-				prerequisites={{
-					survey: "",
-					certificate: "",
-				}}
-				setPrerequisites={function (
-					value: SetStateAction<{ survey: string; certificate: string }>
-				): void {
-					throw new Error("Function not implemented.");
-				}}
-			/>
+		<div>
+			<div className="flex flex-row w-full gap-4 p-4">
+				<WorkshopCard
+					prerequisites={{
+						survey: "",
+						certificate: "",
+					}}
+					setPrerequisites={function (
+						value: SetStateAction<{ survey: string; certificate: string }>
+					): void {
+						throw new Error("Function not implemented.");
+					}}
+				/>
+				<SurveyCard
+					prerequisites={{
+						survey: "",
+						certificate: "",
+					}}
+					setPrerequisites={function (
+						value: SetStateAction<{ survey: string; certificate: string }>
+					): void {
+						throw new Error("Function not implemented.");
+					}}
+				/>
+				<CertificateCard
+					workshop={undefined}
+					prerequisites={{
+						survey: "",
+						certificate: "",
+					}}
+					setPrerequisites={function (
+						value: SetStateAction<{ survey: string; certificate: string }>
+					): void {
+						throw new Error("Function not implemented.");
+					}}
+				/>
+			</div>
+			<SaveCourseButton prevLink="pricing" nextLink="handouts" />
 		</div>
 	);
 }

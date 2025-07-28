@@ -45,10 +45,11 @@ const SaveCourseButton = ({ prevLink, nextLink }: SaveCourseButtonProps) => {
 					handleSave();
 					navigate("/admin/products");
 				}}
-				className="text-purple2 cursor-pointer"
+				className={`text-purple2 cursor-pointer ${prevLink === "" && nextLink === "" ? "text-white bg-purple2 py-3 px-6 rounded-md" : ""}`}
 			>
 				Exit and Save
 			</button>
+
 			{prevLink === "" ? (
 				<></>
 			) : (
@@ -62,14 +63,18 @@ const SaveCourseButton = ({ prevLink, nextLink }: SaveCourseButtonProps) => {
 				</button>
 			)}
 
-			<button
-				className="px-14 py-2 bg-purple2 text-white rounded-md cursor-pointer"
-				onClick={() => {
-					navigate(`${basePath}/${nextLink}`);
-				}}
-			>
-				Next
-			</button>
+			{nextLink === "" ? (
+				<></>
+			) : (
+				<button
+					className="px-14 py-2 bg-purple2 text-white rounded-md cursor-pointer"
+					onClick={() => {
+						navigate(`${basePath}/${nextLink}`);
+					}}
+				>
+					Next
+				</button>
+			)}
 		</div>
 	);
 };

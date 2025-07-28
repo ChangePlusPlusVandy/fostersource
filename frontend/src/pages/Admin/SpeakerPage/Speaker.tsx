@@ -6,6 +6,7 @@ import Dropdown from "../../../components/dropdown-select";
 import SearchDropdown from "../ComponentPage/DropDownSearch";
 import SaveCourseButton from "../../../components/SaveCourseButtons";
 import adminApiClient from "../../../services/adminApiClient";
+import { useParams } from "react-router-dom";
 
 interface Speaker {
 	_id?: string;
@@ -103,23 +104,25 @@ export default function SpeakersPage() {
 	useEffect(() => {
 		if (!hasHydratedRef.current) {
 			hasHydratedRef.current = true;
-			fetchSpeakers(); // only runs after Zustand state is restored
+			fetchSpeakers();
 		}
 	}, [speakers]);
+
+	const { id } = useParams();
 
 	const fetchSpeakers = async () => {
 		try {
 			setLoading(true);
+			const response2 = await apiClient.get(`/courses/${id}`);
+			const course = response2.data.data;
+			setCourseSpeakers(course.speakers);
+
 			const response = await apiClient.get("/speakers");
 			if (Array.isArray(response.data) && response.data.length > 0) {
 				const all = response.data;
 
-				console.log(all);
+				const remaining = all.filter((s) => !course.speakers.includes(s._id));
 
-				const matched = all.filter((s) => speakers.includes(s._id));
-				const remaining = all.filter((s) => !speakers.includes(s._id));
-
-				setCourseSpeakers(matched);
 				setAllSpeakers(remaining);
 			} else {
 				console.warn("No speakers found or data is not an array");
@@ -227,10 +230,24 @@ export default function SpeakersPage() {
 	const handleRemoveSpeaker = async (speakerId: string | undefined) => {
 		if (!speakerId) return;
 
-		const updatedSpeakers = speakers.filter((id) => id !== speakerId);
-		setField("speakers", updatedSpeakers);
+		console.log("speakers", speakers);
 
+		const updatedSpeakers = speakers.filter((s) => s !== speakerId);
+		console.log("updatedSpeakesr", updatedSpeakers);
+		setField("speakers", updatedSpeakers);
 		setCourseSpeakers((prev) => prev.filter((s) => s._id !== speakerId));
+
+		console.log("deleted: ", speakers);
+
+		try {
+			const speakerIds = updatedSpeakers.map((s) => s);
+
+			await apiClient.put(`/courses/${id}`, {
+				speakers: speakerIds,
+			});
+		} catch (err) {
+			console.error("Failed to update course speakers in backend:", err);
+		}
 	};
 
 	const handleUpdateSpeaker = async () => {
@@ -396,17 +413,29 @@ export default function SpeakersPage() {
 							selected={selectedSpeakerNames}
 							setSelected={setSelectedSpeakerNames}
 							placeholder="Search for existing speakers"
-							onSelect={(selectedName) => {
+							onSelect={async (selectedName) => {
 								const matched = allSpeakers.find(
 									(s) => s.name === selectedName
 								);
 								if (matched && matched._id) {
-									setCurrentSpeaker(matched);
-									setField("speakers", [...speakers, matched._id]);
+									// Update Zustand state
+									const updatedSpeakerIds = [...speakers, matched._id];
+									setField("speakers", updatedSpeakerIds);
+
+									// Optimistically update UI
 									setAllSpeakers((prev) =>
 										prev.filter((s) => s._id !== matched._id)
 									);
 									setCourseSpeakers((prev) => [...prev, matched]);
+
+									// ✅ Persist to backend
+									try {
+										await apiClient.put(`/courses/${id}`, {
+											speakers: updatedSpeakerIds,
+										});
+									} catch (err) {
+										console.error("Failed to persist speaker to course:", err);
+									}
 								}
 								handleExit();
 							}}
@@ -639,7 +668,7 @@ export default function SpeakersPage() {
 			{/* Add Speaker Modal */}
 			{showAddModal && <SpeakerFormModal isAdd={true} />}
 
-			<SaveCourseButton prevLink="components" nextLink={"handouts"} />
+			<SaveCourseButton prevLink="" nextLink="" />
 		</div>
 	);
 }

@@ -13,6 +13,7 @@ import {
 	getCleanCourseData,
 	useCourseEditStore,
 } from "../../../store/useCourseEditStore";
+import { useNavigate } from "react-router-dom";
 
 export default function WorkshopCreation() {
 	const [webinarData, setWebinarData] = useState({
@@ -47,6 +48,8 @@ export default function WorkshopCreation() {
 	};
 
 	const course = getCleanCourseData();
+
+	const navigate = useNavigate();
 
 	function getInitialType() {
 		if (course.productType === "Virtual Training - On Demand") {
@@ -320,10 +323,16 @@ export default function WorkshopCreation() {
 						/>
 					)}
 				</div>
-				<SaveCourseButton
-					prevLink="pricing"
-					nextLink="speakers"
-				></SaveCourseButton>
+				<div className="flex justify-end">
+					<button
+						className="px-14 py-2 bg-purple2 text-white rounded-md cursor-pointer"
+						onClick={() => {
+							navigate(`/admin/product/edit/${course._id}/components`);
+						}}
+					>
+						Back
+					</button>
+				</div>
 			</form>
 
 			{/* New Meeting Modal */}
