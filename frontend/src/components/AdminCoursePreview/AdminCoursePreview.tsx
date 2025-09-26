@@ -35,7 +35,7 @@ interface AdminCoursePreviewProps {
 }
 
 const elemColors: Record<string, string> = {
-	Ongoing: "#30CD5A",
+	Ongoing: "#444444",
 	"Open Registration": "#F79518",
 	"Closed Registration": "#BE0000",
 	Storage: "#444444",
@@ -103,7 +103,14 @@ function AdminCoursePreview({
 					style={{ accentColor: "#8757a3" }}
 				/>
 				<div className="flex items-center gap-2">
-					<span className="font-medium">{product.course.className}</span>
+					<span className="font-medium flex gap-1">
+						{product.course.className}{" "}
+						{product.course.draft ? (
+							<p className="text-red-600 italic">[Draft]</p>
+						) : (
+							""
+						)}
+					</span>
 				</div>
 			</div>
 
@@ -133,15 +140,15 @@ function AdminCoursePreview({
 					</span>
 				)}
 
-				<Calendar className="w-12" />
+				{/* <Calendar className="w-12" />
 				<span className="text-gray-500 w-24">
 					{product.startTime.getMonth() + 1}/{product.startTime.getDate()}/
 					{product.startTime.getFullYear()} at {product.startTime.getHours()}:
 					{product.startTime.getMinutes().toString().padStart(2, "0")}{" "}
 					{product.timeZone}
-				</span>
+				</span> */}
 
-				<div className="flex flex-col space-y-2 w-36">
+				{/* <div className="flex flex-col space-y-2 w-36">
 					<div className="flex flex-row justify-between">
 						<div
 							className="flex rounded-lg border text-white px-1 group relative"
@@ -168,13 +175,12 @@ function AdminCoursePreview({
 						>
 							Live
 						</div>
-						<div
-							className="text-white rounded-lg px-1"
-							style={{ backgroundColor: "#9C75B4" }}
-						>
-							{product.course.students.length} registered
-						</div>
+						
 					</div>
+				</div> */}
+
+				<div className="rounded-lg text-gray-500 px-1">
+					{product.course.students.length} registered
 				</div>
 
 				<div className="flex gap-4">

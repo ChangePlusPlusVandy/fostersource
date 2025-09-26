@@ -323,7 +323,7 @@ export default function ProductPage() {
 			<div className="max-w-screen-2xl mx-auto px-8 py-6">
 				<div className="bg-white border rounded-lg p-6">
 					<div className="mb-6">
-						<h1 className="text-2xl font-bold">Products</h1>
+						<h1 className="text-2xl font-bold">Courses</h1>
 					</div>
 
 					<div className="mb-6">
@@ -333,7 +333,7 @@ export default function ProductPage() {
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
 								className="w-full pl-4 pr-16 py-3 rounded-lg border bg-white text-gray-800 placeholder-gray-400"
-								placeholder="Search products..."
+								placeholder="Search courses..."
 							/>
 							<div className="absolute right-0 top-0 bottom-0 flex items-center rounded-r-lg overflow-hidden">
 								<div className="h-full px-4 flex items-center bg-[#9c74b4]">

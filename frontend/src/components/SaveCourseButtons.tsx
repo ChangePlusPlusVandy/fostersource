@@ -23,9 +23,11 @@ const SaveCourseButton = ({ prevLink, nextLink }: SaveCourseButtonProps) => {
 			if (course._id) {
 				console.log("course:", course);
 				await apiClient.put(`/courses/${course._id}`, course);
+				navigate("/admin/products");
 				alert("Course updated!");
 			} else {
 				const res = await apiClient.post("/courses", course);
+				navigate("/admin/products");
 				alert("Course created!");
 				// Optionally redirect to edit mode after creating:
 				// navigate(`/admin/product/edit/${res.data.data._id}/details`);
@@ -36,14 +38,26 @@ const SaveCourseButton = ({ prevLink, nextLink }: SaveCourseButtonProps) => {
 		}
 	};
 
+	const handlePublish = async () => {
+		await apiClient.put(`/courses/${course._id}`, { draft: !course.draft });
+		navigate("/admin/products");
+	};
+
 	const navigate = useNavigate();
 
 	return (
 		<div className="w-full flex justify-end gap-4 mt-2 z-50">
 			<button
+				className="text-purple2 cursor-pointer mr-4"
+				onClick={() => {
+					handlePublish();
+				}}
+			>
+				{course.draft ? "Publish" : "Unpublish"}
+			</button>
+			<button
 				onClick={() => {
 					handleSave();
-					navigate("/admin/products");
 				}}
 				className={`text-purple2 cursor-pointer ${prevLink === "" && nextLink === "" ? "text-white bg-purple2 py-3 px-6 rounded-md" : ""}`}
 			>
