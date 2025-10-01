@@ -12,8 +12,9 @@ import {
 
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
+	isLoggedIn: boolean;
 }
-export default function Catalog({ setCartItemCount }: CatalogProps) {
+export default function Catalog({ setCartItemCount, isLoggedIn }: CatalogProps) {
 	const [courses, setCourses] = useState<Course[]>([]);
 	const location = useLocation();
 	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
@@ -34,9 +35,6 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 			try {
 				setLoading(true);
 
-				const user = JSON.parse(localStorage.getItem("user") || "{}");
-				const userId = user._id;
-
 				// Get all open courses (not drafts)
 				const courseResponse = await apiClient.get("/courses");
 				const openCourses: Course[] = courseResponse.data.data.filter(
@@ -45,30 +43,61 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 						!course.draft
 				);
 
-				// Get user's progresses (i.e. registered courses)
-				const progressResponse = await apiClient.get(
-					`/progress/progress/${userId}`
-				);
-				const registeredCourseIds = new Set(
-					progressResponse.data.progresses.map((p: any) => p.course._id)
-				);
+				if (isLoggedIn) {
+					// Only fetch user progress and filter if user is logged in
+					const user = JSON.parse(localStorage.getItem("user") || "{}");
+					const userId = user._id;
 
-				// Filter out courses the user is already registered for
-				const unregisteredCourses = openCourses.filter(
-					(course) => !registeredCourseIds.has(course._id)
-				);
+					if (userId) {
+						// Get user's progresses (i.e. registered courses)
+						const progressResponse = await apiClient.get(
+							`/progress/progress/${userId}`
+						);
+						const registeredCourseIds = new Set(
+							progressResponse.data.progresses.map((p: any) => p.course._id)
+						);
 
-				setCourses(unregisteredCourses);
-				setFilteredCourses(unregisteredCourses);
+						// Filter out courses the user is already registered for
+						const unregisteredCourses = openCourses.filter(
+							(course) => !registeredCourseIds.has(course._id)
+						);
+
+						setCourses(unregisteredCourses);
+						setFilteredCourses(unregisteredCourses);
+					} else {
+						// If no userId found but logged in, show all courses
+						setCourses(openCourses);
+						setFilteredCourses(openCourses);
+					}
+				} else {
+					// If not logged in, show all available courses
+					setCourses(openCourses);
+					setFilteredCourses(openCourses);
+				}
 			} catch (error) {
 				console.error("Error loading catalog:", error);
+				// Fallback to showing all courses if there's an error
+				try {
+					const courseResponse = await apiClient.get("/courses");
+					const openCourses: Course[] = courseResponse.data.data.filter(
+						(course: Course) =>
+							new Date(course.regStart).getTime() < new Date().getTime() &&
+							!course.draft
+					);
+					setCourses(openCourses);
+					setFilteredCourses(openCourses);
+				} catch (fallbackError) {
+					console.error("Fallback course loading failed:", fallbackError);
+					setCourses([]);
+					setFilteredCourses([]);
+				}
 			} finally {
 				setLoading(false);
 			}
 		};
 
 		fetchData();
-	}, []);
+	}, [isLoggedIn]);
 
 	// Initialize cart state from localStorage when the component mounts
 	useEffect(() => {
@@ -193,6 +222,7 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 								course={course}
 								setCartItemCount={setCartItemCount}
 								isInCart={cart.some((c) => c._id === course._id)}
+								isLoggedIn={isLoggedIn}
 							/>
 						))
 					) : (

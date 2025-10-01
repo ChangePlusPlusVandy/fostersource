@@ -7,12 +7,14 @@ interface CatalogCourseComponentProps {
 	course: Course;
 	setCartItemCount: Dispatch<SetStateAction<number>>;
 	isInCart: boolean;
+	isLoggedIn: boolean;
 }
 
 export default function CatalogCourseComponent({
 	course,
 	setCartItemCount,
 	isInCart,
+	isLoggedIn,
 }: CatalogCourseComponentProps) {
 	const renderStars = (rating: number) => {
 		const fullStars = Math.floor(rating);
@@ -97,28 +99,38 @@ export default function CatalogCourseComponent({
 				</p>
 
 				<div className="flex items-center gap-4 mt-6">
-					<button
-						disabled={isDisabled}
-						onClick={() => !isDisabled && handleRegister(course)}
-						className={`text-white text-sm font-medium py-2 px-4 rounded-lg transition ${
-							isDisabled
-								? "bg-gray-400 cursor-not-allowed"
-								: "bg-orange-500 hover:bg-orange-600"
-						}`}
-					>
-						{isInCart
-							? "Already in Cart"
-							: isAtCapacity
-								? "Course Full"
-								: `Register (${
-										JSON.parse(localStorage.user).role.cost === 0
-											? "Free"
-											: `${new Intl.NumberFormat("en-US", {
-													style: "currency",
-													currency: "USD",
-												}).format(JSON.parse(localStorage.user).role.cost)}`
-									})`}
-					</button>
+					{isLoggedIn ? (
+						<button
+							disabled={isDisabled}
+							onClick={() => !isDisabled && handleRegister(course)}
+							className={`text-white text-sm font-medium py-2 px-4 rounded-lg transition ${
+								isDisabled
+									? "bg-gray-400 cursor-not-allowed"
+									: "bg-orange-500 hover:bg-orange-600"
+							}`}
+						>
+							{isInCart
+								? "Already in Cart"
+								: isAtCapacity
+									? "Course Full"
+									: `Register (${
+											localStorage.user && JSON.parse(localStorage.user).role?.cost === 0
+												? "Free"
+												: localStorage.user 
+													? `${new Intl.NumberFormat("en-US", {
+															style: "currency",
+															currency: "USD",
+														}).format(JSON.parse(localStorage.user).role.cost)}`
+													: "Free"
+										})`}
+						</button>
+					) : (
+						<Link to="/login">
+							<button className="bg-blue-500 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-blue-600 transition">
+								Login to Register
+							</button>
+						</Link>
+					)}
 					<Link to={`/courseDetails?courseId=${course._id}`}>
 						<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
 							Learn More
