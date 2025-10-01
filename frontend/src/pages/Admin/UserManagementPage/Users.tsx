@@ -171,10 +171,13 @@ const UserManagementPage: React.FC = () => {
 	};
 
 	const formatUserForBackend = (userData: UserForm) => {
+		console.log("User form data:", userData); // Debug log
+		console.log("UserType data:", userData.userType); // Debug log
+
 		return {
 			name: `${userData.firstName} ${userData.lastName}`,
 			email: userData.email,
-			userType: userData.userType,
+			role: userData.userType?._id, // Send as 'role' with just the ObjectId
 			company: userData.company,
 			address1: userData.addressLine,
 			city: userData.city,
@@ -192,9 +195,14 @@ const UserManagementPage: React.FC = () => {
 
 		try {
 			const backendUserData = formatUserForBackend(userForm);
+			console.log("Sending user data to backend:", backendUserData); // Debug log
 
 			if (editingUserId) {
-				await apiClient.put(`/users/${editingUserId}`, backendUserData);
+				const response = await apiClient.put(
+					`/users/${editingUserId}`,
+					backendUserData
+				);
+				console.log("Backend response:", response.data); // Debug log
 
 				setUsers((prevUsers) =>
 					prevUsers.map((user) =>
@@ -274,6 +282,7 @@ const UserManagementPage: React.FC = () => {
 			language: "English",
 			certification: "",
 		});
+		setUserType(null); // Also reset the userType state
 	};
 
 	const handleEditUser = (user: User) => {
@@ -292,6 +301,7 @@ const UserManagementPage: React.FC = () => {
 			language: user.language || "English",
 			certification: user.certification || "",
 		});
+		setUserType(user.userType); // Sync the userType state with the form
 		setEditingUserId(user._id || null);
 		setIsUserModalOpen(true);
 	};
@@ -855,7 +865,10 @@ const UserManagementPage: React.FC = () => {
 									getOptionLabel={(ut) => ut.name}
 									getOptionValue={(ut) => ut._id}
 									value={userType}
-									onChange={(ut) => setUserType(ut)}
+									onChange={(ut) => {
+										setUserType(ut);
+										setUserForm((prev) => ({ ...prev, userType: ut }));
+									}}
 									placeholder="Choose User Type"
 									styles={{
 										control: (provided, state) => ({
