@@ -63,8 +63,8 @@ export default function SurveySummary() {
 				numResponses: Array.isArray(surveyResponses)
 					? surveyResponses.length
 					: 0,
-				questionIds: Array.isArray(survey.questions) 
-					? survey.questions.map((q: any) => q._id || q) 
+				questionIds: Array.isArray(survey.questions)
+					? survey.questions.map((q: any) => q._id || q)
 					: [],
 			};
 			receivedSurveys.push(surveyData);
