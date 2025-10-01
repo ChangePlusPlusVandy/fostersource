@@ -104,7 +104,7 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 			highlightLeftOffset: "24.5px",
 		},
 		{
-			name: "Participation",
+			name: "Progress",
 			path: `${basePath}/participation`,
 			highlightLeftOffset: "16px",
 		},
@@ -117,11 +117,11 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 
 	const filteredSidebarItems = sidebarItems.filter((item) => {
 		if (isManagePage) {
-			return ["Speakers", "Registrants", "Participation", "Email"].includes(
+			return ["Speakers", "Registrants", "Progress", "Email"].includes(
 				item.name
 			);
 		} else {
-			return !["Registrants", "Participation", "Email"].includes(item.name);
+			return !["Registrants", "Progress", "Email"].includes(item.name);
 		}
 	});
 

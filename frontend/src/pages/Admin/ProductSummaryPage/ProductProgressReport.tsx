@@ -188,6 +188,10 @@ const ProductProgressReport: React.FC<ProductProgressReportProps> = ({
 	const [selectedUserType, setSelectedUserType] = useState("All");
 	const [excludeFinished, setExcludeFinished] = useState(false);
 	const [userProgress, setUserProgress] = useState<UserProgress[]>([]);
+	const [originalUserProgress, setOriginalUserProgress] = useState<
+		UserProgress[]
+	>([]);
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [itemsPerPage] = useState(15);
@@ -338,9 +342,13 @@ const ProductProgressReport: React.FC<ProductProgressReportProps> = ({
 			}
 
 			setUserProgress(filteredProgress);
+			setOriginalUserProgress(JSON.parse(JSON.stringify(filteredProgress))); // Deep copy
+			setHasUnsavedChanges(false); // Reset change tracking when new data is loaded
 		} catch (error) {
 			console.error("Error fetching data:", error);
 			setUserProgress([]);
+			setOriginalUserProgress([]);
+			setHasUnsavedChanges(false);
 		} finally {
 			setIsLoading(false);
 		}
@@ -361,6 +369,7 @@ const ProductProgressReport: React.FC<ProductProgressReportProps> = ({
 					: p
 			)
 		);
+		setHasUnsavedChanges(true); // Mark that changes have been made
 		setEditModalOpen(false);
 	};
 
@@ -384,6 +393,9 @@ const ProductProgressReport: React.FC<ProductProgressReportProps> = ({
 
 			if (response.data.success) {
 				alert("All progress saved successfully.");
+				// Reset change tracking after successful save
+				setOriginalUserProgress(JSON.parse(JSON.stringify(userProgress))); // Deep copy
+				setHasUnsavedChanges(false);
 			} else {
 				console.error("Batch update failed:", response.data.message);
 				alert("Batch update failed.");
@@ -627,9 +639,15 @@ const ProductProgressReport: React.FC<ProductProgressReportProps> = ({
 													</td>
 													<td
 														className="px-4 py-2 text-sm truncate"
-														title={progress.user.role}
+														title={
+															(progress.user.role as any)?.name ||
+															progress.user.role ||
+															"N/A"
+														}
 													>
-														{progress.user.role}
+														{(progress.user.role as any)?.name ||
+															progress.user.role ||
+															"N/A"}
 													</td>
 													<td className="px-4 py-2 text-sm">
 														{progress.registeredDate ? (
@@ -714,7 +732,12 @@ const ProductProgressReport: React.FC<ProductProgressReportProps> = ({
 
 						<button
 							onClick={handleSaveAllProgress}
-							className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 self-end"
+							disabled={!hasUnsavedChanges}
+							className={`mt-4 px-4 py-2 rounded self-end ${
+								hasUnsavedChanges
+									? "bg-green-600 text-white hover:bg-green-700"
+									: "bg-gray-300 text-gray-500 cursor-not-allowed"
+							}`}
 						>
 							Save All Changes
 						</button>

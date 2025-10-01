@@ -406,9 +406,15 @@ export const getCourseUsers = async (
 			return;
 		}
 
-		// Check if the course exists and populate the students field
+		// Check if the course exists and populate the students field with their roles
 		console.log("Looking up course in database...");
-		const course = await Course.findById(courseId).populate("students");
+		const course = await Course.findById(courseId).populate({
+			path: "students",
+			populate: {
+				path: "role",
+				model: "UserType",
+			},
+		});
 		console.log("Found course:", course ? "Yes" : "No");
 		if (!course) {
 			console.log("Course not found in database");
