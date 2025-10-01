@@ -135,9 +135,20 @@ export default function UserTypesPage() {
 									</td>
 									{/* <td className="p-3">{ut.userCount}</td> */}
 									<td className="p-3 flex gap-3">
-										{ut.name === "Foster Parent (Colorado)" ||
-										ut.name === "Staff" ? (
+										{ut.name === "Staff" ? (
 											<></>
+										) : ut.name === "Foster Parent (Colorado)" ? (
+											<div className="flex gap-3">
+												<Pencil
+													className="w-4 h-4 cursor-pointer text-gray-600 hover:text-blue-600"
+													onClick={() => {
+														setSelectedType(ut);
+														setNewName(ut.name);
+														setNewCost(String(ut.cost));
+														setShowEdit(true);
+													}}
+												/>
+											</div>
 										) : (
 											<div className="flex gap-3">
 												<Pencil
@@ -233,10 +244,15 @@ export default function UserTypesPage() {
 							Type Name
 							<input
 								type="text"
-								className="w-full border p-2 mb-4 mt-1"
+								className={`w-full border p-2 mb-4 mt-1 ${
+									selectedType?.name === "Foster Parent (Colorado)" 
+										? "bg-gray-100 cursor-not-allowed" 
+										: ""
+								}`}
 								value={newName}
 								onChange={(e) => setNewName(e.target.value)}
 								placeholder="Type"
+								disabled={selectedType?.name === "Foster Parent (Colorado)"}
 							/>
 						</label>
 						<label>
