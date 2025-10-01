@@ -10,7 +10,6 @@ export default function Home() {
 		navigate(`/catalog?format=${format}`);
 	};
 	return (
-		
 		<div className="bg-gray-100 min-h-screen flex w-full">
 			<div className="flex-grow">
 				<main className="container mx-auto py-8 px-6 max-w-screen-lg">
@@ -80,6 +79,7 @@ export default function Home() {
 									}}
 									whileTap={{ scale: 0.93 }}
 									className="bg-black text-white px-6 py-2 rounded-lg shadow hover:bg-gray-800 transition duration-200"
+									onClick={() => navigate("/faqs")}
 								>
 									Learn More
 								</motion.button>

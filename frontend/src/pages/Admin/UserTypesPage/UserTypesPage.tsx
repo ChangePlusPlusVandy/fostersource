@@ -245,8 +245,8 @@ export default function UserTypesPage() {
 							<input
 								type="text"
 								className={`w-full border p-2 mb-4 mt-1 ${
-									selectedType?.name === "Foster Parent (Colorado)" 
-										? "bg-gray-100 cursor-not-allowed" 
+									selectedType?.name === "Foster Parent (Colorado)"
+										? "bg-gray-100 cursor-not-allowed"
 										: ""
 								}`}
 								value={newName}
