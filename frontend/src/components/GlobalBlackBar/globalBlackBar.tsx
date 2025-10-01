@@ -9,25 +9,27 @@ const GlobalBlackBar = () => {
 
 	useEffect(() => {
 		const checkTranslateElement = () => {
-			const translateElement = document.getElementById("google_translate_element");
+			const translateElement = document.getElementById(
+				"google_translate_element"
+			);
 			if (translateElement && !translateElement.hasChildNodes()) {
 				if (window.googleTranslateElementInit) {
 					window.googleTranslateElementInit();
 				}
 			}
 		};
-		
+
 		setTimeout(checkTranslateElement, 1000);
 		const handleTranslateClick = () => {
-			const googleElement = document.querySelector('.goog-te-gadget-simple');
+			const googleElement = document.querySelector(".goog-te-gadget-simple");
 			if (googleElement) {
 				(googleElement as HTMLElement).click();
 			} else {
-				console.log('bruh');
+				console.log("bruh");
 				if (window.googleTranslateElementInit) {
 					window.googleTranslateElementInit();
 					setTimeout(() => {
-						const newElement = document.querySelector('.goog-te-gadget-simple');
+						const newElement = document.querySelector(".goog-te-gadget-simple");
 						if (newElement) {
 							(newElement as HTMLElement).click();
 						}
@@ -38,12 +40,12 @@ const GlobalBlackBar = () => {
 
 		const translateLabel = translateLabelRef.current;
 		if (translateLabel) {
-			translateLabel.addEventListener('click', handleTranslateClick);
+			translateLabel.addEventListener("click", handleTranslateClick);
 		}
 
 		return () => {
 			if (translateLabel) {
-				translateLabel.removeEventListener('click', handleTranslateClick);
+				translateLabel.removeEventListener("click", handleTranslateClick);
 			}
 		};
 	}, []);
@@ -54,74 +56,58 @@ const GlobalBlackBar = () => {
 				<div className="contact-info">
 					<div className="contact-item">
 						<Phone className="contact-icon" />
-						<a href="tel:+13036184331">
-							(303) 618-4331
-						</a>
+						<a href="tel:+13036184331">(303) 618-4331</a>
 					</div>
 					<div className="contact-item">
 						<Mail className="contact-icon" />
-						<a href="mailto:info@fostersource.org">
-							info@fostersource.org
-						</a>
+						<a href="mailto:info@bethesource.org">info@bethesource.org</a>
 					</div>
 				</div>
 
 				<div className="social-links">
 					<a
-						href="https://www.facebook.com/FosterSource/"
+						href="https://www.facebook.com/BetheSourceCO/"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<img
-							src="/assets/icons/facebook.png"
-							alt="Facebook"
-						/>
+						<img src="/assets/icons/facebook.png" alt="Facebook" />
 					</a>
 					<a
-						href="https://twitter.com/FosterSource"
+						href="https://x.com/bethesourceco"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<img
-							src="/assets/icons/twitter.png"
-							alt="Twitter"
-						/>
+						<img src="/assets/icons/twitter.png" alt="Twitter" />
 					</a>
 					<a
-						href="https://instagram.com/fostersource"
+						href="https://www.instagram.com/bethesourceco"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<img
-							src="/assets/icons/instagram.png"
-							alt="Instagram"
-						/>
+						<img src="/assets/icons/instagram.png" alt="Instagram" />
 					</a>
 					<a
-						href="https://www.youtube.com/channel/UCh_IJt7uDOjTLlGR14dtCFg"
+						href="https://www.youtube.com/channel/UCYHuLduw7O4XA3iVy7LIy5w"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<img
-							src="/assets/icons/youtube.png"
-							alt="YouTube"
-						/>
+						<img src="/assets/icons/youtube.png" alt="YouTube" />
 					</a>
 				</div>
 			</div>
 
 			<div className="right-side">
 				<div className="translate-wrapper">
-					<span 
-						ref={translateLabelRef} 
+					<span
+						ref={translateLabelRef}
 						className="translate-label"
-						style={{ cursor: 'pointer', color: 'white' }}
+						style={{ cursor: "pointer", color: "white" }}
 					>
 						Traducir
 					</span>
 					<GoogleTranslate />
 				</div>
-				
+
 				<a
 					href="https://fostersource.org/donate/"
 					target="_blank"
