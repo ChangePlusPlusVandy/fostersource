@@ -18,9 +18,13 @@ export default function Dashboard() {
 				setLoading(true);
 				const progresses = (await fetchUserProgress()).progresses;
 				console.log(progresses);
-				setIncompleteCourses(progresses.filter((p: any) => !p.isComplete));
-				setCompletedCourses(progresses.filter((p: any) => p.isComplete));
-				console.log(progresses);
+				// Filter out progress entries with null/deleted courses
+				const validProgresses = progresses.filter(
+					(p: any) => p.course !== null
+				);
+				setIncompleteCourses(validProgresses.filter((p: any) => !p.isComplete));
+				setCompletedCourses(validProgresses.filter((p: any) => p.isComplete));
+				console.log("Valid progresses:", validProgresses);
 				setLoading(false);
 			} catch (error) {
 				console.error(error);
