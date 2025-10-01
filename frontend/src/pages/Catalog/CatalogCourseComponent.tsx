@@ -44,6 +44,12 @@ export default function CatalogCourseComponent({
 		});
 	}
 
+	// Check if course is at registration capacity
+	const isAtCapacity =
+		course.registrationLimit > 0 &&
+		course.students.length >= course.registrationLimit;
+	const isDisabled = isInCart || isAtCapacity;
+
 	return (
 		<div className="flex bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
 			<div className="w-3/4 p-6">
@@ -92,24 +98,26 @@ export default function CatalogCourseComponent({
 
 				<div className="flex items-center gap-4 mt-6">
 					<button
-						disabled={isInCart}
-						onClick={() => !isInCart && handleRegister(course)}
+						disabled={isDisabled}
+						onClick={() => !isDisabled && handleRegister(course)}
 						className={`text-white text-sm font-medium py-2 px-4 rounded-lg transition ${
-							isInCart
+							isDisabled
 								? "bg-gray-400 cursor-not-allowed"
 								: "bg-orange-500 hover:bg-orange-600"
 						}`}
 					>
 						{isInCart
 							? "Already in Cart"
-							: `Register (${
-									JSON.parse(localStorage.user).role.cost === 0
-										? "Free"
-										: `${new Intl.NumberFormat("en-US", {
-												style: "currency",
-												currency: "USD",
-											}).format(JSON.parse(localStorage.user).role.cost)}`
-								})`}
+							: isAtCapacity
+								? "Course Full"
+								: `Register (${
+										JSON.parse(localStorage.user).role.cost === 0
+											? "Free"
+											: `${new Intl.NumberFormat("en-US", {
+													style: "currency",
+													currency: "USD",
+												}).format(JSON.parse(localStorage.user).role.cost)}`
+									})`}
 					</button>
 					<Link to={`/courseDetails?courseId=${course._id}`}>
 						<button className="bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition">
