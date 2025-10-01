@@ -180,7 +180,11 @@ function AdminCoursePreview({
 				</div> */}
 
 				<div className="rounded-lg text-gray-500 px-1">
-					{product.course.students.length} registered
+					{product.course.students.length}
+					{product.course.registrationLimit > 0
+						? `/${product.course.registrationLimit}`
+						: ""}{" "}
+					registered
 				</div>
 
 				<div className="flex gap-4">

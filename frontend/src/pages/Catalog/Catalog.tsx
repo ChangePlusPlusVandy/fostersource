@@ -37,11 +37,12 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 				const user = JSON.parse(localStorage.getItem("user") || "{}");
 				const userId = user._id;
 
-				// Get all open courses
+				// Get all open courses (not drafts)
 				const courseResponse = await apiClient.get("/courses");
 				const openCourses: Course[] = courseResponse.data.data.filter(
 					(course: Course) =>
-						new Date(course.regStart).getTime() < new Date().getTime()
+						new Date(course.regStart).getTime() < new Date().getTime() &&
+						!course.draft
 				);
 
 				// Get user's progresses (i.e. registered courses)

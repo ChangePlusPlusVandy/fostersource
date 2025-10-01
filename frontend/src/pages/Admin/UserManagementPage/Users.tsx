@@ -580,14 +580,6 @@ const UserManagementPage: React.FC = () => {
 														<FiEye className="w-5 h-5" />
 													</button>
 												</Tooltip>
-												<Tooltip text="Voice Products">
-													<button
-														className="text-gray-600 hover:text-gray-900"
-														onClick={() => openSpeakerModal(user)}
-													>
-														<FiMic className="w-5 h-5" />
-													</button>
-												</Tooltip>
 												<Tooltip text="Delete">
 													<button
 														className="text-gray-600 hover:text-gray-900"

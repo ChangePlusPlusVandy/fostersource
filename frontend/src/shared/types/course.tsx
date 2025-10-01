@@ -31,4 +31,5 @@ export type Course = {
 	productInfo: string;
 	shortUrl: string;
 	draft: boolean;
+	registrationLimit: number;
 };
