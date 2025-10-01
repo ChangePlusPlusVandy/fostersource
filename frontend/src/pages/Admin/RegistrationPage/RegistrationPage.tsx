@@ -14,6 +14,7 @@ interface Registration {
 	date: Date;
 	transactionId: string;
 	paid: number;
+	userId: string; // Add userId for better tracking
 }
 
 export default function RegistrationPage() {
@@ -70,48 +71,138 @@ export default function RegistrationPage() {
 
 	const fetchRegistrations = async () => {
 		try {
-			const response = await apiClient.get("/payments");
+			console.log("Fetching registrations from progress data...");
+			const response = await apiClient.get("/progress");
+			console.log("Progress response:", response.data);
 
-			const receivedPayments: Registration[] = [];
+			const receivedRegistrations: Registration[] = [];
 			const courseTitles = new Map<string, string>();
 			const userEmails = new Map<string, string>();
+			const userNames = new Map<string, string>();
+			const paymentData = new Map<
+				string,
+				{ transactionId: string; amount: number }
+			>();
 
-			for (const payment of response.data) {
-				let userEmail: string;
-
-				if (userEmails.has(payment.userId)) {
-					userEmail = userEmails.get(payment.userId)!;
-				} else {
-					const userResp = await apiClient.get(`/users/${payment.userId}`);
-					userEmail = userResp.data.email;
-					userEmails.set(payment.userId, userEmail);
-				}
-
-				for (const courseId of payment.courses) {
-					let courseTitle: string;
-
-					if (courseTitles.has(courseId)) {
-						courseTitle = courseTitles.get(courseId)!;
-					} else {
-						const courseResp = await apiClient.get(`/courses/${courseId}`);
-						courseTitle = courseResp.data.className;
-						courseTitles.set(courseId, courseTitle);
+			// First, fetch payment data to get transaction info
+			try {
+				const paymentsResponse = await apiClient.get("/payments");
+				for (const payment of paymentsResponse.data) {
+					for (const courseId of payment.courses) {
+						const key = `${payment.userId}-${courseId}`;
+						paymentData.set(key, {
+							transactionId: payment.transactionId || "N/A",
+							amount: payment.amount || 0,
+						});
 					}
-
-					receivedPayments.push({
-						title: courseTitle,
-						user: payment.userId,
-						email: userEmail,
-						date: payment.date,
-						transactionId: payment.transactionId,
-						paid: payment.amount,
-					});
 				}
+			} catch (paymentError) {
+				console.error("Error fetching payment data:", paymentError);
 			}
 
-			setRegistrations(receivedPayments);
+			// Process progress data
+			for (const progress of response.data.progresses || response.data || []) {
+				console.log("Processing progress:", progress);
+
+				const userId = progress.user?._id || progress.user;
+				const courseId = progress.course?._id || progress.course;
+
+				if (!userId || !courseId) {
+					console.warn(
+						"Skipping progress with missing user or course:",
+						progress
+					);
+					continue;
+				}
+
+				// Get user info - check if already populated first
+				let userEmail: string;
+				let userName: string;
+
+				// Check if user data is already populated in progress
+				if (
+					progress.user &&
+					typeof progress.user === "object" &&
+					progress.user.email
+				) {
+					userEmail = progress.user.email;
+					userName = progress.user.name || "Unknown User";
+					console.log("Using populated user data:", {
+						email: userEmail,
+						name: userName,
+					});
+				} else if (userEmails.has(userId) && userNames.has(userId)) {
+					userEmail = userEmails.get(userId)!;
+					userName = userNames.get(userId)!;
+				} else {
+					try {
+						console.log("Fetching user:", userId);
+						const userResp = await apiClient.get(`/users/${userId}`);
+						console.log("User response:", userResp.data);
+						userEmail = userResp.data.email || "Unknown Email";
+						userName = userResp.data.name || "Unknown User";
+						userEmails.set(userId, userEmail);
+						userNames.set(userId, userName);
+					} catch (userError) {
+						console.error("Error fetching user:", userError);
+						userEmail = "Unknown Email";
+						userName = "Unknown User";
+					}
+				}
+
+				// Get course info - check if already populated first
+				let courseTitle: string;
+
+				// Check if course data is already populated in progress
+				if (
+					progress.course &&
+					typeof progress.course === "object" &&
+					progress.course.className
+				) {
+					courseTitle = progress.course.className;
+					console.log("Using populated course data:", courseTitle);
+				} else if (courseTitles.has(courseId)) {
+					courseTitle = courseTitles.get(courseId)!;
+				} else {
+					try {
+						console.log("Fetching course:", courseId);
+						const courseResp = await apiClient.get(`/courses/${courseId}`);
+						console.log("Course response:", courseResp.data);
+						courseTitle = courseResp.data.data.className;
+						courseTitles.set(courseId, courseTitle);
+					} catch (courseError) {
+						console.error("Error fetching course:", courseError);
+						courseTitle = "Unknown Course";
+					}
+				}
+
+				// Get payment info
+				const paymentKey = `${userId}-${courseId}`;
+				const payment = paymentData.get(paymentKey) || {
+					transactionId: "N/A",
+					amount: 0,
+				};
+
+				// Use progress creation date as registration date
+				const registrationDate = progress.createdAt
+					? new Date(progress.createdAt)
+					: new Date();
+
+				receivedRegistrations.push({
+					title: courseTitle,
+					user: userName,
+					userId: userId,
+					email: userEmail,
+					date: registrationDate,
+					transactionId: payment.transactionId,
+					paid: payment.amount,
+				});
+			}
+
+			console.log("Final registrations:", receivedRegistrations);
+			setRegistrations(receivedRegistrations);
 		} catch (error) {
-			console.error(error);
+			console.error("Error in fetchRegistrations:", error);
 		}
 	};
 
@@ -279,7 +370,7 @@ export default function RegistrationPage() {
 								{tableHeaders.map((header, idx) => (
 									<th
 										key={idx}
-										className="border border-gray-200 first:rounded-tl-md last:rounded-tr-md text-left pl-3"
+										className="border border-gray-200 first:rounded-tl-md last:rounded-tr-md text-left px-3 py-3"
 									>
 										{header}
 									</th>
@@ -292,22 +383,25 @@ export default function RegistrationPage() {
 									key={rowIdx}
 									className={rowIdx % 2 === 0 ? "bg-white" : "bg-gray-100"}
 								>
-									<td className="border border-gray-200 text-left">
+									<td className="border border-gray-200 text-left px-3 py-2">
 										{registration.title}
 									</td>
-									<td className="border border-gray-200 text-left">
+									<td className="border border-gray-200 text-left px-3 py-2">
 										{registration.user}
 									</td>
-									<td className="border border-gray-200 text-left">
+									<td className="border border-gray-200 text-left px-3 py-2">
 										{registration.email}
 									</td>
-									<td className="border border-gray-200 text-left">
-										{registration.date.toDateString()}
+									<td className="border border-gray-200 text-left px-3 py-2">
+										{registration.date instanceof Date &&
+										!isNaN(registration.date.getTime())
+											? registration.date.toDateString()
+											: "Invalid Date"}
 									</td>
-									<td className="border border-gray-200 text-left">
+									<td className="border border-gray-200 text-left px-3 py-2">
 										{registration.transactionId}
 									</td>
-									<td className="border border-gray-200 text-left">
+									<td className="border border-gray-200 text-left px-3 py-2">
 										{registration.paid}
 									</td>
 								</tr>

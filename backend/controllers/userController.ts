@@ -297,11 +297,15 @@ export const checkAdmin = async (req: AuthenticatedRequest, res: Response) => {
 	}
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	try {
 		const user = await User.findById(req.params.id);
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			res.status(404).json({ message: "User not found" });
+			return;
 		}
 		res.json(user);
 	} catch (error) {
