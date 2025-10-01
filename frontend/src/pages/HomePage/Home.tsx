@@ -120,7 +120,7 @@ export default function Home() {
 
 						{/* In-Person Training Tile */}
 						<motion.div
-							className="relative overflow-hidden shadow-lg mx-auto"
+							className="relative overflow-hidden shadow-lg mx-auto cursor-pointer"
 							style={{
 								width: "90%",
 								maxWidth: "600px",
@@ -135,6 +135,7 @@ export default function Home() {
 								boxShadow: "0px 4px 10px rgba(0,0,0,0.3)",
 								transition: { duration: 0.15 },
 							}}
+							onClick={() => handleFilterRedirect("In-Person")}
 						>
 							<img
 								src="/images/inPersonTraining.png"
@@ -187,7 +188,7 @@ export default function Home() {
 										className="bg-orange-500 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow-md"
 										onClick={() => handleFilterRedirect("Live")}
 									>
-										Upcoming
+										Live
 									</motion.button>
 
 									<motion.button
