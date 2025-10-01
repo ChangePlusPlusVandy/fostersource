@@ -106,17 +106,20 @@ export default function Catalog({
 						const progressResponse = await apiClient.get(
 							`/progress/progress/${userId}`
 						);
-						const registeredCourseIds = new Set(
-							progressResponse.data.progresses.map((p: any) => p.course._id)
+						// Filter out courses the user has ANY progress for (both in-progress and completed)
+						const userCourseIds = new Set(
+							progressResponse.data.progresses
+								.filter((p: any) => p.course !== null) // Filter out null courses
+								.map((p: any) => p.course._id)
 						);
 
-						// Filter out courses the user is already registered for
-						const unregisteredCourses = openCourses.filter(
-							(course) => !registeredCourseIds.has(course._id)
+						// Filter out courses the user is already registered for OR has completed
+						const availableCourses = openCourses.filter(
+							(course) => !userCourseIds.has(course._id)
 						);
 
-						setCourses(unregisteredCourses);
-						setFilteredCourses(unregisteredCourses);
+						setCourses(availableCourses);
+						setFilteredCourses(availableCourses);
 					} else {
 						// If no userId found but logged in, show all courses
 						setCourses(openCourses);
