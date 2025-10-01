@@ -196,7 +196,17 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 							</div>
 
 							<div>
-								<h3 className="text-sm font-medium mb-2">End Registration</h3>
+								<div className="flex items-center justify-between mb-2">
+									<h3 className="text-sm font-medium">End Registration</h3>
+									{regEnd && (
+										<button
+											onClick={() => setField("regEnd", undefined)}
+											className="text-xs text-red-600 hover:text-red-800 px-2 py-1 rounded border border-red-300 hover:border-red-500"
+										>
+											Clear Date
+										</button>
+									)}
+								</div>
 								<DatePicker
 									selected={
 										regEnd instanceof Date
@@ -205,10 +215,12 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 												? new Date(regEnd)
 												: null
 									}
-									onChange={(date) => date && setField("regEnd", date)}
+									onChange={(date) => setField("regEnd", date || undefined)}
 									showTimeSelect
 									dateFormat="Pp"
 									className="w-64 p-2 border rounded-lg text-sm"
+									placeholderText="Optional - Leave empty for no end date"
+									isClearable
 								/>
 							</div>
 						</div>
