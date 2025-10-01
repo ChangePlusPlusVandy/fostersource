@@ -47,6 +47,10 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 						? course.speakers.map((s: any) => s._id.toString())
 						: [],
 					_id: courseId,
+					// Convert date strings to Date objects
+					time: course.time ? new Date(course.time) : new Date(),
+					regStart: course.regStart ? new Date(course.regStart) : new Date(),
+					regEnd: course.regEnd ? new Date(course.regEnd) : undefined,
 				};
 
 				setAllFields(cleanedCourse);

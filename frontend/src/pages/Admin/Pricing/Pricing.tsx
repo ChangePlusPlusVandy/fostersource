@@ -181,7 +181,13 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 							<div>
 								<h3 className="text-sm font-medium mb-2">Start Registration</h3>
 								<DatePicker
-									selected={regStart}
+									selected={
+										regStart instanceof Date
+											? regStart
+											: regStart
+												? new Date(regStart)
+												: null
+									}
 									onChange={(date) => date && setField("regStart", date)}
 									showTimeSelect
 									dateFormat="Pp"
@@ -192,7 +198,13 @@ const Pricing: React.FC<PricingProps> = ({ onClose }) => {
 							<div>
 								<h3 className="text-sm font-medium mb-2">End Registration</h3>
 								<DatePicker
-									selected={regEnd}
+									selected={
+										regEnd instanceof Date
+											? regEnd
+											: regEnd
+												? new Date(regEnd)
+												: null
+									}
 									onChange={(date) => date && setField("regEnd", date)}
 									showTimeSelect
 									dateFormat="Pp"

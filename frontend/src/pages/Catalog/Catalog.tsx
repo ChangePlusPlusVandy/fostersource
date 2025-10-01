@@ -14,7 +14,10 @@ interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
 	isLoggedIn: boolean;
 }
-export default function Catalog({ setCartItemCount, isLoggedIn }: CatalogProps) {
+export default function Catalog({
+	setCartItemCount,
+	isLoggedIn,
+}: CatalogProps) {
 	const [courses, setCourses] = useState<Course[]>([]);
 	const location = useLocation();
 	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
@@ -35,12 +38,62 @@ export default function Catalog({ setCartItemCount, isLoggedIn }: CatalogProps) 
 			try {
 				setLoading(true);
 
-				// Get all open courses (not drafts)
+				// Get all open courses (not drafts) where registration is currently open
 				const courseResponse = await apiClient.get("/courses");
+				const now = new Date();
+				console.log("Current time:", now);
+
 				const openCourses: Course[] = courseResponse.data.data.filter(
-					(course: Course) =>
-						new Date(course.regStart).getTime() < new Date().getTime() &&
-						!course.draft
+					(course: Course) => {
+						try {
+							const regStart = new Date(course.regStart);
+							const regEnd = course.regEnd ? new Date(course.regEnd) : null;
+
+							// Check for invalid dates
+							if (isNaN(regStart.getTime())) {
+								console.warn(
+									`Invalid regStart for course ${course.className}:`,
+									course.regStart
+								);
+								return false;
+							}
+
+							if (regEnd && isNaN(regEnd.getTime())) {
+								console.warn(
+									`Invalid regEnd for course ${course.className}:`,
+									course.regEnd
+								);
+								return false;
+							}
+
+							// Registration must have started
+							const registrationStarted = regStart.getTime() <= now.getTime();
+
+							// Registration must not have ended (or no end date set)
+							const registrationNotEnded =
+								!regEnd || regEnd.getTime() >= now.getTime();
+
+							const isVisible =
+								registrationStarted && registrationNotEnded && !course.draft;
+
+							console.log(`Course "${course.className}":`, {
+								regStart: regStart,
+								regEnd: regEnd,
+								registrationStarted,
+								registrationNotEnded,
+								isDraft: course.draft,
+								isVisible,
+							});
+
+							return isVisible;
+						} catch (error) {
+							console.error(
+								`Error processing course ${course.className}:`,
+								error
+							);
+							return false;
+						}
+					}
 				);
 
 				if (isLoggedIn) {

@@ -132,7 +132,15 @@ function RoutesAndLayout({
 				<Routes>
 					{/* ===== LEARNER ROUTES ===== */}
 					<Route path="/" element={<Home />} />
-					<Route path="/catalog" element={<Catalog setCartItemCount={setCartItemCount} isLoggedIn={isLoggedIn} />} />
+					<Route
+						path="/catalog"
+						element={
+							<Catalog
+								setCartItemCount={setCartItemCount}
+								isLoggedIn={isLoggedIn}
+							/>
+						}
+					/>
 					<Route path="/faqs" element={<FAQPage />} />
 					<Route
 						path="/dashboard"

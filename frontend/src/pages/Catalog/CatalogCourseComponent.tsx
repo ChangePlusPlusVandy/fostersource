@@ -114,9 +114,10 @@ export default function CatalogCourseComponent({
 								: isAtCapacity
 									? "Course Full"
 									: `Register (${
-											localStorage.user && JSON.parse(localStorage.user).role?.cost === 0
+											localStorage.user &&
+											JSON.parse(localStorage.user).role?.cost === 0
 												? "Free"
-												: localStorage.user 
+												: localStorage.user
 													? `${new Intl.NumberFormat("en-US", {
 															style: "currency",
 															currency: "USD",
