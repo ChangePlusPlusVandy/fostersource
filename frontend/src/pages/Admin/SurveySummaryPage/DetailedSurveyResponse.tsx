@@ -32,13 +32,29 @@ export default function DetailedSurveyResponse({ surveyQuestionIDs, toggleModal 
 
   const fetchSurveyQuestions = async () => {
     try {
+      console.log("Fetching survey questions for IDs:", surveyQuestionIDs);
       const receivedSurveyQuestions: SurveyQuestion[] = []; 
       const receivedResponses: SurveyResponse[] = [];
 
       // Fetch all questions and their responses
       for (const surveyQuestionID of surveyQuestionIDs) {
-        const response = await apiClient.get(`/questions/${surveyQuestionID}`); 
-        const rawQuestionData: QuestionType = response.data; 
+        console.log("Fetching question:", surveyQuestionID);
+        
+        // Handle case where surveyQuestionID might be an object or a string
+        const questionId = typeof surveyQuestionID === 'string' ? surveyQuestionID : (surveyQuestionID as any)._id;
+        console.log("Using question ID:", questionId);
+        
+        // Use query parameter to get specific question since there's no GET /:id route
+        const response = await apiClient.get(`/questions?_id=${questionId}`); 
+        const questionsArray = response.data;
+        
+        if (!questionsArray || questionsArray.length === 0) {
+          console.warn(`Question with ID ${questionId} not found`);
+          continue; // Skip this question if not found
+        }
+        
+        const rawQuestionData: QuestionType = questionsArray[0]; // Get first (and should be only) result
+        console.log("Question data:", rawQuestionData);
         
         const questionData: SurveyQuestion = {
           question: rawQuestionData.question,
@@ -49,8 +65,10 @@ export default function DetailedSurveyResponse({ surveyQuestionIDs, toggleModal 
           responseBreakdown: [], 
         }
 
-        const questionIdResponse = await apiClient.get(`/questionResponses/${surveyQuestionID}`); 
+        console.log("Fetching question responses for questionId:", questionId);
+        const questionIdResponse = await apiClient.get(`/questionResponses?questionId=${questionId}`); 
         const responses = questionIdResponse.data;
+        console.log("Question responses:", responses);
         
         // Update question data
         questionData.numResponses = responses.length; 

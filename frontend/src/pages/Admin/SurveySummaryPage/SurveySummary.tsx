@@ -43,29 +43,36 @@ export default function SurveySummary() {
 
 	const fetchSurveys = async () => {
 		try {
+			console.log("Fetching surveys...");
 			const response = await apiClient.get("/surveys");
 			const survey = response.data;
+			console.log("Survey data:", survey);
 
 			const receivedSurveys: SurveyElem[] = [];
 
-			const courseResponse = await apiClient.get(`/courses/${survey.courseId}`);
-			const courseTitle = courseResponse.data.className;
+			// Get all survey responses since they're not tied to a specific survey
+			console.log("Fetching all survey responses...");
+			const surveyResponsesResponse = await apiClient.get("/surveyResponses");
+			console.log("Survey responses data:", surveyResponsesResponse.data);
 
-			const surveyId = survey.surveyId;
-			const surveyResponses = await apiClient.get(
-				`/surveyResponses/${surveyId}`
-			);
+			const surveyResponses =
+				surveyResponsesResponse.data.data || surveyResponsesResponse.data;
 
 			const surveyData: SurveyElem = {
-				courseTitle: courseTitle,
-				numResponses: surveyResponses.data.length,
-				questionIds: survey.questionIds,
+				courseTitle: "General Survey", // Default title since no course relationship exists
+				numResponses: Array.isArray(surveyResponses)
+					? surveyResponses.length
+					: 0,
+				questionIds: Array.isArray(survey.questions) 
+					? survey.questions.map((q: any) => q._id || q) 
+					: [],
 			};
 			receivedSurveys.push(surveyData);
 
+			console.log("Final survey data:", receivedSurveys);
 			setSurveys(receivedSurveys);
 		} catch (error) {
-			console.error(error);
+			console.error("Error fetching surveys:", error);
 		}
 	};
 
@@ -80,6 +87,8 @@ export default function SurveySummary() {
 
 	const handleModalOpen = (surveyIdx: number) => {
 		const selectedSurvey = displayedSurveys[surveyIdx];
+		console.log("Opening modal for survey:", selectedSurvey);
+		console.log("Question IDs:", selectedSurvey.questionIds);
 		setModalSurveyIds(selectedSurvey.questionIds);
 		setModalOpen(true);
 	};
@@ -102,7 +111,7 @@ export default function SurveySummary() {
 				<div className="bg-white border rounded-lg p-6">
 					<div className="flex justify-between">
 						<div className="mb-6">
-							<h1 className="text-2xl font-bold">Registration Report</h1>
+							<h1 className="text-2xl font-bold">Survey Results</h1>
 						</div>
 						<Expand className="w-6 border rounded-lg p-1 cursor-pointer"></Expand>
 					</div>
@@ -136,10 +145,10 @@ export default function SurveySummary() {
 									<td className="border border-gray-200 text-left w-9/12 pl-3">
 										{survey.courseTitle}
 									</td>
-									<td className="border border-gray-200 text-left w-2/12 text-center">
+									<td className="border border-gray-200 w-2/12 text-center">
 										{survey.numResponses}
 									</td>
-									<td className="border border-gray-200 text-left w-1/12 justify-items-center">
+									<td className="border border-gray-200 w-1/12 text-center">
 										<Search
 											className="w-6 border rounded-lg p-1 cursor-pointer"
 											onClick={() => handleModalOpen(rowIdx)}
