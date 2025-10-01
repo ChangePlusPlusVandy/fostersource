@@ -467,11 +467,9 @@ const UserManagementPage: React.FC = () => {
 
 						<button
 							onClick={() => {
-								resetForm();
-								setEditingUserId(null);
-								setIsUserModalOpen(true);
+								alert("This feature is still under development");
 							}}
-							className="px-4 py-1.5 bg-[#7b499a] text-white rounded-md hover:bg-[#6a3e85] transition-colors flex items-center gap-2"
+							className="px-4 py-1.5 bg-gray-400 text-white rounded-md hover:bg-gray-500 transition-colors flex items-center gap-2 cursor-not-allowed"
 						>
 							<span>New User</span>
 						</button>
@@ -586,7 +584,12 @@ const UserManagementPage: React.FC = () => {
 													</button>
 												</Tooltip>
 												<Tooltip text="Login">
-													<button className="text-gray-600 hover:text-gray-900">
+													<button
+														className="text-gray-400 hover:text-gray-500 cursor-not-allowed"
+														onClick={() =>
+															alert("This feature is still under development")
+														}
+													>
 														<FiEye className="w-5 h-5" />
 													</button>
 												</Tooltip>
