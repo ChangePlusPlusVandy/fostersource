@@ -12,8 +12,12 @@ import {
 
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
+	isLoggedIn: boolean;
 }
-export default function Catalog({ setCartItemCount }: CatalogProps) {
+export default function Catalog({
+	setCartItemCount,
+	isLoggedIn,
+}: CatalogProps) {
 	const [courses, setCourses] = useState<Course[]>([]);
 	const location = useLocation();
 	const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
@@ -34,40 +38,122 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 			try {
 				setLoading(true);
 
-				const user = JSON.parse(localStorage.getItem("user") || "{}");
-				const userId = user._id;
-
-				// Get all open courses
+				// Get all open courses (not drafts) where registration is currently open
 				const courseResponse = await apiClient.get("/courses");
+				const now = new Date();
+				console.log("Current time:", now);
+
 				const openCourses: Course[] = courseResponse.data.data.filter(
-					(course: Course) =>
-						new Date(course.regStart).getTime() < new Date().getTime()
+					(course: Course) => {
+						try {
+							const regStart = new Date(course.regStart);
+							const regEnd = course.regEnd ? new Date(course.regEnd) : null;
+
+							// Check for invalid dates
+							if (isNaN(regStart.getTime())) {
+								console.warn(
+									`Invalid regStart for course ${course.className}:`,
+									course.regStart
+								);
+								return false;
+							}
+
+							if (regEnd && isNaN(regEnd.getTime())) {
+								console.warn(
+									`Invalid regEnd for course ${course.className}:`,
+									course.regEnd
+								);
+								return false;
+							}
+
+							// Registration must have started
+							const registrationStarted = regStart.getTime() <= now.getTime();
+
+							// Registration must not have ended (or no end date set)
+							const registrationNotEnded =
+								!regEnd || regEnd.getTime() >= now.getTime();
+
+							const isVisible =
+								registrationStarted && registrationNotEnded && !course.draft;
+
+							console.log(`Course "${course.className}":`, {
+								regStart: regStart,
+								regEnd: regEnd,
+								registrationStarted,
+								registrationNotEnded,
+								isDraft: course.draft,
+								isVisible,
+							});
+
+							return isVisible;
+						} catch (error) {
+							console.error(
+								`Error processing course ${course.className}:`,
+								error
+							);
+							return false;
+						}
+					}
 				);
 
-				// Get user's progresses (i.e. registered courses)
-				const progressResponse = await apiClient.get(
-					`/progress/progress/${userId}`
-				);
-				const registeredCourseIds = new Set(
-					progressResponse.data.progresses.map((p: any) => p.course._id)
-				);
+				if (isLoggedIn) {
+					// Only fetch user progress and filter if user is logged in
+					const user = JSON.parse(localStorage.getItem("user") || "{}");
+					const userId = user._id;
 
-				// Filter out courses the user is already registered for
-				const unregisteredCourses = openCourses.filter(
-					(course) => !registeredCourseIds.has(course._id)
-				);
+					if (userId) {
+						// Get user's progresses (i.e. registered courses)
+						const progressResponse = await apiClient.get(
+							`/progress/progress/${userId}`
+						);
+						// Filter out courses the user has ANY progress for (both in-progress and completed)
+						const userCourseIds = new Set(
+							progressResponse.data.progresses
+								.filter((p: any) => p.course !== null) // Filter out null courses
+								.map((p: any) => p.course._id)
+						);
 
-				setCourses(unregisteredCourses);
-				setFilteredCourses(unregisteredCourses);
+						// Filter out courses the user is already registered for OR has completed
+						const availableCourses = openCourses.filter(
+							(course) => !userCourseIds.has(course._id)
+						);
+
+						setCourses(availableCourses);
+						setFilteredCourses(availableCourses);
+					} else {
+						// If no userId found but logged in, show all courses
+						setCourses(openCourses);
+						setFilteredCourses(openCourses);
+					}
+				} else {
+					// If not logged in, show all available courses
+					setCourses(openCourses);
+					setFilteredCourses(openCourses);
+				}
 			} catch (error) {
 				console.error("Error loading catalog:", error);
+				// Fallback to showing all courses if there's an error
+				try {
+					const courseResponse = await apiClient.get("/courses");
+					const openCourses: Course[] = courseResponse.data.data.filter(
+						(course: Course) =>
+							new Date(course.regStart).getTime() < new Date().getTime() &&
+							!course.draft
+					);
+					setCourses(openCourses);
+					setFilteredCourses(openCourses);
+				} catch (fallbackError) {
+					console.error("Fallback course loading failed:", fallbackError);
+					setCourses([]);
+					setFilteredCourses([]);
+				}
 			} finally {
 				setLoading(false);
 			}
 		};
 
 		fetchData();
-	}, []);
+	}, [isLoggedIn]);
 
 	// Initialize cart state from localStorage when the component mounts
 	useEffect(() => {
@@ -192,6 +278,7 @@ export default function Catalog({ setCartItemCount }: CatalogProps) {
 								course={course}
 								setCartItemCount={setCartItemCount}
 								isInCart={cart.some((c) => c._id === course._id)}
+								isLoggedIn={isLoggedIn}
 							/>
 						))
 					) : (

@@ -39,7 +39,21 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 		const loadCourse = async () => {
 			try {
 				const res = await apiClient.get(`/courses/${courseId}`);
-				setAllFields({ ...res.data.data, _id: courseId });
+				const course = res.data.data;
+
+				const cleanedCourse = {
+					...course,
+					speakers: Array.isArray(course.speakers)
+						? course.speakers.map((s: any) => s._id.toString())
+						: [],
+					_id: courseId,
+					// Convert date strings to Date objects
+					time: course.time ? new Date(course.time) : new Date(),
+					regStart: course.regStart ? new Date(course.regStart) : new Date(),
+					regEnd: course.regEnd ? new Date(course.regEnd) : undefined,
+				};
+
+				setAllFields(cleanedCourse);
 				setFetchedFromBackend();
 			} catch (err) {
 				console.error("Failed to fetch course", err);
@@ -65,7 +79,7 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 			highlightLeftOffset: "51.4px",
 		},
 		{
-			name: "Pricing",
+			name: "Settings",
 			path: `${basePath}/pricing`,
 			highlightLeftOffset: "51.4px",
 		},
@@ -90,7 +104,7 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 			highlightLeftOffset: "24.5px",
 		},
 		{
-			name: "Participation",
+			name: "Progress",
 			path: `${basePath}/participation`,
 			highlightLeftOffset: "16px",
 		},
@@ -103,11 +117,11 @@ const EditSideBar: React.FC<SideBarProps> = ({ children }) => {
 
 	const filteredSidebarItems = sidebarItems.filter((item) => {
 		if (isManagePage) {
-			return ["Speakers", "Registrants", "Participation", "Email"].includes(
+			return ["Speakers", "Registrants", "Progress", "Email"].includes(
 				item.name
 			);
 		} else {
-			return !["Registrants", "Participation", "Email"].includes(item.name);
+			return !["Registrants", "Progress", "Email"].includes(item.name);
 		}
 	});
 

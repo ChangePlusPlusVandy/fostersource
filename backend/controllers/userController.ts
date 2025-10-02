@@ -16,6 +16,9 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 			pagination = "true",
 		} = req.query;
 
+		// Extract _id parameter with proper typing
+		const _id = req.query._id as string | string[] | undefined;
+
 		let query: any = {};
 
 		if (search) {
@@ -29,6 +32,26 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 			query.userType = userType;
 		}
 
+		// Handle _id filtering - support both single ID and array of IDs
+		if (_id) {
+			if (Array.isArray(_id)) {
+				// Multiple IDs: _id[]
+				const objectIds = _id.map((id) => new mongoose.Types.ObjectId(id));
+				query._id = { $in: objectIds };
+			} else {
+				// Single ID or comma-separated string
+				const ids = _id.split(",");
+				if (ids.length > 1) {
+					const objectIds = ids.map(
+						(id) => new mongoose.Types.ObjectId(id.trim())
+					);
+					query._id = { $in: objectIds };
+				} else {
+					query._id = new mongoose.Types.ObjectId(ids[0].trim());
+				}
+			}
+		}
+
 		// If pagination=false, return all matching users
 		if (pagination === "false") {
 			const users = await User.find(query)
@@ -36,6 +59,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 					"name email role company certification address1 city state zip phone language certification"
 				)
 				.populate("role");
+
 			res.json({ users, total: users.length, pages: 1 });
 			return;
 		}
@@ -273,11 +297,15 @@ export const checkAdmin = async (req: AuthenticatedRequest, res: Response) => {
 	}
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	try {
 		const user = await User.findById(req.params.id);
 		if (!user) {
-			return res.status(404).json({ message: "User not found" });
+			res.status(404).json({ message: "User not found" });
+			return;
 		}
 		res.json(user);
 	} catch (error) {

@@ -50,7 +50,7 @@ const Dropdown: React.FC<DropdownProps> = ({ buttonLabel, menuItems }) => {
 
 			{isOpen && (
 				<div
-					className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+					className="absolute left-0 z-10 mt-2 w-40 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
 					role="menu"
 					aria-orientation="vertical"
 					aria-labelledby="menu-button"

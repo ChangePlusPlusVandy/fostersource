@@ -1,6 +1,7 @@
 import express from "express";
 import {
 	getUsers,
+	getUserById,
 	getOrCreateUser,
 	updateUser,
 	deleteUser,
@@ -13,6 +14,9 @@ const router = express.Router();
 
 // GET all users or by filter
 router.get("/", getUsers);
+
+// GET user by ID
+router.get("/:id", getUserById);
 
 // POST new user if does not exist, otherwise return existing user for login
 router.post("/", getOrCreateUser);

@@ -29,6 +29,7 @@ interface CourseEditState {
 	productInfo: string;
 	shortUrl?: string;
 	draft: boolean;
+	registrationLimit: number;
 
 	// Hydration & data control
 	hasHydrated: boolean;
@@ -80,6 +81,7 @@ const initialState: Omit<
 	productInfo: "",
 	shortUrl: undefined,
 	draft: true,
+	registrationLimit: 0,
 };
 
 export const useCourseEditStore = create<CourseEditState>()(
@@ -117,8 +119,20 @@ export const useCourseEditStore = create<CourseEditState>()(
 			storage: createJSONStorage(() => sessionStorage),
 
 			onRehydrateStorage: (state) => {
-				return () => {
-					state?.setHydrated(); // this is how Zustand recommends setting hydration flag
+				return (state) => {
+					// Convert date strings back to Date objects after rehydration
+					if (state) {
+						if (typeof state.time === "string") {
+							state.time = new Date(state.time);
+						}
+						if (typeof state.regStart === "string") {
+							state.regStart = new Date(state.regStart);
+						}
+						if (typeof state.regEnd === "string") {
+							state.regEnd = new Date(state.regEnd);
+						}
+						state.setHydrated(); // this is how Zustand recommends setting hydration flag
+					}
 				};
 			},
 		}

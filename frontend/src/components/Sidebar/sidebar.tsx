@@ -46,11 +46,11 @@ export const items = [
 		description: "Catalog",
 		href: "/catalog",
 	},
-	{
-		icon: <Mic />,
-		description: "Podcasts",
-		href: "#",
-	},
+	// {
+	// 	icon: <Mic />,
+	// 	description: "Podcasts",
+	// 	href: "#",
+	// },
 	{
 		icon: <Calendar />,
 		description: "Calendar",
@@ -65,7 +65,7 @@ export const items = [
 	{
 		icon: <Phone />,
 		description: "Contact",
-		href: "mailto:info@fostersource.org",
+		href: "mailto:info@bethesource.org",
 	},
 ];
 
@@ -154,13 +154,7 @@ export function Profile({ isCollapsed, isLoggedIn, name, role }: ProfileProps) {
 				</div>
 			)}
 			{isLoggedIn && (
-				<img
-					src={
-						"https://static-00.iconduck.com/assets.00/profile-default-icon-1024x1023-4u5mrj2v.png"
-					}
-					alt="Profile"
-					className="profile-pic"
-				/>
+				<img src="/images/pfp.jpg" alt="Profile" className="profile-pic" />
 			)}
 			{isLoggedIn && !isCollapsed && (
 				<div className="pl-3 align-middle">

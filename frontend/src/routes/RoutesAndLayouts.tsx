@@ -133,18 +133,20 @@ function RoutesAndLayout({
 					{/* ===== LEARNER ROUTES ===== */}
 					<Route path="/" element={<Home />} />
 					<Route
+						path="/catalog"
+						element={
+							<Catalog
+								setCartItemCount={setCartItemCount}
+								isLoggedIn={isLoggedIn}
+							/>
+						}
+					/>
+					<Route path="/faqs" element={<FAQPage />} />
+					<Route
 						path="/dashboard"
 						element={
 							<PrivateRoute>
 								<Dashboard />
-							</PrivateRoute>
-						}
-					/>
-					<Route
-						path="/catalog"
-						element={
-							<PrivateRoute>
-								<Catalog setCartItemCount={setCartItemCount} />
 							</PrivateRoute>
 						}
 					/>
@@ -164,7 +166,6 @@ function RoutesAndLayout({
 							</PrivateRoute>
 						}
 					/>
-					<Route path="/faqs" element={<FAQPage />} />
 					<Route
 						path="/courseDetails"
 						element={

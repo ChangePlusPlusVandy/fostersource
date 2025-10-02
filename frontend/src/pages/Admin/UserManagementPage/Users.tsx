@@ -171,10 +171,13 @@ const UserManagementPage: React.FC = () => {
 	};
 
 	const formatUserForBackend = (userData: UserForm) => {
+		console.log("User form data:", userData); // Debug log
+		console.log("UserType data:", userData.userType); // Debug log
+
 		return {
 			name: `${userData.firstName} ${userData.lastName}`,
 			email: userData.email,
-			userType: userData.userType,
+			role: userData.userType?._id, // Send as 'role' with just the ObjectId
 			company: userData.company,
 			address1: userData.addressLine,
 			city: userData.city,
@@ -192,9 +195,14 @@ const UserManagementPage: React.FC = () => {
 
 		try {
 			const backendUserData = formatUserForBackend(userForm);
+			console.log("Sending user data to backend:", backendUserData); // Debug log
 
 			if (editingUserId) {
-				await apiClient.put(`/users/${editingUserId}`, backendUserData);
+				const response = await apiClient.put(
+					`/users/${editingUserId}`,
+					backendUserData
+				);
+				console.log("Backend response:", response.data); // Debug log
 
 				setUsers((prevUsers) =>
 					prevUsers.map((user) =>
@@ -274,6 +282,7 @@ const UserManagementPage: React.FC = () => {
 			language: "English",
 			certification: "",
 		});
+		setUserType(null); // Also reset the userType state
 	};
 
 	const handleEditUser = (user: User) => {
@@ -292,6 +301,7 @@ const UserManagementPage: React.FC = () => {
 			language: user.language || "English",
 			certification: user.certification || "",
 		});
+		setUserType(user.userType); // Sync the userType state with the form
 		setEditingUserId(user._id || null);
 		setIsUserModalOpen(true);
 	};
@@ -457,11 +467,9 @@ const UserManagementPage: React.FC = () => {
 
 						<button
 							onClick={() => {
-								resetForm();
-								setEditingUserId(null);
-								setIsUserModalOpen(true);
+								alert("This feature is still under development");
 							}}
-							className="px-4 py-1.5 bg-[#7b499a] text-white rounded-md hover:bg-[#6a3e85] transition-colors flex items-center gap-2"
+							className="px-4 py-1.5 bg-gray-400 text-white rounded-md hover:bg-gray-500 transition-colors flex items-center gap-2 cursor-not-allowed"
 						>
 							<span>New User</span>
 						</button>
@@ -576,16 +584,13 @@ const UserManagementPage: React.FC = () => {
 													</button>
 												</Tooltip>
 												<Tooltip text="Login">
-													<button className="text-gray-600 hover:text-gray-900">
-														<FiEye className="w-5 h-5" />
-													</button>
-												</Tooltip>
-												<Tooltip text="Voice Products">
 													<button
-														className="text-gray-600 hover:text-gray-900"
-														onClick={() => openSpeakerModal(user)}
+														className="text-gray-400 hover:text-gray-500 cursor-not-allowed"
+														onClick={() =>
+															alert("This feature is still under development")
+														}
 													>
-														<FiMic className="w-5 h-5" />
+														<FiEye className="w-5 h-5" />
 													</button>
 												</Tooltip>
 												<Tooltip text="Delete">
@@ -863,7 +868,10 @@ const UserManagementPage: React.FC = () => {
 									getOptionLabel={(ut) => ut.name}
 									getOptionValue={(ut) => ut._id}
 									value={userType}
-									onChange={(ut) => setUserType(ut)}
+									onChange={(ut) => {
+										setUserType(ut);
+										setUserForm((prev) => ({ ...prev, userType: ut }));
+									}}
 									placeholder="Choose User Type"
 									styles={{
 										control: (provided, state) => ({

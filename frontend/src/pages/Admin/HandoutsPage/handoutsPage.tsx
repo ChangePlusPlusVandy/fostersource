@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import apiClient from "../../../services/apiClient";
 import { useParams } from "react-router-dom";
+import SaveCourseButton from "../../../components/SaveCourseButtons";
 type Row = {
-	id?: number;
+	id?: string;
 	subject: string;
-	file: string | File;
+	file: string;
 };
 type Handout = {
 	title: string;
@@ -33,10 +34,13 @@ const HandoutPage = () => {
 			const response = await apiClient.get(`/courses/${id}`);
 			const course = response.data.data;
 			const formattedHandouts = course.handouts.map(
-				(handout: { title: string; file: string }, index: number) => ({
-					id: index,
-					subject: handout.title,
-					file: handout.file,
+				(
+					handout: { fileType: string; fileUrl: string; _id: string },
+					index: number
+				) => ({
+					id: handout._id,
+					subject: handout.fileType,
+					file: handout.fileUrl,
 				})
 			);
 			setRows(formattedHandouts);
@@ -46,33 +50,38 @@ const HandoutPage = () => {
 		}
 	};
 
-	const rowsRef = useRef<Handout[]>([]);
-	useEffect(() => {
-		const formattedRows = rows.map(({ subject, file }) => ({
-			title: subject,
-			file: typeof file === "string" ? file : file.name, // handle File object or string
-		}));
+	// const rowsRef = useRef<Handout[]>([]);
+	// useEffect(() => {
+	// 	const formattedRows = rows.map(({ subject, file }) => ({
+	// 		title: subject,
+	// 		file: typeof file === "string" ? file : file.name, // handle File object or string
+	// 	}));
 
-		rowsRef.current = formattedRows;
-	}, [rows]);
+	// 	rowsRef.current = formattedRows;
+	// }, [rows]);
 
 	const updateHandouts = async () => {
+		const formattedHandouts = rows.map(({ subject, file }) => ({
+			title: subject,
+			file: file,
+		}));
+
 		try {
-			const response = await apiClient.put(`/courses/${id}`, {
-				handouts: rowsRef.current,
+			await apiClient.put(`/courses/${id}`, {
+				handouts: formattedHandouts,
 			});
 		} catch (e) {
 			console.log("Error updating course " + e);
 		}
 	};
 
-	useEffect(() => {
-		return () => {
-			if (dataLoaded) {
-				updateHandouts();
-			}
-		};
-	}, [dataLoaded]);
+	// useEffect(() => {
+	// 	return () => {
+	// 		if (dataLoaded) {
+	// 			updateHandouts();
+	// 		}
+	// 	};
+	// }, [dataLoaded]);
 
 	useEffect(() => {
 		getHandouts();
@@ -102,40 +111,79 @@ const HandoutPage = () => {
 		setUploadLink(true);
 	};
 
-	const handleSubmit = (subject: string, file: string | File | null) => {
-		if (file) {
-			let id = rows.length;
-			setRows([...rows, { id, subject, file }]);
+	const handleSubmit = async (subject: string, file: string | File | null) => {
+		if (!file || typeof file !== "string") {
+			alert("Enter a valid link");
+			return;
+		}
+
+		try {
+			// Step 1: Create the handout
+			const handoutResponse = await apiClient.post("/handout", {
+				courseId: id, // from useParams()
+				fileUrl: file,
+				fileType: subject, // or "pdf", "image", etc. if needed
+			});
+
+			const newHandout = handoutResponse.data.data;
+
+			// Step 2: Update the course to include the new handout
+			const response = await apiClient.put(`/courses/${id}`, {
+				$push: { handouts: newHandout._id },
+			});
+
+			console.log("updated course: ", response.data.data);
+
+			// Step 3: Update local state
+			const newRow = {
+				id: newHandout._id,
+				subject,
+				file,
+			};
+			setRows([...rows, newRow]);
+
+			// Cleanup
 			setModalOpen(false);
 			setFile(null);
 			setSubjectValue("");
 			setLink("");
-		} else {
-			alert("Enter link/file");
+		} catch (error) {
+			console.error("Error creating handout or updating course:", error);
+			alert("Failed to save handout");
 		}
 	};
 
-	const handleEditSubmit = (
-		id: number,
+	const handleEditSubmit = async (
+		index: number,
 		subject: string,
-		file: string | File | null
+		file: string
 	) => {
-		if (file) {
-			const updatedRows = rows.map((row, index) => {
-				if (index === id) {
-					// If the row's id matches, update this row with new data
-					console.log(row.id);
-					return { ...row, subject, file };
-				}
-				return row; // Return the unchanged row for others
+		const handout = rows[index];
+		if (!handout?.id || !file || typeof file !== "string") {
+			alert("Invalid handout or missing file URL");
+			return;
+		}
+
+		try {
+			// Backend update
+			await apiClient.put(`/handout/${handout.id}`, {
+				fileUrl: file,
+				fileType: subject,
 			});
-			setRows(updatedRows); // Update the state with the modified rows array
-			setEditModalOpen(false); // Close the modal
-			setFile(null); // Clear the file state if needed
+
+			// Local state update
+			const updatedRows = [...rows];
+			updatedRows[index] = { ...updatedRows[index], subject, file };
+			setRows(updatedRows);
+
+			// Reset
+			setEditModalOpen(false);
+			setFile(null);
 			setLink("");
 			setSubjectValue("");
-		} else {
-			alert("Enter link/file");
+		} catch (err) {
+			console.error("Failed to update handout:", err);
+			alert("Failed to update handout");
 		}
 	};
 
@@ -149,11 +197,25 @@ const HandoutPage = () => {
 		} else {
 			setFile(fileType);
 		}
+		updateHandouts();
 	};
 
-	const handleDelete = (index: number) => {
-		const updatedRows = rows.filter((_, i) => i !== index); // Remove the row at the specified index
-		setRows(updatedRows); // Update the state with the new array
+	const handleDelete = async (index: number) => {
+		const handout = rows[index];
+		if (!handout?.id) return;
+
+		try {
+			await apiClient.delete(`/handout/${handout.id}`, {
+				data: { courseId: id }, // courseId needed for backend update
+			});
+
+			// Local state update
+			const updatedRows = rows.filter((_, i) => i !== index);
+			setRows(updatedRows);
+		} catch (err) {
+			console.error("Error deleting handout:", err);
+			alert("Failed to delete handout");
+		}
 	};
 
 	return (
@@ -312,9 +374,7 @@ const HandoutPage = () => {
 									<button
 										className="w-[124px] h-[34px] bg-purple-500 border rounded-md ml-12"
 										onClick={() => {
-											uploadLink
-												? handleEditSubmit(editId, subjectValue, link)
-												: handleEditSubmit(editId, subjectValue, file);
+											handleEditSubmit(editId, subjectValue, link);
 										}}
 									>
 										<p className="text-white text-xs">Save and Exit</p>
@@ -496,7 +556,7 @@ const HandoutPage = () => {
 											setFile(null);
 										}}
 									>
-										<p className="text-purple-500 text-xs">Exit</p>
+										<p className="text-purple-500 text-xs">Cancel</p>
 									</button>
 								</div>
 							</div>
@@ -526,18 +586,14 @@ const HandoutPage = () => {
 							>
 								<td className="p-2 border">{row.subject}</td>
 								<td className="p-2 border">
-									{typeof row.file === "string" ? (
-										<a
-											href={row.file}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="text-blue-600 underline"
-										>
-											{row.file}
-										</a>
-									) : (
-										<p>{row.file.name}</p>
-									)}
+									<a
+										href={row.file ? row.file : ""}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-blue-600 underline"
+									>
+										{row.file}
+									</a>
 								</td>
 
 								<td className="p-2 border flex flex-row">
@@ -558,6 +614,7 @@ const HandoutPage = () => {
 					</tbody>
 				</table>
 			</div>
+			<SaveCourseButton prevLink="components" nextLink="speakers" />
 		</div>
 	);
 };

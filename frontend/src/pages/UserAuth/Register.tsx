@@ -336,7 +336,8 @@ const Register: React.FC = () => {
 								</div>
 								<div>
 									<label className="block mb-1 text-sm font-medium text-black">
-										Who are you certified through?
+										Who are you certified through? (Provide county or CPA you
+										are with if you are not certified.)
 									</label>
 									<input
 										type="text"

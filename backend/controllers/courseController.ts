@@ -52,7 +52,9 @@ export const getCourseById = async (
 
 		if (id) {
 			// Find course by ID and populate related fields
-			const course = await Course.findById(id).populate(["speakers"]).exec();
+			const course = await Course.findById(id)
+				.populate(["speakers", "handouts"])
+				.exec();
 
 			if (!course) {
 				res.status(404).json({
@@ -118,6 +120,7 @@ export const createCourse = async (
 			productInfo,
 			shortUrl,
 			draft,
+			registrationLimit,
 		} = req.body;
 
 		// Validate required fields
@@ -175,6 +178,7 @@ export const createCourse = async (
 			productInfo,
 			shortUrl,
 			draft,
+			registrationLimit,
 		});
 
 		const savedCourseResponse = await newCourseResponse.save();
@@ -402,9 +406,15 @@ export const getCourseUsers = async (
 			return;
 		}
 
-		// Check if the course exists and populate the students field
+		// Check if the course exists and populate the students field with their roles
 		console.log("Looking up course in database...");
-		const course = await Course.findById(courseId).populate("students");
+		const course = await Course.findById(courseId).populate({
+			path: "students",
+			populate: {
+				path: "role",
+				model: "UserType",
+			},
+		});
 		console.log("Found course:", course ? "Yes" : "No");
 		if (!course) {
 			console.log("Course not found in database");

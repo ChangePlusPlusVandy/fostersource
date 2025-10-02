@@ -2,8 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { List, Trash2, X } from "lucide-react";
 import apiClient from "../../../services/apiClient";
+import { getCleanCourseData } from "../../../store/useCourseEditStore";
 
 const Survey = () => {
+	const course = getCleanCourseData();
+
+	const navigate = useNavigate();
 	const [questions, setQuestions] = useState([
 		{
 			_id: "",
@@ -26,7 +30,7 @@ const Survey = () => {
 			try {
 				const response = await apiClient.get("/surveys"); // Fetch the existing survey
 				const surveyData = response.data;
-				console.log(response.data);
+				console.log("survey: ", surveyData);
 
 				if (surveyData) {
 					setSurveyId(surveyData._id);
@@ -143,10 +147,11 @@ const Survey = () => {
 	};
 
 	const handleLeave = () => {
-		// TODO: Implement exit logic here (e.g., redirecting the user or closing the form)
-		setIsModalOpen(false);
+		// setIsModalOpen(false);
 		// Console log that the user is leaving
 		// console.log("User left the page.");
+
+		navigate(`/admin/product/edit/${course._id}/components`);
 	};
 
 	const handleSaveSurvey = async () => {
@@ -179,6 +184,8 @@ const Survey = () => {
 				})
 			);
 
+			console.log(createdQuestions);
+
 			// Create survey data to send to backend
 			const surveyData = {
 				questions: createdQuestions,
@@ -186,16 +193,14 @@ const Survey = () => {
 
 			if (surveyId) {
 				// If surveyId exists, update the existing survey
-				const response = await apiClient.put(
-					`/surveys/${surveyId}`,
-					surveyData
-				);
+				const response = await apiClient.put(`/surveys`, surveyData);
+				console.log("data from survey after saving question: ", response.data);
 				alert("Survey saved successfully!");
 				setHasUnsavedChanges(false);
 				setSurveyId(response.data._id);
 			} else {
 				// Create a new survey if there is no surveyId
-				//response = await apiClient.post("http://localhost:5001/api/surveys", surveyData);
+				const response = await apiClient.post("/api/surveys", surveyData);
 				console.error("No surveyId");
 			}
 		} catch (err) {
@@ -353,7 +358,7 @@ const Survey = () => {
 
 					{/* Exit Button */}
 					<button
-						onClick={() => setIsModalOpen(true)}
+						onClick={() => handleLeave()}
 						className="w-[200px] text-[#8757A3] border border-[#8757A3] py-2 px-4 rounded-md hover:bg-[#8757A3] hover:text-white focus:ring-2 focus:ring-[#8757A3]"
 					>
 						Exit

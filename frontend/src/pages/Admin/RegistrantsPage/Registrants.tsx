@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { FaTrashAlt as _FaTrashAlt } from "react-icons/fa";
 import { ComponentType } from "react";
+import { useParams } from "react-router-dom";
 import apiClient from "../../../services/apiClient";
-import qs from "qs";
-import { useCourseEditStore } from "../../../store/useCourseEditStore";
 
 const FaTrashAlt = _FaTrashAlt as ComponentType<{
 	size?: number;
@@ -22,9 +21,7 @@ interface RegistrantDisplayInfo {
 }
 
 export default function Registrants() {
-	const { students, setField, setAllFields } = useCourseEditStore();
-
-	const courseId = "67acf95247f5d8867107e881"; // Replace with useParams later
+	const { id: courseId } = useParams<{ id: string }>();
 
 	const [registrants, setRegistrants] = useState<RegistrantDisplayInfo[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
@@ -34,26 +31,96 @@ export default function Registrants() {
 	useEffect(() => {
 		const fetchRegistrants = async () => {
 			try {
-				const query = qs.stringify(
-					{ _id: { $in: students } },
-					{ arrayFormat: "brackets" }
+				// First, fetch the course data to get the students array
+				const courseRes = await apiClient.get(`/courses/${courseId}`);
+				const courseData = courseRes.data.data; // API returns course in data.data, not data.course
+
+				// If no students in the course, set empty array
+				if (!courseData?.students || courseData.students.length === 0) {
+					setRegistrants([]);
+					return;
+				}
+
+				// Use backend _id filtering for efficiency
+				const userIdsParam = courseData.students.join(",");
+				const usersRes = await apiClient.get(
+					`/users?_id=${userIdsParam}&pagination=false`
 				);
-				const usersRes = await apiClient.get(`/users?${query}`);
-				const users = usersRes.data.users;
+				const registeredUsers = usersRes.data.users;
 
-				const formatted: RegistrantDisplayInfo[] = users.map((user: any) => ({
-					id: user._id,
-					userType: user.userType || "N/A",
-					fullName: user.name || "Unknown",
-					email: user.email || "No email",
-					registrationDate: "N/A",
-					completed: "N/A",
-					paid: "$?.??",
-					transactionId: "-",
-					preRegistered: "N/A",
-				}));
+				// Try to fetch progress data for registration dates and completion status
+				const progressPromises = courseData.students.map(
+					async (studentId: string) => {
+						try {
+							const progressRes = await apiClient.get(
+								`/progress/progress/${studentId}`
+							);
+							const courseProgress = progressRes.data.progresses?.find(
+								(p: any) => p.course._id === courseId || p.course === courseId
+							);
+							return {
+								userId: studentId,
+								registrationDate: courseProgress?.createdAt || null,
+								completed: courseProgress?.completed || false,
+							};
+						} catch {
+							return {
+								userId: studentId,
+								registrationDate: null,
+								completed: false,
+							};
+						}
+					}
+				);
 
-				// TODO: fix this
+				const progressData = await Promise.all(progressPromises);
+				const progressMap = new Map(progressData.map((p) => [p.userId, p]));
+
+				// Try to fetch payment data
+				const paymentPromises = courseData.students.map(
+					async (studentId: string) => {
+						try {
+							const paymentsRes = await apiClient.get(
+								`/payments?user=${studentId}&course=${courseId}`
+							);
+							const payment = paymentsRes.data.payments?.[0];
+							return {
+								userId: studentId,
+								paid: payment?.amount ? `$${payment.amount}` : "$0.00",
+								transactionId: payment?.transactionId || "-",
+							};
+						} catch {
+							return {
+								userId: studentId,
+								paid: "$0.00",
+								transactionId: "-",
+							};
+						}
+					}
+				);
+
+				const paymentData = await Promise.all(paymentPromises);
+				const paymentMap = new Map(paymentData.map((p) => [p.userId, p]));
+
+				const formatted: RegistrantDisplayInfo[] = registeredUsers.map(
+					(user: any) => {
+						const progress = progressMap.get(user._id);
+						const payment = paymentMap.get(user._id);
+
+						return {
+							id: user._id,
+							userType: user.role?.name || user.userType || "N/A",
+							fullName: user.name || "Unknown",
+							email: user.email || "No email",
+							registrationDate: progress?.registrationDate
+								? new Date(progress.registrationDate).toLocaleDateString()
+								: "N/A",
+							completed: progress?.completed ? "Yes" : "No",
+							paid: payment?.paid || "$0.00",
+							transactionId: payment?.transactionId || "-",
+						};
+					}
+				);
 
 				setRegistrants(formatted);
 			} catch (err: any) {
@@ -64,7 +131,9 @@ export default function Registrants() {
 			}
 		};
 
-		fetchRegistrants();
+		if (courseId) {
+			fetchRegistrants();
+		}
 	}, [courseId]);
 
 	const handleDelete = (id: string) => {

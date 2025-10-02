@@ -10,7 +10,6 @@ export default function Home() {
 		navigate(`/catalog?format=${format}`);
 	};
 	return (
-		
 		<div className="bg-gray-100 min-h-screen flex w-full">
 			<div className="flex-grow">
 				<main className="container mx-auto py-8 px-6 max-w-screen-lg">
@@ -80,6 +79,7 @@ export default function Home() {
 									}}
 									whileTap={{ scale: 0.93 }}
 									className="bg-black text-white px-6 py-2 rounded-lg shadow hover:bg-gray-800 transition duration-200"
+									onClick={() => navigate("/faqs")}
 								>
 									Learn More
 								</motion.button>
@@ -120,7 +120,7 @@ export default function Home() {
 
 						{/* In-Person Training Tile */}
 						<motion.div
-							className="relative overflow-hidden shadow-lg mx-auto"
+							className="relative overflow-hidden shadow-lg mx-auto cursor-pointer"
 							style={{
 								width: "90%",
 								maxWidth: "600px",
@@ -135,6 +135,7 @@ export default function Home() {
 								boxShadow: "0px 4px 10px rgba(0,0,0,0.3)",
 								transition: { duration: 0.15 },
 							}}
+							onClick={() => handleFilterRedirect("In-Person")}
 						>
 							<img
 								src="/images/inPersonTraining.png"
@@ -187,7 +188,7 @@ export default function Home() {
 										className="bg-orange-500 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow-md"
 										onClick={() => handleFilterRedirect("Live")}
 									>
-										Upcoming
+										Live
 									</motion.button>
 
 									<motion.button

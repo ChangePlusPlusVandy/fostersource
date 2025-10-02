@@ -227,9 +227,9 @@ const EditCourse = () => {
 		<div className="flex flex-col p-8 bg-white">
 			<p className="text-2xl">Details</p>
 			<div className="mt-2">
-				<div className="flex justify-between flex-row-reverse">
-					<div className="flex flex-col justify-end">
-						<p className="text-xs">Catalog</p>
+				<div className="flex justify-between flex-row-reverse gap-12">
+					<div className="flex flex-col">
+						<p className="text-lg">Thumbnail</p>
 						<div
 							className="border-2 border-dashed border-gray-400 rounded-lg p-6 w-full max-w-lg mx-auto text-center cursor-pointer"
 							onDragOver={(e) => e.preventDefault()}
@@ -283,42 +283,6 @@ const EditCourse = () => {
 							)}
 						</div>
 
-						<p className="text-xs mr-52 mt-10">Banner Image</p>
-						<div
-							className="border-2 border-dashed border-gray-400 rounded-lg p-6 w-full max-w-lg mx-auto text-center cursor-pointer "
-							onDragOver={(e) => e.preventDefault()}
-							onDrop={handleBannerDrop}
-						>
-							<div className="flex flex-col items-center">
-								{/* Upload Icon */}
-								<span className="text-gray-500 text-2xl">⬆️</span>
-
-								{/* Upload Text */}
-								<p className="font-semibold mt-2">
-									Choose a file or drag & drop it here
-								</p>
-								<p className="text-gray-400 text-sm">
-									JPEG or PNG format, up to 50MB
-								</p>
-
-								{/* File Input */}
-								<input
-									type="file"
-									accept=".jpeg, .jpg, .png"
-									className="hidden"
-									id="bannerInput"
-									onChange={handleBannerChange}
-								/>
-								<label
-									htmlFor="bannerInput"
-									className="mt-4 bg-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm cursor-pointer"
-								>
-									Browse Files
-								</label>
-
-								{/* Show Selected File */}
-							</div>
-						</div>
 						<div className="relative text-center">
 							{bannerImage && (
 								<div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[370px] h-[37px] bg-gray-200 flex flex-row items-center px-3 shadow-md rounded-md">
@@ -335,22 +299,22 @@ const EditCourse = () => {
 							)}
 						</div>
 					</div>
-					<div className="">
-						<div className="flex flex-col flex-grow text-sm w-full">
+					<div className=" w-full">
+						<div className="flex flex-col flex-grow text-md w-full">
 							<p>Title</p>
 							<input
 								type="text"
-								className="h-8 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
+								className="h-12 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
 								placeholder="Title of the class"
 								value={className}
 								onChange={(e) => setField("className", e.target.value)}
 							/>
 						</div>
 						<div className="mt-3">
-							<p className="text-sm">Summary</p>
-							<div className="text-xs">
+							<p className="text-md">Summary</p>
+							<div className="text-md">
 								<textarea
-									className="w-full h-11 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
+									className="w-full h-12 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
 									placeholder="Enter summary displayed on preview"
 									value={discussion}
 									onChange={(e) => setField("discussion", e.target.value)}
@@ -358,15 +322,15 @@ const EditCourse = () => {
 							</div>
 						</div>
 						<div className="mt-3">
-							<p className="text-sm">Description</p>
+							<p className="text-md">Description</p>
 							<textarea
-								className="w-full h-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-xs"
+								className="w-full h-20 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 text-md"
 								placeholder="Short description that will show on the overview tab"
 								value={courseDescription}
 								onChange={(e) => setField("courseDescription", e.target.value)}
 							/>
 						</div>
-						<div className="mt-2">
+						{/* <div className="mt-2">
 							<div className="flex flex-row items-start space-x-2 w-full">
 								<p className="text-sm leading-none">Short Product Url</p>
 								<p className="text-gray-400 text-xs leading-none">
@@ -381,56 +345,60 @@ const EditCourse = () => {
 									onChange={(e) => setField("shortUrl", e.target.value)}
 								/>
 							</div>
-						</div>
+						</div> */}
 
-						<div className="flex flex-row">
-							<div className="mt-2 gap-1 flex flex-col text-sm">
-								Credits
-								<div className="">
-									<input
-										type="number"
-										className="h-6 w-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-center"
-										min="0"
-										max="10"
-										value={creditNumber}
-										onChange={(e) =>
-											setField("creditNumber", Number(e.target.value))
-										}
-									/>
+						<div className="flex gap-8">
+							<div className="flex flex-row">
+								<div className="mt-2 gap-1 flex flex-col text-md">
+									Credits
+									<div className="">
+										<input
+											type="number"
+											className="h-12 w-20 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-center"
+											min="0"
+											max="10"
+											value={creditNumber}
+											onChange={(e) =>
+												setField("creditNumber", Number(e.target.value))
+											}
+										/>
+									</div>
 								</div>
 							</div>
-						</div>
 
-						<div className="mt-3 ml-20 gap-1 flex flex-col text-sm ">
-							Categories
-							<SetOptionsContext.Provider value={setOptions}>
-								<CustomSelect
-									className="w-[250px]"
-									options={options}
-									isMulti
-									value={options.filter((opt) =>
-										categories.includes(opt.value)
-									)}
-									onChange={(selected) => {
-										const selectedValues = (selected as OptionType[]).map(
-											(opt) => opt.value
-										);
-										setField("categories", selectedValues);
-									}}
-									components={{ Option: CustomOption }}
-								/>
-							</SetOptionsContext.Provider>
-						</div>
+							<div className="flex">
+								<div className="mt-3 gap-1 flex flex-col text-md ">
+									Categories
+									<SetOptionsContext.Provider value={setOptions}>
+										<CustomSelect
+											className="w-[250px]"
+											options={options}
+											isMulti
+											value={options.filter((opt) =>
+												categories.includes(opt.value)
+											)}
+											onChange={(selected) => {
+												const selectedValues = (selected as OptionType[]).map(
+													(opt) => opt.value
+												);
+												setField("categories", selectedValues);
+											}}
+											components={{ Option: CustomOption }}
+										/>
+									</SetOptionsContext.Provider>
+								</div>
 
-						<div className="mt-9 ml-5">
-							<button
-								className="w-32 h-10 text-purple-400"
-								onClick={() => setModalopen(!modalOpen)}
-							>
-								<p className="text-xs font-medium text-purple-400">
-									Add Category
-								</p>
-							</button>
+								<div className="self-end">
+									<button
+										className="w-32 h-10 text-purple-400"
+										onClick={() => setModalopen(!modalOpen)}
+									>
+										<p className="text-xs font-medium text-purple-400">
+											Add Category
+										</p>
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 					{/* {modalOpen && (

@@ -303,12 +303,27 @@ export default function ProductPage() {
 		getOptions();
 	}, []);
 
+	const handleAddCourse = async () => {
+		try {
+			const res = await apiClient.post("/courses", {
+				className: "Untitled",
+				draft: true,
+			});
+
+			const createdCourse = res.data.data;
+			navigate(`/admin/product/edit/${createdCourse._id}`);
+		} catch (error) {
+			console.error("Failed to create course", error);
+			// Optional: toast or error message
+		}
+	};
+
 	return (
 		<div className="w-full min-h-screen bg-gray-100">
 			<div className="max-w-screen-2xl mx-auto px-8 py-6">
 				<div className="bg-white border rounded-lg p-6">
 					<div className="mb-6">
-						<h1 className="text-2xl font-bold">Products</h1>
+						<h1 className="text-2xl font-bold">Courses</h1>
 					</div>
 
 					<div className="mb-6">
@@ -318,7 +333,7 @@ export default function ProductPage() {
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
 								className="w-full pl-4 pr-16 py-3 rounded-lg border bg-white text-gray-800 placeholder-gray-400"
-								placeholder="Search products..."
+								placeholder="Search courses..."
 							/>
 							<div className="absolute right-0 top-0 bottom-0 flex items-center rounded-r-lg overflow-hidden">
 								<div className="h-full px-4 flex items-center bg-[#9c74b4]">
@@ -425,9 +440,7 @@ export default function ProductPage() {
 						<button
 							className="text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
 							style={{ backgroundColor: "#8757a3" }}
-							onClick={() => {
-								navigate("/admin/product/create");
-							}}
+							onClick={handleAddCourse}
 						>
 							Add Course
 						</button>

@@ -15,7 +15,7 @@ router.get("/", getSurvey);
 // router.post("/", createSurvey);
 
 // PUT update survey by ID
-router.put("/:id", updateSurvey);
+router.put("/", updateSurvey);
 
 // DELETE survey by ID
 router.delete("/:id", deleteSurvey);
