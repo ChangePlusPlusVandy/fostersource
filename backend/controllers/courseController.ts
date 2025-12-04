@@ -3,6 +3,7 @@ import Course from "../models/courseModel";
 import Rating from "../models/ratingModel";
 import User, { IUser } from "../models/userModel";
 import Progress, { IProgress } from "../models/progressModel";
+import { emailQueue } from "../jobs/emailQueue";
 
 // Define an interface for error objects
 interface ErrorWithDetails {
@@ -439,6 +440,110 @@ export const getCourseUsers = async (
 		});
 	} catch (error: any) {
 		console.error("Error in getCourseUsers:", error);
+		res.status(500).json({
+			success: false,
+			message: error.message || "Internal server error.",
+		});
+	}
+};
+
+// @desc    Drop a user from a course and auto-enroll from waitlist
+// @route   POST /api/courses/:courseId/drop
+// @access  Public
+export const dropCourseEnrollment = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { courseId } = req.params;
+		const { userId } = req.body;
+
+		if (!courseId || !userId) {
+			res.status(400).json({
+				success: false,
+				message: "Course ID and User ID are required.",
+			});
+			return;
+		}
+
+		const course = await Course.findById(courseId);
+		if (!course) {
+			res.status(404).json({
+				success: false,
+				message: "Course not found.",
+			});
+			return;
+		}
+
+		const beforeCount = course.students.length;
+		course.students = course.students.filter(
+			(id) => id.toString() !== userId.toString()
+		);
+
+		if (beforeCount === course.students.length) {
+			res.status(404).json({
+				success: false,
+				message: "User not enrolled in this course.",
+			});
+			return;
+		}
+
+		await Progress.deleteMany({ course: courseId, user: userId });
+
+		let promotedUserId: string | null = null;
+
+		const limit = course.registrationLimit || 0;
+		const hasCapacity = limit === 0 || course.students.length < limit;
+
+		if (hasCapacity && course.waitlist && course.waitlist.length > 0) {
+			course.waitlist.sort(
+				(a, b) =>
+					new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime()
+			);
+			const nextInLine = course.waitlist.shift();
+			if (nextInLine) {
+				const promotedId = nextInLine.user.toString();
+				course.students.push(nextInLine.user as any);
+				promotedUserId = promotedId;
+
+				const existingProgress = await Progress.findOne({
+					course: courseId,
+					user: promotedId,
+				});
+				if (!existingProgress) {
+					await new Progress({
+						course: courseId,
+						user: promotedId,
+						isComplete: false,
+						completedComponents: {
+							webinar: false,
+							survey: false,
+							certificate: false,
+						},
+						dateCompleted: null,
+					}).save();
+				}
+
+				await emailQueue.add("registration-confirmation", {
+					userId: promotedId,
+					courseId,
+				});
+				await emailQueue.add("waitlist-promotion", {
+					userId: promotedId,
+					courseId,
+				});
+			}
+		}
+
+		await course.save();
+
+		res.status(200).json({
+			success: true,
+			message: "User dropped from course.",
+			promotedUserId,
+		});
+	} catch (error: any) {
+		console.error("Error dropping course enrollment:", error);
 		res.status(500).json({
 			success: false,
 			message: error.message || "Internal server error.",

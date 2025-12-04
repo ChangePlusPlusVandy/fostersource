@@ -10,6 +10,7 @@ import {
 	updateUserProgress,
 	batchUpdateUserProgress,
 	getUserCourseProgress,
+	dropCourseEnrollment,
 } from "../controllers/courseController";
 
 const router = express.Router();
@@ -31,6 +32,9 @@ router.delete("/:id", deleteCourse);
 
 // GET all users enrolled in a course
 router.get("/:courseId/users", getCourseUsers);
+
+// Drop a user and auto-enroll from waitlist if available
+router.post("/:courseId/drop", dropCourseEnrollment);
 
 // GET progress for all users in a course
 router.get("/:courseId/progress", getCourseProgress);
