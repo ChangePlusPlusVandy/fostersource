@@ -63,6 +63,13 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [surveyCompleted, setSurveyCompleted] = useState<boolean>(false);
 	const [certificateCompleted, setCertificateCompleted] =
 		useState<boolean>(false);
+	const [isDroppingCourse, setIsDroppingCourse] = useState(false);
+	const [dropStatusMessage, setDropStatusMessage] = useState<string | null>(
+		null
+	);
+	const [dropStatusType, setDropStatusType] = useState<"success" | "error" | "idle">(
+		"idle"
+	);
 
 	useEffect(() => {
 		const fetchProgress = async () => {
@@ -160,6 +167,37 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 				ratings: [...prevCourse.ratings, newRating], // Add new rating
 			};
 		});
+	};
+
+	const handleDropCourse = async () => {
+		if (!courseId || !user?._id) {
+			setDropStatusType("error");
+			setDropStatusMessage("Missing course or user information.");
+			return;
+		}
+
+		setIsDroppingCourse(true);
+		setDropStatusMessage(null);
+		setDropStatusType("idle");
+
+		try {
+			await apiClient.post(`courses/${courseId}/drop`, {
+				userId: user._id,
+			});
+			setDropStatusType("success");
+			setDropStatusMessage("You have left this course.");
+			setHasProgress(false);
+			setProgress(null);
+			setWorkshopCompleted(false);
+			setSurveyCompleted(false);
+			setCertificateCompleted(false);
+		} catch (error) {
+			console.error("Error dropping course enrollment:", error);
+			setDropStatusType("error");
+			setDropStatusMessage("Unable to drop the course. Please try again.");
+		} finally {
+			setIsDroppingCourse(false);
+		}
 	};
 
 	return (
@@ -389,6 +427,32 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 					</div>
 				</div>
 			</div>
+			{hasProgress && (
+				<div className="mt-8 flex flex-col items-start gap-2">
+					<button
+						onClick={handleDropCourse}
+						disabled={isDroppingCourse}
+						className={`rounded-md px-6 py-3 text-sm font-semibold text-white transition ${
+							isDroppingCourse
+								? "bg-gray-400 cursor-not-allowed"
+								: "bg-red-500 hover:bg-red-600"
+						}`}
+					>
+						{isDroppingCourse ? "Dropping..." : "Leave Course"}
+					</button>
+					{dropStatusMessage && (
+						<p
+							className={`text-sm ${
+								dropStatusType === "success"
+									? "text-green-600"
+									: "text-red-600"
+							}`}
+						>
+							{dropStatusMessage}
+						</p>
+					)}
+				</div>
+			)}
 		</div>
 	);
 };
