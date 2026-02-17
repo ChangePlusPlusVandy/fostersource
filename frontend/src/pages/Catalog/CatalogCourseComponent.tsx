@@ -1,7 +1,16 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, {
+	Dispatch,
+	SetStateAction,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import { Course } from "../../shared/types/course";
 import { Link } from "react-router-dom";
-import { addToCart } from "../../services/registrationServices";
+import {
+	addToCart,
+	registerForCourse,
+} from "../../services/registrationServices";
 
 interface CatalogCourseComponentProps {
 	course: Course;
@@ -10,12 +19,66 @@ interface CatalogCourseComponentProps {
 	isLoggedIn: boolean;
 }
 
+type RegistrationStatus =
+	| "none"
+	| "waitlisted"
+	| "enrolled"
+	| "already-enrolled";
+
 export default function CatalogCourseComponent({
 	course,
 	setCartItemCount,
 	isInCart,
 	isLoggedIn,
 }: CatalogCourseComponentProps) {
+	const storedUser = useMemo(() => {
+		if (!isLoggedIn) {
+			return null;
+		}
+
+		try {
+			const rawUser = localStorage.getItem("user");
+			return rawUser ? JSON.parse(rawUser) : null;
+		} catch (error) {
+			console.error("Failed to parse stored user:", error);
+			return null;
+		}
+	}, [isLoggedIn]);
+
+	const userId: string | undefined = storedUser?._id;
+
+	const defaultStatus = useMemo<RegistrationStatus>(() => {
+		if (!userId) {
+			return "none";
+		}
+
+		if (course.students.some((id) => id === userId)) {
+			return "enrolled";
+		}
+
+		const waitlistEntries = course.waitlist ?? [];
+		const onWaitlist = waitlistEntries.some((entry) => {
+			const entryUser = entry.user as string | { _id?: string } | undefined;
+			const entryId =
+				typeof entryUser === "string" ? entryUser : entryUser?._id;
+			return entryId === userId;
+		});
+
+		return onWaitlist ? "waitlisted" : "none";
+	}, [course.students, course.waitlist, userId]);
+
+	const [registrationStatus, setRegistrationStatus] =
+		useState<RegistrationStatus>(defaultStatus);
+
+	useEffect(() => {
+		setRegistrationStatus(defaultStatus);
+	}, [defaultStatus]);
+
+	const isRegistrationLocked =
+		registrationStatus === "waitlisted" ||
+		registrationStatus === "enrolled" ||
+		registrationStatus === "already-enrolled";
+
 	const renderStars = (rating: number) => {
 		const fullStars = Math.floor(rating);
 		const hasHalfStar = rating % 1 !== 0;
@@ -39,6 +102,20 @@ export default function CatalogCourseComponent({
 	};
 
 	async function handleRegister(course: Course) {
+		if (isAtCapacity) {
+			try {
+				const data = await registerForCourse(course._id);
+				const courseResult = data.results.find(
+					(result) => result.courseId === course._id
+				);
+
+				setRegistrationStatus(courseResult?.status ?? "waitlisted");
+			} catch (error) {
+				console.error(error);
+			}
+			return;
+		}
+
 		await addToCart(course).then(() => {
 			setCartItemCount(
 				localStorage.user ? JSON.parse(localStorage.user).cart.length : 0
@@ -46,11 +123,62 @@ export default function CatalogCourseComponent({
 		});
 	}
 
-	// Check if course is at registration capacity
 	const isAtCapacity =
 		course.registrationLimit > 0 &&
 		course.students.length >= course.registrationLimit;
-	const isDisabled = isInCart || isAtCapacity;
+	const isDisabled = isInCart || isRegistrationLocked;
+
+	const statusMessage = useMemo(() => {
+		if (registrationStatus === "waitlisted") {
+			return "You're on the waitlist for this course.";
+		}
+
+		if (
+			registrationStatus === "enrolled" ||
+			registrationStatus === "already-enrolled"
+		) {
+			return "You're registered for this course.";
+		}
+
+		return null;
+	}, [registrationStatus]);
+
+	const primaryButtonLabel = useMemo(() => {
+		if (isInCart) {
+			return "Already in Cart";
+		}
+
+		if (registrationStatus === "waitlisted") {
+			return "On Waitlist";
+		}
+
+		if (
+			registrationStatus === "enrolled" ||
+			registrationStatus === "already-enrolled"
+		) {
+			return "Registered";
+		}
+
+		if (isAtCapacity) {
+			return "Join Waitlist";
+		}
+
+		const cost = storedUser?.role?.cost;
+
+		if (cost === 0) {
+			return "Register (Free)";
+		}
+
+		if (typeof cost === "number") {
+			const formattedCost = new Intl.NumberFormat("en-US", {
+				style: "currency",
+				currency: "USD",
+			}).format(cost);
+			return `Register (${formattedCost})`;
+		}
+
+		return "Register (Free)";
+	}, [isAtCapacity, isInCart, registrationStatus, storedUser]);
 
 	return (
 		<div className="flex bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200">
@@ -109,21 +237,7 @@ export default function CatalogCourseComponent({
 									: "bg-orange-500 hover:bg-orange-600"
 							}`}
 						>
-							{isInCart
-								? "Already in Cart"
-								: isAtCapacity
-									? "Course Full"
-									: `Register (${
-											localStorage.user &&
-											JSON.parse(localStorage.user).role?.cost === 0
-												? "Free"
-												: localStorage.user
-													? `${new Intl.NumberFormat("en-US", {
-															style: "currency",
-															currency: "USD",
-														}).format(JSON.parse(localStorage.user).role.cost)}`
-													: "Free"
-										})`}
+							{primaryButtonLabel}
 						</button>
 					) : (
 						<Link to="/login">
@@ -138,6 +252,17 @@ export default function CatalogCourseComponent({
 						</button>
 					</Link>
 				</div>
+				{statusMessage && (
+					<p
+						className={`text-sm mt-2 ${
+							registrationStatus === "waitlisted"
+								? "text-blue-600"
+								: "text-green-600"
+						}`}
+					>
+						{statusMessage}
+					</p>
+				)}
 			</div>
 			<div className="w-1/4 bg-gray-300">
 				<img

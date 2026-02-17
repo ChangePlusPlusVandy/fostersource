@@ -5,6 +5,7 @@ import Payment from "../models/paymentModel";
 import Course from "../models/courseModel";
 import mongoose from "mongoose";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
+import { emailQueue } from "../jobs/emailQueue";
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
 	try {
@@ -232,8 +233,45 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 				throw new Error(`Course with ID ${courseId} not found.`);
 			}
 
+			const studentId = new mongoose.Types.ObjectId(userId);
+			const alreadyEnrolled = course.students.some(
+				(id) => id.toString() === userId.toString()
+			);
+			if (alreadyEnrolled) {
+				return {
+					courseId,
+					status: "already-enrolled",
+				};
+			}
+
+			const limit = course.registrationLimit || 0;
+			const isFull = limit > 0 && course.students.length >= limit;
+			const existingWaitlistEntry = course.waitlist?.find(
+				(entry) => entry.user.toString() === userId.toString()
+			);
+
+			if (isFull) {
+				if (!existingWaitlistEntry) {
+					course.waitlist = course.waitlist || [];
+					course.waitlist.push({ user: studentId, joinedAt: new Date() });
+					course.waitlist.sort(
+						(a, b) =>
+							new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime()
+					);
+					await course.save();
+					await emailQueue.add("waitlist-confirmation", {
+						userId: userId.toString(),
+						courseId: courseId.toString(),
+					});
+				}
+				return {
+					courseId,
+					status: "waitlisted",
+				};
+			}
+
 			const progress = new Progress({
-				user: new mongoose.Types.ObjectId(userId),
+				user: studentId,
 				course: new mongoose.Types.ObjectId(courseId),
 				isComplete: false,
 				completedComponents: {
@@ -245,22 +283,29 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 			});
 			await progress.save();
 
-			console.log("progress", progress);
-
-			if (!course.students.includes(new mongoose.Types.ObjectId(userId))) {
-				course.students.push(new mongoose.Types.ObjectId(userId));
+			if (!course.students.some((id) => id.toString() === userId.toString())) {
+				course.students.push(studentId);
 				await course.save();
 			}
 
-			return progress;
+			await emailQueue.add("registration-confirmation", {
+				userId: userId.toString(),
+				courseId: courseId.toString(),
+			});
+
+			return {
+				courseId,
+				status: "enrolled",
+				progressId: progress._id,
+			};
 		});
 
 		const progressResults = await Promise.all(progressPromises);
 
 		res.status(201).json({
 			success: true,
-			message: "User registered to courses successfully.",
-			progress: progressResults,
+			message: "User processed for course registration.",
+			results: progressResults,
 		});
 	} catch (error) {
 		console.error(error);

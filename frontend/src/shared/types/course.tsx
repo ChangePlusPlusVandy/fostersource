@@ -23,6 +23,10 @@ export type Course = {
 	speakers: string[];
 	regStart: Date;
 	regEnd: Date;
+	waitlist?: {
+		user: string | User;
+		joinedAt: string;
+	}[];
 	productType:
 		| "Virtual Training - Live Meeting"
 		| "In-Person Training"

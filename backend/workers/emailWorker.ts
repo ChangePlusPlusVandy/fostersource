@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import Email from "../models/emailModel";
 import User from "../models/userModel";
 import { sendEmail } from "../config/resend";
-import { ICourse } from "../models/courseModel";
+import Course, { ICourse } from "../models/courseModel";
 import connectDB from "../config/db";
 import "../models/courseModel";
 import { emailQueue } from "../jobs/emailQueue";
@@ -53,6 +53,72 @@ const recoverMissedEmails = async () => {
 		async (job) => {
 			try {
 				console.log("📦 Worker picked up job:", job.id, job.data);
+
+				if (job.name === "waitlist-confirmation") {
+					const { userId, courseId } = job.data;
+					const [user, course] = await Promise.all([
+						User.findById(userId),
+						Course.findById(courseId),
+					]);
+					if (user && course) {
+						await sendEmail(
+							user.email,
+							`You are waitlisted for ${course.className}`,
+							`<p>Hi {{name}},</p><p>You have been added to the waitlist for {{course}}. We'll email you if a seat opens.</p>`,
+							{ name: user.name, course: course.className }
+						);
+					}
+					return;
+				}
+
+				if (job.name === "waitlist-promotion") {
+					const { userId, courseId } = job.data;
+					const [user, course] = await Promise.all([
+						User.findById(userId),
+						Course.findById(courseId),
+					]);
+					if (user && course) {
+						await sendEmail(
+							user.email,
+							`You're in! ${course.className}`,
+							`<p>Hi {{name}},</p><p>A seat opened up and you are now enrolled in {{course}}.</p>`,
+							{ name: user.name, course: course.className }
+						);
+					}
+					return;
+				}
+
+				if (job.name === "registration-confirmation") {
+					const { userId, courseId } = job.data;
+					const [user, course] = await Promise.all([
+						User.findById(userId),
+						Course.findById(courseId),
+					]);
+					if (user && course) {
+						await sendEmail(
+							user.email,
+							`Registered for ${course.className}`,
+							`<p>Hi {{name}},</p><p>You are registered for {{course}}.</p>`,
+							{ name: user.name, course: course.className }
+						);
+					}
+					return;
+				}
+
+				if (job.name === "course-reminder") {
+					console.log("course-reminder ");
+					return;
+				}
+
+				if (job.name === "speaker-assignment") {
+					console.log("speaker-assignment");
+					return;
+				}
+
+				if (job.name !== "send-course-email") {
+					console.log(`No handler for job type '${job.name}', skipping.`);
+					return;
+				}
 
 				const email = await Email.findById(job.data.emailId).populate("course");
 				if (!email) {
