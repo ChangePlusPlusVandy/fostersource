@@ -2,6 +2,18 @@ import { Course } from "../shared/types/course";
 import apiClient from "./apiClient";
 import { dummyCourses } from "../shared/DummyCourses";
 
+type RegistrationResult = {
+	courseId: string;
+	status: "enrolled" | "waitlisted" | "already-enrolled";
+	progressId?: string;
+};
+
+export type RegistrationResponse = {
+	success: boolean;
+	message: string;
+	results: RegistrationResult[];
+};
+
 export async function addToCart(course: Course) {
 	let user = localStorage.getItem("user")
 		? // @ts-ignore
@@ -112,6 +124,32 @@ export async function registerFromCart() {
 			// @ts-ignore
 			error.response?.data || error.message
 		);
+	}
+}
+
+export async function registerForCourse(
+	courseId: string
+): Promise<RegistrationResponse> {
+	const user = localStorage.user ? JSON.parse(localStorage.user) : null;
+
+	if (user === null) {
+		throw new Error("User is not logged in.");
+	}
+
+	try {
+		const response = await apiClient.post(`/users/register`, {
+			userId: user._id,
+			courseIds: [courseId],
+		});
+
+		return response.data as RegistrationResponse;
+	} catch (error) {
+		console.error(
+			"Error registering user for course:",
+			// @ts-ignore
+			error.response?.data || error.message
+		);
+		throw error;
 	}
 }
 
