@@ -18,7 +18,9 @@ Monorepo for an education platform with:
 	- `cd backend && npm start` (or `ts-node server.ts`)
 3. **Start frontend**
 	- `cd frontend && npm start`
-4. **Run tests**
+4. **Start email worker**
+	- `cd backend && npm run worker`
+5. **Run tests**
 	- Backend: `cd backend && npm test`
 	- Frontend: `cd frontend && npm test`
 
