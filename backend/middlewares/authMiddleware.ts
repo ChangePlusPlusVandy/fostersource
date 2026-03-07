@@ -68,7 +68,9 @@ export const verifyFirebaseAuth = async (
 				isImpersonating = true;
 				impersonationReason = session.reason;
 			} else {
-				const existingSession = await ImpersonationSession.findOne({ tokenHash });
+				const existingSession = await ImpersonationSession.findOne({
+					tokenHash,
+				});
 
 				if (existingSession?.expiresAt && existingSession.expiresAt <= now) {
 					await ImpersonationSession.updateMany(
