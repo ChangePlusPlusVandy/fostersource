@@ -26,6 +26,11 @@ apiClient.interceptors.request.use(async (config) => {
 		config.headers.Authorization = `Bearer ${token}`;
 	}
 
+	const impersonationToken = localStorage.getItem("impersonationToken");
+	if (impersonationToken) {
+		config.headers["x-impersonation-token"] = impersonationToken;
+	}
+
 	if (config.data instanceof FormData) {
 		config.headers["Content-Type"] = "multipart/form-data";
 	}

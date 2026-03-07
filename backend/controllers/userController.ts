@@ -4,8 +4,18 @@ import Progress from "../models/progressModel";
 import Payment from "../models/paymentModel";
 import Course from "../models/courseModel";
 import mongoose from "mongoose";
+import crypto from "crypto";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 import { emailQueue } from "../jobs/emailQueue";
+import ImpersonationSession from "../models/impersonationSessionModel";
+
+const IMPERSONATION_TTL_MINUTES = 15;
+
+const isStaffRole = (roleName?: string) => {
+	if (!roleName) return false;
+	const normalized = roleName.trim().toLowerCase();
+	return normalized === "staff" || normalized === "admin";
+};
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
 	try {
@@ -316,12 +326,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 	}
 };
 
-export const checkAdmin = async (req: AuthenticatedRequest, res: Response) => {
+export const checkAdmin = async (
+	req: AuthenticatedRequest,
+	res: Response
+): Promise<void> => {
 	try {
 		if (!req.user) {
-			return res
-				.status(401)
-				.json({ message: "Unauthorized: No user data found" });
+			res.status(401).json({ message: "Unauthorized: No user data found" });
+			return;
 		}
 
 		const user = await User.findOne({ firebaseId: req.user.uid }).populate(
@@ -329,16 +341,201 @@ export const checkAdmin = async (req: AuthenticatedRequest, res: Response) => {
 		);
 
 		if (!user || !user.role) {
-			return res
-				.status(404)
-				.json({ message: "User not found or role missing" });
+			res.status(404).json({ message: "User not found or role missing" });
+			return;
 		}
 
 		const isAdmin = (user.role as any).name?.toLowerCase() === "staff";
 
-		return res.status(200).json({ isAdmin });
+		res.status(200).json({ isAdmin });
+		return;
 	} catch (error) {
-		return res.status(500).json({ message: "Server error", error });
+		res.status(500).json({ message: "Server error", error });
+		return;
+	}
+};
+
+export const startImpersonation = async (
+	req: AuthenticatedRequest,
+	res: Response
+): Promise<void> => {
+	try {
+		if (!req.user?.uid) {
+			res.status(401).json({ message: "Unauthorized" });
+			return;
+		}
+
+		if (req.user.isImpersonating) {
+			res.status(400).json({ message: "Nested impersonation is not allowed" });
+			return;
+		}
+
+		const actor = await User.findOne({ firebaseId: req.user.uid }).populate(
+			"role"
+		);
+		if (!actor) {
+			res.status(404).json({ message: "Actor not found" });
+			return;
+		}
+
+		const actorRoleName = (actor.role as any)?.name;
+		if (!isStaffRole(actorRoleName)) {
+			res.status(403).json({ message: "Only staff/admin can impersonate" });
+			return;
+		}
+
+		const { targetUserId } = req.params;
+		const { reason } = req.body || {};
+
+		if (!targetUserId || !mongoose.Types.ObjectId.isValid(targetUserId)) {
+			res.status(400).json({ message: "Invalid target user id" });
+			return;
+		}
+
+		const targetUser = await User.findById(targetUserId).populate("role");
+		if (!targetUser) {
+			res.status(404).json({ message: "Target user not found" });
+			return;
+		}
+
+		if (targetUser.firebaseId === req.user.uid) {
+			res.status(400).json({ message: "Cannot impersonate yourself" });
+			return;
+		}
+
+		const targetRoleName = (targetUser.role as any)?.name;
+		if (isStaffRole(targetRoleName)) {
+			res.status(403).json({ message: "Cannot impersonate staff/admin users" });
+			return;
+		}
+
+		const now = new Date();
+		const expiresAt = new Date(
+			now.getTime() + IMPERSONATION_TTL_MINUTES * 60 * 1000
+		);
+		const rawToken = crypto.randomBytes(48).toString("hex");
+		const tokenHash = crypto
+			.createHash("sha256")
+			.update(rawToken)
+			.digest("hex");
+
+		await ImpersonationSession.updateMany(
+			{ actorUid: req.user.uid, active: true },
+			{ $set: { active: false, stoppedAt: now } }
+		);
+
+		await ImpersonationSession.create({
+			actorUid: req.user.uid,
+			targetUid: targetUser.firebaseId,
+			tokenHash,
+			reason,
+			startedAt: now,
+			expiresAt,
+			active: true,
+		});
+
+		res.status(200).json({
+			message: "Impersonation started",
+			impersonationToken: rawToken,
+			expiresAt,
+			actorUid: req.user.uid,
+			targetUid: targetUser.firebaseId,
+			targetUserId: targetUser._id,
+			targetUserName: targetUser.name,
+			targetUser,
+		});
+	} catch (error) {
+		console.error("Error starting impersonation:", error);
+		res.status(500).json({ message: "Error starting impersonation", error });
+	}
+};
+
+export const stopImpersonation = async (
+	req: AuthenticatedRequest,
+	res: Response
+): Promise<void> => {
+	try {
+		if (!req.user?.uid || !req.user.actorUid) {
+			res.status(400).json({ message: "Not currently impersonating" });
+			return;
+		}
+
+		const impersonationTokenHeader = req.headers["x-impersonation-token"];
+		const impersonationToken =
+			typeof impersonationTokenHeader === "string"
+				? impersonationTokenHeader
+				: Array.isArray(impersonationTokenHeader)
+					? impersonationTokenHeader[0]
+					: undefined;
+
+		if (!impersonationToken) {
+			res.status(400).json({ message: "Missing impersonation token" });
+			return;
+		}
+
+		const tokenHash = crypto
+			.createHash("sha256")
+			.update(impersonationToken)
+			.digest("hex");
+
+		const updatedSession = await ImpersonationSession.findOneAndUpdate(
+			{
+				tokenHash,
+				active: true,
+				actorUid: req.user.actorUid,
+				targetUid: req.user.uid,
+			},
+			{ $set: { active: false, stoppedAt: new Date() } },
+			{ new: true }
+		);
+
+		if (!updatedSession) {
+			res
+				.status(404)
+				.json({ message: "Active impersonation session not found" });
+			return;
+		}
+
+		res.status(200).json({
+			message: "Impersonation stopped",
+		});
+	} catch (error) {
+		console.error("Error stopping impersonation:", error);
+		res.status(500).json({ message: "Error stopping impersonation", error });
+	}
+};
+
+export const getImpersonationStatus = async (
+	req: AuthenticatedRequest,
+	res: Response
+): Promise<void> => {
+	try {
+		if (!req.user?.uid) {
+			res.status(401).json({ message: "Unauthorized" });
+			return;
+		}
+
+		if (!req.user.isImpersonating || !req.user.actorUid) {
+			res.status(200).json({ isImpersonating: false });
+			return;
+		}
+
+		const targetUser = await User.findOne({ firebaseId: req.user.uid })
+			.select("_id name email")
+			.lean();
+
+		res.status(200).json({
+			isImpersonating: true,
+			actorUid: req.user.actorUid,
+			targetUid: req.user.uid,
+			targetUser,
+			reason: req.user.impersonationReason,
+		});
+	} catch (error) {
+		console.error("Error fetching impersonation status:", error);
+		res
+			.status(500)
+			.json({ message: "Error fetching impersonation status", error });
 	}
 };
 

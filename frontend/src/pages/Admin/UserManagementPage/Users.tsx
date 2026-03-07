@@ -9,6 +9,7 @@ import {
 import { US_STATES, TIMEZONES } from "./locationData";
 import { Pagination } from "../../../components/Pagination/Pagination";
 import apiClient from "../../../services/apiClient";
+import impersonationService from "../../../services/impersonationService";
 import Select from "react-select";
 import countryList from "react-select-country-list";
 import { UserType } from "../../../shared/types";
@@ -326,6 +327,33 @@ const UserManagementPage: React.FC = () => {
 		}
 	};
 
+	const handleImpersonate = async (user: User) => {
+		if (!user._id) {
+			alert("Unable to impersonate: user id is missing");
+			return;
+		}
+
+		const roleName = user.userType?.name?.toLowerCase?.() || "";
+		if (roleName === "staff" || roleName === "admin") {
+			alert("You cannot impersonate staff/admin users");
+			return;
+		}
+
+		try {
+			await impersonationService.startImpersonation(
+				user._id,
+				`Support session for ${user.email}`
+			);
+			window.location.href = "/";
+		} catch (error: any) {
+			console.error("Error starting impersonation:", error);
+			alert(
+				error?.response?.data?.message ||
+					"Could not start impersonation. Please try again."
+			);
+		}
+	};
+
 	const toggleSelection = (id: string) => {
 		setUsers(
 			users.map((user) =>
@@ -539,72 +567,87 @@ const UserManagementPage: React.FC = () => {
 									</td>
 								</tr>
 							) : (
-								displayedUsers.map((user) => (
-									<tr
-										key={user.id}
-										className={`hover:bg-gray-50 ${user.selected ? "bg-purple-50" : ""}`}
-									>
-										<td className="px-6 py-4">
-											<input
-												type="checkbox"
-												checked={user.selected}
-												onChange={() => toggleSelection(String(user.id))}
-												className="rounded border-gray-300"
-											/>
-										</td>
-										<td className="px-6 py-4 text-sm text-gray-900">{`${user.firstName} ${user.lastName}`}</td>
-										<td className="px-6 py-4 text-sm text-gray-900">
-											{user.email}
-										</td>
-										<td className="px-6 py-4 text-sm text-gray-900">
-											{user.userType?.name}
-										</td>
-										<td className="px-6 py-4 text-sm text-gray-900">
-											{user.company}
-										</td>
-										<td className="px-6 py-4 text-sm text-gray-900">
-											<span
-												className={`px-2.5 py-0.5 rounded-full text-xs font-medium 
+								displayedUsers.map((user) => {
+									const roleName = user.userType?.name?.toLowerCase?.() || "";
+									const isPrivileged =
+										roleName === "staff" || roleName === "admin";
+
+									return (
+										<tr
+											key={user.id}
+											className={`hover:bg-gray-50 ${user.selected ? "bg-purple-50" : ""}`}
+										>
+											<td className="px-6 py-4">
+												<input
+													type="checkbox"
+													checked={user.selected}
+													onChange={() => toggleSelection(String(user.id))}
+													className="rounded border-gray-300"
+												/>
+											</td>
+											<td className="px-6 py-4 text-sm text-gray-900">{`${user.firstName} ${user.lastName}`}</td>
+											<td className="px-6 py-4 text-sm text-gray-900">
+												{user.email}
+											</td>
+											<td className="px-6 py-4 text-sm text-gray-900">
+												{user.userType?.name}
+											</td>
+											<td className="px-6 py-4 text-sm text-gray-900">
+												{user.company}
+											</td>
+											<td className="px-6 py-4 text-sm text-gray-900">
+												<span
+													className={`px-2.5 py-0.5 rounded-full text-xs font-medium 
                                                 ${user.language === "English" ? "bg-blue-100 text-blue-800" : "bg-yellow-100 text-yellow-800"}`}
-											>
-												{user.language}
-											</span>
-										</td>
-										<td className="px-6 py-4 text-sm text-gray-900">
-											{user.certification}
-										</td>
-										<td className="px-6 py-4 text-sm">
-											<div className="flex gap-3">
-												<Tooltip text="Edit">
-													<button
-														className="text-gray-600 hover:text-gray-900"
-														onClick={() => handleEditUser(user)}
-													>
-														<FiEdit2 className="w-5 h-5" />
-													</button>
-												</Tooltip>
-												<Tooltip text="Login">
-													<button
-														className="text-gray-400 hover:text-gray-500 cursor-not-allowed"
-														onClick={() =>
-															alert("This feature is still under development")
+												>
+													{user.language}
+												</span>
+											</td>
+											<td className="px-6 py-4 text-sm text-gray-900">
+												{user.certification}
+											</td>
+											<td className="px-6 py-4 text-sm">
+												<div className="flex gap-3">
+													<Tooltip text="Edit">
+														<button
+															className="text-gray-600 hover:text-gray-900"
+															onClick={() => handleEditUser(user)}
+														>
+															<FiEdit2 className="w-5 h-5" />
+														</button>
+													</Tooltip>
+													<Tooltip
+														text={
+															isPrivileged
+																? "Cannot login as staff/admin"
+																: "Login"
 														}
 													>
-														<FiEye className="w-5 h-5" />
-													</button>
-												</Tooltip>
-												<Tooltip text="Delete">
-													<button
-														className="text-gray-600 hover:text-gray-900"
-														onClick={() => handleDelete(String(user.id))}
-													>
-														<FiTrash2 className="w-5 h-5" />
-													</button>
-												</Tooltip>
-											</div>
-										</td>
-									</tr>
-								))
+														<button
+															className={
+																isPrivileged
+																	? "text-gray-400 cursor-not-allowed"
+																	: "text-gray-600 hover:text-gray-900"
+															}
+															disabled={isPrivileged}
+															onClick={() => handleImpersonate(user)}
+														>
+															<FiEye className="w-5 h-5" />
+														</button>
+													</Tooltip>
+													<Tooltip text="Delete">
+														<button
+															className="text-gray-600 hover:text-gray-900"
+															onClick={() => handleDelete(String(user.id))}
+														>
+															<FiTrash2 className="w-5 h-5" />
+														</button>
+													</Tooltip>
+												</div>
+											</td>
+										</tr>
+									);
+								})
 							)}
 						</tbody>
 					</table>
