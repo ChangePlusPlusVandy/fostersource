@@ -9,7 +9,7 @@ import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 import { emailQueue } from "../jobs/emailQueue";
 import ImpersonationSession from "../models/impersonationSessionModel";
 
-const IMPERSONATION_TTL_MINUTES = 1;
+const IMPERSONATION_TTL_MINUTES = 15;
 
 const isStaffRole = (roleName?: string) => {
 	if (!roleName) return false;
