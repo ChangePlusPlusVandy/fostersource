@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import authService from "../../services/authService";
+import impersonationService from "../../services/impersonationService";
 
 // User information
 export const userInfo = {
@@ -180,6 +181,25 @@ export function SidebarItems({
 	setIsLoggedIn,
 	cartItemCount,
 }: SidebarItemsProps) {
+	const [isImpersonating, setIsImpersonating] = useState<boolean>(
+		impersonationService.isImpersonating()
+	);
+
+	useEffect(() => {
+		const syncImpersonationState = () => {
+			setIsImpersonating(impersonationService.isImpersonating());
+		};
+
+		syncImpersonationState();
+		window.addEventListener("storage", syncImpersonationState);
+		window.addEventListener("focus", syncImpersonationState);
+
+		return () => {
+			window.removeEventListener("storage", syncImpersonationState);
+			window.removeEventListener("focus", syncImpersonationState);
+		};
+	}, []);
+
 	const [isAdmin, setIsAdmin] = useState(
 		localStorage.user && JSON.parse(localStorage.user).role.name === "Staff"
 	);
@@ -198,6 +218,13 @@ export function SidebarItems({
 	// }, []);
 
 	const handleLogOut = async () => {
+		const currentlyImpersonating = impersonationService.isImpersonating();
+		setIsImpersonating(currentlyImpersonating);
+
+		if (currentlyImpersonating) {
+			return;
+		}
+
 		try {
 			await authService.logout();
 		} catch (err: any) {
@@ -254,8 +281,16 @@ export function SidebarItems({
 			{sidebarItems}
 			{isLoggedIn && (
 				<div className="logout">
-					<li className={`${logoutActive}`} onClick={() => handleLogOut()}>
-						<Link to={logout.href}>
+					<li
+						className={`${logoutActive} ${isImpersonating ? "opacity-60 cursor-not-allowed" : ""}`}
+						onClick={() => handleLogOut()}
+						title={
+							isImpersonating
+								? "Stop impersonation before logging out"
+								: "Logout"
+						}
+					>
+						<Link to={isImpersonating ? "#" : logout.href}>
 							<div className={`${iconDescMargin}`}>{logout.icon}</div>
 							{!isCollapsed && logout.description}
 						</Link>
