@@ -42,6 +42,7 @@ export const verifyFirebaseAuth = async (
 					: undefined;
 
 		if (impersonationToken) {
+			const now = new Date();
 			const tokenHash = crypto
 				.createHash("sha256")
 				.update(impersonationToken)
@@ -50,7 +51,7 @@ export const verifyFirebaseAuth = async (
 			const session = await ImpersonationSession.findOne({
 				tokenHash,
 				active: true,
-				expiresAt: { $gt: new Date() },
+				expiresAt: { $gt: now },
 			});
 
 			if (session) {
@@ -67,8 +68,32 @@ export const verifyFirebaseAuth = async (
 				isImpersonating = true;
 				impersonationReason = session.reason;
 			} else {
+				const existingSession = await ImpersonationSession.findOne({ tokenHash });
+
+				if (existingSession?.expiresAt && existingSession.expiresAt <= now) {
+					await ImpersonationSession.updateMany(
+						{ tokenHash, active: true },
+						{ $set: { active: false, stoppedAt: now } }
+					);
+
+					res.status(401).json({
+						message: "Impersonation session expired",
+						code: "IMPERSONATION_EXPIRED",
+					});
+					return;
+				}
+
+				if (existingSession && existingSession.active === false) {
+					res.status(401).json({
+						message: "Impersonation session is no longer active",
+						code: "IMPERSONATION_INACTIVE",
+					});
+					return;
+				}
+
 				res.status(401).json({
 					message: "Unauthorized: Invalid or expired impersonation token",
+					code: "IMPERSONATION_INVALID",
 				});
 				return;
 			}
