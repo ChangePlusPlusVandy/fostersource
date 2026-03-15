@@ -5,6 +5,7 @@ import {
 	updateEmail,
 	deleteEmail,
 	createAndSendEmail,
+	sendDirectEmail,
 } from "../controllers/emailController";
 
 const router = express.Router();
@@ -17,6 +18,9 @@ router.post("/", createEmail);
 
 // Create and send a new email
 router.post("/send", createAndSendEmail);
+
+// Send a direct email without storing a course email record
+router.post("/send-direct", sendDirectEmail);
 
 // PUT update email by ID
 router.put("/:id", updateEmail);

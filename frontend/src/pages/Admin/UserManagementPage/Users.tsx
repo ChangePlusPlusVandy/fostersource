@@ -72,6 +72,19 @@ const SPEAKER_PRODUCTS: SpeakerProduct[] = [
 	{ title: "Socialization and COVID-19", onDemand: true },
 ];
 
+const TEMP_PASSWORD_CHARACTERS =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+const generateTempPassword = (length = 10) => {
+	const randomValues = new Uint32Array(length);
+	globalThis.crypto.getRandomValues(randomValues);
+
+	return Array.from(
+		randomValues,
+		(value) => TEMP_PASSWORD_CHARACTERS[value % TEMP_PASSWORD_CHARACTERS.length]
+	).join("");
+};
+
 const UserManagementPage: React.FC = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedUserType, setSelectedUserType] = useState<UserType | null>(
@@ -225,7 +238,7 @@ const UserManagementPage: React.FC = () => {
 				);
 			} else {
 				// 1. Set the arbitrary temporary password
-				const tempPassword = "TempPassword123!";
+				const tempPassword = generateTempPassword();
 				let firebaseUid = "";
 
 				// 2. Create the Firebase Auth account first
@@ -252,6 +265,23 @@ const UserManagementPage: React.FC = () => {
 					...backendUserData,
 					firebaseId: firebaseUid,
 				});
+
+				try {
+					await apiClient.post("/emails/send-direct", {
+						to: userForm.email,
+						subject: "Your Foster Source temporary password",
+						body: "<p>Hi {{name}},</p><p>Your Foster Source account has been created.</p><p>Your temporary password is: <strong>{{tempPassword}}</strong></p><p>Please log in and change it as soon as possible.</p>",
+						variables: {
+							name: userForm.firstName || userForm.email,
+							tempPassword,
+						},
+					});
+				} catch (emailError) {
+					console.error("Error sending temporary password email:", emailError);
+					alert(
+						"User was created, but the temporary password email could not be sent."
+					);
+				}
 
 				const newUser = {
 					_id: response.data.user._id,

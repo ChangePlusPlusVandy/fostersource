@@ -85,6 +85,32 @@ export const createAndSendEmail = async (
 	}
 };
 
+// @desc    Send a direct email without creating a course email record
+// @route   POST /api/email/send-direct
+// @access  Public
+export const sendDirectEmail = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { to, subject, body, variables = {} } = req.body;
+
+		if (!to || !subject || !body) {
+			res.status(400).json({
+				message: "'to', 'subject', and 'body' are required.",
+			});
+			return;
+		}
+
+		await sendEmail(to, subject, body, variables);
+
+		res.status(200).json({ message: "Email sent successfully" });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Error sending email", error });
+	}
+};
+
 // @desc    Update an email
 // @route   PUT /api/email/:id
 // @access  Public
