@@ -107,11 +107,11 @@ export default function AdminPage() {
 
 	const toggleSelection = (id: string) => {
 		setProducts(
-		  products.map((c) =>
-			c.course._id === id ? { ...c, selected: !c.selected } : c
-		  )
+			products.map((c) =>
+				c.course._id === id ? { ...c, selected: !c.selected } : c
+			)
 		);
-	  };
+	};
 
 	const setFilter = (filterType: string, filterSpec: string) => {};
 

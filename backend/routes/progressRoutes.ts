@@ -24,5 +24,4 @@ router.delete("/:id", deleteProgress);
 // GET progress based on the user
 router.get("/progress/:userId", getUserProgresses);
 
-
 export default router;

@@ -1,10 +1,10 @@
 // backend/routes/userTypeRoutes.ts
 import express from "express";
 import {
-  createUserType,
-  getUserTypes,
-  deleteUserType, 
-  updateUserType,
+	createUserType,
+	getUserTypes,
+	deleteUserType,
+	updateUserType,
 } from "../controllers/userTypeController";
 
 const router = express.Router();
