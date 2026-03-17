@@ -80,11 +80,13 @@ export const deleteProgress = async (
 	}
 };
 
-
 // @desc    Registers users
 // @route   PUT /api/users/register
 // @access  Public
-export const getUserProgresses = async (req: Request, res: Response): Promise<void> => {
+export const getUserProgresses = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	try {
 		const { userId } = req.params;
 

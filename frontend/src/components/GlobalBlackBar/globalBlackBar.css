@@ -152,7 +152,10 @@
 }
 
 /* Hide the default arrow and add a custom one */
-#google_translate_element .goog-te-gadget-simple .goog-te-menu-value span[style*="border-left"] {
+#google_translate_element
+	.goog-te-gadget-simple
+	.goog-te-menu-value
+	span[style*="border-left"] {
 	display: none;
 }
 
@@ -179,7 +182,7 @@
 .goog-logo-link {
 	display: none !important;
 }
-.goog-te-gadget{
+.goog-te-gadget {
 	color: transparent !important;
 }
 
@@ -194,21 +197,21 @@
 		height: auto;
 		padding-bottom: 0.5rem;
 	}
-	
+
 	.global-black-bar .left-side,
 	.global-black-bar .right-side {
 		width: 100%;
 		justify-content: center;
 		margin-bottom: 0.5rem;
 	}
-	
+
 	.global-black-bar .contact-info {
 		margin-right: 0;
 		margin-bottom: 0.5rem;
 		flex-direction: column;
 		align-items: flex-start;
 	}
-	
+
 	.global-black-bar .social-links {
 		justify-content: center;
 		margin-bottom: 0.5rem;
