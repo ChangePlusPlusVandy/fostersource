@@ -6,6 +6,7 @@ import Course from "../models/courseModel";
 import mongoose from "mongoose";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 import { emailQueue } from "../jobs/emailQueue";
+import admin from "../firebase/firebaseAdmin";
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
 	try {
@@ -186,6 +187,17 @@ export const deleteUser = async (
 				message: "User not found.",
 			});
 			return;
+		}
+
+		if (user.firebaseId) {
+			try {
+				await admin.auth().deleteUser(user.firebaseId);
+			} catch (firebaseError: any) {
+				// If Firebase user is already gone, continue deleting local records.
+				if (firebaseError?.code !== "auth/user-not-found") {
+					throw firebaseError;
+				}
+			}
 		}
 
 		await Progress.deleteMany({ _id: { $in: user.progress } });

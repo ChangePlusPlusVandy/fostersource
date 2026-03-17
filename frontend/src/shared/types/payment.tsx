@@ -3,6 +3,6 @@ export type Payment = {
 	date: number;
 	amount: number;
 	memo: string;
-	courses: string[]; 
-	transactionId: string; 
+	courses: string[];
+	transactionId: string;
 };

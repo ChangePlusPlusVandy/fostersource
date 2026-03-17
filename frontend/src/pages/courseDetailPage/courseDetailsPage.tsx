@@ -67,9 +67,9 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [dropStatusMessage, setDropStatusMessage] = useState<string | null>(
 		null
 	);
-	const [dropStatusType, setDropStatusType] = useState<"success" | "error" | "idle">(
-		"idle"
-	);
+	const [dropStatusType, setDropStatusType] = useState<
+		"success" | "error" | "idle"
+	>("idle");
 
 	useEffect(() => {
 		const fetchProgress = async () => {
@@ -443,9 +443,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 					{dropStatusMessage && (
 						<p
 							className={`text-sm ${
-								dropStatusType === "success"
-									? "text-green-600"
-									: "text-red-600"
+								dropStatusType === "success" ? "text-green-600" : "text-red-600"
 							}`}
 						>
 							{dropStatusMessage}

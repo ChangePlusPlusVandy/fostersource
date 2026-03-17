@@ -16,7 +16,7 @@ const QuestionSchema: Schema = new Schema(
 		explanation: { type: String },
 		answerType: { type: String, required: true },
 		answers: [{ type: String }],
-		isRequired: {type: Boolean, required: true },
+		isRequired: { type: Boolean, required: true },
 	},
 	{
 		timestamps: true,

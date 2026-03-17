@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  getEmails,
-  getEmailById,
-  createEmail,
-  updateEmail,
-  deleteEmail,
+	getEmails,
+	getEmailById,
+	createEmail,
+	updateEmail,
+	deleteEmail,
 } from "../controllers/emailTemplateController";
 
 const router = express.Router();

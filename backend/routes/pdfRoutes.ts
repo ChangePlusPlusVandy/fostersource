@@ -1,8 +1,8 @@
-import express from "express"; 
+import express from "express";
 import { generateCertificate } from "../controllers/pdfGenerator";
 
-const router = express.Router(); 
+const router = express.Router();
 
-router.post("/", generateCertificate); 
+router.post("/", generateCertificate);
 
-export default router; 
+export default router;

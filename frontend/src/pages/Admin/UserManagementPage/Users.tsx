@@ -12,6 +12,7 @@ import apiClient from "../../../services/apiClient";
 import Select from "react-select";
 import countryList from "react-select-country-list";
 import { UserType } from "../../../shared/types";
+import { auth } from "../../../services/firebaseConfig";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
@@ -71,6 +72,19 @@ const SPEAKER_PRODUCTS: SpeakerProduct[] = [
 	{ title: "Socialization and COVID-19", onDemand: true },
 ];
 
+const TEMP_PASSWORD_CHARACTERS =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+const generateTempPassword = (length = 10) => {
+	const randomValues = new Uint32Array(length);
+	globalThis.crypto.getRandomValues(randomValues);
+
+	return Array.from(
+		randomValues,
+		(value) => TEMP_PASSWORD_CHARACTERS[value % TEMP_PASSWORD_CHARACTERS.length]
+	).join("");
+};
+
 const UserManagementPage: React.FC = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedUserType, setSelectedUserType] = useState<UserType | null>(
@@ -120,9 +134,7 @@ const UserManagementPage: React.FC = () => {
 	const fetchUsers = async () => {
 		setIsLoading(true);
 		try {
-			const response = await apiClient.get(`/users?pagination=false`); // no params
-
-			console.log(response.data);
+			const response = await apiClient.get(`/users?pagination=false`);
 
 			const mappedUsers = response.data.users.map((user: any) => ({
 				_id: user._id,
@@ -171,22 +183,21 @@ const UserManagementPage: React.FC = () => {
 	};
 
 	const formatUserForBackend = (userData: UserForm) => {
-		console.log("User form data:", userData); // Debug log
-		console.log("UserType data:", userData.userType); // Debug log
-
 		return {
 			name: `${userData.firstName} ${userData.lastName}`,
 			email: userData.email,
-			role: userData.userType?._id, // Send as 'role' with just the ObjectId
-			company: userData.company,
-			address1: userData.addressLine,
-			city: userData.city,
-			state: userData.stateProvinceRegion,
-			zip: userData.zipPostalCode,
-			country: userData.country,
-			phone: userData.phoneNumber,
-			language: userData.language,
-			certification: userData.certification,
+			role: userData.userType?._id,
+			company: userData.company || "N/A",
+			address1: userData.addressLine || "N/A",
+			address2: "N/A",
+			city: userData.city || "N/A",
+			state: userData.stateProvinceRegion || "N/A",
+			zip: userData.zipPostalCode || "N/A",
+			country: userData.country || "N/A",
+			phone: userData.phoneNumber || "N/A",
+			language: userData.language || "English",
+			certification: userData.certification || "N/A",
+			isColorado: false,
 		};
 	};
 
@@ -195,14 +206,12 @@ const UserManagementPage: React.FC = () => {
 
 		try {
 			const backendUserData = formatUserForBackend(userForm);
-			console.log("Sending user data to backend:", backendUserData); // Debug log
 
 			if (editingUserId) {
 				const response = await apiClient.put(
 					`/users/${editingUserId}`,
 					backendUserData
 				);
-				console.log("Backend response:", response.data); // Debug log
 
 				setUsers((prevUsers) =>
 					prevUsers.map((user) =>
@@ -228,11 +237,51 @@ const UserManagementPage: React.FC = () => {
 					)
 				);
 			} else {
+				// 1. Set the arbitrary temporary password
+				const tempPassword = generateTempPassword();
+				let firebaseUid = "";
+
+				// 2. Create the Firebase Auth account first
+				try {
+					const userCredential = await auth.createUserWithEmailAndPassword(
+						userForm.email,
+						tempPassword
+					);
+
+					// Grab the unique ID Firebase just generated!
+					firebaseUid = userCredential.user?.uid || "";
+
+					alert(
+						`Success! Firebase account created. Temporary Password: ${tempPassword}`
+					);
+				} catch (firebaseError: any) {
+					console.error("Firebase creation error:", firebaseError);
+					alert("Failed to create Firebase account: " + firebaseError.message);
+					return; // Stop the function here if Firebase fails
+				}
+
+				// 3. Create the user object in the database WITH the firebaseId
 				const response = await apiClient.post("/users", {
 					...backendUserData,
-
-					// role: userForm.userType.includes("Admin") ? "staff" : "user",
+					firebaseId: firebaseUid,
 				});
+
+				try {
+					await apiClient.post("/emails/send-direct", {
+						to: userForm.email,
+						subject: "Your Foster Source temporary password",
+						body: "<p>Hi {{name}},</p><p>Your Foster Source account has been created.</p><p>Your temporary password is: <strong>{{tempPassword}}</strong></p><p>Please log in and change it as soon as possible.</p>",
+						variables: {
+							name: userForm.firstName || userForm.email,
+							tempPassword,
+						},
+					});
+				} catch (emailError) {
+					console.error("Error sending temporary password email:", emailError);
+					alert(
+						"User was created, but the temporary password email could not be sent."
+					);
+				}
 
 				const newUser = {
 					_id: response.data.user._id,
@@ -282,7 +331,7 @@ const UserManagementPage: React.FC = () => {
 			language: "English",
 			certification: "",
 		});
-		setUserType(null); // Also reset the userType state
+		setUserType(null);
 	};
 
 	const handleEditUser = (user: User) => {
@@ -301,7 +350,7 @@ const UserManagementPage: React.FC = () => {
 			language: user.language || "English",
 			certification: user.certification || "",
 		});
-		setUserType(user.userType); // Sync the userType state with the form
+		setUserType(user.userType);
 		setEditingUserId(user._id || null);
 		setIsUserModalOpen(true);
 	};
@@ -467,9 +516,10 @@ const UserManagementPage: React.FC = () => {
 
 						<button
 							onClick={() => {
-								alert("This feature is still under development");
+								resetForm();
+								setIsUserModalOpen(true);
 							}}
-							className="px-4 py-1.5 bg-gray-400 text-white rounded-md hover:bg-gray-500 transition-colors flex items-center gap-2 cursor-not-allowed"
+							className="px-4 py-1.5 bg-[#7b499a] text-white rounded-md hover:bg-[#6a3e85] transition-colors flex items-center gap-2"
 						>
 							<span>New User</span>
 						</button>
@@ -897,52 +947,6 @@ const UserManagementPage: React.FC = () => {
 									}}
 								/>
 							</div>
-
-							{/* <div className="mb-4">
-								<label className="block text-sm text-gray-500 mb-1">
-									Timezone <span>(optional)</span>
-								</label>
-								<Select
-									options={TIMEZONES.map((timezone) => ({
-										value: timezone.value,
-										label: timezone.label,
-									}))}
-									value={
-										userForm.timezone
-											? { value: userForm.timezone, label: userForm.timezone }
-											: null
-									}
-									onChange={(selectedOption) =>
-										setUserForm((prev) => ({
-											...prev,
-											timezone: selectedOption ? selectedOption.value : "",
-										}))
-									}
-									placeholder="Choose a Timezone"
-									styles={{
-										control: (provided, state) => ({
-											...provided,
-											borderColor: state.isFocused
-												? "#F79518"
-												: provided.borderColor,
-											boxShadow: state.isFocused
-												? "0 0 0 1px #F79518"
-												: provided.boxShadow,
-											"&:hover": {
-												borderColor: "#F79518",
-											},
-										}),
-										placeholder: (provided) => ({
-											...provided,
-											color: "gray",
-										}),
-										singleValue: (provided) => ({
-											...provided,
-											color: "black",
-										}),
-									}}
-								/>
-							</div> */}
 
 							<div>
 								<label className="block text-sm font-semibold mb-1">
