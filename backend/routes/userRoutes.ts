@@ -7,10 +7,17 @@ import {
 	deleteUser,
 	register,
 	checkAdmin,
+	startImpersonation,
+	stopImpersonation,
+	getImpersonationStatus,
 } from "../controllers/userController";
-import { verifyFirebaseAuth } from "../middlewares/authMiddleware";
 
 const router = express.Router();
+
+router.get("/is-admin", checkAdmin);
+router.get("/impersonation/status", getImpersonationStatus);
+router.post("/:targetUserId/impersonate", startImpersonation);
+router.post("/impersonation/stop", stopImpersonation);
 
 // GET all users or by filter
 router.get("/", getUsers);
@@ -29,9 +36,6 @@ router.delete("/:id", deleteUser);
 
 // PUT Registers a user for a bunch of classes
 router.post("/register", register);
-
-// @ts-ignore
-router.get("/is-admin", verifyFirebaseAuth, checkAdmin); // Protect the route
 
 // @ts-ignore
 export default router;

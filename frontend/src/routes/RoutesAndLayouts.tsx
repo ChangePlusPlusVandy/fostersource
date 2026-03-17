@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Home from "../pages/HomePage/Home";
 import { Sidebar } from "../components/Sidebar/sidebar";
 import GlobalBlackBar from "../components/GlobalBlackBar/globalBlackBar";
@@ -32,6 +33,7 @@ import ProductProgressReport from "../pages/Admin/ProductSummaryPage/ProductProg
 import FAQPage from "../pages/FAQPage/FAQPage";
 import HandoutPage from "../pages/Admin/HandoutsPage/handoutsPage";
 import EmailTemplates from "../pages/Admin/EmailTemplatePage/EmailTemplates";
+import impersonationService from "../services/impersonationService";
 
 function RoutesAndLayout({
 	isHeaderBarOpen,
@@ -59,6 +61,9 @@ function RoutesAndLayout({
 	AdminRoute: any;
 }) {
 	const location = useLocation();
+	const [impersonationState, setImpersonationState] = useState(
+		impersonationService.getImpersonationState()
+	);
 
 	const isAuthRoute =
 		location.pathname.startsWith("/login") ||
@@ -66,6 +71,22 @@ function RoutesAndLayout({
 		location.pathname.startsWith("/reset-password");
 
 	const isAdminRoute = location.pathname.startsWith("/admin");
+
+	useEffect(() => {
+		setImpersonationState(impersonationService.getImpersonationState());
+	}, [location.pathname]);
+
+	const handleStopImpersonation = async () => {
+		try {
+			await impersonationService.stopImpersonation();
+		} catch (error) {
+			console.error("Failed to stop impersonation:", error);
+			impersonationService.clearImpersonationLocally();
+		} finally {
+			setImpersonationState(impersonationService.getImpersonationState());
+			window.location.href = "/admin/users";
+		}
+	};
 
 	return (
 		<div
@@ -77,6 +98,20 @@ function RoutesAndLayout({
 			}}
 			className="bg-gray-100"
 		>
+			{impersonationState.isImpersonating && (
+				<div className="w-full bg-amber-100 border-b border-amber-300 px-4 py-2 flex items-center justify-between text-amber-900 text-sm">
+					<div>
+						You are impersonating{" "}
+						{impersonationState.targetUser?.name || "a user"}
+					</div>
+					<button
+						onClick={handleStopImpersonation}
+						className="px-3 py-1 rounded bg-amber-700 text-white hover:bg-amber-800"
+					>
+						Return to staff account
+					</button>
+				</div>
+			)}
 			{isAdminRoute || isAuthRoute ? (
 				<></>
 			) : (
