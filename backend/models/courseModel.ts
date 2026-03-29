@@ -106,6 +106,7 @@ const CourseSchema: Schema = new Schema(
 				_id: false,
 			},
 		],
+		surveyId: { type: Schema.Types.ObjectId, ref: "Survey", default: null },
 	},
 	{
 		timestamps: true,

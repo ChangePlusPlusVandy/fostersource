@@ -13,6 +13,11 @@ export interface ISurvey extends Document {
 const surveySchema: Schema = new Schema(
 	{
 		// Define fields here:
+		name: {type: String, required: true},
+		courseIds: [{type: Schema.Types.ObjectId, ref: "Course"}],
+		version: {type: Number, default: 1},
+		parentSurveyId: {type: Schema.Types.ObjectId, ref: "Survey", default: null},
+		isActive: {type: Boolean, default: true}, 
 		questions: [
 			{
 				type: mongoose.Schema.Types.ObjectId,

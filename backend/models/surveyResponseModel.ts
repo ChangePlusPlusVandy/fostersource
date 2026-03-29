@@ -15,6 +15,8 @@ const surveyResponseSchema: Schema = new Schema(
 				ref: "QuestionResponse",
 			},
 		],
+		surveyId: { type: Schema.Types.ObjectId, ref: "Survey"},
+		courseId: { type: Schema.Types.ObjectId, ref: "Course"},
 	},
 	{
 		timestamps: true,
