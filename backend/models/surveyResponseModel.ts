@@ -4,6 +4,8 @@ import QuestionResponse, { IQuestionResponse } from "./questionResponseModel";
 export interface ISurveyResponse extends Document {
 	userId: string;
 	answers: (mongoose.Types.ObjectId | IQuestionResponse)[];
+	surveyId: mongoose.Types.ObjectId;
+	courseId: mongoose.Types.ObjectId;
 }
 
 const surveyResponseSchema: Schema = new Schema(

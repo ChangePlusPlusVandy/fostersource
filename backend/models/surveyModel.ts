@@ -5,8 +5,12 @@ import { IQuestion } from "./questionModel";
 export interface ISurvey extends Document {
 	// Define fields here:
 	id: string;
+	name: string;
 	questions: mongoose.Types.ObjectId[];
-	courseId: mongoose.Types.ObjectId;
+	courseIds: mongoose.Types.ObjectId[];
+	version: number;
+	parentSurveyId: mongoose.Types.ObjectId | null;
+	isActive: boolean;
 }
 
 // Define the schema with placeholders for fields (others will fill this in)
