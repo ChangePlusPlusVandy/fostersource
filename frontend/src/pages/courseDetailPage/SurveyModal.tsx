@@ -6,6 +6,7 @@ interface SurveyModalProps {
 	isOpen: boolean;
 	onClose: any;
 	courseId: string | null;
+	surveyId: string | null;
 	setSurveyCompleted: any;
 }
 
@@ -13,6 +14,7 @@ export default function SurveyModal({
 	isOpen,
 	onClose,
 	courseId,
+	surveyId,
 	setSurveyCompleted,
 }: SurveyModalProps) {
 	const [questionNumber, setQuestionNumber] = useState<number>(0);
@@ -20,33 +22,22 @@ export default function SurveyModal({
 	const [responses, setResponses] = useState<{ [key: string]: string }>({});
 
 	useEffect(() => {
+		if (!surveyId) return;
+
 		const populateQuestions = async () => {
-			let tempQuestions: any[] = [];
 			try {
-				const questionIds = (await apiClient.get("surveys")).data.questions;
-				console.log(questionIds);
-				setSurveyQuestions(questionIds);
+				const response = await apiClient.get(`surveys/${surveyId}`);
+				const survey = response.data.survey || response.data;
+				setSurveyQuestions(survey.questions || []);
 			} catch (error) {
-				console.error("Error: ", error);
+				console.error("Error fetching survey:", error);
 			}
 		};
 
 		populateQuestions();
-	}, []);
+	}, [surveyId]);
 
 	if (!isOpen) return null;
-
-	// async function addQuestion() {
-	// 	try {
-	// 		const response = await apiClient.post("survey", {
-	// 			question: "Do you have any other feedback for the course?",
-	// 			isMCQ: false,
-	// 		});
-	// 		console.log(response.status);
-	// 	} catch (error) {
-	// 		console.error("Failed to check admin status", error);
-	// 	}
-	// }
 
 	const handleAnswerChange = (questionId: string, answer: string) => {
 		setResponses((prev) => ({
@@ -60,32 +51,36 @@ export default function SurveyModal({
 			setQuestionNumber(questionNumber + 1);
 		} else {
 			try {
+				const userId = JSON.parse(localStorage.user)._id;
+
+				// Create question responses
 				let responseIds = [];
 				for (let id of Object.keys(responses)) {
 					const response = await apiClient.post("questionResponses", {
-						userId: JSON.parse(localStorage.user)._id,
+						userId,
 						questionId: id,
 						answer: responses[`${id}`].toString(),
 					});
 					responseIds.push(response.data._id);
 				}
-				const response = await apiClient.post("surveyResponses", {
-					userId: JSON.parse(localStorage.user)._id,
+
+				// Create survey response with surveyId and courseId
+				await apiClient.post("surveyResponses", {
+					userId,
 					answers: responseIds,
+					surveyId,
+					courseId,
 				});
 
-				// let surveyResponseId = response.data._id
-				// Beloved EM please add the updating the course to append the survey response once the other changes from Kevin is added for this.
-
-				const progressResponse = await apiClient.put(
-					`/courses/${courseId}/progress/single/${JSON.parse(localStorage.user)._id}`,
+				// Update progress
+				await apiClient.put(
+					`/courses/${courseId}/progress/single/${userId}`,
 					{
 						surveyComplete: true,
 						webinarComplete: true,
 					}
 				);
 				setSurveyCompleted(true);
-				console.log("progress updated");
 			} catch (error) {
 				console.error(error);
 			}
@@ -113,7 +108,7 @@ export default function SurveyModal({
 					className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
 					aria-label="Close"
 				>
-					×
+					&times;
 				</button>
 				<h2 className="text-2xl font-bold mb-6 text-center">Survey</h2>
 				<div className="flex-1 overflow-auto">

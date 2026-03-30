@@ -1,8 +1,10 @@
 export type QuestionType = {
 	id: string;
 	question: string;
-	isMCQ: boolean;
-	answers?: string[]; // Optional array of possible answers
+	explanation?: string;
+	answerType: "Text Input" | "Multiple Choice" | "Multi-select";
+	answers?: string[];
+	isRequired: boolean;
 	createdAt?: Date;
 	updatedAt?: Date;
 };

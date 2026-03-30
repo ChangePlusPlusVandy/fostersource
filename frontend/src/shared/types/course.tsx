@@ -36,4 +36,5 @@ export type Course = {
 	shortUrl: string;
 	draft: boolean;
 	registrationLimit: number;
+	surveyId?: string;
 };
