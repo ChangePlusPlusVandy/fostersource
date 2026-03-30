@@ -1,286 +1,339 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../../../services/apiClient";
-import { QuestionType } from "../../../shared/types/question";
-import { X } from "lucide-react";
+import { X, Download, Filter } from "lucide-react";
 import PercentBar from "./PercentBar";
 
 interface DetailedSurveyResponseProps {
-	surveyQuestionIDs: string[];
+	surveyId: string;
+	surveyName: string;
 	toggleModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-interface SurveyQuestion {
-	question: string;
-	isMCQ: boolean;
-	numResponses: number;
-	responseOptions: string[];
-	responses: string[];
-	responseBreakdown: number[];
+interface QuestionStat {
+	questionId: string;
+	questionText: string;
+	answerType: string;
+	options: string[];
+	totalAnswered: number;
+	breakdown: Record<string, number>;
 }
 
-interface SurveyResponse {
-	userName: string;
-	userEmail: string;
-	date: Date;
-	answers: string[];
+interface StatGroup {
+	surveyId: string;
+	surveyName: string;
+	surveyVersion: number;
+	courseId: string;
+	courseName: string;
+	totalResponses: number;
+	questions: QuestionStat[];
 }
 
 export default function DetailedSurveyResponse({
-	surveyQuestionIDs,
+	surveyId,
+	surveyName,
 	toggleModal,
 }: DetailedSurveyResponseProps) {
-	const [surveyQuestions, setSurveyQuestions] = useState<SurveyQuestion[]>([]);
-	const [surveyResponses, setSurveyResponses] = useState<SurveyResponse[]>([]);
-
-	const fetchSurveyQuestions = async () => {
-		try {
-			console.log("Fetching survey questions for IDs:", surveyQuestionIDs);
-			const receivedSurveyQuestions: SurveyQuestion[] = [];
-			const receivedResponses: SurveyResponse[] = [];
-
-			// Fetch all questions and their responses
-			for (const surveyQuestionID of surveyQuestionIDs) {
-				console.log("Fetching question:", surveyQuestionID);
-
-				// Handle case where surveyQuestionID might be an object or a string
-				const questionId =
-					typeof surveyQuestionID === "string"
-						? surveyQuestionID
-						: (surveyQuestionID as any)._id;
-				console.log("Using question ID:", questionId);
-
-				// Use query parameter to get specific question since there's no GET /:id route
-				const response = await apiClient.get(`/questions?_id=${questionId}`);
-				const questionsArray = response.data;
-
-				if (!questionsArray || questionsArray.length === 0) {
-					console.warn(`Question with ID ${questionId} not found`);
-					continue; // Skip this question if not found
-				}
-
-				const rawQuestionData: QuestionType = questionsArray[0]; // Get first (and should be only) result
-				console.log("Question data:", rawQuestionData);
-
-				const questionData: SurveyQuestion = {
-					question: rawQuestionData.question,
-					isMCQ: rawQuestionData.isMCQ,
-					responseOptions: rawQuestionData.isMCQ
-						? rawQuestionData.answers || []
-						: [],
-					numResponses: 0,
-					responses: [],
-					responseBreakdown: [],
-				};
-
-				console.log("Fetching question responses for questionId:", questionId);
-				const questionIdResponse = await apiClient.get(
-					`/questionResponses?questionId=${questionId}`
-				);
-				const responses = questionIdResponse.data;
-				console.log("Question responses:", responses);
-
-				// Update question data
-				questionData.numResponses = responses.length;
-				questionData.responses = responses.map(
-					(response: any) => response.answer
-				);
-
-				// Calculate response breakdown for MCQ questions
-				if (questionData.isMCQ) {
-					questionData.responseBreakdown = questionData.responseOptions.map(
-						(option) =>
-							questionData.responses.filter((response) => response === option)
-								.length
-					);
-				}
-
-				receivedSurveyQuestions.push(questionData);
-
-				// Process responses
-				responses.forEach((response: any) => {
-					const existingResponse = receivedResponses.find(
-						(r) => r.userEmail === response.userEmail
-					);
-					if (existingResponse) {
-						existingResponse.answers.push(response.answer);
-					} else {
-						receivedResponses.push({
-							userName: response.userName || "Anonymous",
-							userEmail: response.userEmail,
-							date: new Date(response.createdAt),
-							answers: [response.answer],
-						});
-					}
-				});
-			}
-
-			setSurveyQuestions(receivedSurveyQuestions);
-			setSurveyResponses(receivedResponses);
-		} catch (error) {
-			console.error("Error fetching survey data:", error);
-		}
-	};
-
-	const handleDownloadCSV = () => {
-		if (!surveyQuestions.length || !surveyResponses.length) {
-			console.warn("No survey data available to download");
-			return;
-		}
-
-		// Create headers
-		const headers = [
-			"Submitted",
-			"Name",
-			"Registered User Email",
-			...surveyQuestions.map((q, idx) => `${idx + 1}. ${q.question}`),
-		];
-
-		// Create rows
-		const rows = surveyResponses.map((response) => [
-			response.date.toDateString(),
-			response.userName,
-			response.userEmail,
-			...response.answers,
-		]);
-
-		// Combine headers and rows
-		const csvContent = [
-			headers.join(","),
-			...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-		].join("\n");
-
-		// Create and trigger download
-		const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-		const link = document.createElement("a");
-		const url = URL.createObjectURL(blob);
-		link.setAttribute("href", url);
-		link.setAttribute("download", "survey_responses.csv");
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	};
+	const [stats, setStats] = useState<StatGroup[]>([]);
+	const [selectedCourseId, setSelectedCourseId] = useState<string>("all");
+	const [loading, setLoading] = useState(true);
+	const [exportFormat, setExportFormat] = useState<string>("row-per-response");
 
 	useEffect(() => {
-		fetchSurveyQuestions();
-	}, []);
+		fetchStats();
+	}, [surveyId]);
+
+	const fetchStats = async () => {
+		try {
+			setLoading(true);
+			const response = await apiClient.get(
+				`/surveyResponses/stats?surveyId=${surveyId}`
+			);
+			setStats(response.data.data || []);
+		} catch (error) {
+			console.error("Error fetching survey stats:", error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	// Aggregate questions across all course groups or filter to one
+	const filteredStats =
+		selectedCourseId === "all"
+			? stats
+			: stats.filter((s) => s.courseId === selectedCourseId);
+
+	// Merge question stats across filtered groups
+	const mergedQuestions: QuestionStat[] = [];
+	let totalResponses = 0;
+	for (const group of filteredStats) {
+		totalResponses += group.totalResponses;
+		for (const q of group.questions) {
+			const existing = mergedQuestions.find(
+				(mq) => mq.questionId === q.questionId
+			);
+			if (existing) {
+				existing.totalAnswered += q.totalAnswered;
+				for (const [key, count] of Object.entries(q.breakdown)) {
+					existing.breakdown[key] = (existing.breakdown[key] || 0) + count;
+				}
+			} else {
+				mergedQuestions.push({
+					...q,
+					breakdown: { ...q.breakdown },
+				});
+			}
+		}
+	}
+
+	// Unique courses for filter dropdown
+	const courseOptions = stats.map((s) => ({
+		id: s.courseId,
+		name: s.courseName,
+	}));
+	const uniqueCourses = courseOptions.filter(
+		(c, i, arr) => arr.findIndex((x) => x.id === c.id) === i
+	);
+
+	const handleExport = async (format: string) => {
+		try {
+			const params = new URLSearchParams({ surveyId, format });
+			if (selectedCourseId !== "all") {
+				params.set("courseId", selectedCourseId);
+			}
+			const response = await apiClient.get(
+				`/surveyResponses/export?${params.toString()}`,
+				{ responseType: "blob" }
+			);
+			const blob = new Blob([response.data], {
+				type: "text/csv;charset=utf-8;",
+			});
+			const link = document.createElement("a");
+			link.href = URL.createObjectURL(blob);
+			link.download = `${surveyName.replace(/\s+/g, "_")}_responses.csv`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		} catch (error) {
+			console.error("Error exporting:", error);
+		}
+	};
 
 	return (
-		<div className="absolute inset-0 z-50 bg-black/50 flex items-center justify-center">
-			<div className="bg-white flex flex-col w-11/12 h-5/6 shadow-md border rounded-md p-3">
-				<div className="flex w-full justify-between my-2">
-					<h1 className="text-2xl font-bold">Survey Responses</h1>
-					<X
-						className="border rounded-md border-gray-400 mx-2 cursor-pointer"
+		<div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+			<div className="bg-white flex flex-col w-full max-w-7xl h-[90vh] shadow-xl rounded-xl overflow-hidden">
+				{/* Header */}
+				<div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
+					<div>
+						<h1 className="text-xl font-bold text-gray-800">{surveyName}</h1>
+						<p className="text-sm text-gray-500">
+							{totalResponses} total response{totalResponses !== 1 ? "s" : ""}
+						</p>
+					</div>
+					<button
+						className="p-2 hover:bg-gray-200 rounded-lg transition"
 						onClick={() => toggleModal(false)}
-					></X>
+					>
+						<X className="w-5 h-5 text-gray-500" />
+					</button>
 				</div>
 
-				<div className="flex justify-between">
-					<div className="w-4/12 ml-2">
-						<div className="flex justify-end">
-							<button
-								className="text-white text-sm px-6 py-2.5 rounded-lg font-medium hover:opacity-90 w-2/5"
-								style={{ backgroundColor: "#8757a3" }}
-								// onClick={} //TODO: implement download as PDF
-							>
-								Download as PDF
-							</button>
+				{/* Toolbar */}
+				<div className="flex items-center justify-between px-6 py-3 border-b gap-4">
+					<div className="flex items-center gap-3">
+						<Filter className="w-4 h-4 text-gray-400" />
+						<select
+							value={selectedCourseId}
+							onChange={(e) => setSelectedCourseId(e.target.value)}
+							className="border rounded-lg px-3 py-2 text-sm bg-white"
+						>
+							<option value="all">All Courses</option>
+							{uniqueCourses.map((c) => (
+								<option key={c.id} value={c.id}>
+									{c.name}
+								</option>
+							))}
+						</select>
+					</div>
+					<div className="flex items-center gap-2">
+						<select
+							value={exportFormat}
+							onChange={(e) => setExportFormat(e.target.value)}
+							className="border rounded-lg px-3 py-2 text-sm bg-white"
+						>
+							<option value="row-per-response">One row per response</option>
+							<option value="row-per-answer">One row per answer</option>
+						</select>
+						<button
+							className="flex items-center gap-2 text-white text-sm px-4 py-2 rounded-lg font-medium hover:opacity-90 transition"
+							style={{ backgroundColor: "#8757a3" }}
+							onClick={() => handleExport(exportFormat)}
+						>
+							<Download className="w-4 h-4" />
+							Export CSV
+						</button>
+					</div>
+				</div>
+
+				{/* Content */}
+				<div className="flex flex-1 overflow-hidden">
+					{loading ? (
+						<div className="flex items-center justify-center w-full">
+							<p className="text-gray-500">Loading statistics...</p>
 						</div>
-						<h2 className="text-xl font-bold">Questions</h2>
-						<div className="flex flex-col">
-							{surveyQuestions.map((question, index) => (
-								<div key={index} className="flex space-x-2 my-2">
-									<div>{index + 1}</div>
-									<div className="flex flex-col w-full">
-										<div className="font-bold">{question.question}</div>
-										<div className="text-xs text-gray-400">
-											{question.isMCQ ? "Multiple Choice" : "Free Response"}
+					) : mergedQuestions.length === 0 ? (
+						<div className="flex items-center justify-center w-full">
+							<p className="text-gray-500">No responses yet.</p>
+						</div>
+					) : (
+						<>
+							{/* Left Panel - Question Breakdown */}
+							<div className="w-5/12 border-r overflow-y-auto p-6 space-y-6">
+								<h2 className="text-lg font-semibold text-gray-800">
+									Question Breakdown
+								</h2>
+								{mergedQuestions.map((question, index) => (
+									<div
+										key={question.questionId}
+										className="bg-gray-50 rounded-lg p-4 space-y-3"
+									>
+										<div className="flex items-start gap-3">
+											<span className="flex-shrink-0 w-7 h-7 rounded-full bg-[#8757a3] text-white text-sm flex items-center justify-center font-medium">
+												{index + 1}
+											</span>
+											<div className="flex-1">
+												<p className="font-medium text-gray-800">
+													{question.questionText}
+												</p>
+												<p className="text-xs text-gray-400 mt-0.5">
+													{question.answerType} &middot;{" "}
+													{question.totalAnswered} response
+													{question.totalAnswered !== 1 ? "s" : ""}
+												</p>
+											</div>
 										</div>
-										{question.isMCQ ? (
-											<div className="flex flex-col mt-2">
-												{question.responseOptions.map((option, opIdx) => (
-													<div className="text-sm" key={opIdx}>
-														<div>{option}</div>
-														<PercentBar
-															percentage={question.responseBreakdown[opIdx]}
-															total={question.numResponses}
-														></PercentBar>
-													</div>
-												))}
+
+										{question.answerType === "Multiple Choice" ||
+										question.answerType === "Multi-select" ? (
+											<div className="space-y-2 ml-10">
+												{question.options.map((option, opIdx) => {
+													const count = question.breakdown[option] || 0;
+													const pct =
+														question.totalAnswered > 0
+															? Math.round(
+																	(count / question.totalAnswered) * 100
+																)
+															: 0;
+													return (
+														<div key={opIdx}>
+															<div className="text-sm text-gray-700 mb-1">
+																{option}
+															</div>
+															<PercentBar percentage={pct} total={count} />
+														</div>
+													);
+												})}
 											</div>
 										) : (
-											<div className="mt-2">
-												<div className="text-sm">Responses</div>
+											<div className="ml-10">
 												<PercentBar
 													percentage={100}
-													total={question.numResponses}
-												></PercentBar>
+													total={question.totalAnswered}
+												/>
 											</div>
 										)}
 									</div>
-								</div>
-							))}
-						</div>
-					</div>
-
-					<div className="flex flex-col w-7/12 mr-2 overflow-x-auto overflow-y-auto">
-						<div className="flex justify-end space-x-3">
-							<button
-								className="text-white text-sm px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
-								style={{ backgroundColor: "#8757a3" }}
-								onClick={handleDownloadCSV}
-							>
-								Download as CSV
-							</button>
-							<button
-								className="text-white text-sm px-6 py-2.5 rounded-lg font-medium hover:opacity-90"
-								style={{ backgroundColor: "#8757a3" }}
-								// onClick={} //TODO: implement download as PDF
-							>
-								Download as PDF
-							</button>
-						</div>
-						<h2 className="text-xl font-bold">Individual Responses</h2>
-						<table className="border border-gray-300 rounded-lg overflow-hidden mt-3">
-							<thead>
-								<tr className="text-left text-sm align-bottom bg-gray-200">
-									<th className="border border-gray-300 p-2 pb-1">Submitted</th>
-									<th className="border border-gray-300 p-2 pb-1">Name</th>
-									<th className="border border-gray-300 p-2 pb-1">
-										Registered User Email
-									</th>
-									{surveyQuestions.map((question, idx) => (
-										<th key={idx} className="border border-gray-300 p-2 pb-1">
-											{idx + 1}. {question.question}
-										</th>
-									))}
-								</tr>
-							</thead>
-							<tbody className="text-sm">
-								{surveyResponses.map((response, rowIdx) => (
-									<tr
-										key={rowIdx}
-										className={rowIdx % 2 === 0 ? "bg-white" : "bg-gray-200"}
-									>
-										<td className="border border-gray-300 p-2 pb-1">
-											{response.date.toDateString()}
-										</td>
-										<td className="border border-gray-300 p-2 pb-1">
-											{response.userName}
-										</td>
-										<td className="border border-gray-300 p-2 pb-1">
-											{response.userEmail}
-										</td>
-										{response.answers.map((answer) => (
-											<td className="border border-gray-300 p-2 pb-1">
-												{answer}
-											</td>
-										))}
-									</tr>
 								))}
-							</tbody>
-						</table>
-					</div>
+							</div>
+
+							{/* Right Panel - Per-Course Breakdown */}
+							<div className="w-7/12 overflow-y-auto p-6">
+								<h2 className="text-lg font-semibold text-gray-800 mb-4">
+									Responses by Course
+								</h2>
+								{filteredStats.length === 0 ? (
+									<p className="text-gray-500 text-sm">
+										No data for selected filter.
+									</p>
+								) : (
+									<div className="space-y-4">
+										{filteredStats.map((group) => (
+											<div
+												key={`${group.surveyId}-${group.courseId}`}
+												className="bg-gray-50 rounded-lg p-4"
+											>
+												<div className="flex items-center justify-between mb-3">
+													<div>
+														<h3 className="font-medium text-gray-800">
+															{group.courseName}
+														</h3>
+														<p className="text-xs text-gray-400">
+															v{group.surveyVersion} &middot;{" "}
+															{group.totalResponses} response
+															{group.totalResponses !== 1 ? "s" : ""}
+														</p>
+													</div>
+												</div>
+												<div className="overflow-x-auto">
+													<table className="w-full text-sm border-collapse">
+														<thead>
+															<tr className="bg-gray-100">
+																<th className="text-left p-2 border border-gray-200 font-medium text-gray-600">
+																	#
+																</th>
+																<th className="text-left p-2 border border-gray-200 font-medium text-gray-600">
+																	Question
+																</th>
+																<th className="text-center p-2 border border-gray-200 font-medium text-gray-600">
+																	Responses
+																</th>
+																<th className="text-left p-2 border border-gray-200 font-medium text-gray-600">
+																	Top Answer
+																</th>
+															</tr>
+														</thead>
+														<tbody>
+															{group.questions.map((q, idx) => {
+																const topAnswer =
+																	Object.entries(q.breakdown).sort(
+																		([, a], [, b]) => b - a
+																	)[0] || [];
+																return (
+																	<tr
+																		key={q.questionId}
+																		className={
+																			idx % 2 === 0
+																				? "bg-white"
+																				: "bg-gray-50"
+																		}
+																	>
+																		<td className="p-2 border border-gray-200 text-gray-500">
+																			{idx + 1}
+																		</td>
+																		<td className="p-2 border border-gray-200 text-gray-700">
+																			{q.questionText}
+																		</td>
+																		<td className="p-2 border border-gray-200 text-center">
+																			{q.totalAnswered}
+																		</td>
+																		<td className="p-2 border border-gray-200 text-gray-600">
+																			{topAnswer[0] || "—"}
+																			{topAnswer[1]
+																				? ` (${topAnswer[1]})`
+																				: ""}
+																		</td>
+																	</tr>
+																);
+															})}
+														</tbody>
+													</table>
+												</div>
+											</div>
+										))}
+									</div>
+								)}
+							</div>
+						</>
+					)}
 				</div>
 			</div>
 		</div>
