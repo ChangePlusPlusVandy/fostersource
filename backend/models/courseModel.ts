@@ -35,6 +35,7 @@ export interface ICourse extends Document {
 	draft: boolean;
 	registrationLimit: number;
 	waitlist: { user: mongoose.Types.ObjectId | IUser; joinedAt: Date }[];
+	surveyId: mongoose.Types.ObjectId | null;
 }
 
 const CourseSchema: Schema = new Schema(
