@@ -37,3 +37,4 @@ Default config works for local development. The backend connects to `localhost:6
 ## Notes
 - Backend uses MongoDB, Cloudinary, Firebase, and Resend (see `backend/config/`)
 - For more details, see `.github/copilot-instructions.md` and `frontend/README.md`
+.
