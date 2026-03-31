@@ -286,15 +286,15 @@ export default function Registrants() {
 					</div>
 					<button
 						className="px-4 py-2 bg-[#7b4899] text-white rounded-md hover:bg-[#6a3e83] transition-colors duration-200 text-sm font-medium min-w-max"
-						onClick={handleDownloadCSV}
-					>
-						Download as CSV
-					</button>
-					<button
-						className="px-4 py-2 bg-[#7b4899] text-white rounded-md hover:bg-[#6a3e83] transition-colors duration-200 text-sm font-medium min-w-max"
 						onClick={() => setIsModalOpen(true)}
 					>
 						+ Add New User
+					</button>
+					<button
+						className="px-4 py-2 bg-[#7b4899] text-white rounded-md hover:bg-[#6a3e83] transition-colors duration-200 text-sm font-medium min-w-max"
+						onClick={handleDownloadCSV}
+					>
+						Download as CSV
 					</button>
 				</div>
 
