@@ -138,14 +138,14 @@ export default function SurveyCard({
 								onClick={handleEditClick}
 							>
 								<Plus className="w-4 h-4" />
-								Create New Survey
+								Create Or Select Survey
 							</button>
-							<button
+							{/* <button
 								className="text-[#8757A3] border border-[#8757A3] py-2.5 px-4 rounded-md w-full transition hover:bg-[#8757A3] hover:text-white"
 								onClick={handleEditClick}
 							>
 								Use Existing Survey
-							</button>
+							</button> */}
 						</div>
 					</>
 				)}
