@@ -387,6 +387,7 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 								setCertificateCompleted={setCertificateCompleted}
 								courseName={courseDetailsData.className}
 								certificate={certificateCompleted}
+								surveyId={courseDetailsData.surveyId || null}
 							/>
 						</div>
 					</div>
@@ -487,6 +488,7 @@ const DisplayBar = ({
 	certificate,
 	courseName,
 	creditHours,
+	surveyId,
 }: {
 	creditHours: number;
 	time: Date;
@@ -502,6 +504,7 @@ const DisplayBar = ({
 	setSurveyCompleted: any;
 	setCertificateCompleted: any;
 	courseName: string;
+	surveyId: string | null;
 }) => {
 	const [currentPage, setCurrentPage] = useState("Workshop");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
@@ -903,23 +906,32 @@ const DisplayBar = ({
 					{currentPage === "Survey" && (
 						<div className="text-sm font-normal flex flex-col gap-3">
 							<div className="flex flex-col text-xs">
-								<p
-									className={workshop ? "hidden text-red-600" : "text-red-600"}
-								>
-									Complete workshop to access survey. (For in person events,
-									this may take a couple of days to update.)
-								</p>
-								<button
-									className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 bg-orange-400 disabled:bg-gray-400 disabled:cursor-not-allowed bg-[#F79518]}`}
-									disabled={!workshop || survey}
-									onClick={() => setIsSurveyModalOpen(true)}
-								>
-									{survey ? "Already Completed Survey" : "Begin Survey"}
-								</button>
+								{!surveyId ? (
+									<p className="text-gray-500">
+										No survey configured for this course.
+									</p>
+								) : (
+									<>
+										<p
+											className={workshop ? "hidden text-red-600" : "text-red-600"}
+										>
+											Complete workshop to access survey. (For in person events,
+											this may take a couple of days to update.)
+										</p>
+										<button
+											className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 bg-orange-400 disabled:bg-gray-400 disabled:cursor-not-allowed bg-[#F79518]}`}
+											disabled={!workshop || survey}
+											onClick={() => setIsSurveyModalOpen(true)}
+										>
+											{survey ? "Already Completed Survey" : "Begin Survey"}
+										</button>
+									</>
+								)}
 								<SurveyModal
 									isOpen={isSurveyModalOpen}
 									onClose={() => setIsSurveyModalOpen(false)}
 									courseId={courseId}
+									surveyId={surveyId || null}
 									setSurveyCompleted={setSurveyCompleted}
 								></SurveyModal>
 							</div>

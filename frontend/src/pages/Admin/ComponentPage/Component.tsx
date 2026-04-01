@@ -34,7 +34,7 @@ function Button({ children, className }: ButtonProps) {
 
 interface InclusiveSupportPageProps {
 	workshop: any;
-	survey: any;
+	survey?: any;
 	certificate: any;
 }
 export default function Component({

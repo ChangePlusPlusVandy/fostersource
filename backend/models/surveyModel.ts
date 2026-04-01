@@ -5,14 +5,23 @@ import { IQuestion } from "./questionModel";
 export interface ISurvey extends Document {
 	// Define fields here:
 	id: string;
+	name: string;
 	questions: mongoose.Types.ObjectId[];
-	courseId: mongoose.Types.ObjectId;
+	courseIds: mongoose.Types.ObjectId[];
+	version: number;
+	parentSurveyId: mongoose.Types.ObjectId | null;
+	isActive: boolean;
 }
 
 // Define the schema with placeholders for fields (others will fill this in)
 const surveySchema: Schema = new Schema(
 	{
 		// Define fields here:
+		name: {type: String, required: true},
+		courseIds: [{type: Schema.Types.ObjectId, ref: "Course"}],
+		version: {type: Number, default: 1},
+		parentSurveyId: {type: Schema.Types.ObjectId, ref: "Survey", default: null},
+		isActive: {type: Boolean, default: true}, 
 		questions: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
