@@ -31,6 +31,7 @@ export default function CatalogCourseComponent({
 	setCartItemCount,
 	isInCart,
 	isLoggedIn,
+	onAddToCart,
 }: CatalogCourseComponentProps) {
 	const storedUser = useMemo(() => {
 		if (!isLoggedIn) {
@@ -121,6 +122,7 @@ export default function CatalogCourseComponent({
 			setCartItemCount(
 				localStorage.user ? JSON.parse(localStorage.user).cart.length : 0
 			);
+			onAddToCart(course.className);
 		});
 	}
 
