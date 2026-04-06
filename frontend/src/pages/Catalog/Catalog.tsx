@@ -9,6 +9,7 @@ import {
 	addToCart,
 	insertCoursesIndividually,
 } from "../../services/registrationServices";
+import Toast from "./Toast";
 
 interface CatalogProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
@@ -32,6 +33,17 @@ export default function Catalog({
 		const storedUser = localStorage.getItem("user");
 		return storedUser ? JSON.parse(storedUser).cart || [] : [];
 	});
+
+	// Toast state
+	const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+	const showToast = (courseName: string) => {
+		setToastMessage(courseName);
+	};
+
+	const dismissToast = () => {
+		setToastMessage(null);
+	};
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -279,6 +291,7 @@ export default function Catalog({
 								setCartItemCount={setCartItemCount}
 								isInCart={cart.some((c) => c._id === course._id)}
 								isLoggedIn={isLoggedIn}
+								onAddToCart={showToast}
 							/>
 						))
 					) : (
@@ -286,6 +299,16 @@ export default function Catalog({
 					)}
 				</div>
 			</div>
+
+			{/* Toast notification */}
+			{toastMessage && (
+				<Toast
+					message={toastMessage}
+					onDismiss={dismissToast}
+					duration={60000}
+				/>
+			)}
+
 			{/*<div>*/}
 			{/*	<p onClick={() => registerAll()}> DEBUG ONLY: Add all courses individually to mongo</p>*/}
 			{/*</div>*/}

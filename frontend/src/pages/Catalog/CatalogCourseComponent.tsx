@@ -17,6 +17,7 @@ interface CatalogCourseComponentProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
 	isInCart: boolean;
 	isLoggedIn: boolean;
+	onAddToCart: (courseName: string) => void;
 }
 
 type RegistrationStatus =
