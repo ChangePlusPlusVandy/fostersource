@@ -38,10 +38,16 @@ export default function Registrants() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [userSearch, setUserSearch] = useState("");
 	const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
+	const [hasSearchedUsers, setHasSearchedUsers] = useState(false);
 	const [isSearching, setIsSearching] = useState(false);
-	const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
+	const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(
+		null
+	);
 	const [isEnrolling, setIsEnrolling] = useState(false);
-	const [enrollMessage, setEnrollMessage] = useState<{ text: string; isError: boolean } | null>(null);
+	const [enrollMessage, setEnrollMessage] = useState<{
+		text: string;
+		isError: boolean;
+	} | null>(null);
 
 	const fetchRegistrants = useCallback(async () => {
 		setIsLoading(true);
@@ -155,11 +161,14 @@ export default function Registrants() {
 
 	const handleSearchUsers = async () => {
 		if (!userSearch.trim()) return;
+		setHasSearchedUsers(true);
 		setIsSearching(true);
 		setSearchResults([]);
 		setSelectedUser(null);
 		try {
-			const res = await apiClient.get(`/users?search=${encodeURIComponent(userSearch)}&pagination=false`);
+			const res = await apiClient.get(
+				`/users?search=${encodeURIComponent(userSearch)}&pagination=false`
+			);
 			setSearchResults(res.data.users || []);
 		} catch {
 			setSearchResults([]);
@@ -179,16 +188,28 @@ export default function Registrants() {
 			});
 			const result = res.data.results?.[0];
 			if (result?.status === "already-enrolled") {
-				setEnrollMessage({ text: "This user is already enrolled in the course.", isError: true });
+				setEnrollMessage({
+					text: "This user is already enrolled in the course.",
+					isError: true,
+				});
 			} else if (result?.status === "waitlisted") {
-				setEnrollMessage({ text: "User has been added to the waitlist.", isError: false });
+				setEnrollMessage({
+					text: "User has been added to the waitlist.",
+					isError: false,
+				});
 				await fetchRegistrants();
 			} else {
-				setEnrollMessage({ text: `${selectedUser.name} has been enrolled successfully.`, isError: false });
+				setEnrollMessage({
+					text: `${selectedUser.name} has been enrolled successfully.`,
+					isError: false,
+				});
 				await fetchRegistrants();
 			}
 		} catch (err: any) {
-			setEnrollMessage({ text: err?.response?.data?.message || "Enrollment failed.", isError: true });
+			setEnrollMessage({
+				text: err?.response?.data?.message || "Enrollment failed.",
+				isError: true,
+			});
 		} finally {
 			setIsEnrolling(false);
 		}
@@ -198,6 +219,7 @@ export default function Registrants() {
 		setIsModalOpen(false);
 		setUserSearch("");
 		setSearchResults([]);
+		setHasSearchedUsers(false);
 		setSelectedUser(null);
 		setEnrollMessage(null);
 	};
@@ -301,7 +323,9 @@ export default function Registrants() {
 				{isModalOpen && (
 					<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
 						<div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 flex flex-col gap-4">
-							<h2 className="text-lg font-semibold text-gray-800">Enroll a User</h2>
+							<h2 className="text-lg font-semibold text-gray-800">
+								Enroll a User
+							</h2>
 
 							<div className="flex gap-2">
 								<input
@@ -330,24 +354,33 @@ export default function Registrants() {
 											onClick={() => setSelectedUser(user)}
 										>
 											<span className="text-gray-800">{user.name}</span>
-											<span className="text-gray-400 ml-2 text-xs">{user.email}</span>
+											<span className="text-gray-400 ml-2 text-xs">
+												{user.email}
+											</span>
 										</li>
 									))}
 								</ul>
 							)}
 
-							{searchResults.length === 0 && userSearch && !isSearching && (
-								<p className="text-sm text-gray-400">No users found.</p>
-							)}
+							{hasSearchedUsers &&
+								searchResults.length === 0 &&
+								userSearch.trim() &&
+								!isSearching && (
+									<p className="text-sm text-gray-400">No users found.</p>
+								)}
 
 							{selectedUser && (
 								<p className="text-sm text-gray-600">
-									Selected: <span className="font-medium">{selectedUser.name}</span> ({selectedUser.email})
+									Selected:{" "}
+									<span className="font-medium">{selectedUser.name}</span> (
+									{selectedUser.email})
 								</p>
 							)}
 
 							{enrollMessage && (
-								<p className={`text-sm ${enrollMessage.isError ? "text-red-500" : "text-green-600"}`}>
+								<p
+									className={`text-sm ${enrollMessage.isError ? "text-red-500" : "text-green-600"}`}
+								>
 									{enrollMessage.text}
 								</p>
 							)}
