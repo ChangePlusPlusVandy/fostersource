@@ -17,6 +17,7 @@ interface CatalogCourseComponentProps {
 	setCartItemCount: Dispatch<SetStateAction<number>>;
 	isInCart: boolean;
 	isLoggedIn: boolean;
+	onAddToCart: (courseName: string) => void;
 }
 
 type RegistrationStatus =
@@ -30,6 +31,7 @@ export default function CatalogCourseComponent({
 	setCartItemCount,
 	isInCart,
 	isLoggedIn,
+	onAddToCart,
 }: CatalogCourseComponentProps) {
 	const storedUser = useMemo(() => {
 		if (!isLoggedIn) {
@@ -120,6 +122,7 @@ export default function CatalogCourseComponent({
 			setCartItemCount(
 				localStorage.user ? JSON.parse(localStorage.user).cart.length : 0
 			);
+			onAddToCart(course.className);
 		});
 	}
 
