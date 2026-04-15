@@ -3,6 +3,7 @@ import { FaTrashAlt as _FaTrashAlt } from "react-icons/fa";
 import { ComponentType } from "react";
 import { useParams } from "react-router-dom";
 import apiClient from "../../../services/apiClient";
+import adminApiClient from "../../../services/adminApiClient";
 
 const FaTrashAlt = _FaTrashAlt as ComponentType<{
 	size?: number;
@@ -48,7 +49,7 @@ export default function Registrants() {
 		text: string;
 		isError: boolean;
 	} | null>(null);
-
+	const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
 	const fetchRegistrants = useCallback(async () => {
 		setIsLoading(true);
 		setError(null);
@@ -224,9 +225,21 @@ export default function Registrants() {
 		setEnrollMessage(null);
 	};
 
-	const handleDelete = (id: string) => {
-		console.log("Delete user:", id);
-		setRegistrants((prev) => prev.filter((r) => r.id !== id));
+	const handleDelete = async (id: string) => {
+		setIsDeletingId(id);
+		try {
+			await adminApiClient.post(`/courses/${courseId}/drop`, { userId: id });
+			setRegistrants((prev) => prev.filter((r) => r.id !== id));
+		} catch (error: any) {
+			const errorMsg = error?.response?.data?.message;
+			if (error?.response?.status === 409) {
+				alert("Cannot remove user who has already completed the course.");
+			} else {
+				alert(errorMsg || "Failed to remove user from course.");
+			}
+		} finally {
+			setIsDeletingId(null);
+		}
 	};
 
 	const handleDownloadCSV = () => {
@@ -440,10 +453,15 @@ export default function Registrants() {
 										<td className="px-4 py-3 text-center">
 											<button
 												onClick={() => handleDelete(registrant.id)}
-												className="text-red-500 hover:text-red-700"
+												className="text-red-500 hover:text-red-700 disabled:opacity-50"
+												disabled={isDeletingId === registrant.id}
 												aria-label={`Delete ${registrant.fullName}`}
 											>
-												<FaTrashAlt />
+												{isDeletingId === registrant.id ? (
+													"..."
+												) : (
+													<FaTrashAlt />
+												)}
 											</button>
 										</td>
 									</tr>

@@ -4,6 +4,7 @@ import Rating from "../models/ratingModel";
 import User, { IUser } from "../models/userModel";
 import Progress, { IProgress } from "../models/progressModel";
 import { emailQueue } from "../jobs/emailQueue";
+import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 
 // Define an interface for error objects
 interface ErrorWithDetails {
@@ -451,7 +452,7 @@ export const getCourseUsers = async (
 // @route   POST /api/courses/:courseId/drop
 // @access  Public
 export const dropCourseEnrollment = async (
-	req: Request,
+	req: AuthenticatedRequest,
 	res: Response
 ): Promise<void> => {
 	try {
@@ -466,11 +467,47 @@ export const dropCourseEnrollment = async (
 			return;
 		}
 
+		// Check if requester is admin/staff
+		if (!req.user?.uid) {
+			res.status(401).json({
+				success: false,
+				message: "Unauthorized.",
+			});
+			return;
+		}
+
+		const requester = await User.findOne({ firebaseId: req.user.uid }).populate(
+			"role"
+		);
+
+		const isAdmin = (requester?.role as any)?.name?.toLowerCase() === "staff";
+		if (!isAdmin) {
+			res.status(403).json({
+				success: false,
+				message: "Only admins can remove users from courses.",
+			});
+			return;
+		}
+
 		const course = await Course.findById(courseId);
 		if (!course) {
 			res.status(404).json({
 				success: false,
 				message: "Course not found.",
+			});
+			return;
+		}
+
+		// Check if user has completed the course
+		const userProgress = await Progress.findOne({
+			course: courseId,
+			user: userId,
+		});
+
+		if (userProgress?.isComplete) {
+			res.status(409).json({
+				success: false,
+				message: "Cannot remove user who has already completed the course.",
 			});
 			return;
 		}
