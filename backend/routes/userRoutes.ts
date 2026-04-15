@@ -10,6 +10,7 @@ import {
 	startImpersonation,
 	stopImpersonation,
 	getImpersonationStatus,
+	completeInitialPasswordReset,
 } from "../controllers/userController";
 
 const router = express.Router();
@@ -18,6 +19,7 @@ router.get("/is-admin", checkAdmin);
 router.get("/impersonation/status", getImpersonationStatus);
 router.post("/:targetUserId/impersonate", startImpersonation);
 router.post("/impersonation/stop", stopImpersonation);
+router.post("/me/password-reset-complete", completeInitialPasswordReset);
 
 // GET all users or by filter
 router.get("/", getUsers);

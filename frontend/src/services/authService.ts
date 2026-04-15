@@ -23,6 +23,11 @@ interface RegisterCredentials {
 	zip: string;
 	country: string;
 }
+
+interface LoginResponse {
+	requiresPasswordReset: boolean;
+}
+
 class AuthService {
 	private static instance: AuthService;
 	private authState: AuthState = {
@@ -63,7 +68,7 @@ class AuthService {
 		}
 	}
 
-	async login(email: string, password: string): Promise<void> {
+	async login(email: string, password: string): Promise<LoginResponse> {
 		try {
 			const userCredential = await auth.signInWithEmailAndPassword(
 				email,
@@ -90,8 +95,13 @@ class AuthService {
 			);
 
 			const user = response.data.user;
+			const requiresPasswordReset = Boolean(
+				response.data.requiresPasswordReset
+			);
 
 			await this.updateAuthState(user, firebaseToken);
+
+			return { requiresPasswordReset };
 		} catch (error: any) {
 			console.error("Login error:", error);
 			throw new Error(error.message || "Login failed. Please try again.");
