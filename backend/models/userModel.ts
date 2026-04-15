@@ -6,6 +6,8 @@ import { IUserType } from "./userTypeModel";
 export interface IUser extends Document {
 	firebaseId: string;
 	email: string;
+	createdByAdmin: boolean;
+	mustResetPassword: boolean;
 	isColorado: boolean;
 	role: mongoose.Types.ObjectId | IUserType;
 	name: string;
@@ -27,6 +29,8 @@ const userSchema: Schema = new Schema(
 	{
 		firebaseId: { type: String, required: true },
 		email: { type: String, required: true },
+		createdByAdmin: { type: Boolean, default: false },
+		mustResetPassword: { type: Boolean, default: false },
 		isColorado: { type: Boolean, required: true },
 		role: {
 			type: Schema.Types.ObjectId,

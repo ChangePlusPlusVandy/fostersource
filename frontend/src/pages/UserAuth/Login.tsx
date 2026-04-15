@@ -17,7 +17,12 @@ const Login: React.FC = () => {
 		setIsLoading(true);
 
 		try {
-			await authService.login(email, password);
+			const loginResult = await authService.login(email, password);
+
+			if (loginResult.requiresPasswordReset) {
+				window.location.href = "/change-password-now";
+				return;
+			}
 
 			window.location.href = "/catalog";
 		} catch (err: any) {
