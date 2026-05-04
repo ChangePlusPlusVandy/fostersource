@@ -102,6 +102,8 @@ export const createUser = async (
 		const newUser = new User({
 			firebaseId,
 			email,
+			createdByAdmin: false,
+			mustResetPassword: false,
 			name,
 			role,
 			isColorado,
@@ -184,6 +186,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
 		res.status(200).json({
 			user,
+			requiresPasswordReset: user.createdByAdmin && user.mustResetPassword,
 			message: "Login successful",
 		});
 	} catch (error) {

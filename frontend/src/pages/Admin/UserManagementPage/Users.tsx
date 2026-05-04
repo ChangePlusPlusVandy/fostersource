@@ -13,7 +13,7 @@ import impersonationService from "../../../services/impersonationService";
 import Select from "react-select";
 import countryList from "react-select-country-list";
 import { UserType } from "../../../shared/types";
-import { auth } from "../../../services/firebaseConfig";
+import firebase, { auth } from "../../../services/firebaseConfig";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
@@ -242,15 +242,24 @@ const UserManagementPage: React.FC = () => {
 				const tempPassword = generateTempPassword();
 				let firebaseUid = "";
 
-				// 2. Create the Firebase Auth account first
+				// 2. Create the Firebase Auth account in a secondary app so admin session remains signed in
+				let secondaryApp: firebase.app.App | null = null;
 				try {
-					const userCredential = await auth.createUserWithEmailAndPassword(
-						userForm.email,
-						tempPassword
+					const secondaryAppName = `admin-user-create-${Date.now()}`;
+					secondaryApp = firebase.initializeApp(
+						auth.app.options,
+						secondaryAppName
 					);
+					const secondaryAuth = secondaryApp.auth();
 
-					// Grab the unique ID Firebase just generated!
+					const userCredential =
+						await secondaryAuth.createUserWithEmailAndPassword(
+							userForm.email,
+							tempPassword
+						);
+
 					firebaseUid = userCredential.user?.uid || "";
+					await secondaryAuth.signOut();
 
 					alert(
 						`Success! Firebase account created. Temporary Password: ${tempPassword}`
@@ -258,7 +267,18 @@ const UserManagementPage: React.FC = () => {
 				} catch (firebaseError: any) {
 					console.error("Firebase creation error:", firebaseError);
 					alert("Failed to create Firebase account: " + firebaseError.message);
-					return; // Stop the function here if Firebase fails
+					return;
+				} finally {
+					if (secondaryApp) {
+						try {
+							await secondaryApp.delete();
+						} catch (cleanupError) {
+							console.error(
+								"Secondary Firebase app cleanup error:",
+								cleanupError
+							);
+						}
+					}
 				}
 
 				// 3. Create the user object in the database WITH the firebaseId

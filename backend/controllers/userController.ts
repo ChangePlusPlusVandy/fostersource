@@ -100,7 +100,7 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const getOrCreateUser = async (
-	req: Request,
+	req: AuthenticatedRequest,
 	res: Response
 ): Promise<void> => {
 	try {
@@ -130,9 +130,19 @@ export const getOrCreateUser = async (
 			return;
 		}
 
+		let createdByAdmin = false;
+		if (req.user?.uid) {
+			const actor = await User.findOne({ firebaseId: req.user.uid }).populate(
+				"role"
+			);
+			createdByAdmin = isStaffRole((actor?.role as any)?.name);
+		}
+
 		const newUser = new User({
 			firebaseId,
 			email,
+			createdByAdmin,
+			mustResetPassword: createdByAdmin,
 			isColorado,
 			role,
 			name,
@@ -155,6 +165,39 @@ export const getOrCreateUser = async (
 			.json({ user: savedUser, message: "User created successfully" });
 	} catch (error) {
 		res.status(400).json({ message: "Failed to get or create user", error });
+	}
+};
+
+export const completeInitialPasswordReset = async (
+	req: AuthenticatedRequest,
+	res: Response
+): Promise<void> => {
+	try {
+		if (!req.user?.uid) {
+			res.status(401).json({ message: "Unauthorized" });
+			return;
+		}
+
+		const user = await User.findOneAndUpdate(
+			{ firebaseId: req.user.uid },
+			{ $set: { mustResetPassword: false } },
+			{ new: true }
+		);
+
+		if (!user) {
+			res.status(404).json({ message: "User not found" });
+			return;
+		}
+
+		res.status(200).json({
+			message: "Initial password reset completed",
+			user,
+		});
+	} catch (error) {
+		res.status(500).json({
+			message: "Error completing initial password reset",
+			error,
+		});
 	}
 };
 

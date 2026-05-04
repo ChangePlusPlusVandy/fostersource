@@ -10,6 +10,7 @@ import Login from "../pages/UserAuth/Login";
 import Register from "../pages/UserAuth/Register";
 import ResetPassword from "../pages/UserAuth/resetPassword";
 import ResetPasswordForm from "../pages/UserAuth/resetPasswordForm";
+import ChangePasswordNow from "../pages/UserAuth/changePasswordNow";
 import CoursePage from "../pages/courseDetailPage/courseDetailsPage";
 import DiscountPage from "../pages/Admin/DiscountPage/Discount";
 import SpeakerPage from "../pages/Admin/SpeakerPage/Speaker";
@@ -68,7 +69,8 @@ function RoutesAndLayout({
 	const isAuthRoute =
 		location.pathname.startsWith("/login") ||
 		location.pathname.startsWith("/register") ||
-		location.pathname.startsWith("/reset-password");
+		location.pathname.startsWith("/reset-password") ||
+		location.pathname.startsWith("/change-password-now");
 
 	const isAdminRoute = location.pathname.startsWith("/admin");
 
@@ -212,6 +214,14 @@ function RoutesAndLayout({
 					<Route path="/login" element={<Login />} />
 					<Route path="/register" element={<Register />} />
 					<Route path="/reset-password" element={<ResetPassword />} />
+					<Route
+						path="/change-password-now"
+						element={
+							<PrivateRoute>
+								<ChangePasswordNow />
+							</PrivateRoute>
+						}
+					/>
 					<Route
 						path="/reset-password/:token"
 						element={<ResetPasswordForm />}

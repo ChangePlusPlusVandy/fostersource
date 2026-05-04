@@ -22,6 +22,7 @@ export default function SurveyModal({
 	const [questionNumber, setQuestionNumber] = useState<number>(0);
 	const [surveyQuestions, setSurveyQuestions] = useState<any[]>([]);
 	const [responses, setResponses] = useState<{ [key: string]: string }>({});
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (!surveyId) return;
@@ -53,14 +54,19 @@ export default function SurveyModal({
 	};
 
 	async function handleNextQuestion() {
+		if (isSubmitting) return;
+
 		if (questionNumber < surveyQuestions.length - 1) {
 			setQuestionNumber(questionNumber + 1);
 		} else {
+			if (!isCurrentAnswered) return;
+
+			setIsSubmitting(true);
 			try {
 				const userId = JSON.parse(localStorage.user)._id;
 
 				// Create question responses
-				let responseIds = [];
+				const responseIds: string[] = [];
 				for (let id of Object.keys(responses)) {
 					const response = await apiClient.post("questionResponses", {
 						userId,
@@ -89,11 +95,12 @@ export default function SurveyModal({
 					progressBody
 				);
 				setSurveyCompleted(true);
+				onClose();
 			} catch (error) {
 				console.error(error);
+			} finally {
+				setIsSubmitting(false);
 			}
-
-			onClose();
 		}
 	}
 
@@ -115,6 +122,7 @@ export default function SurveyModal({
 					onClick={onClose}
 					className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
 					aria-label="Close"
+					disabled={isSubmitting}
 				>
 					&times;
 				</button>
@@ -141,7 +149,7 @@ export default function SurveyModal({
 				<button
 					onClick={handlePreviousQuestion}
 					className="mt-6 px-6 py-3 bg-orange-400 hover:bg-orange-500 text-white font-semibold rounded-lg transition-all disabled:bg-orange-200"
-					disabled={questionNumber === 0}
+					disabled={questionNumber === 0 || isSubmitting}
 				>
 					Previous
 				</button>
@@ -149,12 +157,17 @@ export default function SurveyModal({
 				<button
 					onClick={handleNextQuestion}
 					className={`mt-6 px-6 py-3 text-white font-semibold rounded-lg transition-all ${
-						isCurrentAnswered
+						isCurrentAnswered && !isSubmitting
 							? "bg-orange-400 hover:bg-orange-500"
 							: "bg-orange-200 cursor-not-allowed"
 					}`}
+					disabled={!isCurrentAnswered || isSubmitting}
 				>
-					{questionNumber < surveyQuestions.length - 1 ? "Next" : "Finish"}
+					{isSubmitting
+						? "Submitting..."
+						: questionNumber < surveyQuestions.length - 1
+							? "Next"
+							: "Finish"}
 				</button>
 			</div>
 		</div>
