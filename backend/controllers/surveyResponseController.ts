@@ -14,13 +14,14 @@ export const getSurveyResponses = async (
 	res: Response
 ): Promise<void> => {
 	try {
-		const { userId, surveyId, courseId, startDate, endDate } = req.query;
+		const { userId, surveyId, courseId, startDate, endDate, phase } = req.query;
 
 		let filter: any = {};
 
 		if (userId) filter.userId = userId;
 		if (surveyId) filter.surveyId = surveyId;
 		if (courseId) filter.courseId = courseId;
+		if (phase === "pre" || phase === "post") filter.phase = phase;
 
 		if (startDate || endDate) {
 			filter.dateCompleted = {};
@@ -62,7 +63,7 @@ export const createSurveyResponse = async (
 ): Promise<void> => {
 	try {
 		// answers are a list of QuestionResponse IDs and QuestionResponse objects must be created first before calling this endpoint
-		const { userId, answers, surveyId, courseId } = req.body;
+		const { userId, answers, surveyId, courseId, phase } = req.body;
 
 		if (!userId || !answers || answers.length === 0) {
 			res.status(400).json({
@@ -80,12 +81,20 @@ export const createSurveyResponse = async (
 			return;
 		}
 
+		if (phase !== "pre" && phase !== "post") {
+			res.status(400).json({
+				success: false,
+				message: "Please provide a valid phase ('pre' or 'post').",
+			});
+			return;
+		}
 
 		const newSurveyResponse = new SurveyResponse({
 			userId,
 			answers,
 			surveyId,
 			courseId,
+			phase,
 		});
 
 		const savedSurveyResponse = await newSurveyResponse.save();
@@ -152,18 +161,23 @@ export const deleteSurveyResponse = async (req: Request, res: Response): Promise
 // }
 export const getSurveyResponseStats = async (req: Request, res: Response): Promise<void> => {
 	try {
-		const { surveyId, courseId } = req.query;
+		const { surveyId, courseId, phase } = req.query;
 		const matchStage: any = {};
 
 		if (surveyId) matchStage.surveyId = new mongoose.Types.ObjectId(surveyId as string);
 		if (courseId) matchStage.courseId = new mongoose.Types.ObjectId(courseId as string);
+		if (phase === "pre" || phase === "post") matchStage.phase = phase;
 
-		// Group responses by survey + courses
+		// Group responses by survey + course + phase
 		const grouped = await SurveyResponse.aggregate([
 			{ $match: matchStage },
 			{
 				$group: {
-					_id: { surveyId: "$surveyId", courseId: "$courseId" },
+					_id: {
+						surveyId: "$surveyId",
+						courseId: "$courseId",
+						phase: { $ifNull: ["$phase", "post"] },
+					},
 					totalResponses: { $sum: 1 },
 				},
 			},
@@ -177,15 +191,24 @@ export const getSurveyResponseStats = async (req: Request, res: Response): Promi
 
 			if (!survey) continue;
 
-			// Get all QuestionResponse IDs for this survey+course combo
-			const answerIds = await SurveyResponse.find({
+			// Get all QuestionResponse IDs for this survey+course+phase combo
+			const phaseFilter: any = {
 				surveyId: group._id.surveyId,
 				courseId: group._id.courseId,
-			}).distinct("answers");
+			};
+			if (group._id.phase === "pre") {
+				phaseFilter.phase = "pre";
+			} else {
+				phaseFilter.$or = [{ phase: "post" }, { phase: { $exists: false } }];
+			}
+			const answerIds = await SurveyResponse.find(phaseFilter).distinct("answers");
 
-			// For each question in the survey, calculate breakdown of answers
+			// For each question in the survey matching this phase, calculate breakdown
+			const phaseQuestions = (survey.questions as any[]).filter(
+				(q) => (q.phase || "post") === group._id.phase
+			);
 			const questionStats = [];
-			for (const question of survey.questions as any[]) {
+			for (const question of phaseQuestions) {
 				const questionResponses = await QuestionResponse.find({
 					questionId: question._id,
 					_id: { $in: answerIds },
@@ -217,6 +240,7 @@ export const getSurveyResponseStats = async (req: Request, res: Response): Promi
 				surveyVersion: survey.version,
 				courseId: group._id.courseId,
 				courseName: course?.className || "Unknown Course",
+				phase: group._id.phase,
 				totalResponses: group.totalResponses,
 				questions: questionStats,
 			});
@@ -233,11 +257,12 @@ export const getSurveyResponseStats = async (req: Request, res: Response): Promi
 // @route   GET /api/surveyResponses/export?surveyId=&courseId=&format=row-per-response|row-per-answer
 export const exportSurveyResponses = async (req: Request, res: Response): Promise<void> => {
 	try {
-		const { surveyId, courseId, format = "row-per-response" } = req.query;
+		const { surveyId, courseId, format = "row-per-response", phase } = req.query;
 		const filter: any = {};
- 
+
 		if (surveyId) filter.surveyId = surveyId;
 		if (courseId) filter.courseId = courseId;
+		if (phase === "pre" || phase === "post") filter.phase = phase;
  
 		const responses = await SurveyResponse.find(filter)
 			.populate("answers")
@@ -256,19 +281,20 @@ export const exportSurveyResponses = async (req: Request, res: Response): Promis
 		if (format === "row-per-answer") {
 			// Normalized: one row per question-answer pair
 			const headers = [
-				"SurveyName", "CourseName", "UserId", "SubmittedAt",
+				"SurveyName", "CourseName", "Phase", "UserId", "SubmittedAt",
 				"QuestionId", "QuestionText", "AnswerType", "Answer",
 			];
- 
+
 			const rows: string[][] = [];
 			for (const resp of responses as any[]) {
 				const surveyName = resp.surveyId?.name || "Unknown";
 				const courseName = resp.courseId?.className || "Unknown";
- 
+				const respPhase = resp.phase || "post";
+
 				for (const answer of resp.answers) {
 					const question = await Question.findById(answer.questionId);
 					rows.push([
-						surveyName, courseName, resp.userId,
+						surveyName, courseName, respPhase, resp.userId,
 						resp.createdAt?.toISOString() || "",
 						answer.questionId?.toString() || "",
 						question?.question || "",
@@ -297,22 +323,23 @@ export const exportSurveyResponses = async (req: Request, res: Response): Promis
 			}
  
 			const headers = [
-				"SurveyName", "CourseName", "UserId", "SubmittedAt",
+				"SurveyName", "CourseName", "Phase", "UserId", "SubmittedAt",
 				...allQuestions.map((q, i) => `${i + 1}. ${q.question}`),
 			];
- 
+
 			const rows: string[][] = [];
 			for (const resp of responses as any[]) {
 				const surveyName = resp.surveyId?.name || "Unknown";
 				const courseName = resp.courseId?.className || "Unknown";
- 
+				const respPhase = resp.phase || "post";
+
 				const answerMap = new Map<string, string>();
 				for (const answer of resp.answers) {
 					answerMap.set(answer.questionId?.toString() || "", answer.answer || "");
 				}
- 
+
 				rows.push([
-					surveyName, courseName, resp.userId,
+					surveyName, courseName, respPhase, resp.userId,
 					resp.createdAt?.toISOString() || "",
 					...allQuestions.map((q) => answerMap.get(q._id.toString()) || ""),
 				]);

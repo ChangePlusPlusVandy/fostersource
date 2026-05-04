@@ -60,7 +60,10 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 	const [hasProgress, setHasProgress] = useState<boolean | null>(null);
 	const [progress, setProgress] = useState<Progress | null>(null);
 	const [workshopCompleted, setWorkshopCompleted] = useState<boolean>(false);
-	const [surveyCompleted, setSurveyCompleted] = useState<boolean>(false);
+	const [preSurveyCompleted, setPreSurveyCompleted] =
+		useState<boolean>(false);
+	const [postSurveyCompleted, setPostSurveyCompleted] =
+		useState<boolean>(false);
 	const [certificateCompleted, setCertificateCompleted] =
 		useState<boolean>(false);
 	const [isDroppingCourse, setIsDroppingCourse] = useState(false);
@@ -84,9 +87,18 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 				} else {
 					setHasProgress(true);
 					setProgress(progress);
-					setWorkshopCompleted(progress.completedComponents.webinar);
-					setSurveyCompleted(progress.completedComponents.survey);
-					setCertificateCompleted(progress.completedComponents.certificate);
+					const cc = progress.completedComponents || {};
+					setWorkshopCompleted(Boolean(cc.webinar));
+					// Fall back to legacy `survey` flag when pre/post fields are absent.
+					setPreSurveyCompleted(
+						cc.preSurvey !== undefined ? Boolean(cc.preSurvey) : Boolean(cc.survey)
+					);
+					setPostSurveyCompleted(
+						cc.postSurvey !== undefined
+							? Boolean(cc.postSurvey)
+							: Boolean(cc.survey)
+					);
+					setCertificateCompleted(Boolean(cc.certificate));
 					console.log("progress", response.data);
 				}
 			} catch (error) {
@@ -189,7 +201,8 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 			setHasProgress(false);
 			setProgress(null);
 			setWorkshopCompleted(false);
-			setSurveyCompleted(false);
+			setPreSurveyCompleted(false);
+			setPostSurveyCompleted(false);
 			setCertificateCompleted(false);
 		} catch (error) {
 			console.error("Error dropping course enrollment:", error);
@@ -381,9 +394,11 @@ const CoursePage = ({ setCartItemCount }: CatalogProps) => {
 								productType={courseDetailsData.productType}
 								hasProgress={hasProgress}
 								workshop={workshopCompleted}
-								survey={surveyCompleted}
+								preSurvey={preSurveyCompleted}
+								postSurvey={postSurveyCompleted}
 								setWorkshopCompleted={setWorkshopCompleted}
-								setSurveyCompleted={setSurveyCompleted}
+								setPreSurveyCompleted={setPreSurveyCompleted}
+								setPostSurveyCompleted={setPostSurveyCompleted}
 								setCertificateCompleted={setCertificateCompleted}
 								courseName={courseDetailsData.className}
 								certificate={certificateCompleted}
@@ -481,9 +496,11 @@ const DisplayBar = ({
 	productType,
 	hasProgress,
 	workshop,
-	survey,
+	preSurvey,
+	postSurvey,
 	setWorkshopCompleted,
-	setSurveyCompleted,
+	setPreSurveyCompleted,
+	setPostSurveyCompleted,
 	setCertificateCompleted,
 	certificate,
 	courseName,
@@ -498,15 +515,18 @@ const DisplayBar = ({
 	productType: string;
 	hasProgress: boolean | null;
 	workshop: boolean;
-	survey: boolean;
+	preSurvey: boolean;
+	postSurvey: boolean;
 	certificate: boolean;
 	setWorkshopCompleted: any;
-	setSurveyCompleted: any;
+	setPreSurveyCompleted: any;
+	setPostSurveyCompleted: any;
 	setCertificateCompleted: any;
 	courseName: string;
 	surveyId: string | null;
 }) => {
-	const [currentPage, setCurrentPage] = useState("Workshop");
+	const [currentPage, setCurrentPage] = useState("PreSurvey");
+	const [preSurveyColor, setPreSurveyColor] = useState("#F79518");
 	const [surveyColor, setSurveyColor] = useState("#D9D9D9");
 	const [certificateColor, setCertificateColor] = useState("#D9D9D9");
 	const [videoLink, setVideoLink] = useState<string | null>("");
@@ -738,14 +758,35 @@ const DisplayBar = ({
 				<div className="flex flex-col w-full">
 					{/* Workshop -> Survey -> Certificate */}
 					<div className="flex min-w-min h-9 mb-5">
-						{/* Workshop Button */}
+						{/* Pre-Survey Button */}
 						<button
-							className="bg-[#F79518] rounded-l-full text-center cursor-pointer w-48"
+							className="rounded-l-full text-center cursor-pointer w-48"
 							style={{
+								backgroundColor: preSurveyColor,
 								clipPath: "polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)",
 							}}
 							onClick={() => {
+								setCurrentPage("PreSurvey");
+								setPreSurveyColor("#F79518");
+								setSurveyColor("#FEC781");
+								setCertificateColor("#FEC781");
+							}}
+						>
+							<p className="flex justify-center items-center text-xs text-white font-semibold">
+								Pre-Survey
+							</p>
+						</button>
+						{/* Workshop Button */}
+						<button
+							className="text-center cursor-pointer w-48 -ml-6"
+							style={{
+								backgroundColor: workshop || !hasProgress ? "#FEC781" : "#FEC781",
+								clipPath:
+									"polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
+							}}
+							onClick={() => {
 								setCurrentPage("Workshop");
+								setPreSurveyColor("#FEC781");
 								setSurveyColor("#FEC781");
 								setCertificateColor("#FEC781");
 							}}
@@ -754,7 +795,7 @@ const DisplayBar = ({
 								Workshop
 							</p>
 						</button>
-						{/* Survey Button */}
+						{/* Post-Survey Button */}
 						<button
 							className="text-center cursor-pointer w-48 -ml-6 text-xs text-white font-semibold"
 							style={{
@@ -763,12 +804,13 @@ const DisplayBar = ({
 									"polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%, 15% 50%)",
 							}}
 							onClick={() => {
+								setPreSurveyColor("#FEC781");
 								setSurveyColor("#F79518");
 								setCertificateColor("#FEC781");
 								setCurrentPage("Survey");
 							}}
 						>
-							Survey
+							Post-Survey
 						</button>
 						{/* Certificate Button */}
 						<button
@@ -781,6 +823,7 @@ const DisplayBar = ({
 							<p
 								className="flex justify-center items-center text-xs text-white font-semibold"
 								onClick={() => {
+									setPreSurveyColor("#FEC781");
 									setSurveyColor("#F79518");
 									setCertificateColor("#F79518");
 									setCurrentPage("Certificate");
@@ -790,6 +833,35 @@ const DisplayBar = ({
 							</p>
 						</button>
 					</div>
+					{currentPage === "PreSurvey" && (
+						<div className="text-sm font-normal flex flex-col gap-3">
+							<div className="flex flex-col text-xs">
+								{!surveyId ? (
+									<p className="text-gray-500">
+										No survey configured for this course.
+									</p>
+								) : (
+									<button
+										className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 bg-orange-400 disabled:bg-gray-400 disabled:cursor-not-allowed`}
+										disabled={preSurvey}
+										onClick={() => setIsSurveyModalOpen(true)}
+									>
+										{preSurvey
+											? "Already Completed Pre-Survey"
+											: "Begin Pre-Survey"}
+									</button>
+								)}
+								<SurveyModal
+									isOpen={isSurveyModalOpen}
+									onClose={() => setIsSurveyModalOpen(false)}
+									courseId={courseId}
+									surveyId={surveyId || null}
+									setSurveyCompleted={setPreSurveyCompleted}
+									phase="pre"
+								/>
+							</div>
+						</div>
+					)}
 					{currentPage === "Workshop" && (
 						<div className="flex flex-col justify-between w-full">
 							{productType === "Virtual Training - On Demand" ? (
@@ -920,10 +992,12 @@ const DisplayBar = ({
 										</p>
 										<button
 											className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 bg-orange-400 disabled:bg-gray-400 disabled:cursor-not-allowed bg-[#F79518]}`}
-											disabled={!workshop || survey}
+											disabled={!workshop || postSurvey}
 											onClick={() => setIsSurveyModalOpen(true)}
 										>
-											{survey ? "Already Completed Survey" : "Begin Survey"}
+											{postSurvey
+												? "Already Completed Post-Survey"
+												: "Begin Post-Survey"}
 										</button>
 									</>
 								)}
@@ -932,7 +1006,8 @@ const DisplayBar = ({
 									onClose={() => setIsSurveyModalOpen(false)}
 									courseId={courseId}
 									surveyId={surveyId || null}
-									setSurveyCompleted={setSurveyCompleted}
+									setSurveyCompleted={setPostSurveyCompleted}
+									phase="post"
 								></SurveyModal>
 							</div>
 						</div>
@@ -942,12 +1017,12 @@ const DisplayBar = ({
 							Once you have completed the course, your certificate will be
 							accessible here.
 							<div className="flex flex-col text-xs text-red-600">
-								<p className={survey ? "hidden" : ""}>
+								<p className={postSurvey ? "hidden" : ""}>
 									Complete webinar to access certificate
 								</p>
 								<button
-									className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 cursor-pointer hover:bg-orange-500 transition ${!survey ? "bg-gray-400 cursor-not-allowed" : "bg-[#F79518]"}`}
-									disabled={!survey}
+									className={`w-max rounded-md text-center text-white text-xs align-middle px-6 py-3 cursor-pointer hover:bg-orange-500 transition ${!postSurvey ? "bg-gray-400 cursor-not-allowed" : "bg-[#F79518]"}`}
+									disabled={!postSurvey}
 									onClick={handleAccessCertificate}
 								>
 									Print Certificate

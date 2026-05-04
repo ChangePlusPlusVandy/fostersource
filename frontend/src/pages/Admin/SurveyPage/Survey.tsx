@@ -14,6 +14,7 @@ interface SurveyQuestion {
 	answerType: string;
 	answers: string[];
 	isRequired: boolean;
+	phase: "pre" | "post";
 	isEdited: boolean;
 }
 
@@ -70,6 +71,7 @@ const Survey = () => {
 					setQuestions(
 						(surveyData.questions || []).map((q: any) => ({
 							...q,
+							phase: q.phase || "post",
 							isEdited: false,
 						}))
 					);
@@ -102,6 +104,7 @@ const Survey = () => {
 				answerType: "Text Input",
 				answers: [""],
 				isRequired: true,
+				phase: "post",
 				isEdited: true,
 			},
 		]);
@@ -116,6 +119,14 @@ const Survey = () => {
 	const handleExplanationChange = (index: number, value: string) => {
 		const updated = [...questions];
 		updated[index].explanation = value;
+		updated[index].isEdited = true;
+		setQuestions(updated);
+		setHasUnsavedChanges(true);
+	};
+
+	const handlePhaseChange = (index: number, value: "pre" | "post") => {
+		const updated = [...questions];
+		updated[index].phase = value;
 		updated[index].isEdited = true;
 		setQuestions(updated);
 		setHasUnsavedChanges(true);
@@ -189,6 +200,7 @@ const Survey = () => {
 						answerType: q.answerType,
 						answers: q.answers || [],
 						isRequired: q.isRequired,
+						phase: q.phase || "post",
 					});
 					return response.data._id;
 				}
@@ -321,7 +333,7 @@ const Survey = () => {
 			setSurveyName(survey.name);
 			setLinkedCourseIds([...survey.courseIds, course._id]);
 			setQuestions(
-				survey.questions.map((q: any) => ({ ...q, isEdited: false }))
+				survey.questions.map((q: any) => ({ ...q, phase: q.phase || "post", isEdited: false }))
 			);
 			setShowReuseModal(false);
 			setHasUnsavedChanges(false);
@@ -344,7 +356,7 @@ const Survey = () => {
 			setSurveyName(data.name);
 			setLinkedCourseIds(data.courseIds || []);
 			setQuestions(
-				(data.questions || []).map((q: any) => ({ ...q, isEdited: false }))
+				(data.questions || []).map((q: any) => ({ ...q, phase: q.phase || "post", isEdited: false }))
 			);
 			setShowReuseModal(false);
 			setHasUnsavedChanges(false);
@@ -353,7 +365,7 @@ const Survey = () => {
 			const fetched = await apiClient.get(`/surveys/${data._id}`);
 			const full = fetched.data.survey || fetched.data;
 			setQuestions(
-				(full.questions || []).map((q: any) => ({ ...q, isEdited: false }))
+				(full.questions || []).map((q: any) => ({ ...q, phase: q.phase || "post", isEdited: false }))
 			);
 		} catch (error) {
 			console.error("Error duplicating survey:", error);
@@ -477,6 +489,26 @@ const Survey = () => {
 								<option value="Text Input">Text Input</option>
 								<option value="Multiple Choice">Multiple Choice</option>
 								<option value="Multi-select">Multi-select</option>
+							</select>
+						</div>
+
+						<div>
+							<label
+								htmlFor={`phase-${index}`}
+								className="block font-semibold text-sm"
+							>
+								Phase
+							</label>
+							<select
+								id={`phase-${index}`}
+								value={question.phase}
+								onChange={(e) =>
+									handlePhaseChange(index, e.target.value as "pre" | "post")
+								}
+								className="w-3/4 mt-2 p-3 border rounded-md"
+							>
+								<option value="pre">Pre-Survey (before course)</option>
+								<option value="post">Post-Survey (after course)</option>
 							</select>
 						</div>
 

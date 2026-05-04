@@ -8,6 +8,7 @@ interface SurveyModalProps {
 	courseId: string | null;
 	surveyId: string | null;
 	setSurveyCompleted: any;
+	phase: "pre" | "post";
 }
 
 export default function SurveyModal({
@@ -16,6 +17,7 @@ export default function SurveyModal({
 	courseId,
 	surveyId,
 	setSurveyCompleted,
+	phase,
 }: SurveyModalProps) {
 	const [questionNumber, setQuestionNumber] = useState<number>(0);
 	const [surveyQuestions, setSurveyQuestions] = useState<any[]>([]);
@@ -29,14 +31,18 @@ export default function SurveyModal({
 			try {
 				const response = await apiClient.get(`surveys/${surveyId}`);
 				const survey = response.data.survey || response.data;
-				setSurveyQuestions(survey.questions || []);
+				const all = survey.questions || [];
+				const filtered = all.filter(
+					(q: any) => (q.phase || "post") === phase
+				);
+				setSurveyQuestions(filtered);
 			} catch (error) {
 				console.error("Error fetching survey:", error);
 			}
 		};
 
 		populateQuestions();
-	}, [surveyId]);
+	}, [surveyId, phase]);
 
 	if (!isOpen) return null;
 
@@ -70,19 +76,24 @@ export default function SurveyModal({
 					responseIds.push(response.data._id);
 				}
 
-				// Create survey response with surveyId and courseId
+				// Create survey response with surveyId, courseId, and phase
 				await apiClient.post("surveyResponses", {
 					userId,
 					answers: responseIds,
 					surveyId,
 					courseId,
+					phase,
 				});
 
-				// Update progress
-				await apiClient.put(`/courses/${courseId}/progress/single/${userId}`, {
-					surveyComplete: true,
-					webinarComplete: true,
-				});
+				// Update progress (phase-aware)
+				const progressBody: Record<string, boolean> =
+					phase === "pre"
+						? { preSurveyComplete: true }
+						: { postSurveyComplete: true, webinarComplete: true };
+				await apiClient.put(
+					`/courses/${courseId}/progress/single/${userId}`,
+					progressBody
+				);
 				setSurveyCompleted(true);
 				onClose();
 			} catch (error) {
@@ -115,7 +126,9 @@ export default function SurveyModal({
 				>
 					&times;
 				</button>
-				<h2 className="text-2xl font-bold mb-6 text-center">Survey</h2>
+				<h2 className="text-2xl font-bold mb-6 text-center">
+					{phase === "pre" ? "Pre-Survey" : "Post-Survey"}
+				</h2>
 				<div className="flex-1 overflow-auto">
 					{surveyQuestions.length > 0 ? (
 						<SurveyQuestion
@@ -126,7 +139,10 @@ export default function SurveyModal({
 							onAnswerChange={handleAnswerChange}
 						/>
 					) : (
-						<p className="text-gray-600 text-center">Loading questions...</p>
+						<p className="text-gray-600 text-center">
+							No {phase === "pre" ? "pre-survey" : "post-survey"} questions
+							for this course.
+						</p>
 					)}
 				</div>
 

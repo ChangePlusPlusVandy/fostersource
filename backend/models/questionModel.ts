@@ -7,6 +7,7 @@ export interface IQuestion extends Document {
 	answerType: string;
 	answers?: string[];
 	isRequired: boolean;
+	phase: "pre" | "post";
 }
 
 // Define the schema with placeholders for fields (others will fill this in)
@@ -17,6 +18,12 @@ const QuestionSchema: Schema = new Schema(
 		answerType: { type: String, required: true },
 		answers: [{ type: String }],
 		isRequired: { type: Boolean, required: true },
+		phase: {
+			type: String,
+			enum: ["pre", "post"],
+			default: "post",
+			required: true,
+		},
 	},
 	{
 		timestamps: true,

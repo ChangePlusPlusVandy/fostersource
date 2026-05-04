@@ -108,7 +108,11 @@ export const updateSurvey = async(req: Request, res: Response) : Promise<void> =
 		// Check if there are existing responses for this survey
 		const responseCount = await SurveyResponse.countDocuments({surveyId: survey._id});
 
-		if (responseCount === 0) {
+		// If no responses AND (no partial course selection OR all courses selected), safe to update in place
+		const allCourseIds = survey.courseIds.map((id: any) => id.toString());
+		const isPartialUpdate = courseIdsToUpdate && courseIdsToUpdate.length < allCourseIds.length;
+
+		if (responseCount === 0 && !isPartialUpdate) {
 			// No responses, safe to update in place
 			if (name) survey.name = name;
 			if (questions) survey.questions = questions;
@@ -120,7 +124,7 @@ export const updateSurvey = async(req: Request, res: Response) : Promise<void> =
 			return;
 		}
 
-		const coursesToUpdate = courseIdsToUpdate || survey.courseIds.map(id => id.toString());
+		const coursesToUpdate = courseIdsToUpdate || allCourseIds;
 
 		const coursesStaying = survey.courseIds.map(id => id.toString()).filter(id => !coursesToUpdate.includes(id));
 
