@@ -3,7 +3,31 @@ import Course from "../models/courseModel";
 import Rating from "../models/ratingModel";
 import User, { IUser } from "../models/userModel";
 import Progress, { IProgress } from "../models/progressModel";
+import Survey from "../models/surveyModel";
+import Question from "../models/questionModel";
 import { emailQueue } from "../jobs/emailQueue";
+
+// Returns { hasPre, hasPost } for the survey attached to a course (if any).
+async function getSurveyPhasePresence(
+	courseId: string | { toString(): string }
+): Promise<{ hasPre: boolean; hasPost: boolean }> {
+	const course = await Course.findById(courseId).select("surveyId");
+	if (!course || !course.surveyId) return { hasPre: false, hasPost: false };
+	const survey = await Survey.findById(course.surveyId).select("questions");
+	if (!survey || !survey.questions || survey.questions.length === 0) {
+		return { hasPre: false, hasPost: false };
+	}
+	const questions = await Question.find({
+		_id: { $in: survey.questions },
+	}).select("phase");
+	let hasPre = false;
+	let hasPost = false;
+	for (const q of questions) {
+		if (q.phase === "pre") hasPre = true;
+		else hasPost = true;
+	}
+	return { hasPre, hasPost };
+}
 
 // Define an interface for error objects
 interface ErrorWithDetails {
@@ -517,7 +541,8 @@ export const dropCourseEnrollment = async (
 						isComplete: false,
 						completedComponents: {
 							webinar: false,
-							survey: false,
+							preSurvey: false,
+							postSurvey: false,
 							certificate: false,
 						},
 						dateCompleted: null,
@@ -608,7 +633,8 @@ export const getCourseProgress = async (
 					isComplete: false,
 					completedComponents: {
 						webinar: false,
-						survey: false,
+						preSurvey: false,
+						postSurvey: false,
 						certificate: false,
 					},
 					dateCompleted: null,
@@ -693,7 +719,8 @@ export const getUserCourseProgress = async (
 				isComplete: false,
 				completedComponents: {
 					webinar: false,
-					survey: false,
+					preSurvey: false,
+					postSurvey: false,
 					certificate: false,
 				},
 				dateCompleted: null,
@@ -726,13 +753,19 @@ export const updateUserProgress = async (
 ): Promise<void> => {
 	try {
 		const { courseId, userId } = req.params;
-		const { webinarComplete, surveyComplete, certificateComplete } = req.body;
+		const {
+			webinarComplete,
+			preSurveyComplete,
+			postSurveyComplete,
+			certificateComplete,
+		} = req.body;
 
 		console.log("=== Progress Update Request ===");
 		console.log("Params:", { courseId, userId });
 		console.log("Body:", {
 			webinarComplete,
-			surveyComplete,
+			preSurveyComplete,
+			postSurveyComplete,
 			certificateComplete,
 		});
 
@@ -753,11 +786,31 @@ export const updateUserProgress = async (
 
 		console.log("Found progress:", progress._id);
 
-		// Update completed components
+		// Merge with existing values so a single-phase update doesn't clobber the other.
+		const existing = progress.completedComponents || {};
+		const legacySurvey = Boolean(existing.survey);
+
+		const { hasPre, hasPost } = await getSurveyPhasePresence(courseId);
+
 		const completedComponents = {
-			webinar: Boolean(webinarComplete),
-			survey: Boolean(surveyComplete),
-			certificate: Boolean(certificateComplete),
+			webinar:
+				webinarComplete !== undefined
+					? Boolean(webinarComplete)
+					: Boolean(existing.webinar),
+			preSurvey: hasPre
+				? preSurveyComplete !== undefined
+					? Boolean(preSurveyComplete)
+					: Boolean(existing.preSurvey ?? legacySurvey)
+				: true,
+			postSurvey: hasPost
+				? postSurveyComplete !== undefined
+					? Boolean(postSurveyComplete)
+					: Boolean(existing.postSurvey ?? legacySurvey)
+				: true,
+			certificate:
+				certificateComplete !== undefined
+					? Boolean(certificateComplete)
+					: Boolean(existing.certificate),
 		};
 
 		console.log("Setting completed components:", completedComponents);
@@ -818,9 +871,16 @@ export const batchUpdateUserProgress = async (
 
 		const results: any[] = [];
 
+		const { hasPre, hasPost } = await getSurveyPhasePresence(courseId);
+
 		for (const update of updates) {
-			const { userId, webinarComplete, surveyComplete, certificateComplete } =
-				update;
+			const {
+				userId,
+				webinarComplete,
+				preSurveyComplete,
+				postSurveyComplete,
+				certificateComplete,
+			} = update;
 
 			console.log("Processing update for user:", userId);
 
@@ -839,10 +899,28 @@ export const batchUpdateUserProgress = async (
 				continue;
 			}
 
+			const existing = progress.completedComponents || {};
+			const legacySurvey = Boolean(existing.survey);
+
 			const completedComponents = {
-				webinar: Boolean(webinarComplete),
-				survey: Boolean(surveyComplete),
-				certificate: Boolean(certificateComplete),
+				webinar:
+					webinarComplete !== undefined
+						? Boolean(webinarComplete)
+						: Boolean(existing.webinar),
+				preSurvey: hasPre
+					? preSurveyComplete !== undefined
+						? Boolean(preSurveyComplete)
+						: Boolean(existing.preSurvey ?? legacySurvey)
+					: true,
+				postSurvey: hasPost
+					? postSurveyComplete !== undefined
+						? Boolean(postSurveyComplete)
+						: Boolean(existing.postSurvey ?? legacySurvey)
+					: true,
+				certificate:
+					certificateComplete !== undefined
+						? Boolean(certificateComplete)
+						: Boolean(existing.certificate),
 			};
 
 			progress.completedComponents = completedComponents;
